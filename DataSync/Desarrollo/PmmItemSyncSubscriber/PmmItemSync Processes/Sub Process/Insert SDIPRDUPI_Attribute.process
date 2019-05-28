@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/MD_BDM" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx2="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx5="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd2" xmlns:pfx6="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd5" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:pfx7="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd" xmlns:pfx8="http://xmlns.heb.com/ei/SDIPRDUPI_DATA">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/MD_BDM"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/SC_SDIVALMSI.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd2" schemaLocation="/Shared Resources/Schema Definitions/Custom/MD_CODIGOBARRAS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd5" schemaLocation="/Shared Resources/Schema Definitions/Custom/MD_ATRIBUTOS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIPRDUPI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIPRDUPI_DATA.xsd"/>
+    <pd:name>PmmItemSync Processes/Sub Process/Insert SDIPRDUPI_Attribute.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx8:SDIPRDUPI"/>
+    <pd:startX>28</pd:startX>
+    <pd:startY>243</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <KeyDuplicate>
+                <xsl:value-of select="if ($_error_Insert_BDM/ActivityErrors/pfx2:JDBCSQLException/sqlState=23000) then 1 else 0"/>
+            </KeyDuplicate>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1392</pd:endX>
+    <pd:endY>257</pd:endY>
+    <pd:errorSchemas>
+        <ErrorSchema ref="pfx3:ErrorManagementSchema"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1440522884858</pd:targetNamespace>
+    <pd:group name="Group Batch Number">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>256</pd:x>
+        <pd:y>65</pd:y>
+        <pd:width>310</pd:width>
+        <pd:height>356</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>batch number</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>batch number</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="batch number">
+            <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+            <pd:x>403</pd:x>
+            <pd:y>198</pd:y>
+            <config>
+                <timeout>%%Connections/DataBase/BDPMM/GLB_TIMEOUT%%</timeout>
+                <maxRows>%%Connections/DataBase/BDPMM/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+                <ProcedureName>BASTKEY</ProcedureName>
+                <parameterTypes>
+                    <parameter>
+                        <colName>IN_BAS_COUNTER_NAME</colName>
+                        <colType>1</colType>
+                        <dataType>12</dataType>
+                        <typeName>NCHAR</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_BAS_COUNTER_VALUE</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>OUT_BAS_COUNTER_VALUE</colName>
+                        <colType>4</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_PROCESS_LUW</colName>
+                        <colType>1</colType>
+                        <dataType>1</dataType>
+                        <typeName>CHAR</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_BATCH_COUNT</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                </parameterTypes>
+            </config>
+            <pd:inputBindings>
+                <inputs>
+                    <inputSet>
+                        <IN_BAS_COUNTER_NAME>
+                            <xsl:value-of select="'BATCH_NUMBER'"/>
+                        </IN_BAS_COUNTER_NAME>
+                        <IN_BAS_COUNTER_VALUE>
+                            <xsl:value-of select="0"/>
+                        </IN_BAS_COUNTER_VALUE>
+                        <IN_PROCESS_LUW>
+                            <xsl:value-of select="'T'"/>
+                        </IN_PROCESS_LUW>
+                        <IN_BATCH_COUNT>
+                            <xsl:value-of select="0"/>
+                        </IN_BATCH_COUNT>
+                    </inputSet>
+                </inputs>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:group name="Group SP SDIATIBA">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>997</pd:x>
+        <pd:y>72</pd:y>
+        <pd:width>292</pd:width>
+        <pd:height>341</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>SDIATIBA</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SDIATIBA</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="SDIATIBA">
+            <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+            <pd:x>1144</pd:x>
+            <pd:y>191</pd:y>
+            <config>
+                <timeout>%%Connections/DataBase/BDPMM/GLB_TIMEOUT%%</timeout>
+                <maxRows>%%Connections/DataBase/BDPMM/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+                <ProcedureName>SDIATIBA</ProcedureName>
+                <parameterTypes>
+                    <parameter>
+                        <colName>IN_BATCH_NUM</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_PROCESS_LUW</colName>
+                        <colType>1</colType>
+                        <dataType>12</dataType>
+                        <typeName>NCHAR</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_ORG_LVL_NUMBER</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_PRD_LVL_NUMBER</colName>
+                        <colType>1</colType>
+                        <dataType>12</dataType>
+                        <typeName>NCHAR</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_LVL_ID</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_VENDOR_NUMBER</colName>
+                        <colType>1</colType>
+                        <dataType>12</dataType>
+                        <typeName>NCHAR</typeName>
+                    </parameter>
+                </parameterTypes>
+            </config>
+            <pd:inputBindings>
+                <inputs>
+                    <inputSet>
+                        <IN_BATCH_NUM>
+                            <xsl:copy-of select="$batch-number/resultSet/outputSet/OUT_BAS_COUNTER_VALUE/@xsi:nil"/>
+                            <xsl:value-of select="$batch-number/resultSet/outputSet/OUT_BAS_COUNTER_VALUE"/>
+                        </IN_BATCH_NUM>
+                        <IN_PROCESS_LUW>
+                            <xsl:value-of select="'T'"/>
+                        </IN_PROCESS_LUW>
+                        <IN_ORG_LVL_NUMBER>
+                            <xsl:value-of select="0"/>
+                        </IN_ORG_LVL_NUMBER>
+                        <IN_PRD_LVL_NUMBER>
+                            <xsl:value-of select="''"/>
+                        </IN_PRD_LVL_NUMBER>
+                        <IN_LVL_ID>
+                            <xsl:value-of select="0"/>
+                        </IN_LVL_ID>
+                        <IN_VENDOR_NUMBER>
+                            <xsl:value-of select="''"/>
+                        </IN_VENDOR_NUMBER>
+                    </inputSet>
+                </inputs>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:group name="Group Insert SDIPRDUPI">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>628</pd:x>
+        <pd:y>68</pd:y>
+        <pd:width>290</pd:width>
+        <pd:height>339</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Insert SDIPRDUPI</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Insert SDIPRDUPI</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Insert SDIPRDUPI">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>764</pd:x>
+            <pd:y>188</pd:y>
+            <config>
+                <timeout>%%Connections/DataBase/BDPMM/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO PMM.SDIPRDUPI(BATCH_NUM, PRD_UPC, TRAN_TYPE, PRD_LVL_NUMBER, PRD_PRICE, PRD_PCT_OFF, PRD_AMT_OFF, UPC_TYPE,
+VENDOR_NUMBER, VPC_CASE_PACK_ID, PRD_PRIMARY_FLAG, VPC_PRIMARY_FLAG, PRD_UPC_DESC, DATE_CREATED, DOWNLOAD_DATE_1, 
+DOWNLOAD_DATE_2, DEFAULT_FLAG, ACTIVE_FLAG, UPC_UOM_SIZE, UPC_SLL_UOM, UPC_COMP_UOM, UPC_CONV_QTY, PRD_PDH_NAME_1, PRD_PDD_CODE_1,
+PRD_PDH_NAME_2, PRD_PDD_CODE_2, PRD_PDH_NAME_3, PRD_PDD_CODE_3, PRODUCT_UPC, CASE_PACK_UPC, PRD_PLU, UPC_SIZE_UOM)
+VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>BATCH_NUM</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_UPC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TRAN_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_LVL_NUMBER</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PRICE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PCT_OFF</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_AMT_OFF</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UPC_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>VENDOR_NUMBER</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>VPC_CASE_PACK_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PRIMARY_FLAG</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>VPC_PRIMARY_FLAG</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_UPC_DESC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DATE_CREATED</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DOWNLOAD_DATE_1</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DOWNLOAD_DATE_2</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEFAULT_FLAG</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ACTIVE_FLAG</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UPC_UOM_SIZE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UPC_SLL_UOM</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UPC_COMP_UOM</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UPC_CONV_QTY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PDH_NAME_1</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PDD_CODE_1</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PDH_NAME_2</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PDD_CODE_2</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PDH_NAME_3</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PDD_CODE_3</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRODUCT_UPC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CASE_PACK_UPC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRD_PLU</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UPC_SIZE_UOM</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <xsl:for-each select="$Start/pfx8:SDIPRDUPI/pfx8:RECORD[1]">
+                    <jdbcUpdateActivityInput>
+                        <BATCH_NUM>
+                            <xsl:copy-of select="$batch-number/resultSet/outputSet/OUT_BAS_COUNTER_VALUE/@xsi:nil"/>
+                            <xsl:value-of select="$batch-number/resultSet/outputSet/OUT_BAS_COUNTER_VALUE"/>
+                        </BATCH_NUM>
+                        <PRD_UPC>
+                            <xsl:copy-of select="pfx8:PRD_UPC/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_UPC"/>
+                        </PRD_UPC>
+                        <TRAN_TYPE>
+                            <xsl:copy-of select="pfx8:TRAN_TYPE/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:TRAN_TYPE"/>
+                        </TRAN_TYPE>
+                        <PRD_LVL_NUMBER>
+                            <xsl:copy-of select="pfx8:PRD_LVL_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_LVL_NUMBER"/>
+                        </PRD_LVL_NUMBER>
+                        <PRD_PRICE>
+                            <xsl:copy-of select="pfx8:PRD_PRICE/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PRICE"/>
+                        </PRD_PRICE>
+                        <PRD_PCT_OFF>
+                            <xsl:copy-of select="pfx8:PRD_PCT_OFF/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PCT_OFF"/>
+                        </PRD_PCT_OFF>
+                        <PRD_AMT_OFF>
+                            <xsl:copy-of select="pfx8:PRD_AMT_OFF/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_AMT_OFF"/>
+                        </PRD_AMT_OFF>
+                        <UPC_TYPE>
+                            <xsl:copy-of select="pfx8:UPC_TYPE/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:UPC_TYPE"/>
+                        </UPC_TYPE>
+                        <VENDOR_NUMBER>
+                            <xsl:copy-of select="pfx8:VENDOR_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:VENDOR_NUMBER"/>
+                        </VENDOR_NUMBER>
+                        <VPC_CASE_PACK_ID>
+                            <xsl:copy-of select="pfx8:VPC_CASE_PACK_ID/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:VPC_CASE_PACK_ID"/>
+                        </VPC_CASE_PACK_ID>
+                        <PRD_PRIMARY_FLAG>
+                            <xsl:copy-of select="pfx8:PRD_PRIMATY_FLAG/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PRIMATY_FLAG"/>
+                        </PRD_PRIMARY_FLAG>
+                        <VPC_PRIMARY_FLAG>
+                            <xsl:copy-of select="pfx8:VPC_PRIMARY_FLAG/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:VPC_PRIMARY_FLAG"/>
+                        </VPC_PRIMARY_FLAG>
+                        <PRD_UPC_DESC>
+                            <xsl:copy-of select="pfx8:PRD_UPC_DESC/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_UPC_DESC"/>
+                        </PRD_UPC_DESC>
+                        <DATE_CREATED>
+                            <xsl:copy-of select="pfx8:DATE_CREATED/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:DATE_CREATED"/>
+                        </DATE_CREATED>
+                        <DOWNLOAD_DATE_1>
+                            <xsl:copy-of select="pfx8:DOWNLOAD_DATE_1/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:DOWNLOAD_DATE_1"/>
+                        </DOWNLOAD_DATE_1>
+                        <DOWNLOAD_DATE_2>
+                            <xsl:copy-of select="pfx8:DOWNLOAD_DATE_2/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:DOWNLOAD_DATE_2"/>
+                        </DOWNLOAD_DATE_2>
+                        <DEFAULT_FLAG>
+                            <xsl:copy-of select="pfx8:DEFAULT_FLAG/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:DEFAULT_FLAG"/>
+                        </DEFAULT_FLAG>
+                        <ACTIVE_FLAG>
+                            <xsl:copy-of select="pfx8:ACTIVE_FLAG/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:ACTIVE_FLAG"/>
+                        </ACTIVE_FLAG>
+                        <UPC_UOM_SIZE>
+                            <xsl:copy-of select="pfx8:UPC_UOM_SIZE/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:UPC_UOM_SIZE"/>
+                        </UPC_UOM_SIZE>
+                        <UPC_SLL_UOM>
+                            <xsl:copy-of select="pfx8:UPC_SLL_UOM/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:UPC_SLL_UOM"/>
+                        </UPC_SLL_UOM>
+                        <UPC_COMP_UOM>
+                            <xsl:copy-of select="pfx8:UPC_COMP_UOM/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:UPC_COMP_UOM"/>
+                        </UPC_COMP_UOM>
+                        <UPC_CONV_QTY>
+                            <xsl:copy-of select="pfx8:UPC_CONV_QTY/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:UPC_CONV_QTY"/>
+                        </UPC_CONV_QTY>
+                        <PRD_PDH_NAME_1>
+                            <xsl:copy-of select="pfx8:PRD_PDH_NAME_1/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PDH_NAME_1"/>
+                        </PRD_PDH_NAME_1>
+                        <PRD_PDD_CODE_1>
+                            <xsl:copy-of select="pfx8:PRD_PDD_CODE_1/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PDD_CODE_1"/>
+                        </PRD_PDD_CODE_1>
+                        <PRD_PDH_NAME_2>
+                            <xsl:copy-of select="pfx8:PRD_PDH_NAME_2/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PDH_NAME_2"/>
+                        </PRD_PDH_NAME_2>
+                        <PRD_PDD_CODE_2>
+                            <xsl:copy-of select="pfx8:PRD_PDD_CODE_2/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PDD_CODE_2"/>
+                        </PRD_PDD_CODE_2>
+                        <PRD_PDH_NAME_3>
+                            <xsl:copy-of select="pfx8:PRD_PDH_NAME_3/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PDH_NAME_3"/>
+                        </PRD_PDH_NAME_3>
+                        <PRD_PDD_CODE_3>
+                            <xsl:copy-of select="pfx8:PRD_PDD_CODE_3/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PDD_CODE_3"/>
+                        </PRD_PDD_CODE_3>
+                        <PRODUCT_UPC>
+                            <xsl:copy-of select="pfx8:PRODUCT_UPC/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRODUCT_UPC"/>
+                        </PRODUCT_UPC>
+                        <CASE_PACK_UPC>
+                            <xsl:copy-of select="pfx8:CASE_PACK_UPC/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:CASE_PACK_UPC"/>
+                        </CASE_PACK_UPC>
+                        <PRD_PLU>
+                            <xsl:copy-of select="pfx8:PRD_PLU/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:PRD_PLU"/>
+                        </PRD_PLU>
+                        <UPC_SIZE_UOM>
+                            <xsl:copy-of select="pfx8:UPC_SIZE_UOM/@xsi:nil"/>
+                            <xsl:value-of select="pfx8:UPC_SIZE_UOM"/>
+                        </UPC_SIZE_UOM>
+                    </jdbcUpdateActivityInput>
+                </xsl:for-each>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group Batch Number</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Batch Number</pd:from>
+        <pd:to>Group Insert SDIPRDUPI</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Insert SDIPRDUPI</pd:from>
+        <pd:to>Group SP SDIATIBA</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group SP SDIATIBA</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

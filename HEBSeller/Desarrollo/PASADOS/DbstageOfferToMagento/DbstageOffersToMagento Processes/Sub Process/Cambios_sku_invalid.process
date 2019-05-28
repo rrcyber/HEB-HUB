@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema.xsd"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Cambios_sku_invalid.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>109</pd:startX>
+    <pd:startY>131</pd:startY>
+    <pd:returnBindings>
+        <Products>
+            <promo_id>
+                <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/promo_id"/>
+            </promo_id>
+            <sku>
+                <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/sku"/>
+            </sku>
+            <promo_type>
+                <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/promo_type"/>
+            </promo_type>
+            <website>
+                <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/website"/>
+            </website>
+        </Products>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Products">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="promo_id" type="xsd:string"/>
+                    <xsd:element name="sku" type="xsd:string"/>
+                    <xsd:element name="promo_type" type="xsd:string"/>
+                    <xsd:element name="website" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>331</pd:endX>
+    <pd:endY>135</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1436800525002</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>223</pd:x>
+        <pd:y>133</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <statement>select new_run.promo_id, new_run.sku, new_run.promo_type, new_run.website
+from 
+       (
+       SELECT DISTINCT Loosers.promo_id, Loosers.sku, Loosers.promo_type, Loosers.website
+       FROM mag_import_HistorialPromociones Loosers
+       WHERE loosers.[status] = 'I' 
+       ) as new_run
+full outer join mag_import_sku_invalid as last_run on new_run.SKU = last_run.product_sku and  new_run.promo_id = last_run.source_Promo_id and new_run.promo_type = last_run.promo_type and new_run.website = last_run.WebSite
+where new_run.SKU is null or last_run.product_sku is null
+</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <optionalOrNillable>true</optionalOrNillable>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>promo_id</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>sku</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>promo_type</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>website</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

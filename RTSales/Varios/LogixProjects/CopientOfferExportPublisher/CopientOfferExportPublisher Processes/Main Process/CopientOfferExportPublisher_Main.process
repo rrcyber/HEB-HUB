@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:pfx2="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PromoCPE.xsd" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Offer_bk.xsd" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Offer.xsd" xmlns:ns5="http://www.tibco.com/namespaces/tnt/plugins/jms">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PromoCPE.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Offer.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Offer.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Offer_bk.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Offer_bk.xsd"/>
+    <pd:name>CopientOfferExportPublisher Processes/Main Process/CopientOfferExportPublisher_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="FileName" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>71</pd:startX>
+    <pd:startY>111</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>550</pd:endX>
+    <pd:endY>115</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1247134670997</pd:targetNamespace>
+    <pd:activity name="Read File">
+        <pd:type>com.tibco.plugin.file.FileReadActivity</pd:type>
+        <pd:resourceType>ae.activities.FileReadActivity</pd:resourceType>
+        <pd:x>206</pd:x>
+        <pd:y>112</pd:y>
+        <config>
+            <encoding>text</encoding>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ReadActivityInputClass>
+                <fileName>
+                    <xsl:value-of select="concat(tib:substring-before-last($Start/root/FileName, '.ok'),'.xml')"/>
+                </fileName>
+                <encoding>
+                    <xsl:value-of select="'UTF-8'"/>
+                </encoding>
+            </pfx2:ReadActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Topic Publisher">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>318</pd:x>
+        <pd:y>122</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Topics/GLB_COMMON_COPIENT_OFFEREXPORT_TOPIC%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>%%Connections/JMS/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                <JMSExpiration>%%Connections/JMS/Properties/GLB_JMS_EXPIRATION%%</JMSExpiration>
+                <JMSPriority>%%Connections/JMS/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings>
+            <ns5:ActivityInput>
+                <JMSCorrelationID>
+                    <xsl:value-of select="$Start/root/FileName"/>
+                </JMSCorrelationID>
+                <Body>
+                    <xsl:value-of select="$Read-File/ns:ReadActivityOutputTextClass/fileContent/textContent"/>
+                </Body>
+            </ns5:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call Copient Offer Export Sub Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>430</pd:x>
+        <pd:y>124</pd:y>
+        <config>
+            <processName>/CopientOfferExportPublisher Processes/Sub Process/CopientOfferExportPublisher_Sub.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <FileContent>
+                    <xsl:value-of select="$Start/root/FileName"/>
+                </FileContent>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Read File</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Read File</pd:from>
+        <pd:to>JMS Topic Publisher</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Topic Publisher</pd:from>
+        <pd:to>Call Copient Offer Export Sub Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Copient Offer Export Sub Process</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

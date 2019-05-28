@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns14="www.tibco.com/plugin/Sleep" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/DISCOUNTS.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/DISCOUNTS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/DISCOUNTS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>Processes/Sub Process/Set_DateInitial.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="DATE" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>89</pd:startX>
+    <pd:startY>112</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>408</pd:endX>
+    <pd:endY>114</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns12:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1403558436899</pd:targetNamespace>
+    <pd:activity name="SetVariable">
+        <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+        <pd:x>249</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/VariableDate.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <Initial_Date>
+                    <xsl:value-of select="$Start/DATE"/>
+                </Initial_Date>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>304</pd:x>
+        <pd:y>251</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <ns12:MSG_Container>
+                        <ns12:Header>
+                            <ns12:ProjectName>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                            </ns12:ProjectName>
+                            <ns12:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </ns12:Source_Domain>
+                            <ns12:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </ns12:Destination_Domain>
+                            <ns12:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/TransactionType"/>
+                            </ns12:Transaction_Type>
+                            <ns12:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                            </ns12:TimeStamp>
+                        </ns12:Header>
+                        <ns12:Body>
+                            <ns12:ErrorManagementSchema>
+                                <ns12:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </ns12:inrtn_id>
+                                <ns12:inrtn_instn_nm>
+                                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                                </ns12:inrtn_instn_nm>
+                                <ns12:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="concat(&#xA;'Message Code: ',$_error/ns:ErrorReport/MsgCode,&quot;&#xA;&quot;,&#xA;'Error Message: ',$_error/ns:ErrorReport/Msg,&quot;&#xA;&quot;,&#xA;'Error Class: ',$_error/ns:ErrorReport/Class,&quot;&#xA;&quot;,&#xA;tib:render-xml($_error/ns:ErrorReport/Data),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;'STACKTRACE: ',$_error/ns:ErrorReport/StackTrace,&quot;&#xA;&quot;)"/>
+                                </ns12:inrtn_err_rtn_desc>
+                                <ns12:inrtn_msg_body>
+                                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                                </ns12:inrtn_msg_body>
+                                <ns12:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                                </ns12:cre8_ts>
+                                <ns12:u_code>
+                                    <xsl:value-of select="if (contains($_error/ns:ErrorReport/MsgCode, 'BW-JDBC')) then&#xA;concat($_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_TECHNICAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else if (contains($_error/ns:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;concat($_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else &#xA;concat($_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns:ErrorReport/MsgCode)"/>
+                                </ns12:u_code>
+                                <ns12:sev_id>
+                                    <xsl:value-of select="if (contains($_error/ns:ErrorReport/MsgCode, 'BW-JDBC')) then&#xA;$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH&#xA;else if (contains($_error/ns:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED&#xA;else &#xA;$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_LOW"/>
+                                </ns12:sev_id>
+                            </ns12:ErrorManagementSchema>
+                        </ns12:Body>
+                    </ns12:MSG_Container>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>154</pd:x>
+        <pd:y>249</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate-Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetVariable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

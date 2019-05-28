@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <pd:name>Project Name Processes/Starter Process/OrderData_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>95</pd:x>
+        <pd:y>172</pd:y>
+        <config>
+            <StartTime>1374512400000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%TIMER_CONF/INTERVAL_ORD%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>675</pd:endX>
+    <pd:endY>176</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1374504613846</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>196</pd:x>
+        <pd:y>56</pd:y>
+        <pd:width>368</pd:width>
+        <pd:height>226</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>OrderData_Main</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>OrderData_Main</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>OrderData_Main</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>308</pd:x>
+            <pd:y>228</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>467</pd:x>
+            <pd:y>228</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="OrderData_Main">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>310</pd:x>
+            <pd:y>129</pd:y>
+            <config>
+                <processName>/Project Name Processes/Main Process/OrderData_Main.process</processName>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

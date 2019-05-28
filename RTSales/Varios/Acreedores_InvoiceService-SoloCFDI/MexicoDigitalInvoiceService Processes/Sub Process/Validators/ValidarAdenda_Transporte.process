@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://xmlns.heb.com/ei/AddendaTransporte" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns1="http://www.tibco.com/schemas/Acreedores_InvoiceService/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/AddendaTransporte" schemaLocation="/Shared Resources/Schema Definitions/Custom/AddendaTransporte.xsd"/>
+    <wsdl:import namespace="http://tempuri.org/" location="/Shared Resources/WSDL/ControlR/ControlR.wsdl"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Validators/ValidarAdenda_Transporte.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx2:Transporte"/>
+                    <xsd:element name="Subtotal" type="xsd:double"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>47</pd:startX>
+    <pd:startY>293</pd:startY>
+    <pd:returnBindings>
+        <Validacion>
+            <Valido>
+                <xsl:value-of select="if($Validar_Proceso/Validacion/Mensaje =$_globalVariables/ns:GlobalVariables/MensajesAddenda/RCNoDisponible) then $Validar_Proceso/Validacion/Valido &#xA;else&#xA;if($Validar_LineaTransporte/Validacion/Valido = 'true' and&#xA;$Validar_OrigenViaje/Validacion/Valido = 'true'  and&#xA;$Validar_TipoMercancia/Validacion/Valido= 'true'  and&#xA;$Validar_NumeroRutas/Validacion/Valido= 'true' and&#xA;$ValidaTarifa/IsValid='true'  and&#xA;$ValidarRepartosResumen/Validacion/Valido= 'true'  and&#xA;$ValidaSubtotales/Validacion/isValid = 'true'&#xA;)&#xA;then 1&#xA;else 0"/>
+            </Valido>
+            <Excepciones>
+                <xsl:value-of select="if($Validar_Proceso/Validacion/Mensaje =$_globalVariables/ns:GlobalVariables/MensajesAddenda/RCNoDisponible) &#xA;then $Validar_Proceso/Validacion/Mensaje &#xA;else&#xA;if($Validar_LineaTransporte/Validacion/Valido = 'true' and&#xA;$Validar_OrigenViaje/Validacion/Valido = 'true'  and&#xA;$Validar_TipoRemolque/Validacion/Valido= 'true'  and&#xA;$Validar_NumeroRutas/Validacion/Valido= 'true' and&#xA;$ValidaTarifa/IsValid='true'  and &#xA;$ValidarRepartosResumen/Validacion/Valido='true'  and&#xA;$ValidaSubtotales/Validacion/isValid='true' &#xA;)&#xA;then ''&#xA;else &#xA;concat(&#xA;if ($Validar_LineaTransporte/Validacion/Mensaje =&quot;&quot;)              &#x9;then &quot;&quot; else concat($Validar_LineaTransporte/Validacion/Mensaje,&quot; | &quot;),&#xA;if($Validar_OrigenViaje/Validacion/Mensaje =&quot;&quot;)                        &#x9;then &quot;&quot; else concat($Validar_OrigenViaje/Validacion/Mensaje,&quot; | &quot;),&#xA;if($Validar_TipoRemolque/Validacion/Mensaje =&quot;&quot;)                        &#x9;then &quot;&quot; else concat($Validar_TipoRemolque/Validacion/Mensaje,&quot; | &quot;),&#xA;if($ValidarRepartosResumen/Validacion/Mensaje =&quot;&quot;)                          &#x9;then &quot;&quot; else concat($ValidarRepartosResumen/Validacion/Mensaje,&quot; | &quot;),&#xA;if($ValidaTarifa/IsValid='true')&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9; then &quot;&quot; else &quot; Tarifa inválida | &quot;,&#xA;if($ValidaSubtotales/Validacion/Message =&quot;&quot;)                          &#x9;then &quot;&quot; else concat($ValidaSubtotales/Validacion/Message,&quot; | &quot;),&#xA;$Validar_NumeroRutas/Validacion/Mensaje&#xA;)"/>
+            </Excepciones>
+            <SubArea>
+                <xsl:value-of select="if($Validar_Proceso/Validacion/Mensaje =$_globalVariables/ns:GlobalVariables/MensajesAddenda/RCNoDisponible)&#xA;then 1&#xA;else $Call_spValidaAutorizacion/resultSet/outputSet/SubArea"/>
+            </SubArea>
+            <Referencia>
+                <xsl:value-of select="$Start/group/pfx2:Transporte/pfx2:TipoMercancia"/>
+            </Referencia>
+        </Validacion>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Validacion">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Valido" type="xsd:boolean"/>
+                    <xsd:element name="Excepciones" type="xsd:string"/>
+                    <xsd:element name="SubArea" type="xsd:string"/>
+                    <xsd:element name="Referencia" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1103</pd:endX>
+    <pd:endY>295</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1381246628980</pd:targetNamespace>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>992</pd:x>
+        <pd:y>294</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>307</pd:x>
+        <pd:y>293</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx2:viaje"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="concat(&#xA;'&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&lt;viaje xmlns=&quot;http://xmlns.heb.com/ei/AddendaTransporte&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;>',&#xA;substring-after(&#xA;$SOAPRequestReply/outputMessage/pfx:Consulta_Folio_HEBResponse/pfx:Consulta_Folio_HEBResult, &#xA;&quot;&lt;viaje>&quot;)&#xA;)"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SOAPRequestReply">
+        <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+        <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+        <pd:x>178</pd:x>
+        <pd:y>293</pd:y>
+        <config>
+            <timeout>%%Connections/ControlR/TimeOut%%</timeout>
+            <service>pfx:Consulta_HEB</service>
+            <servicePort>Consulta_HEBSoap</servicePort>
+            <operation>Consulta_Folio_HEB</operation>
+            <soapAction>http://tempuri.org/Consulta_Folio_HEB</soapAction>
+            <endpointURL>%%Connections/ControlR/EndPointURL%%</endpointURL>
+            <policies>
+                <incomingAttachmentPolicy>
+                    <writeToFile>true</writeToFile>
+                    <writeToFileDir>C:\tmp\20131015</writeToFileDir>
+                    <createNonExistDir>true</createNonExistDir>
+                </incomingAttachmentPolicy>
+            </policies>
+        </config>
+        <pd:inputBindings>
+            <inputMessage>
+                <pfx:Consulta_Folio_HEB>
+                    <pfx:Usuario>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/ControlR/Login"/>
+                    </pfx:Usuario>
+                    <pfx:Password>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/ControlR/Password"/>
+                    </pfx:Password>
+                    <pfx:Folio>
+                        <xsl:value-of select="$Start/group/pfx2:Transporte/pfx2:Folio"/>
+                    </pfx:Folio>
+                </pfx:Consulta_Folio_HEB>
+            </inputMessage>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_FechaAsignacionViaje">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>580</pd:x>
+        <pd:y>364</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:FechaAsignacionViaje =$Parse-XML/pfx2:viaje/pfx2:fh_asig_viaje)&#xA;then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:FechaAsignacionViaje =$Parse-XML/pfx2:viaje/pfx2:fh_asig_viaje)&#xA;then ''&#xA;else 'Fecha de asignación de viaje inválida'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_LineaTransporte">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>578</pd:x>
+        <pd:y>433</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:LineaTransporte =$Parse-XML/pfx2:viaje/pfx2:linea_transporte)&#xA;then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:LineaTransporte =$Parse-XML/pfx2:viaje/pfx2:linea_transporte)&#xA;then ''&#xA;else 'Línea de transporte inválida'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_OrigenViaje">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>581</pd:x>
+        <pd:y>86</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:OrigenDelViaje =$Parse-XML/pfx2:viaje/pfx2:origen_de_viaje)&#xA;then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:OrigenDelViaje =$Parse-XML/pfx2:viaje/pfx2:origen_de_viaje)&#xA;then ''&#xA;else 'Origen de viaje inválido'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_Remolque">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>581</pd:x>
+        <pd:y>154</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:Remolque =$Parse-XML/pfx2:viaje/pfx2:remolque)&#xA;then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:Remolque =$Parse-XML/pfx2:viaje/pfx2:remolque)&#xA;then ''&#xA;else 'Remolque inválido'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_TipoMercancia">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>580</pd:x>
+        <pd:y>293</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:TipoMercancia =$Parse-XML/pfx2:viaje/pfx2:tipo_mercancia)&#xA;then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:TipoMercancia =$Parse-XML/pfx2:viaje/pfx2:tipo_mercancia)&#xA;then ''&#xA;else 'Tipo de mercancia inválido'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_TipoRemolque">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>585</pd:x>
+        <pd:y>223</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:TipoRemolque =$Parse-XML/pfx2:viaje/pfx2:tipo_remolque)&#xA;then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:TipoRemolque =$Parse-XML/pfx2:viaje/pfx2:tipo_remolque)&#xA;then ''&#xA;else 'Tipo de remolque inválido'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_NumeroRutas">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>580</pd:x>
+        <pd:y>502</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if(count($Start/group/pfx2:Transporte/pfx2:Repartos/pfx2:Reparto) = count($Parse-XML/pfx2:viaje/pfx2:Repartos/pfx2:Reparto)&#xA;)&#xA;then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if(count($Start/group/pfx2:Transporte/pfx2:Repartos/pfx2:Reparto) = count($Parse-XML/pfx2:viaje/pfx2:Repartos/pfx2:Reparto)&#xA;)&#xA;then ''&#xA;else 'Número de repartos  inválido'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Iterate_ValidateRepartoByRContolList">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>421</pd:x>
+        <pd:y>970</pd:y>
+        <pd:width>171</pd:width>
+        <pd:height>158</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/group/pfx2:Transporte/pfx2:Repartos/pfx2:Reparto</pd:over>
+            <pd:iterationElementSlot>currentRepartoFactura</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:outSlot>ValidationResume</pd:outSlot>
+            <pd:activityOutputName>Call_ValidateRepartoByRContolList</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Call_ValidateRepartoByRContolList</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Call_ValidateRepartoByRContolList</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Call_ValidateRepartoByRContolList">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>510</pd:x>
+            <pd:y>1056</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/ValidateRepartoByRContolList.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:for-each select="$currentRepartoFactura/pfx2:Reparto">
+                        <ns1:Reparto>
+                            <ns1:tienda>
+                                <xsl:value-of select="pfx2:Tienda"/>
+                            </ns1:tienda>
+                            <ns1:no_orden>
+                                <xsl:value-of select="pfx2:NumeroOrden"/>
+                            </ns1:no_orden>
+                            <ns1:monto>
+                                <xsl:value-of select="pfx2:Monto"/>
+                            </ns1:monto>
+                        </ns1:Reparto>
+                    </xsl:for-each>
+                    <RepartosRControl>
+                        <xsl:for-each select="$Parse-XML/pfx2:viaje/pfx2:Repartos/pfx2:Reparto">
+                            <ns0:RepartoCR xmlns:ns0="http://www.tibco.com/schemas/Acreedores_InvoiceService/Shared Resources/Schema Definitions/Custom/RepartoCR.xsd">
+                                <ns0:tienda>
+                                    <xsl:value-of select="pfx2:tienda"/>
+                                </ns0:tienda>
+                                <ns0:no_orden>
+                                    <xsl:value-of select="pfx2:no_orden"/>
+                                </ns0:no_orden>
+                                <ns0:fh_entrada_tienda>
+                                    <xsl:value-of select="pfx2:fh_entrada_tienda"/>
+                                </ns0:fh_entrada_tienda>
+                                <ns0:fh_salida_tienda>
+                                    <xsl:value-of select="pfx2:fh_salida_tienda"/>
+                                </ns0:fh_salida_tienda>
+                                <ns0:monto>
+                                    <xsl:value-of select="0"/>
+                                </ns0:monto>
+                            </ns0:RepartoCR>
+                        </xsl:for-each>
+                    </RepartosRControl>
+                    <IndexFactura>
+                        <xsl:value-of select="$index"/>
+                    </IndexFactura>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>506</pd:x>
+        <pd:y>881</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-2">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>679</pd:x>
+        <pd:y>880</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ValidarRepartosResumen">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>729</pd:x>
+        <pd:y>1057</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if(sum($ValidationResume/AccumulatedOutput/ValidationResume/IsValid) =&#xA;count($ValidationResume/AccumulatedOutput/ValidationResume)&#xA;) then 'true'&#xA;else 'false'"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if(sum($ValidationResume/AccumulatedOutput/ValidationResume/IsValid) =&#xA;count($ValidationResume/AccumulatedOutput/ValidationResume)&#xA;) then ''&#xA;else $_globalVariables/ns:GlobalVariables/MensajesAddenda/RepartoInvalido"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-3">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>312</pd:x>
+        <pd:y>34</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Validar_Proceso">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>992</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="false()"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MensajesAddenda/RCNoDisponible"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validar_Temperatura">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>581</pd:x>
+        <pd:y>585</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Valido" type="xsd:boolean"/>
+                            <xsd:element name="Mensaje" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <Valido>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:Temperatura=$Parse-XML/pfx2:viaje/pfx2:temperatura_frente or&#xA;$Start/group/pfx2:Transporte/pfx2:Temperatura =$Parse-XML/pfx2:viaje/pfx2:temperatura_fondo &#xA;)&#xA;then true()&#xA;else false()"/>
+                </Valido>
+                <Mensaje>
+                    <xsl:value-of select="if($Start/group/pfx2:Transporte/pfx2:Temperatura=$Parse-XML/pfx2:viaje/pfx2:temperatura_frente or&#xA;$Start/group/pfx2:Transporte/pfx2:Temperatura =$Parse-XML/pfx2:viaje/pfx2:temperatura_fondo &#xA;)&#xA;then ''&#xA;else 'Temperatura inválida'"/>
+                </Mensaje>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_spValidaAutorizacion">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>617</pd:x>
+        <pd:y>667</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/TARIFARIO.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>BDTARIFARIO</catalog>
+            <ProcedureName>spValidaAutorizacion;1</ProcedureName>
+            <useSchema>false</useSchema>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OrigenViaje</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TipoMercancia</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@Temperatura</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LineaTransporte</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TipoUnd</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@Subtotal</colName>
+                    <colType>1</colType>
+                    <dataType>2</dataType>
+                    <typeName>numeric</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@List</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@IsValid</colName>
+                    <colType>2</colType>
+                    <dataType>-7</dataType>
+                    <typeName>bit</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@SubArea</colName>
+                    <colType>2</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <OrigenViaje>
+                        <xsl:value-of select="$Start/group/pfx2:Transporte/pfx2:OrigenDelViaje"/>
+                    </OrigenViaje>
+                    <TipoMercancia>
+                        <xsl:value-of select="$Start/group/pfx2:Transporte/pfx2:TipoMercancia"/>
+                    </TipoMercancia>
+                    <Temperatura>
+                        <xsl:value-of select="if(string-length($Start/group/pfx2:Transporte/pfx2:Temperatura) > 0 )&#xA;then $Start/group/pfx2:Transporte/pfx2:Temperatura&#xA;else 0"/>
+                    </Temperatura>
+                    <LineaTransporte>
+                        <xsl:value-of select="$Start/group/pfx2:Transporte/pfx2:LineaTransporte"/>
+                    </LineaTransporte>
+                    <TipoUnd>
+                        <xsl:value-of select="$Start/group/pfx2:Transporte/pfx2:TipoRemolque"/>
+                    </TipoUnd>
+                    <Subtotal>
+                        <xsl:value-of select="tib:round-fraction(&#xA;sum(for $Reparto in $Parse-XML/pfx2:viaje/pfx2:Repartos return $Start/group/pfx2:Transporte/pfx2:Repartos/pfx2:Reparto/pfx2:Monto), 2)"/>
+                    </Subtotal>
+                    <List>
+                        <xsl:value-of select="tib:concat-sequence-format(&#xA;&#x9;for $Tienda&#xA;&#x9; in $FixTiendaName/Parametros &#xA;&#x9;return $FixTiendaName/Parametros/ListaTiendas, &#xA;&#x9;&quot;,&quot;, &#xA;&#x9;true())"/>
+                    </List>
+                    <IsValid>
+                        <xsl:value-of select="0"/>
+                    </IsValid>
+                    <SubArea>
+                        <xsl:value-of select="0"/>
+                    </SubArea>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="FixTiendaName">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>506</pd:x>
+        <pd:y>665</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Parametros">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="ListaTiendas" type="xsd:string" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Parametros>
+                <xsl:for-each select="$Start/group/pfx2:Transporte/pfx2:Repartos/pfx2:Reparto">
+                    <ListaTiendas>
+                        <xsl:value-of select="tib:left( pfx2:Tienda,4)"/>
+                    </ListaTiendas>
+                </xsl:for-each>
+            </Parametros>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ValidaTarifa">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>738</pd:x>
+        <pd:y>669</pd:y>
+        <config>
+            <element>
+                <xsd:element name="IsValid" type="xsd:boolean"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <IsValid>
+                <xsl:value-of select="1"/>
+            </IsValid>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SubTotalRepartos">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>509</pd:x>
+        <pd:y>804</pd:y>
+        <config>
+            <element>
+                <xsd:element name="SubTotalRepartos" type="xsd:double"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <SubTotalRepartos>
+                <xsl:value-of select="sum(&#xA;for $Reparto in &#xA;$Parse-XML/pfx2:viaje/pfx2:Repartos return &#xA;$Start/group/pfx2:Transporte/pfx2:Repartos/pfx2:Reparto/pfx2:Monto)"/>
+            </SubTotalRepartos>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ValidaSubtotales">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>680</pd:x>
+        <pd:y>803</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Validacion">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="isValid" type="xsd:boolean"/>
+                            <xsd:element name="Message" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Validacion>
+                <isValid>
+                    <xsl:value-of select="if($SubTotalRepartos/SubTotalRepartos = $Start/group/Subtotal)&#xA;then 1&#xA;else 0"/>
+                </isValid>
+                <Message>
+                    <xsl:value-of select="if($SubTotalRepartos/SubTotalRepartos = $Start/group/Subtotal)&#xA;then &quot;&quot;&#xA;else $_globalVariables/ns:GlobalVariables/MensajesAddenda/SubTotalesDiferentes"/>
+                </Message>
+            </Validacion>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-4">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>692</pd:x>
+        <pd:y>754</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SOAPRequestReply</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SOAPRequestReply</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_OrigenViaje</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_OrigenViaje</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_Remolque</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_Remolque</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_TipoRemolque</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_TipoRemolque</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_TipoMercancia</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_TipoMercancia</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_FechaAsignacionViaje</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_FechaAsignacionViaje</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_LineaTransporte</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_LineaTransporte</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_NumeroRutas</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_NumeroRutas</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Iterate_ValidateRepartoByRContolList</pd:to>
+        <pd:xpathDescription>=NumDeRepartos</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Start/group/pfx2:Transporte/pfx2:Repartos/pfx2:Reparto) =
+count($Parse-XML/pfx2:viaje/pfx2:Repartos/pfx2:Reparto)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Iterate_ValidateRepartoByRContolList</pd:from>
+        <pd:to>ValidarRepartosResumen</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ValidarRepartosResumen</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>Validar_Proceso</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_Proceso</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SOAPRequestReply</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validar_Temperatura</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validar_Temperatura</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>FixTiendaName</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_spValidaAutorizacion</pd:from>
+        <pd:to>ValidaTarifa</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>FixTiendaName</pd:from>
+        <pd:to>Call_spValidaAutorizacion</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ValidaTarifa</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>SubTotalRepartos</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SubTotalRepartos</pd:from>
+        <pd:to>ValidaSubtotales</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ValidaSubtotales</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_spValidaAutorizacion</pd:from>
+        <pd:to>Null-4</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-4</pd:from>
+        <pd:to>ValidaTarifa</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

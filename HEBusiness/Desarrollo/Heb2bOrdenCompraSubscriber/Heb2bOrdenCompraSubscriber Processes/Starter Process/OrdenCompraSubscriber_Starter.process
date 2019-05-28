@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns02="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/HEB2BPURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Starter Process/OrdenCompraSubscriber_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>65</pd:x>
+        <pd:y>394</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Properties/GLB_MAX_SESSIONS%%</maxSessions>
+                <destination>%%Destinations/Queues/GLB_HEB2B_ORDEN_COMPRA_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ApplicationProperties>/Shared Resources/Connections/JMS/JMS Application Properties.sharedjmsapp</ApplicationProperties>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMSConnection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1032</pd:endX>
+    <pd:endY>395</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389383676896</pd:targetNamespace>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>931</pd:x>
+        <pd:y>396</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>208</pd:x>
+        <pd:y>394</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx4:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Retry Group on Error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>315</pd:x>
+        <pd:y>179</pd:y>
+        <pd:width>428</pd:width>
+        <pd:height>415</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>OrdenCompra_Validate_Subscriber_Main</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>OrdenCompra_Validate_Subscriber_Main</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Is Error Data</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Validate-Error/ErrorCode='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>ErrorProcess 1</pd:to>
+            <pd:xpathDescription>Count =3</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>Generate-Error-1</pd:to>
+            <pd:xpathDescription>No</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch</pd:from>
+            <pd:to>Validate Error</pd:to>
+            <pd:xpathDescription>Is Error</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>Sleep-1</pd:to>
+            <pd:xpathDescription>Is Technical Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep-1">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>520</pd:x>
+            <pd:y>539</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>439</pd:x>
+            <pd:y>324</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Generate-Error-1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>375</pd:x>
+            <pd:y>539</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns02:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns02:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Error">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>517</pd:x>
+            <pd:y>391</pd:y>
+            <config>
+                <element>
+                    <xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" name="ErrorCode" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ErrorCode>
+                    <xsl:value-of select="contains($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_CONDITION_FOR_SUSPEND, $_error/ns1:ErrorReport/MsgCode)"/>
+                </ErrorCode>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess 1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>686</pd:x>
+            <pd:y>539</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$_error_OrdenCompra_Validate_Subscriber_Main/Exception"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="OrdenCompra_Validate_Subscriber_Main">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>398</pd:x>
+            <pd:y>240</pd:y>
+            <config>
+                <processName>/Heb2bOrdenCompraSubscriber Processes/Main Process/Heb2bOrdenCompraSubscriber_Main.process</processName>
+            </config>
+            <pd:inputBindings>
+                <pfx4:PURCHASE_ORDER>
+                    <pfx4:NUMEROORDEN>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:NUMEROORDEN/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:NUMEROORDEN"/>
+                    </pfx4:NUMEROORDEN>
+                    <pfx4:IDPROVEEDOR>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDPROVEEDOR/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDPROVEEDOR"/>
+                    </pfx4:IDPROVEEDOR>
+                    <pfx4:IDSUCURSAL>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDSUCURSAL/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDSUCURSAL"/>
+                    </pfx4:IDSUCURSAL>
+                    <pfx4:IDESTATUS>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDESTATUS/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDESTATUS"/>
+                    </pfx4:IDESTATUS>
+                    <pfx4:IDMETODODISTRIBUCION>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDMETODODISTRIBUCION/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:IDMETODODISTRIBUCION"/>
+                    </pfx4:IDMETODODISTRIBUCION>
+                    <pfx4:FECHAORDEN>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:FECHAORDEN/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:FECHAORDEN"/>
+                    </pfx4:FECHAORDEN>
+                    <pfx4:FECHAENTREGA>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:FECHAENTREGA/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:FECHAENTREGA"/>
+                    </pfx4:FECHAENTREGA>
+                    <pfx4:FECHACANCELACION>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:FECHACANCELACION/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:FECHACANCELACION"/>
+                    </pfx4:FECHACANCELACION>
+                    <pfx4:COMENTARIOS>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:COMENTARIOS/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:COMENTARIOS"/>
+                    </pfx4:COMENTARIOS>
+                    <pfx4:COMPRADOR>
+                        <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:COMPRADOR/@xsi:nil"/>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:COMPRADOR"/>
+                    </pfx4:COMPRADOR>
+                    <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER/pfx4:PURCHASE_ORDER_DETAIL"/>
+                    <xsl:copy-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER/pfx4:PURCHASE_ORDER_DISTRIBUTION"/>
+                </pfx4:PURCHASE_ORDER>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Catch-1">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>882</pd:x>
+        <pd:y>628</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=Exception</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess 2">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1032</pd:x>
+        <pd:y>627</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Catch-1/Exception"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>822</pd:x>
+        <pd:y>396</pd:y>
+        <config>
+            <processName>/Utility Services/AuditProcess/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:AuditingSchema>
+                <ns12:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns12:inrtn_id>
+                <ns12:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns12:inrtn_nm>
+                <ns12:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns12:inrtn_instn_nm>
+                <ns12:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns12:inrtn_proc_id>
+                <xsl:if test="not(($Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:NUMEROORDEN/@xsi:nil=(&quot;true&quot;)) or ($Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:NUMEROORDEN/@xsi:nil=(&quot;1&quot;)))">
+                    <ns12:inrtn_rec_cnt>
+                        <xsl:value-of select="$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:NUMEROORDEN"/>
+                    </ns12:inrtn_rec_cnt>
+                </xsl:if>
+                <ns12:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </ns12:inrtn_cre8_ts>
+            </ns12:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>532</pd:x>
+        <pd:y>684</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns02:ActivityInput>
+                <xsl:if test="$_error/ns1:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <xsl:copy-of select="$_error_OrdenCompra_Validate_Subscriber_Main/Exception"/>
+                </data>
+            </ns02:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Confirm-1">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>1033</pd:x>
+        <pd:y>508</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>207</pd:x>
+        <pd:y>170</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess-1-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>927</pd:x>
+        <pd:y>275</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <Code>
+                    <xsl:value-of select="'ERRSiNDTL'"/>
+                </Code>
+                <Message>
+                    <xsl:value-of select="concat('La OC: ',$Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:NUMEROORDEN,' no cuenta con detalle y no pudo ser procesada')"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Retry Group on Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Parse-XML/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER/pfx4:PURCHASE_ORDER_DETAIL) &gt; 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:xpathDescription>No Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not(exists($_error))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch-1</pd:from>
+        <pd:to>ErrorProcess 2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess 2</pd:from>
+        <pd:to>Confirm-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditProcess</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>Sin Detalle</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>ErrorProcess-1-1</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess-1-1</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: OrdenCompraProjectSubscriber_Starter
+Fecha de creación: 04/01/2014
+Variables globales: PURCHASEORDERQUEUE
+Descripción: Proceso suscrito al Topic HEB.COMMON.PMM.PO_ALL.TOPIC al detectar un nuevo mensaje llama a OrdenCompra_Validate_Subscriber_Main </pd:description>
+        <pd:x>258</pd:x>
+        <pd:y>67</pd:y>
+        <pd:width>497</pd:width>
+        <pd:height>115</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-6710785</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

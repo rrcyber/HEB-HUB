@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd" xmlns:ns02="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://xmlns.tibco.com/body" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:pfx5="http://www.tibco.com/schemas/PmmReprocesamientoAuditNumber/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/schemas/AnioTemporadaProjectPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx3="http://www.tibco.com/schemas/Project HEB Integraciones/Resources/EIM/Services/Ropa/AnioTemporada/Schema.xsd" xmlns:pfx2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/Project HEB Integraciones/Resources/EIM/Services/Ropa/AnioTemporada/Schema.xsd" schemaLocation="/Resources/EIM/Services/Ropa/AnioTemporada/AnioTemporada_Export_Root.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/AnioTemporadaProjectPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmReprocesamientoAuditNumber/Shared Resources/Schema Definitions/Custom/Schema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Reprocesamiento_export.xsd"/>
+    <pd:name>Heb2bReprocesamiento Processes/Starter Process/Heb2bReprocesamiento_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>27</pd:x>
+        <pd:y>232</pd:y>
+        <config>
+            <StartTime>1431434045000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%RetryConfig/Time_Interval%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>444</pd:endX>
+    <pd:endY>233</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1387380424680</pd:targetNamespace>
+    <pd:activity name="SendQueueCatalagos">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>301</pd:x>
+        <pd:y>234</pd:y>
+        <config>
+            <processName>/Heb2bReprocesamiento Processes/SubProcess/SenQueueCatalagos.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="GetQueueReporceso">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>152</pd:x>
+        <pd:y>232</pd:y>
+        <config>
+            <processName>/Heb2bReprocesamiento Processes/SubProcess/GetQueueReporceso.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>GetQueueReporceso</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendQueueCatalagos</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetQueueReporceso</pd:from>
+        <pd:to>SendQueueCatalagos</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

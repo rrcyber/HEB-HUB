@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.tibco.com/body" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>MagentoToPos Processes/Sub Process/Update_POSBitacora.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Result">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Estatus" type="xsd:string"/>
+                    <xsd:element name="TicketGeneradoPOS" type="xsd:string"/>
+                    <xsd:element name="NumeroPedido" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>29</pd:startX>
+    <pd:startY>108</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>550</pd:endX>
+    <pd:endY>108</pd:endY>
+    <pd:errorSchemas>
+        <Fault ref="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1441980768595</pd:targetNamespace>
+    <pd:activity name="Update_POSBitacora_SXD2010107">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>264</pd:x>
+        <pd:y>108</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/Connection_SXD2010107.sharedjdbc</jdbcSharedConfig>
+            <statement>update ecom_posbitacora set Estatus = ?, TicketGeneradoPOS = ?,dtfechaMOd=getdate()
+where NumeroPedido = ?
+and estatus != '4'</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Estatus</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TicketGeneradoPOS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>NumeroPedido</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <Estatus>
+                    <xsl:value-of select="$Start/Result/Estatus"/>
+                </Estatus>
+                <TicketGeneradoPOS>
+                    <xsl:value-of select="$Start/Result/TicketGeneradoPOS"/>
+                </TicketGeneradoPOS>
+                <NumeroPedido>
+                    <xsl:value-of select="$Start/Result/NumeroPedido"/>
+                </NumeroPedido>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 01">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>275</pd:x>
+        <pd:y>330</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns1:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <pfx:Code>
+                            <xsl:value-of select="'Fault 01'"/>
+                        </pfx:Code>
+                        <pfx:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_01"/>
+                        </pfx:Reason>
+                    </pfx:Fault>
+                </data>
+            </ns1:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send Mail">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>270</pd:x>
+        <pd:y>220</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>%%MailConfiguration/Host%%</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns12:mailActivityInput>
+                <from>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/From"/>
+                </from>
+                <to>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/To"/>
+                </to>
+                <subject>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/Subject"/>
+                </subject>
+                <ns2:bodyElement>
+                    <bodyText>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/Body"/>
+                    </bodyText>
+                </ns2:bodyElement>
+            </ns12:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Update_POSBitacora_SXD2010107</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_POSBitacora_SXD2010107</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_POSBitacora_SXD2010107</pd:from>
+        <pd:to>Send Mail</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Mail</pd:from>
+        <pd:to>Fault 01</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

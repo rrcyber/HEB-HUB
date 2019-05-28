@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/LogixOffer.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/LogixOffer.xsd"/>
+    <pd:name>EventPlanningOfferToLogix_Processes/Sub Process/getOfferProductsRewardList.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="OfferFolio" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>150</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <ProductList>
+            <xsl:value-of select="concat(&#xA;tib:concat-sequence-format(&#xA;$JDBC-Query/resultSet/Record/PRODUCTLIST&#xA;, concat(&quot;, 1 &quot;, &quot;&#xD;&#xA;&quot;)&#xA;, true()&#xA;)&#xA;,&quot;, 1 &quot;&#xA;)"/>
+        </ProductList>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="ProductList" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>450</pd:endX>
+    <pd:endY>63</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1396995624865</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>296</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <timeout>%%Connections/Database/XPORTAL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/XPORTAL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/XPORTAL.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT DISTINCT
+  C.INDICE AS FOLIO,
+  LEFT(COD_CODIGOPROD, LEN(COD_CODIGOPROD)-1) AS PRODUCTLIST
+FROM CATEVENT E (NOLOCK)
+  JOIN CATCOMEVENTOGC G(NOLOCK)
+    ON G.XQASOCIACION = E.INDICE
+  JOIN CATDCOMBO C(NOLOCK)
+    ON C.XQASOCIACION = G.INDICE
+  JOIN CATPRECIOCLUSTER P(NOLOCK)
+    ON P.XQASOCIACION = C.INDICE
+  JOIN CATDATARGET TA(NOLOCK)
+    ON TA.XQASOCIACION = P.INDICE
+  JOIN GRANDE..OCODP COD(NOLOCK)
+    ON COD.COD_ARTICULO = TA.XVARTICULOL_TARGET
+    AND COD_TICODPRO = 1
+  JOIN BITACORAENVIOLOGIX BE (NOLOCK)
+    ON E.ID_DEL_EVENTO = BE.FOLIOREFERENCIA1
+    AND C.INDICE = BE.FOLIOREFERENCIA2
+    AND BE.ESTATUSENVIO = 0 AND BE.TIPOENVIO = 'COMBOLOCO'
+WHERE
+  BE.ID = ?
+ORDER BY C.INDICE</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>OFFER_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>FOLIO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRODUCTLIST</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <OFFER_ID>
+                    <xsl:value-of select="$Start/OfferFolio"/>
+                </OFFER_ID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

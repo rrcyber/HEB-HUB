@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://xmlns.heb.com/ei/Marcajes_KRONOS" xmlns:pfx="http://www.tibco.com/namespaces/tnt/plugins/jms">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Marcajes_KRONOS" schemaLocation="/Shared Resources/Schema Definitions/Custom/Marcajes_KRONOS.xsd"/>
+    <pd:name>Project Name Processes/Starter Process/Update_Estatus_MarcajeSociosTiendas.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>72</pd:x>
+        <pd:y>207</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB.STORE.ESTATUS.MARCAJE.QUEUE%%</destination>
+                <selector>%%Connections/JMS/EMS/MSG_SELEC_ID_STORES%%</selector>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <_customId>pfx:ActivityOutput/JMSHeaders/pfx:JMSCorrelationID</_customId>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <OutDataxsdString ref="pfx2:Marcajes_KRONOS"/>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>710</pd:endX>
+    <pd:endY>210</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1375712180142</pd:targetNamespace>
+    <pd:group name="Retry Group on Error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>173</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>353</pd:width>
+        <pd:height>395</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>MarcajesSociosTienda</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>MarcajesSociosTienda</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Is Error Data</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Validate-Error/ErrorCode='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch</pd:from>
+            <pd:to>Validate Error</pd:to>
+            <pd:xpathDescription>is Error</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>ErrorProcess</pd:to>
+            <pd:xpathDescription>Count =3</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>Generate-Error-1</pd:to>
+            <pd:xpathDescription>No</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>Sleep-1</pd:to>
+            <pd:xpathDescription>Is Technical Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep-1">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>340</pd:x>
+            <pd:y>318</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>258</pd:x>
+            <pd:y>154</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Generate-Error-1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>246</pd:x>
+            <pd:y>319</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns2:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns2:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Error">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>342</pd:x>
+            <pd:y>207</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="ErrorCode" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ErrorCode>
+                    <xsl:value-of select="contains($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_CONDITION_FOR_DATA_ERROR, $_error/ns1:ErrorReport/MsgCode)"/>
+                </ErrorCode>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>439</pd:x>
+            <pd:y>317</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Exception>
+                    <Domain>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                    </Domain>
+                    <Deployment>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                    </Deployment>
+                    <Project>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </Project>
+                    <EngineName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                    </EngineName>
+                    <TimeStamp>
+                        <xsl:value-of select="current-dateTime()"/>
+                    </TimeStamp>
+                    <Code>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </Code>
+                    <Message>
+                        <xsl:value-of select="tib:render-xml($_error/ns1:ErrorReport, 0,0)"/>
+                    </Message>
+                </Exception>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="MarcajesSociosTienda">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>296</pd:x>
+            <pd:y>63</pd:y>
+            <config>
+                <processName>/Project Name Processes/Main Process/Update_Estado_Marcajes_Tienda.process</processName>
+            </config>
+            <pd:inputBindings>
+                <pfx2:Marcajes_KRONOS>
+                    <xsl:copy-of select="$JMS-Queue-Receiver/pfx:ActivityOutput/Body/pfx2:Marcajes_KRONOS/pfx2:ITEM"/>
+                </pfx2:Marcajes_KRONOS>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>614</pd:x>
+        <pd:y>207</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Retry Group on Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

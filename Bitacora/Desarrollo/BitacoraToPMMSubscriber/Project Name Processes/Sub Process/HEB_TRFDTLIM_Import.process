@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="www.tibco.com/plugin/Sleep">
+    <pd:name>Project Name Processes/Sub Process/HEB_TRFDTLIM_Import.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="session_number" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="action_code" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>57</pd:startX>
+    <pd:startY>226</pd:startY>
+    <pd:returnBindings>
+        <result>
+            <error_message>
+                <xsl:value-of select="if(string-length($Map-Data/root/message)=0) then '' else $Map-Data/root/message"/>
+            </error_message>
+        </result>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>667</pd:endX>
+    <pd:endY>235</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1355263227214</pd:targetNamespace>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>541</pd:x>
+        <pd:y>232</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>595</pd:x>
+        <pd:y>366</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>162</pd:x>
+        <pd:y>97</pd:y>
+        <pd:width>283</pd:width>
+        <pd:height>252</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns1:GlobalVariables/RetryConfig/GLB_SP_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Call Procedure</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Call Procedure</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Call Procedure</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate-Error-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>309</pd:x>
+            <pd:y>295</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns12:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/RetryConfig/GLB_SP_RETRY_DELAY_"/>
+                    </IntervalInMillisec>
+                </ns12:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Call Procedure">
+            <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+            <pd:x>307</pd:x>
+            <pd:y>167</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <maxRows>1</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <schema>PMM</schema>
+                <ProcedureName>HEB_TRFDTLIM</ProcedureName>
+                <parameterTypes>
+                    <parameter>
+                        <colName>IN_SESSION_NUMBER</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_ACTION</colName>
+                        <colType>1</colType>
+                        <dataType>12</dataType>
+                        <typeName>NCHAR</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_TRANS_FEED</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_BATCH_COUNT</colName>
+                        <colType>1</colType>
+                        <dataType>2</dataType>
+                        <typeName>NUMBER</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>IN_CHANGE_DATE</colName>
+                        <colType>1</colType>
+                        <dataType>12</dataType>
+                        <typeName>NCHAR</typeName>
+                    </parameter>
+                </parameterTypes>
+            </config>
+            <pd:inputBindings>
+                <inputs>
+                    <inputSet>
+                        <IN_SESSION_NUMBER>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/group/session_number)">
+                                    <xsl:value-of select="$Start/group/session_number"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IN_SESSION_NUMBER>
+                        <IN_ACTION>
+                            <xsl:value-of select="if($Start/group/action_code='01') then 'W' else (if($Start/group/action_code='02') then 'P' else (if($Start/group/action_code='03') then 'S' else (if($Start/group/action_code='04') then 'R' else (if($Start/group/action_code='05') then 'C' else (if($Start/group/action_code='08') then 'E' else '')))))"/>
+                        </IN_ACTION>
+                        <IN_TRANS_FEED>
+                            <xsl:value-of select="0"/>
+                        </IN_TRANS_FEED>
+                        <IN_BATCH_COUNT>
+                            <xsl:value-of select="100"/>
+                        </IN_BATCH_COUNT>
+                        <IN_CHANGE_DATE>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </IN_CHANGE_DATE>
+                    </inputSet>
+                </inputs>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate-Error-1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>223</pd:x>
+            <pd:y>295</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns2:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns2:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns14="www.tibco.com/plugin/Sleep" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>HebcardCustomerGroupToLogix Processes/Starter Process/Send_CustomerGroup_Main.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>28</pd:x>
+        <pd:y>217</pd:y>
+        <config>
+            <StartTime>1412776800000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%ProjectConfig/RUN_FRECUENCY%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>864</pd:endX>
+    <pd:endY>217</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412716829309</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>658</pd:x>
+        <pd:y>364</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Retry Group on Error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>184</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>428</pd:width>
+        <pd:height>416</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Update_CustomerGroup</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Update_CustomerGroup</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Is Error Data</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Validate-Error/ErrorCode='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>ErrorProcess 1</pd:to>
+            <pd:xpathDescription>Count =3</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>Generate-Error-1</pd:to>
+            <pd:xpathDescription>No</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch-1</pd:from>
+            <pd:to>Validate Error</pd:to>
+            <pd:xpathDescription>Is Error</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>Sleep-1</pd:to>
+            <pd:xpathDescription>Is Technical Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep-1">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>390</pd:x>
+            <pd:y>340</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns14:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GLB_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns14:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch-1">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>308</pd:x>
+            <pd:y>150</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Generate-Error-1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>258</pd:x>
+            <pd:y>340</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns13:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns13:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Error">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>390</pd:x>
+            <pd:y>215</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="ErrorCode" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ErrorCode>
+                    <xsl:value-of select="contains($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_CONDITION_FOR_SUSPEND, $_error/ns1:ErrorReport/MsgCode)"/>
+                </ErrorCode>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess 1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>521</pd:x>
+            <pd:y>341</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Exception>
+                    <Domain>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                    </Domain>
+                    <Deployment>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                    </Deployment>
+                    <Project>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </Project>
+                    <EngineName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                    </EngineName>
+                    <TimeStamp>
+                        <xsl:value-of select="current-dateTime()"/>
+                    </TimeStamp>
+                    <Code>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </Code>
+                    <Message>
+                        <xsl:value-of select="concat( 'ERROR MESSAGE: Incident at Send_CustomerGroup_Main',&quot;&amp;If;&quot;,&#xA;') Unexpected Unexpected :' , tib:render-xml($_error/ns1:ErrorReport ,0, 0))"/>
+                    </Message>
+                </Exception>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Update_CustomerGroup">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>350</pd:x>
+            <pd:y>67</pd:y>
+            <config>
+                <processName>/HebcardCustomerGroupToLogix Processes/Main Process/Update_CustomerGroup.process</processName>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="ErrorProcess-1-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>782</pd:x>
+        <pd:y>366</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <Code>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                </Code>
+                <Message>
+                    <xsl:value-of select="concat( 'ERROR MESSAGE: Incident at Send_CustomerGroup_Main',&quot;&amp;If;&quot;,&#xA;') Unexpected Unexpected :' , tib:render-xml($_error/ns1:ErrorReport ,0, 0))"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess-1-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess-1-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>Retry Group on Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

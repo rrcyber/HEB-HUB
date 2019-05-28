@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/storeruid.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>160</pd:startX>
+    <pd:startY>68</pd:startY>
+    <pd:returnBindings>
+        <run_id>
+            <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/Run_ID"/>
+        </run_id>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="run_id" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>403</pd:endX>
+    <pd:endY>66</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1449252406766</pd:targetNamespace>
+    <pd:activity name="JDBC Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>290</pd:x>
+        <pd:y>76</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>DBSTAGE</catalog>
+            <ProcedureName>usp_GetNew_run_id;1</ProcedureName>
+            <commit>true</commit>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@Run_ID</colName>
+                    <colType>2</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <Run_ID>
+                        <xsl:value-of select="''"/>
+                    </Run_ID>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

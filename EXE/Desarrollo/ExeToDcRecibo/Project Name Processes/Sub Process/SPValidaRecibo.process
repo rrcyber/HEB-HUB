@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/SPValidaRecibo.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>171</pd:startX>
+    <pd:startY>118</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>396</pd:endX>
+    <pd:endY>122</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx2:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1502229051452</pd:targetNamespace>
+    <pd:activity name="JDBC Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>286</pd:x>
+        <pd:y>128</pd:y>
+        <config>
+            <timeout>%%Connections/Database/Interfase_01/TimeOut%%</timeout>
+            <maxRows>%%Connections/Database/Interfase_01/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/Interfase_01.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>INTERFASE</catalog>
+            <ProcedureName>ValidaReciboEXE;1</ProcedureName>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@ValidaDc_Recibo</colName>
+                    <colType>1</colType>
+                    <dataType>-7</dataType>
+                    <typeName>bit</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@Resultado</colName>
+                    <colType>2</colType>
+                    <dataType>-7</dataType>
+                    <typeName>bit</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <ValidaDc_Recibo xsi:nil="true"/>
+                    <Resultado>
+                        <xsl:value-of select="'1'"/>
+                    </Resultado>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>286</pd:x>
+        <pd:y>236</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JDBC-Call-Procedure/resultSet/outputSet/Resultado = '1'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="www.tibco.com/plugin/java/JavaToXmlActivityInput" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="www.tibco.com/plugin/java/JavaMethodActivityInput" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Project Name Processes/Sub Process/DynamicConnectionQuery.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="DB_URL" type="xsd:string"/>
+                    <xsd:element name="USER" type="xsd:string"/>
+                    <xsd:element name="QUERY" type="xsd:string"/>
+                    <xsd:element name="MAX_ROWS" type="xsd:int"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>150</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:if test="$Java-Code/javaCodeActivityOutput/RESULT_STR">
+                <result>
+                    <xsl:value-of select="$Java-Code/javaCodeActivityOutput/RESULT_STR"/>
+                </result>
+            </xsl:if>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="result" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>499</pd:endX>
+    <pd:endY>66</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1363048007401</pd:targetNamespace>
+    <pd:activity name="Java Code">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>317</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <fullsource>package ProjectNameProcesses.SubProcess.DynamicConnectionQuery;
+
+import java.util.*;
+import java.io.*;
+import java.sql.*;
+import com.tibco.security.ObfuscationEngine;
+
+public class DynamicConnectionQueryJavaCode{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String DB_URL = "";
+	protected String USR = "";
+	protected String SQL_QUERY = "";
+	protected int LOGIN_TIMEOUT = 0;
+	protected int MAX_ROWS = 0;
+	protected int QUERY_TIMEOUT = 0;
+	protected String RESULT_STR = "";
+	protected String ERROR_MSG = "";
+	public String getDB_URL() {
+		return DB_URL;
+	}
+	public void setDB_URL(String val) {
+		DB_URL = val;
+	}
+	public String getUSR() {
+		return USR;
+	}
+	public void setUSR(String val) {
+		USR = val;
+	}
+	public String getSQL_QUERY() {
+		return SQL_QUERY;
+	}
+	public void setSQL_QUERY(String val) {
+		SQL_QUERY = val;
+	}
+	public int getLOGIN_TIMEOUT() {
+		return LOGIN_TIMEOUT;
+	}
+	public void setLOGIN_TIMEOUT(int val) {
+		LOGIN_TIMEOUT = val;
+	}
+	public int getMAX_ROWS() {
+		return MAX_ROWS;
+	}
+	public void setMAX_ROWS(int val) {
+		MAX_ROWS = val;
+	}
+	public int getQUERY_TIMEOUT() {
+		return QUERY_TIMEOUT;
+	}
+	public void setQUERY_TIMEOUT(int val) {
+		QUERY_TIMEOUT = val;
+	}
+	public String getRESULT_STR() {
+		return RESULT_STR;
+	}
+	public void setRESULT_STR(String val) {
+		RESULT_STR = val;
+	}
+	public String getERROR_MSG() {
+		return ERROR_MSG;
+	}
+	public void setERROR_MSG(String val) {
+		ERROR_MSG = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public DynamicConnectionQueryJavaCode() {
+	}
+
+public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String DB_URL
+	In  : String USR
+	In  : String SQL_QUERY
+	In  : int LOGIN_TIMEOUT
+	In  : int MAX_ROWS
+	In  : int QUERY_TIMEOUT
+	Out : String RESULT_STR
+	Out : String ERROR_MSG
+* Available Variables: DO NOT MODIFY *****/
+
+//METHOD VARIABLE
+	Connection conn = null;
+	Statement stmt = null;
+    ResultSet rs = null;
+    String sResult = "";
+    int count = 0;   
+    boolean flag = false;
+	String sPass = com.tibco.pe.plugin.PluginProperties.getProperty("tibco.clientVar.Connections/Database/DatabaseName/MIG_DBPASSWORD");
+
+//GET CONNECTION
+  try{
+		DriverManager.setLoginTimeout(LOGIN_TIMEOUT);
+		conn = DriverManager.getConnection(getDB_URL(),getUSR(),sPass);
+        if(conn!=null){
+			try {
+				//EXECUTE QUERY				
+				stmt = conn.createStatement();
+				stmt.setMaxRows(MAX_ROWS);
+				stmt.setQueryTimeout(QUERY_TIMEOUT);
+				rs = stmt.executeQuery(getSQL_QUERY());
+				//PREPARE RESULTS
+				while(rs.next()){
+					String sRow = "";
+					for(int index=1;flag!=true;index++){
+						try{
+							String sTemp =  rs.getString(index);
+							sRow += sTemp+"^";
+
+						}catch(Exception e){
+						flag=true; 
+						}
+					}
+					flag=false;
+					if(sRow.lastIndexOf("^")&gt;0)
+					sRow = sRow.substring(0, sRow.length()-1) + "\n";
+	    
+					sRow = sRow.replaceAll("null", "");
+					sResult += sRow;
+				}
+				
+				setRESULT_STR(sResult);
+				
+		
+			} catch (SQLException e ) {
+					setERROR_MSG(e.getMessage());
+			}finally {
+					if (rs != null) try { rs.close(); } catch(Exception e) {}
+					if (stmt != null) try { stmt.close(); } catch(Exception e) {}
+					if (conn != null) try { conn.close(); } catch(Exception e) {}
+			}
+	
+		}
+    }
+    catch(Exception e){
+		setERROR_MSG(e.getMessage());
+	}finally {
+					if (rs != null) try { rs.close(); } catch(Exception e) {}
+					if (stmt != null) try { stmt.close(); } catch(Exception e) {}
+					if (conn != null) try { conn.close(); } catch(Exception e) {}
+			}
+}
+}
+</fullsource>
+            <fileName>DynamicConnectionQueryJavaCode</fileName>
+            <packageName>ProjectNameProcesses.SubProcess.DynamicConnectionQuery</packageName>
+            <javaArchive/>
+            <inputData>
+                <row>
+                    <fieldName>DB_URL</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>USR</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>SQL_QUERY</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>LOGIN_TIMEOUT</fieldName>
+                    <fieldType>int</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>MAX_ROWS</fieldName>
+                    <fieldType>int</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>QUERY_TIMEOUT</fieldName>
+                    <fieldType>int</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+            </inputData>
+            <outputData>
+                <row>
+                    <fieldName>RESULT_STR</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>ERROR_MSG</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </outputData>
+            <byteCode>
+                <class>
+                    <name>DynamicConnectionQueryJavaCode</name>
+                    <byteCode>yv66vgAAADMArgkALABdCQAsAF4JACwAXwkALABgCQAsAGEJACwAYgkALABjCQAsAGQKAC0AZQgAZggAZwoAaABpCgBqAGsKACwAbAoALABtCgBqAG4LAG8AcAsAcQByCwBxAHMKACwAdAsAcQB1CwB2AHcLAHYAeAcAeQoAGABlCgAYAHoIAHsKABgAfAcAfQoAfgB/CgB+AIAKAH4AgQgAgggAgwoAfgCECgAsAIULAHYAhgsAcQCGCwBvAIYHAIcKACgAiAoALACJCgAdAIgHAIoHAIsBAAZEQl9VUkwBABJMamF2YS9sYW5nL1N0cmluZzsBAANVU1IBAAlTUUxfUVVFUlkBAA1MT0dJTl9USU1FT1VUAQABSQEACE1BWF9ST1dTAQANUVVFUllfVElNRU9VVAEAClJFU1VMVF9TVFIBAAlFUlJPUl9NU0cBAAlnZXREQl9VUkwBABQoKUxqYXZhL2xhbmcvU3RyaW5nOwEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBAAlzZXREQl9VUkwBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAAZnZXRVU1IBAAZzZXRVU1IBAAxnZXRTUUxfUVVFUlkBAAxzZXRTUUxfUVVFUlkBABBnZXRMT0dJTl9USU1FT1VUAQADKClJAQAQc2V0TE9HSU5fVElNRU9VVAEABChJKVYBAAtnZXRNQVhfUk9XUwEAC3NldE1BWF9ST1dTAQAQZ2V0UVVFUllfVElNRU9VVAEAEHNldFFVRVJZX1RJTUVPVVQBAA1nZXRSRVNVTFRfU1RSAQANc2V0UkVTVUxUX1NUUgEADGdldEVSUk9SX01TRwEADHNldEVSUk9SX01TRwEABjxpbml0PgEAAygpVgEABmludm9rZQEADVN0YWNrTWFwVGFibGUHAIoHAIwHAI0HAI4HAI8HAH0HAIcHAJABAApFeGNlcHRpb25zAQAKU291cmNlRmlsZQEAI0R5bmFtaWNDb25uZWN0aW9uUXVlcnlKYXZhQ29kZS5qYXZhDAAuAC8MADAALwwAMQAvDAAyADMMADQAMwwANQAzDAA2AC8MADcALwwATgBPAQAAAQBAdGliY28uY2xpZW50VmFyLkNvbm5lY3Rpb25zL0RhdGFiYXNlL0RhdGFiYXNlTmFtZS9NSUdfREJQQVNTV09SRAcAkQwAkgCTBwCUDACVAEUMADgAOQwAPgA5DACWAJcHAIwMAJgAmQcAjQwAmgBFDACbAEUMAEAAOQwAnACdBwCODACeAJ8MAKAAoQEAF2phdmEvbGFuZy9TdHJpbmdCdWlsZGVyDACiAKMBAAFeDACkADkBABNqYXZhL2xhbmcvRXhjZXB0aW9uBwCPDAClAKYMAKcAQwwAqACpAQABCgEABG51bGwMAKoAqwwASwA9DACsAE8BABVqYXZhL3NxbC9TUUxFeGNlcHRpb24MAK0AOQwATQA9AQBVUHJvamVjdE5hbWVQcm9jZXNzZXMvU3ViUHJvY2Vzcy9EeW5hbWljQ29ubmVjdGlvblF1ZXJ5L0R5bmFtaWNDb25uZWN0aW9uUXVlcnlKYXZhQ29kZQEAEGphdmEvbGFuZy9PYmplY3QBABNqYXZhL3NxbC9Db25uZWN0aW9uAQASamF2YS9zcWwvU3RhdGVtZW50AQASamF2YS9zcWwvUmVzdWx0U2V0AQAQamF2YS9sYW5nL1N0cmluZwEAE2phdmEvbGFuZy9UaHJvd2FibGUBACRjb20vdGliY28vcGUvcGx1Z2luL1BsdWdpblByb3BlcnRpZXMBAAtnZXRQcm9wZXJ0eQEAJihMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9TdHJpbmc7AQAWamF2YS9zcWwvRHJpdmVyTWFuYWdlcgEAD3NldExvZ2luVGltZW91dAEADWdldENvbm5lY3Rpb24BAE0oTGphdmEvbGFuZy9TdHJpbmc7TGphdmEvbGFuZy9TdHJpbmc7TGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL3NxbC9Db25uZWN0aW9uOwEAD2NyZWF0ZVN0YXRlbWVudAEAFigpTGphdmEvc3FsL1N0YXRlbWVudDsBAApzZXRNYXhSb3dzAQAPc2V0UXVlcnlUaW1lb3V0AQAMZXhlY3V0ZVF1ZXJ5AQAoKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9zcWwvUmVzdWx0U2V0OwEABG5leHQBAAMoKVoBAAlnZXRTdHJpbmcBABUoSSlMamF2YS9sYW5nL1N0cmluZzsBAAZhcHBlbmQBAC0oTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvU3RyaW5nQnVpbGRlcjsB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</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings>
+            <javaCodeActivityInput>
+                <DB_URL>
+                    <xsl:value-of select="$Start/group/DB_URL"/>
+                </DB_URL>
+                <USR>
+                    <xsl:value-of select="$Start/group/USER"/>
+                </USR>
+                <SQL_QUERY>
+                    <xsl:value-of select="$Start/group/QUERY"/>
+                </SQL_QUERY>
+                <LOGIN_TIMEOUT>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/GLB_TIMEOUT"/>
+                </LOGIN_TIMEOUT>
+                <MAX_ROWS>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                </MAX_ROWS>
+                <QUERY_TIMEOUT>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/GLB_TIMEOUT"/>
+                </QUERY_TIMEOUT>
+            </javaCodeActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>319</pd:x>
+        <pd:y>198</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput>
+                <xsl:if test="$Java-Code/javaCodeActivityOutput/ERROR_MSG">
+                    <message>
+                        <xsl:value-of select="$Java-Code/javaCodeActivityOutput/ERROR_MSG"/>
+                    </message>
+                </xsl:if>
+                <messageCode>
+                    <xsl:value-of select="'BW-JAVA-100001'"/>
+                </messageCode>
+            </pfx2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Java Code</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Java Code</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>Successful</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Java Code</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>string-length($Java-Code/javaCodeActivityOutput/ERROR_MSG) !=0</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

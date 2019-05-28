@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:ns5="http://xmlns.heb.com/ei/Inventory" xmlns:pfx="http://xmlns.heb.com/ei/PO_NOTIFY" xmlns:ns2="www.tibco.com/plugin/Sleep" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://xmlns.heb.com/ei/Price" xmlns:ns3="http://xmlns.heb.com/ei/PlannerDepartmentList" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx5="http://xmlns.heb.com/ei/CatalogoPlanner" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3" xmlns:pfx7="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx6="http://xmlns.heb.com/ei/CatalogoPlannerList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Common/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Custom/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/CatalogoPlanner" schemaLocation="/Shared Resources/Schema Definitions/Custom/CATALOGO_PLANNER_INFORMATION_DATA_SOAP.xsd"/>
+    <pd:name>Processes/Main Process/PriceInventory_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>114</pd:startX>
+    <pd:startY>236</pd:startY>
+    <pd:returnBindings>
+        <Cont>
+            <xsl:value-of select="$i"/>
+        </Cont>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1295</pd:endX>
+    <pd:endY>233</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <Global>
+            <xsd:element name="Flag2" type="xsd:string"/>
+        </Global>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1406154803290</pd:targetNamespace>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>852</pd:x>
+        <pd:y>482</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE: Incident at Planner : ', tib:render-xml($_error/ns:ErrorReport ,0, 0))"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>714</pd:x>
+        <pd:y>482</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Get_ArticuloPricePropuesta">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>228</pd:x>
+        <pd:y>235</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Get_IDPropuesta.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group Propuestas">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>313</pd:x>
+        <pd:y>48</pd:y>
+        <pd:width>901</pd:width>
+        <pd:height>355</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get_ArticuloPricePropuesta/Propuestas/pfx7:BitacoraPropuestaArticuloPriceInventory</pd:over>
+            <pd:iterationElementSlot>Propuesta</pd:iterationElementSlot>
+            <pd:indexSlot>I</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>StatusProcesando</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>AuditProcess</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Propuesta</pd:from>
+            <pd:to>Get_PropuestaPrice</pd:to>
+            <pd:xpathDescription>IsPrice</pd:xpathDescription>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Propuesta/pfx7:BitacoraPropuestaArticuloPriceInventory/pfx7:EsPriceInventory = "true"</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Propuesta</pd:from>
+            <pd:to>Get_PropuestaInventory</pd:to>
+            <pd:xpathDescription>Is Inventory</pd:xpathDescription>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_PropuestaInventory</pd:from>
+            <pd:to>Set_PropuestaInventory</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_PropuestaPrice</pd:from>
+            <pd:to>Set_PropuestaPrice</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>StatusProcesando</pd:from>
+            <pd:to>Propuesta</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Set_PropuestaPrice</pd:from>
+            <pd:to>StatusEnviado</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Set_PropuestaInventory</pd:from>
+            <pd:to>StatusEnviado</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>StatusEnviado</pd:from>
+            <pd:to>AuditProcess</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Propuesta">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>516</pd:x>
+            <pd:y>234</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Get_PropuestaPrice">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>662</pd:x>
+            <pd:y>174</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Get_Price.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Propuesta/pfx7:BitacoraPropuestaArticuloPriceInventory"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_PropuestaInventory">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>661</pd:x>
+            <pd:y>295</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Get_Inventory.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Propuesta/pfx7:BitacoraPropuestaArticuloPriceInventory"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Set_PropuestaInventory">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>822</pd:x>
+            <pd:y>294</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Set_Inventory.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Get_PropuestaInventory/Propuestas"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Set_PropuestaPrice">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>814</pd:x>
+            <pd:y>174</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Set_Price.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Get_PropuestaPrice/Propuestas"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="StatusEnviado">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>988</pd:x>
+            <pd:y>231</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Set_EstatusPropuesta.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:copy-of select="$Propuesta/pfx7:BitacoraPropuestaArticuloPriceInventory"/>
+                    <IdEstatus>
+                        <xsl:value-of select="11"/>
+                    </IdEstatus>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="StatusProcesando">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>420</pd:x>
+            <pd:y>233</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Set_EstatusPropuesta.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:copy-of select="$Propuesta/pfx7:BitacoraPropuestaArticuloPriceInventory"/>
+                    <IdEstatus>
+                        <xsl:value-of select="15"/>
+                    </IdEstatus>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="AuditProcess">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>1117</pd:x>
+            <pd:y>232</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/AuditProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns12:AuditingSchema>
+                    <ns12:inrtn_id>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                    </ns12:inrtn_id>
+                    <ns12:inrtn_nm>
+                        <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                    </ns12:inrtn_nm>
+                    <ns12:inrtn_instn_nm>
+                        <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                    </ns12:inrtn_instn_nm>
+                    <ns12:inrtn_proc_id>
+                        <xsl:value-of select="$_processContext/ns:ProcessContext/ProcessId"/>
+                    </ns12:inrtn_proc_id>
+                    <ns12:inrtn_rec_cnt>
+                        <xsl:value-of select="$Propuesta/pfx7:BitacoraPropuestaArticuloPriceInventory/pfx7:IdPropuestaDetalle"/>
+                    </ns12:inrtn_rec_cnt>
+                    <ns12:inrtn_cre8_ts>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                    </ns12:inrtn_cre8_ts>
+                </ns12:AuditingSchema>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_ArticuloPricePropuesta</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Propuestas</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_ArticuloPricePropuesta</pd:from>
+        <pd:to>Group Propuestas</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

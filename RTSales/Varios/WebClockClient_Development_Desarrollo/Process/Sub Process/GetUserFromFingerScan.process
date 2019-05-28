@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://xmlns.heb.com/ei/WebClock4Kronos/CheckFingerPrintTemplate" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com.mx/1369930841350" xmlns:ns32="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns4="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions">
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Sub Process/GetUserFromFingerScan.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="StoreId" type="xsd:string"/>
+                    <xsd:element name="FingerScan" type="xsd:base64Binary"/>
+                    <xsd:element name="DeviceId" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>95</pd:startX>
+    <pd:startY>183</pd:startY>
+    <pd:returnBindings>
+        <AssociateFound>
+            <xsl:value-of select="if($Call_CheckFingerPrint/result/ValidationResult=&quot;true&quot;)&#xA;then $Call_CheckFingerPrint/result/AssotiateId&#xA;else &quot;0&quot;"/>
+        </AssociateFound>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="AssociateFound" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>928</pd:endX>
+    <pd:endY>186</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371590755535</pd:targetNamespace>
+    <pd:activity name="JDBC_GetAssotiatesFromStore">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>339</pd:x>
+        <pd:y>185</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select	FINGER_TEMPLATE.scan_SocioId,
+		FINGER_TEMPLATE.scan_templatededo
+from	socios  inner join
+		FINGER_TEMPLATE  on socios.socio_id= FINGER_TEMPLATE.scan_socioId
+where	socios.socio_estatus=5 and
+		socios.socio_sucursalid=? and
+		socios.socio_deptoid in (select depto_id from dbo.LECTOR_DEPTO_SUC where lector_id =? and sucursal_id = ?)</statement>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>scan_SocioId</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>scan_templatededo</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>text</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SucursalId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>LectorId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Sucursal_id</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <SucursalId>
+                    <xsl:choose>
+                        <xsl:when test="exists(if(count($JDBC-SucursalTransferencia/resultSet/Record)=0)&#xA;then $Start/root/StoreId &#xA;else $JDBC-SucursalTransferencia/resultSet/Record[1]/STOREID)">
+                            <xsl:value-of select="if(count($JDBC-SucursalTransferencia/resultSet/Record)=0)&#xA;then $Start/root/StoreId &#xA;else $JDBC-SucursalTransferencia/resultSet/Record[1]/STOREID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </SucursalId>
+                <LectorId>
+                    <xsl:choose>
+                        <xsl:when test="exists(if(count($JDBC-SucursalTransferencia/resultSet/Record)=0)&#xA;then $Start/root/DeviceId&#xA;else&#xA;$JDBC-SucursalTransferencia/resultSet/Record[1]/DEVICEID)">
+                            <xsl:value-of select="if(count($JDBC-SucursalTransferencia/resultSet/Record)=0)&#xA;then $Start/root/DeviceId&#xA;else&#xA;$JDBC-SucursalTransferencia/resultSet/Record[1]/DEVICEID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </LectorId>
+                <Sucursal_id>
+                    <xsl:choose>
+                        <xsl:when test="exists(if(count($JDBC-SucursalTransferencia/resultSet/Record)=0)&#xA;then $Start/root/StoreId &#xA;else $JDBC-SucursalTransferencia/resultSet/Record[1]/STOREID)">
+                            <xsl:value-of select="if(count($JDBC-SucursalTransferencia/resultSet/Record)=0)&#xA;then $Start/root/StoreId &#xA;else $JDBC-SucursalTransferencia/resultSet/Record[1]/STOREID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </Sucursal_id>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>505</pd:x>
+        <pd:y>109</pd:y>
+        <pd:width>352</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>$Call_CheckFingerPrint/result/ValidationResult="true" or
+($i&gt;= count($JDBC_GetAssotiatesFromStore/resultSet/Record) and
+$i&gt;= count($JDBC-SociosEnCapacitacion/resultSet/Record))</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Call_CheckFingerPrint</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Call_CheckFingerPrint</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>761</pd:x>
+            <pd:y>189</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="Result">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ValidationResult" type="xsd:boolean"/>
+                                <xsd:element name="AssociateId" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <Result>
+                    <ValidationResult>
+                        <xsl:value-of select="$Call_CheckFingerPrint/result/ValidationResult"/>
+                    </ValidationResult>
+                    <AssociateId>
+                        <xsl:value-of select="$Call_CheckFingerPrint/result/AssotiateId"/>
+                    </AssociateId>
+                </Result>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Call_CheckFingerPrint">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>618</pd:x>
+            <pd:y>187</pd:y>
+            <config>
+                <processName>/Process/Sub Process/CheckFingerPrint.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns:CheckFingerPrintTemplate>
+                    <ns:FingerprintTemplateBLB>
+                        <xsl:value-of select="if(string-length($JDBC_GetAssotiatesFromStore/resultSet/Record[1]))&#xA;then $JDBC_GetAssotiatesFromStore/resultSet/Record[$i]/scan_templatededo&#xA;else $JDBC-SociosEnCapacitacion/resultSet/Record[$i]/SCAN_TEMPLATEDEDO"/>
+                    </ns:FingerprintTemplateBLB>
+                    <ns:FingerprintFeatures>
+                        <xsl:value-of select="$Start/root/FingerScan"/>
+                    </ns:FingerprintFeatures>
+                    <ns:AssotiateId>
+                        <xsl:value-of select="if(string-length($JDBC_GetAssotiatesFromStore/resultSet/Record[1]))&#xA;then $JDBC_GetAssotiatesFromStore/resultSet/Record[$i]/scan_SocioId&#xA;else&#xA;$JDBC-SociosEnCapacitacion/resultSet/Record[$i]/SCAN_SOCIOID"/>
+                    </ns:AssotiateId>
+                </ns:CheckFingerPrintTemplate>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="JDBC-SucursalTransferencia">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>215</pd:x>
+        <pd:y>184</pd:y>
+        <config>
+            <timeout>%%Connections/Database/Kronos214/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/Kronos214/MaxRows%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT  ISNULL(B.LECTOR_ID, ?) AS DEVICEID, ISNULL(B.SUCURSAL_ID, ?) AS STOREID 
+FROM LECTORES A 
+JOIN LECTOR_DEPTO_SUC B ON A.LECTOR_ID = B.LECTOR_ID AND LECTOR_SUCURSALID = SUCURSAL_ID 
+JOIN SOCIOS_TRANSFERIDOS S ON B.SUCURSAL_ID = S.SUCURSAL AND B.DEPTO_ID = S.DEPARTAMENTO 
+WHERE A.LECTOR_SUCURSALID = ?
+AND B.LECTOR_ID = ?
+AND CONVERT(VARCHAR(10), FECHA_FINAL, 120) &gt;= CONVERT(VARCHAR(10), GETDATE(), 120)
+AND HORA_FINAL &gt;= CAST(GETDATE() AS TIME(0))
+</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SUCURSAL_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>LECTOR_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ISNULL_SUCURSAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ISNULL_DEVICE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>DEVICEID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>STOREID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <SUCURSAL_ID>
+                    <xsl:value-of select="$Start/root/StoreId"/>
+                </SUCURSAL_ID>
+                <LECTOR_ID>
+                    <xsl:value-of select="$Start/root/DeviceId"/>
+                </LECTOR_ID>
+                <ISNULL_SUCURSAL>
+                    <xsl:value-of select="$Start/root/StoreId"/>
+                </ISNULL_SUCURSAL>
+                <ISNULL_DEVICE>
+                    <xsl:value-of select="$Start/root/DeviceId"/>
+                </ISNULL_DEVICE>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC-SucursalCapacitacion">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>341</pd:x>
+        <pd:y>326</pd:y>
+        <config>
+            <timeout>%%Connections/Database/Kronos214/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/Kronos214/MaxRows%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT SUCURSAL_ID, SUCURSAL_NOMBRE
+FROM SUCURSALES (nolock)
+WHERE SUCURSAL_FORMATO = 4
+AND SUCURSAL_ESTATUS = 3
+AND SUCURSAL_ID = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SUCURSAL_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>SUCURSAL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SUCURSAL_NOMBRE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <SUCURSAL_ID>
+                    <xsl:value-of select="$Start/root/StoreId"/>
+                </SUCURSAL_ID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC-SociosEnCapacitacion">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>464</pd:x>
+        <pd:y>324</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select	FINGER_TEMPLATE.SCAN_SOCIOID,
+		FINGER_TEMPLATE.SCAN_TEMPLATEDEDO
+from	SOCIOS  (NOLOCK)
+INNER JOIN FINGER_TEMPLATE  (NOLOCK) ON SOCIOS.SOCIO_ID = FINGER_TEMPLATE.SCAN_SOCIOID
+WHERE SOCIOS.SOCIO_ESTATUS = 5 </statement>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>SCAN_SOCIOID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_TEMPLATEDEDO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>text</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>468</pd:x>
+        <pd:y>70</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="10"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_10"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="$Start/root/StoreId"/>
+                                    </ns32:MessageId>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 29">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>178</pd:x>
+        <pd:y>326</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="29"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_29"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_29"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="$Start/root/StoreId"/>
+                                    </ns32:MessageId>
+                                    <ns32:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;Sucursal: &quot;,$Start/root/StoreId,&quot; Terminal: &quot;,$Start/root/DeviceId)"/>
+                                    </ns32:ErrorCode>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 27">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>683</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="27"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_27"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="$Start/root/StoreId"/>
+                                    </ns32:MessageId>
+                                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                        <ns32:ErrorCode>
+                                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                        </ns32:ErrorCode>
+                                    </xsl:if>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>775</pd:x>
+        <pd:y>378</pd:y>
+        <config>
+            <processName>/Utility Service/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:MSG_Container>
+                <ns12:Header>
+                    <ns12:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </ns12:ProjectName>
+                    <ns12:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/GLB_SOURCE_DOMAIN"/>
+                    </ns12:Source_Domain>
+                    <ns12:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/GLB_DESTINATION_DOMAIN"/>
+                    </ns12:Destination_Domain>
+                    <ns12:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/GLB_TRANSACTION_TYPE"/>
+                    </ns12:Transaction_Type>
+                    <ns12:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns12:TimeStamp>
+                </ns12:Header>
+                <ns12:Body>
+                    <ns12:ErrorManagementSchema>
+                        <ns12:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns12:inrtn_id>
+                        <ns12:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns12:inrtn_instn_nm>
+                        <ns12:inrtn_err_rtn_desc>
+                            <xsl:value-of select="string($_error)"/>
+                        </ns12:inrtn_err_rtn_desc>
+                        <ns12:inrtn_msg_body>
+                            <xsl:value-of select="$Start/root/StoreId"/>
+                        </ns12:inrtn_msg_body>
+                        <ns12:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm;ss', current-dateTime())"/>
+                        </ns12:cre8_ts>
+                        <ns12:u_code>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </ns12:u_code>
+                        <ns12:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns12:sev_id>
+                    </ns12:ErrorManagementSchema>
+                </ns12:Body>
+            </ns12:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>643</pd:x>
+        <pd:y>377</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>904</pd:x>
+        <pd:y>379</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>770</pd:x>
+        <pd:y>491</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC-SucursalTransferencia</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-SucursalTransferencia</pd:from>
+        <pd:to>JDBC_GetAssotiatesFromStore</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore</pd:from>
+        <pd:to>JDBC-SucursalCapacitacion</pd:to>
+        <pd:xpathDescription>Vacio</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_GetAssotiatesFromStore/resultSet/Record)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-SucursalCapacitacion</pd:from>
+        <pd:to>JDBC-SociosEnCapacitacion</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:xpathDescription>Datos</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_GetAssotiatesFromStore/resultSet/Record)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-SociosEnCapacitacion</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-SucursalTransferencia</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-SucursalCapacitacion</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-SucursalCapacitacion</pd:from>
+        <pd:to>Fault 29</pd:to>
+        <pd:xpathDescription>No Record</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC-SucursalCapacitacion/resultSet/Record)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-SociosEnCapacitacion</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Fault 27</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:xpathDescription>Client Default</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "ProviderSOAPFault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

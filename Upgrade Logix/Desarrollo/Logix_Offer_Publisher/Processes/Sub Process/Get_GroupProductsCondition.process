@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns14="www.tibco.com/plugin/Sleep" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd" xmlns:pfx3="http://www.tibco.com/schemas/CopientOfferExportServer/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Sub Process/Get_GroupProductsCondition.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="IncentiveID" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>75</pd:startX>
+    <pd:startY>158</pd:startY>
+    <pd:returnBindings>
+        <resultSet>
+            <xsl:copy-of select="$Map-Products/resultSet/Auxilary"/>
+        </resultSet>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx4:resultSet"/>
+    <pd:endX>785</pd:endX>
+    <pd:endY>156</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <CustomerData>
+            <xsd:element name="PRODUCTS" type="xsd:string"/>
+        </CustomerData>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1403558436899</pd:targetNamespace>
+    <pd:group name="Group Get Products">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>257</pd:x>
+        <pd:y>35</pd:y>
+        <pd:width>440</pd:width>
+        <pd:height>225</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$JDBC-Query-Group-Products/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>IGroup</pd:iterationElementSlot>
+            <pd:indexSlot>contador</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query Products</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Products</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query Products</pd:from>
+            <pd:to>Group Concat Products</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group Concat Products</pd:from>
+            <pd:to>Map Products</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Group Concat Products">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>402</pd:x>
+            <pd:y>77</pd:y>
+            <pd:width>168</pd:width>
+            <pd:height>140</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-Query-Products/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>iProducts</pd:iterationElementSlot>
+                <pd:indexSlot>index</pd:indexSlot>
+                <pd:outSlot>Product</pd:outSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>BUILD_DATA</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>BUILD_DATA</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="BUILD_DATA">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:x>487</pd:x>
+                <pd:y>156</pd:y>
+                <config>
+                    <variableName>CustomerData</variableName>
+                </config>
+                <pd:inputBindings>
+                    <PRODUCTS>
+                        <xsl:value-of select="if ($index = 1) then&#xA;concat($CustomerData/PRODUCTS,concat($JDBC-Query-Products/resultSet/Record[$index]/ExtProductID, ',1'))&#xA;else&#xA;concat($CustomerData/PRODUCTS,concat(&quot;&#xA;&quot; ,concat($JDBC-Query-Products/resultSet/Record[$index]/ExtProductID, ',1') ))"/>
+                    </PRODUCTS>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC Query Products">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>345</pd:x>
+            <pd:y>162</pd:y>
+            <config>
+                <timeout>%%Connections/Database/LOGIX/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/LOGIX/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/LOGIX.sharedjdbc</jdbcSharedConfig>
+                <statement> SELECT DISTINCT
+  P.ExtProductID
+ FROM CPE_RewardOptions RO
+ INNER JOIN CPE_IncentiveProductGroups IPG ON  RO.RewardOptionID = IPG.RewardOptionID
+ INNER JOIN ProductGroups PG on IPG.productGroupID = PG.ProductGroupID
+ INNER JOIN ProdGroupItems PGI ON IPG.ProductGroupID = PGI.ProductGroupID
+ INNER JOIN Products P ON PGI.ProductID = P.ProductID
+ WHERE PG.ProductGroupID = ?
+and PGI.Deleted != 1</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>PRODUCT_GROUP_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>ExtProductID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <PRODUCT_GROUP_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-Query-Group-Products/resultSet/Record[$contador]/ProductGroupID)">
+                                <xsl:value-of select="$JDBC-Query-Group-Products/resultSet/Record[$contador]/ProductGroupID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PRODUCT_GROUP_ID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Products">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>621</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <element ref="pfx4:resultSet"/>
+            </config>
+            <pd:inputBindings>
+                <resultSet>
+                    <Auxilary>
+                        <xsl:for-each select="$JDBC-Query-Group-Products/resultSet/Record">
+                            <ProductGroup>
+                                <Header>
+                                    <ProductGroupID>
+                                        <xsl:value-of select="ProductGroupID"/>
+                                    </ProductGroupID>
+                                    <xsl:if test="Name">
+                                        <Name>
+                                            <xsl:value-of select="Name"/>
+                                        </Name>
+                                    </xsl:if>
+                                    <AnyProduct>
+                                        <xsl:value-of select="AnyProduct"/>
+                                    </AnyProduct>
+                                </Header>
+                                <Products>
+                                    <xsl:value-of select="$CustomerData/PRODUCTS"/>
+                                </Products>
+                            </ProductGroup>
+                        </xsl:for-each>
+                    </Auxilary>
+                </resultSet>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="JDBC Query Group Products">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>175</pd:x>
+        <pd:y>165</pd:y>
+        <config>
+            <timeout>%%Connections/Database/LOGIX/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/LOGIX/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/LOGIX.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>INCENTIVE_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <statement> SELECT  IPG.ProductGroupID,
+  PG.Name,
+  PG.AnyProduct
+ FROM CPE_RewardOptions RO
+ INNER JOIN CPE_IncentiveProductGroups IPG ON  RO.RewardOptionID = IPG.RewardOptionID
+ INNER JOIN ProductGroups PG on IPG.productGroupID = PG.ProductGroupID
+ WHERE RO.IncentiveID = ?</statement>
+            <wizardData/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>ProductGroupID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Name</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AnyProduct</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <INCENTIVE_ID>
+                    <xsl:value-of select="$Start/IncentiveID"/>
+                </INCENTIVE_ID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>332</pd:x>
+        <pd:y>313</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="tib:render-xml($_error/ns:ErrorReport, 0,0)"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>175</pd:x>
+        <pd:y>313</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=JDBCSQLException namespace=http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions</fault>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC Query Group Products</pd:from>
+        <pd:to>Group Get Products</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query Group Products</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Get Products</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

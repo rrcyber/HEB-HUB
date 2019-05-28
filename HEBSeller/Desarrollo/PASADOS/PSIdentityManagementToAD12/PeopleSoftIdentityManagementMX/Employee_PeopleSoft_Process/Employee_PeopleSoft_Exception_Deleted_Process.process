@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="www.tibco.com/plugin/Timer" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx="http://xmlns.heb.com/ei/PARTNER_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PARTNER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PARTNER_INFORMATION_SOAP.xsd"/>
+    <pd:name>PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_PeopleSoft_Exception_Deleted_Process.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>27</pd:startX>
+    <pd:startY>157</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>826</pd:endX>
+    <pd:endY>158</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <CountVar>
+            <xsd:element name="countPS_JOB" type="xsd:int"/>
+        </CountVar>
+        <varProcess>
+            <xsd:element name="valueLastStatus" type="xsd:string"/>
+        </varProcess>
+        <varCurrentEmpl>
+            <xsd:element name="strEmpl" type="xsd:string"/>
+        </varCurrentEmpl>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1268939340178</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>224</pd:x>
+        <pd:y>4</pd:y>
+        <pd:width>549</pd:width>
+        <pd:height>291</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Select-Header-Employee-MX-Bajas/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>Current-Select_Baja</pd:iterationElementSlot>
+            <pd:indexSlot>iBajas</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Select Last Record People Soft</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Join-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Select Last Record People Soft</pd:from>
+            <pd:to>Assign Last Index</pd:to>
+            <pd:xpathDescription>Si existe en PS y Status es A</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($Select-Last-Record-People-Soft/resultSet/Record)&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Select Last Record People Soft</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:xpathDescription>Otherwise</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign Last Index</pd:from>
+            <pd:to>Assign_Last_Status</pd:to>
+            <pd:xpathDescription>Continuar</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Add-Emp-Detail</pd:from>
+            <pd:to>Upd-Emp-Header Status A</pd:to>
+            <pd:xpathDescription>Continuar</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Upd-Emp-Header Status A</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign_Last_Status</pd:from>
+            <pd:to>Add-Emp-Detail</pd:to>
+            <pd:xpathDescription>Active Empl</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$varProcess/valueLastStatus='A'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign_Last_Status</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:xpathDescription>No Active</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Select Last Record People Soft">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>310</pd:x>
+            <pd:y>230</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Oracle/DBPS JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT  EMPLID                    "EMPL_ID",
+        EMPL_STATUS               "EMPL_STAT"
+		FROM PS_JOB
+        WHERE EMPLID = ? order by effdt</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>pempl_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>EMPL_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EMPL_STAT</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <pempl_id>
+                        <xsl:value-of select="$Current-Select_Baja/Record/EMPL_ID"/>
+                    </pempl_id>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Join-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>696</pd:x>
+            <pd:y>224</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Assign Last Index">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>307</pd:x>
+            <pd:y>61</pd:y>
+            <config>
+                <variableName>CountVar</variableName>
+            </config>
+            <pd:inputBindings>
+                <countPS_JOB>
+                    <xsl:value-of select="count($Select-Last-Record-People-Soft/resultSet/Record)"/>
+                </countPS_JOB>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Add-Emp-Detail">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:description/>
+            <pd:x>573</pd:x>
+            <pd:y>60</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>insert into PS_EMPL_DATA_DETAIL_MX  
+(SURNAME
+           ,GIVENAME
+           ,DISPLAY_NAME
+           ,PHONE
+           ,PRIMARY_NID
+           ,EMAIL_ADDR
+           ,EFF_DT
+           ,EFF_SEQ
+           ,DEP_DESCR
+           ,JOBCODE_DESCR
+           ,DEPT_ID
+           ,JOB_CD
+           ,EMPL_STAT
+           ,EMPLOYEE_TYPE
+           ,NAME
+           ,NATIONAL_ID
+           ,COMPANY
+           ,LOCATION_ID
+           ,LOCATION_DESCR
+           ,LAST_UPDATE_DT
+           ,TIPO_CONTRATO
+            ,EMPL_ID   
+            ,INSERTEDDATE
+            ,Status_AD,COMPANY_DESCR,CITY,Operacion_PS)
+values(?,?,?,?,?,?,substring(?,1,10),?,?,?,?,?,?,?,replace(?,',',' '),?,?,?,?,substring(?,1,10),?,?,sysdatetime(),'L',?,?,'M')</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>SURNAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>GIVENAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DISPLAY_NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PHONE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRIMARY_NID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMAIL_ADDR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_SEQ</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEP_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOBCODE_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEPT_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOB_CD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_STAT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPLOYEE_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NATIONAL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LAST_UPDATE_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TIPO_CONTRATO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CITY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <SURNAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/SURNAME)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/SURNAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </SURNAME>
+                    <GIVENAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/GIVENAME)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/GIVENAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </GIVENAME>
+                    <DISPLAY_NAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/DISPLAY_NAME)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/DISPLAY_NAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </DISPLAY_NAME>
+                    <PHONE>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/PHONE)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/PHONE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PHONE>
+                    <PRIMARY_NID>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/PRIMARY_NID)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/PRIMARY_NID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PRIMARY_NID>
+                    <EMAIL_ADDR>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/EMAIL_ADDR)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/EMAIL_ADDR"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EMAIL_ADDR>
+                    <EFF_DT>
+                        <xsl:value-of select="$Current-Select_Baja/Record/EFF_DT"/>
+                    </EFF_DT>
+                    <EFF_SEQ>
+                        <xsl:value-of select="$Current-Select_Baja/Record/EFF_SEQ"/>
+                    </EFF_SEQ>
+                    <DEP_DESCR>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/DEP_DESCR)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/DEP_DESCR"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </DEP_DESCR>
+                    <JOBCODE_DESCR>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/JOBCODE_DESCR)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/JOBCODE_DESCR"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </JOBCODE_DESCR>
+                    <DEPT_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/DEPT_ID)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/DEPT_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </DEPT_ID>
+                    <JOB_CD>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/JOB_CD)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/JOB_CD"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </JOB_CD>
+                    <EMPL_STAT>
+                        <xsl:choose>
+                            <xsl:when test="exists('A')">
+                                <xsl:value-of select="'A'"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EMPL_STAT>
+                    <EMPLOYEE_TYPE>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/EMPLOYEE_TYPE)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/EMPLOYEE_TYPE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EMPLOYEE_TYPE>
+                    <NAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/NAME)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/NAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </NAME>
+                    <NATIONAL_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/NATIONAL_ID)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/NATIONAL_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </NATIONAL_ID>
+                    <COMPANY>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/COMPANY)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/COMPANY"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </COMPANY>
+                    <LOCATION_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/LOCATION_ID)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/LOCATION_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOCATION_ID>
+                    <LOCATION_DESCR>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/LOCATION_DESCR)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/LOCATION_DESCR"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOCATION_DESCR>
+                    <LAST_UPDATE_DT>
+                        <xsl:value-of select="$Current-Select_Baja/Record/LAST_UPDATE_DT"/>
+                    </LAST_UPDATE_DT>
+                    <TIPO_CONTRATO>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/TIPO_CONTRATO)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/TIPO_CONTRATO"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </TIPO_CONTRATO>
+                    <EMPL_ID>
+                        <xsl:value-of select="$Current-Select_Baja/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                    <COMPANY_DESCR>
+                        <xsl:value-of select="$Current-Select_Baja/Record/COMPANY_DESCR"/>
+                    </COMPANY_DESCR>
+                    <CITY>
+                        <xsl:choose>
+                            <xsl:when test="exists($Current-Select_Baja/Record/CITY)">
+                                <xsl:value-of select="$Current-Select_Baja/Record/CITY"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </CITY>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Upd-Emp-Header Status A">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>693</pd:x>
+            <pd:y>68</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>Update PS_EMPL_DATA_MX set  EMPL_STAT=?
+	          where EMPL_ID=?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>EMPL_STAT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <EMPL_STAT>
+                        <xsl:value-of select="'R'"/>
+                    </EMPL_STAT>
+                    <EMPL_ID>
+                        <xsl:value-of select="$Current-Select_Baja/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Assign_Last_Status">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>438</pd:x>
+            <pd:y>112</pd:y>
+            <config>
+                <variableName>varProcess</variableName>
+            </config>
+            <pd:inputBindings>
+                <xsl:variable name="var" select="$CountVar/countPS_JOB"/>
+                <xsl:variable name="var2" select="number($var)"/>
+                <valueLastStatus>
+                    <xsl:value-of select="$Select-Last-Record-People-Soft/resultSet/Record[ $var2]/EMPL_STAT"/>
+                </valueLastStatus>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Select Header Employee MX Bajas">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>123</pd:x>
+        <pd:y>165</pd:y>
+        <config>
+            <timeout>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>Select  SURNAME,GIVENAME,DISPLAY_NAME,EMPL_ID,PHONE,PRIMARY_NID,EMAIL_ADDR,EFF_DT,EFF_SEQ,DEP_DESCR,JOBCODE_DESCR,DEPT_ID,JOB_CD,EMPL_STAT,EMPLOYEE_TYPE,
+	        NAME,NATIONAL_ID,COMPANY,LOCATION_ID,LOCATION_DESCR,LAST_UPDATE_DT,TIPO_CONTRATO,CITY,COMPANY_DESCR  from PS_EMPL_DATA_MX where EMPL_STAT=? or EMPL_STAT='D'</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>pStatusBaja</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>SURNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>GIVENAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DISPLAY_NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PHONE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRIMARY_NID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMAIL_ADDR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EFF_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EFF_SEQ</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEP_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>JOBCODE_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEPT_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>JOB_CD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPL_STAT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPLOYEE_TYPE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NATIONAL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>COMPANY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LOCATION_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LOCATION_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LAST_UPDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TIPO_CONTRATO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>COMPANY_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <pStatusBaja>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Status_Baja"/>
+                </pStatusBaja>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Select Header Employee MX Bajas</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Select Header Employee MX Bajas</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

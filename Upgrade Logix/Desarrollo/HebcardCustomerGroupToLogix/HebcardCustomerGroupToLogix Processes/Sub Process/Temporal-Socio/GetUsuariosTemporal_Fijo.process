@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>HebcardCustomerGroupToLogix Processes/Sub Process/Temporal-Socio/GetUsuariosTemporal_Fijo.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:for-each select="$JDBC_HEBANCO/resultSet/Record">
+                <EMPLID>
+                    <EMPLID>
+                        <xsl:value-of select="EMPLID"/>
+                    </EMPLID>
+                </EMPLID>
+            </xsl:for-each>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="EMPLID" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="EMPLID" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>260</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1487698521573</pd:targetNamespace>
+    <pd:activity name="JDBC_HEBANCO">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>140</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <timeout>%%Connections/Database/HEBANCO/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/HEBANCO/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBANCO.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT PS.EMPLID
+FROM HEBANCO..PS_JOB PS
+WHERE PS.REG_TEMP IN ('R')
+AND PS.EFFDT = (SELECT MAX(C.EFFDT) FROM PS_JOB C WHERE PS.EMPLID = C.EMPLID)
+AND PS.EFFSEQ = (SELECT MAX(D.EFFSEQ) FROM PS_JOB D WHERE PS.EMPLID = D.EMPLID AND PS.EFFDT = D.EFFDT)
+AND PS.EMPL_STATUS = 'A'
+AND PS.ACTION IN ('CTC','XFR') 
+AND PS.EFFDT &gt;= GETDATE()-20</statement>
+            <optionalOrNillable>true</optionalOrNillable>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>EMPLID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC_HEBANCO</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_HEBANCO</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx6="http://xmlns.heb.com/ei/PORECEPTION_HEB_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_HEB_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_HEB_INFORMATION_SOAP.xsd"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Main Process/Heb2bOCReceptionSubscriber_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx6:MSG_CONTAINER"/>
+    <pd:startX>114</pd:startX>
+    <pd:startY>91</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>398</pd:endX>
+    <pd:endY>94</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389377586983</pd:targetNamespace>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>563</pd:x>
+        <pd:y>238</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns0:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE: Incident at Heb2bOrdenCompraSubscriber',&quot;&amp;If;&quot;,&#xA;') Unexpected Unexpected :' , tib:render-xml($_error/ns:ErrorReport ,0, 0))"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns0:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>403</pd:x>
+        <pd:y>238</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>254</pd:x>
+        <pd:y>93</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE ordenescompra SET 
+IDESTATUS = 3 
+WHERE NumeroOrden = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>NumeroOrden</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <NumeroOrden>
+                    <xsl:copy-of select="$Start/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:PURCHASE_ORDER[1]/pfx6:PMG_PO_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:PURCHASE_ORDER[1]/pfx6:PMG_PO_NUMBER"/>
+                </NumeroOrden>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SendReprocesoRecibo">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>254</pd:x>
+        <pd:y>253</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/Reproceso/SendReprocesoRecibo.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx6:MSG_CONTAINER"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>SendReprocesoRecibo</pd:to>
+        <pd:xpathDescription>EXIST    OC ?</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates !=1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendReprocesoRecibo</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

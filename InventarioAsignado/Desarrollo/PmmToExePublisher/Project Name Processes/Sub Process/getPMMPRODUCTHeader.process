@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <pd:name>Project Name Processes/Sub Process/getPMMPRODUCTHeader.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>78</pd:startX>
+    <pd:startY>178</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:for-each select="$getHeader/resultSet/Record">
+                <ITEM>
+                    <Value>
+                        <xsl:value-of select="PRD_APH_CODE"/>
+                    </Value>
+                    <audit_number>
+                        <xsl:value-of select="AUDIT_NUMBER"/>
+                    </audit_number>
+                    <PrdLvlNumber>
+                        <xsl:value-of select="PRD_LVL_NUMBER"/>
+                    </PrdLvlNumber>
+                    <prd_lvl_child>
+                        <xsl:value-of select="PRD_LVL_CHILD"/>
+                    </prd_lvl_child>
+                    <upc_prd_lvl_number>
+                        <xsl:value-of select="UPC_PRD_LVL_NUMBER"/>
+                    </upc_prd_lvl_number>
+                    <atr_code_tech_key>
+                        <xsl:value-of select="ATR_COD_TECH_KEY"/>
+                    </atr_code_tech_key>
+                    <atr_code>
+                        <xsl:value-of select="ATR_CODE"/>
+                    </atr_code>
+                    <Header>
+                        <xsl:value-of select="CADENA"/>
+                    </Header>
+                </ITEM>
+            </xsl:for-each>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Value" type="xsd:string"/>
+                                <xsd:element name="audit_number" type="xsd:string"/>
+                                <xsd:element name="PrdLvlNumber" type="xsd:string"/>
+                                <xsd:element name="prd_lvl_child" type="xsd:string"/>
+                                <xsd:element name="upc_prd_lvl_number" type="xsd:string"/>
+                                <xsd:element name="atr_code_tech_key" type="xsd:string"/>
+                                <xsd:element name="atr_code" type="xsd:string"/>
+                                <xsd:element name="Header" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>570</pd:endX>
+    <pd:endY>177</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1373494035049</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>217</pd:x>
+        <pd:y>56</pd:y>
+        <pd:width>227</pd:width>
+        <pd:height>232</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>getHeader</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getHeader</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getHeader</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>263</pd:x>
+            <pd:y>211</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>354</pd:x>
+            <pd:y>212</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="getHeader">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>283</pd:x>
+            <pd:y>119</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC PMM_Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>select distinct hee.prd_aph_code
+      ,sdi.audit_number
+      ,sdi.prd_lvl_number
+      ,case when (S.prd_lvl_number is null and sdi.prd_lvl_id = 0)      then trim(sdi.prd_lvl_number)
+            when (S.prd_lvl_number is null and sdi.prd_lvl_id = 1)      then trim(Prd.prd_lvl_number)
+            when (S.prd_lvl_number is not null and sdi.prd_lvl_id = 0)  then trim(sdi.prd_lvl_number)
+            else trim(S.prd_lvl_number)
+       end as upc_prd_lvl_number
+      ,sdi.prd_lvl_child
+      ,case when pee.atr_cod_tech_key=128 then 'Y' 
+            when pee.atr_cod_tech_key=129 then 'N' 
+       end atr_cod_tech_key,
+       substr(dee1.atr_code,4,3) atr_code
+      ,'HEADER|' || case when sdi.tran_type='C' then 'M'
+                         when sdi.tran_type='A' then 'A'
+                         when sdi.tran_type='D' then 'C'
+                    else sdi.tran_type
+                    end  || '|' || 
+                    case when hee.prd_aph_code='9101' then '91     '
+                         when hee.prd_aph_code='9071' then '90     ' 
+                    end || '|' || 
+                    case when hee.prd_aph_code='9071' then '71'
+                         when hee.prd_aph_code='9101' then '01'
+                    end || '|' ||
+                    case when (S.prd_lvl_number is null and sdi.prd_lvl_id = 0)     then rpad(trim(sdi.prd_lvl_number),18) 
+                         when (S.prd_lvl_number is null and sdi.prd_lvl_id = 1)     then rpad(trim(Prd.prd_lvl_number),18) 
+                         when (S.prd_lvl_number is not null and sdi.prd_lvl_id = 0) then rpad(trim(sdi.prd_lvl_number),18) 
+                         else rpad(trim(S.prd_lvl_number),18) 
+                    end || '|0  |01 |||' ||
+                    case when prd.prd_status in ('1','7','99')  then 'AC'
+                         when prd.prd_status = '3'              then 'HO'
+                         when prd.prd_status = '4'              then 'DE'
+                    end || '|0002|' ||
+                    case when (S.prd_lvl_number is null and sdi.prd_lvl_id = 0)    then rpad(trim(substr(trim(dee.atr_code_desc) || ' ' || replace(sdi.prd_name_full,'|',' '),1,30)),30)
+                         when (S.prd_lvl_number is null and sdi.prd_lvl_id = 1)    then rpad(trim(substr(trim(dee.atr_code_desc) || ' ' || replace(prd.prd_name_full,'|',' '),1,30)),30)
+                         when (S.prd_lvl_number is not null and sdi.prd_lvl_id = 0)then rpad(trim(substr(trim(dee.atr_code_desc) || ' ' || replace(sdi.prd_name_full,'|',' '),1,30)),30)
+                         else rpad(trim(substr(trim(dee.atr_code_desc) || ' ' || replace(s.prd_name_full,'|',' '),1,30)),30)
+                    end || '|' || 
+                    case when (S.prd_lvl_number is null and sdi.prd_lvl_id = 0)    then rpad(substr(replace(sdi.prd_name_full,'|',' '),1,16),16)
+                         when (S.prd_lvl_number is null and sdi.prd_lvl_id = 1)    then rpad(substr(replace(prd.prd_name_full,'|',' '),1,16),16)
+                         when (S.prd_lvl_number is not null and sdi.prd_lvl_id = 0)then rpad(substr(replace(sdi.prd_name_full,'|',' '),1,16),16)
+                         else rpad(substr(replace(s.prd_name_full,'|',' '),1,16),16)
+                    end  || '|C|' ||
+                    nvl(vpc.pack_by_no_days,0) || '|' ||  
+                    nvl(vpc.rcv_by_no_days,0) || '|||N|N|N  |' || 
+                    case when prd.var_weight_item ='T' then 'Y'
+                         else  'N' 
+                    end || '|' || 
+                    nvl(case when vpc.sell_by_no_days &gt; 0 then 'Y' 
+                             else 'N' end,'N') || '|0000|0000|||0000000000|N|0000000|0|' ||  
+                    case when pee.atr_cod_tech_key=128 then 'Y' 
+                         when pee.atr_cod_tech_key=129 then 'N' 
+                    end || '|' ||
+                    substr(dee1.atr_code,4,3) || '|N|0000|0000|0100|0000|F|0000|0000|Y|0001|0000||Y|N|0000|0|' ||
+                    case when (prd.var_weight_item ='T' and prd.var_weight_type = 0)          then 'A'
+                         when (prd.var_weight_item ='T' and substr(dee1.atr_code,4,3)='FSH')  then 'F'
+                         when (prd.var_weight_item ='T' and prd.var_weight_type = 1)          then 'V'
+                    else  ''
+                    end || '|' ||
+                    nvl(case when vpc.sell_by_no_days &gt; 0 then 'Y' 
+                             else 'N' 
+                        end,'N') || '|' || CHR(63) || '|' || 
+                    nvl(vpc.rcv_by_no_days,0) || '|' || CHR(63) ||  '|' ||  CHR(63) ||  '|' ||  CHR(63) ||  '|' cadena
+from pmm.sdiprdmst sdi left outer join pmm.vpcprdee vpc   on  vpc.prd_lvl_child = decode(sdi.prd_lvl_id, 0, sdi.prd_lvl_parent, sdi.prd_lvl_child)  
+                       left outer join pmm.prdmstee prd   on  prd.prd_lvl_child = decode(sdi.prd_lvl_id, 0, sdi.prd_lvl_parent, sdi.prd_lvl_child)  
+                                                          and prd.prd_status = sdi.prd_status
+                       left outer join pmm.prdmstee S     on  prd.prd_lvl_child = S.SPP_SET_PRD_CHILD
+                       left outer join pmm.PRDAPDEE SUC   on  suc.prd_lvl_child = decode(sdi.prd_lvl_id, 0, sdi.prd_lvl_parent, sdi.prd_lvl_child)  
+                       inner join pmm.PRDAPHEE  HEE       on  suc.prd_aph_key = hee.prd_aph_key
+                       left outer join pmm.BASATPEE pee1  on  pee1.prd_lvl_child = decode(sdi.prd_lvl_id, 0, sdi.prd_lvl_parent, sdi.prd_lvl_child) 
+                                                          and pee1.atr_hdr_tech_key = 77 
+                                                          and pee1.ATR_TYP_TECH_KEY = 66
+                       left outer join pmm.BASACDEE dee1  on  pee1.atr_hdr_tech_key = dee1.atr_hdr_tech_key
+                                                          and pee1.atr_cod_tech_key = dee1.atr_cod_tech_key
+                       left outer join pmm.BASVALEE val   on  val.tech_key1 = decode(sdi.prd_lvl_id, 0, sdi.prd_lvl_parent, sdi.prd_lvl_child)
+                                                          and val.field_code = 'SP' 
+                                                          and val.ENTITY_NAME = 'PRDMSTEE'
+                       left outer join pmm.BASATPEE pee   on  pee.prd_lvl_child = decode(sdi.prd_lvl_id, 0, sdi.prd_lvl_parent, sdi.prd_lvl_child)
+                                                          and pee.prd_lvl_id = prd.prd_lvl_id
+                                                          and pee.atr_cod_tech_key in ( 128 , 129 ) 
+                                                          and pee.prd_lvl_id in ( 0 , 1 )
+                      left outer join pmm.BASATPEE pee2 on  pee2.prd_lvl_child = decode(prd.prd_lvl_id, 0, prd.prd_lvl_parent, prd.prd_lvl_child)
+                                                        and pee2.atr_typ_tech_key = 41
+                                                        and pee2.atr_hdr_tech_key in (45,46,47)
+                      LEFT OUTER join pmm.BASACDEE dee  on  pee2.atr_hdr_tech_key = dee.atr_hdr_tech_key  and  pee2.atr_cod_tech_key=dee.atr_cod_tech_key
+                                                        and pee2.atr_typ_tech_key = 41 
+where sdi.date_created &gt;= trunc(sysdate-?)
+  and sdi.org_lvl_number in ( 0 , 9101  , 9071  ) 
+  and hee.prd_aph_code in ( '9101'  , '9071'  )
+  and sdi.download_date_2 is null
+  and sdi.prd_status in ( 1 , 3 , 4 ,  7, 99  )
+  and rownum &lt;= ?</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>DIAS_ATRAS</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ROW_NUM</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PRD_APH_CODE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>AUDIT_NUMBER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>UPC_PRD_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>PRD_LVL_CHILD</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>ATR_COD_TECH_KEY</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>ATR_CODE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>CADENA</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <DIAS_ATRAS>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/TIMER_CONF/DIAS_ATRAS"/>
+                    </DIAS_ATRAS>
+                    <ROW_NUM>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/ROW_NUM_LIMIT"/>
+                    </ROW_NUM>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Heb2bProveedorSubscriber/Sub Process/insertProveedorHEBB.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="root" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="IdPMM" type="xsd:string"/>
+                                <xsd:element name="Nombre" type="xsd:string"/>
+                                <xsd:element name="Calle" type="xsd:string"/>
+                                <xsd:element name="Colonia" type="xsd:string"/>
+                                <xsd:element name="Pais" type="xsd:string"/>
+                                <xsd:element name="Municipio" type="xsd:string"/>
+                                <xsd:element name="Estado" type="xsd:string"/>
+                                <xsd:element name="IdMoneda" type="xsd:string"/>
+                                <xsd:element name="CodigoPostal" type="xsd:string"/>
+                                <xsd:element name="TelelfonoPrincipal" type="xsd:string"/>
+                                <xsd:element name="ContactoPrincipal" type="xsd:string"/>
+                                <xsd:element name="GLN" type="xsd:string"/>
+                                <xsd:element name="Fax" type="xsd:string"/>
+                                <xsd:element name="EmailResponsable" type="xsd:string"/>
+                                <xsd:element name="RFC" type="xsd:string"/>
+                                <xsd:element name="EsAcreedor" type="xsd:string"/>
+                                <xsd:element name="AceptaDevoluciones" type="xsd:string"/>
+                                <xsd:element name="IdProvedorHEBB" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>220</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>621</pd:endX>
+    <pd:endY>218</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389046188915</pd:targetNamespace>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>146</pd:x>
+        <pd:y>2</pd:y>
+        <pd:width>390</pd:width>
+        <pd:height>423</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>false</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>Generate-Error-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>ErrorProcess-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>Sleep-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Insert</pd:from>
+            <pd:to>Java Code</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep-1">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>202</pd:x>
+            <pd:y>348</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate-Error-1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>441</pd:x>
+            <pd:y>348</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess-1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>442</pd:x>
+            <pd:y>256</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns13:MSG_Container>
+                    <ns13:Header>
+                        <ns13:ProjectName>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                        </ns13:ProjectName>
+                        <ns13:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </ns13:Source_Domain>
+                        <ns13:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </ns13:Destination_Domain>
+                        <ns13:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                        </ns13:Transaction_Type>
+                        <ns13:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns13:TimeStamp>
+                    </ns13:Header>
+                    <ns13:Body>
+                        <ns13:ErrorManagementSchema>
+                            <ns13:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </ns13:inrtn_id>
+                            <ns13:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                            </ns13:inrtn_instn_nm>
+                            <ns13:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                            </ns13:inrtn_err_rtn_desc>
+                            <ns13:inrtn_msg_body>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                            </ns13:inrtn_msg_body>
+                            <ns13:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </ns13:cre8_ts>
+                            <ns13:u_code>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                            </ns13:u_code>
+                            <ns13:sev_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                            </ns13:sev_id>
+                        </ns13:ErrorManagementSchema>
+                    </ns13:Body>
+                </ns13:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Java Code">
+            <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+            <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+            <pd:x>206</pd:x>
+            <pd:y>226</pd:y>
+            <config>
+                <fileName>insertProveedorHEBBJavaCode</fileName>
+                <packageName>Heb2bProveedorSubscriber.SubProcess.insertProveedorHEBB</packageName>
+                <fullsource>package Heb2bProveedorSubscriber.SubProcess.insertProveedorHEBB;
+import java.util.*;
+import java.io.*;
+public class insertProveedorHEBBJavaCode{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String ERROR_CODE = "";
+	protected String ERRORS = "";
+	protected String TYPE_ERROR = "";
+	public String getERROR_CODE() {
+		return ERROR_CODE;
+	}
+	public void setERROR_CODE(String val) {
+		ERROR_CODE = val;
+	}
+	public String getERRORS() {
+		return ERRORS;
+	}
+	public void setERRORS(String val) {
+		ERRORS = val;
+	}
+	public String getTYPE_ERROR() {
+		return TYPE_ERROR;
+	}
+	public void setTYPE_ERROR(String val) {
+		TYPE_ERROR = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public insertProveedorHEBBJavaCode() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String ERROR_CODE
+	In  : String ERRORS
+	Out : String TYPE_ERROR
+* Available Variables: DO NOT MODIFY *****/
+
+  
+	  TYPE_ERROR="false";
+           String [] ErrorArray  = ERRORS.split(",");
+
+     for (int i = 0; i &lt; ErrorArray.length; i++) {
+	if ((ErrorArray[i]).equals(ERROR_CODE))
+	{
+         TYPE_ERROR="true" ;
+         break;
+         }
+ 
+	
+ }   }
+}
+</fullsource>
+                <inputData>
+                    <row>
+                        <fieldName>ERROR_CODE</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                    <row>
+                        <fieldName>ERRORS</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </inputData>
+                <outputData>
+                    <row>
+                        <fieldName>TYPE_ERROR</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </outputData>
+                <byteCode>
+                    <class>
+                        <name>insertProveedorHEBBJavaCode</name>
+                        <byteCode>yv66vgAAADMAOAkACwAkCQALACUJAAsAJgoADAAnCAAoCAApCAAqCgArACwKACsALQgALgcALwcAMAEACkVSUk9SX0NPREUBABJMamF2YS9sYW5nL1N0cmluZzsBAAZFUlJPUlMBAApUWVBFX0VSUk9SAQANZ2V0RVJST1JfQ09ERQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADXNldEVSUk9SX0NPREUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAAlnZXRFUlJPUlMBAAlzZXRFUlJPUlMBAA1nZXRUWVBFX0VSUk9SAQANc2V0VFlQRV9FUlJPUgEABjxpbml0PgEAAygpVgEABmludm9rZQEADVN0YWNrTWFwVGFibGUHADEBAApFeGNlcHRpb25zBwAyAQAKU291cmNlRmlsZQEAIGluc2VydFByb3ZlZWRvckhFQkJKYXZhQ29kZS5qYXZhDAANAA4MAA8ADgwAEAAODAAbABwBAAABAAVmYWxzZQEAASwHADMMADQANQwANgA3AQAEdHJ1ZQEAU0hlYjJiUHJvdmVlZG9yU3Vic2NyaWJlci9TdWJQcm9jZXNzL2luc2VydFByb3ZlZWRvckhFQkIvaW5zZXJ0UHJvdmVlZG9ySEVCQkphdmFDb2RlAQAQamF2YS9sYW5nL09iamVjdAEAE1tMamF2YS9sYW5nL1N0cmluZzsBABNqYXZhL2xhbmcvRXhjZXB0aW9uAQAQamF2YS9sYW5nL1N0cmluZwEABXNwbGl0AQAnKExqYXZhL2xhbmcvU3RyaW5nOylbTGphdmEvbGFuZy9TdHJpbmc7AQAGZXF1YWxzAQAVKExqYXZhL2xhbmcvT2JqZWN0OylaACEACwAMAAAAAwAEAA0ADgAAAAQADwAOAAAABAAQAA4AAAAIAAEAEQASAAEAEwAAAB0AAQABAAAABSq0AAGwAAAAAQAUAAAABgABAAAACgABABUAFgABABMAAAAiAAIAAgAAAAYqK7UAAbEAAAABABQAAAAKAAIAAAANAAUADgABABcAEgABABMAAAAdAAEAAQAAAAUqtAACsAAAAAEAFAAAAAYAAQAAABAAAQAYABYAAQATAAAAIgACAAIAAAAGKiu1AAKxAAAAAQAUAAAACgACAAAAEwAFABQAAQAZABIAAQATAAAAHQABAAEAAAAFKrQAA7AAAAABABQAAAAGAAEAAAAWAAEAGgAWAAEAEwAAACIAAgACAAAABiortQADsQAAAAEAFAAAAAoAAgAAABkABQAaAAEAGwAcAAEAEwAAAD8AAgABAAAAFyq3AAQqEgW1AAEqEgW1AAIqEgW1AAOxAAAAAQAUAAAAFgAFAAAAHAAEAAYACgAHABAACAAWAB0AAQAdABwAAgATAAAAfAACAAMAAAA1KhIGtQADKrQAAhIHtgAITAM9HCu+ogAfKxwyKrQAAbYACZkADCoSCrUAA6cACYQCAaf/4bEAAAACABQAAAAiAAgAAAAmAAYAJwAQACkAGAAqACUALAArAC0ALgApADQAMQAeAAAADQAD/QASBwAfARv6AAUAIAAAAAQAAQAhAAEAIgAAAAIAIw==</byteCode>
+                    </class>
+                </byteCode>
+            </config>
+            <pd:inputBindings>
+                <javaCodeActivityInput>
+                    <ERROR_CODE>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </ERROR_CODE>
+                    <ERRORS>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Heb2bProveedorProjectSubscriberVariables/GLB_ConditionForSuspend"/>
+                    </ERRORS>
+                </javaCodeActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Insert">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>196</pd:x>
+            <pd:y>58</pd:y>
+            <config>
+                <timeout>%%Connections/Database/dbHEB2B/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/dbHEB2B.sharedjdbc</jdbcSharedConfig>
+                <statement>insert into Proveedor (IdPMM, Nombre , Calle , Colonia , Pais , Municipio , Estado , IdMoneda , CodigoPostal , 
+TelefonoPrincipal , ContactoPrincipal , GLN , Fax , EmailResponsable , RFC , EsAcreedor , AceptaDevoluciones, IdEsquemaServicio ) 
+values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, (select id from proveedorsetid where SetID= ?) )</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>IdPMM</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Nombre</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Calle</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Colonia</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Pais</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Municipio</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Estado</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>IdMoneda</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CodigoPostal</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TelefonoPrincipal</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ContactoPrincipal</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>GLN</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Fax</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EmailResponsable</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>RFC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EsAcreedor</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>AceptaDevoluciones</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SetID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <IdPMM>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/IdPMM)">
+                                <xsl:value-of select="$Start/group/root[1]/IdPMM"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </IdPMM>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/Nombre)!=0">
+                            <Nombre>
+                                <xsl:value-of select="$Start/group/root[1]/Nombre"/>
+                            </Nombre>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <Nombre>
+                                <xsl:value-of select="'0'"/>
+                            </Nombre>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/Calle)!=0">
+                            <Calle>
+                                <xsl:value-of select="$Start/group/root[1]/Calle"/>
+                            </Calle>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <Calle>
+                                <xsl:value-of select="'0'"/>
+                            </Calle>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/Colonia)!=0">
+                            <Colonia>
+                                <xsl:value-of select="$Start/group/root[1]/Colonia"/>
+                            </Colonia>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <Colonia>
+                                <xsl:value-of select="'0'"/>
+                            </Colonia>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <Pais>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/Pais)">
+                                <xsl:value-of select="$Start/group/root[1]/Pais"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </Pais>
+                    <Municipio>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/Municipio)">
+                                <xsl:value-of select="$Start/group/root[1]/Municipio"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </Municipio>
+                    <Estado>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/Estado)">
+                                <xsl:value-of select="$Start/group/root[1]/Estado"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </Estado>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/IdMoneda)">
+                            <IdMoneda>
+                                <xsl:choose>
+                                    <xsl:when test="exists($Start/group/root[1]/IdMoneda)">
+                                        <xsl:value-of select="$Start/group/root[1]/IdMoneda"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </IdMoneda>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <IdMoneda>
+                                <xsl:choose>
+                                    <xsl:when test="exists('')">
+                                        <xsl:value-of select="''"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </IdMoneda>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/CodigoPostal)!=0">
+                            <CodigoPostal>
+                                <xsl:value-of select="$Start/group/root[1]/CodigoPostal"/>
+                            </CodigoPostal>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <CodigoPostal>
+                                <xsl:value-of select="'0'"/>
+                            </CodigoPostal>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/TelelfonoPrincipal)!=0">
+                            <TelefonoPrincipal>
+                                <xsl:value-of select="$Start/group/root[1]/TelelfonoPrincipal"/>
+                            </TelefonoPrincipal>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <TelefonoPrincipal>
+                                <xsl:value-of select="'0'"/>
+                            </TelefonoPrincipal>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/ContactoPrincipal)!=0">
+                            <ContactoPrincipal>
+                                <xsl:value-of select="$Start/group/root[1]/ContactoPrincipal"/>
+                            </ContactoPrincipal>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <ContactoPrincipal>
+                                <xsl:value-of select="'0'"/>
+                            </ContactoPrincipal>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <GLN>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/GLN)">
+                                <xsl:value-of select="$Start/group/root[1]/GLN"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </GLN>
+                    <Fax>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/Fax)">
+                                <xsl:value-of select="$Start/group/root[1]/Fax"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </Fax>
+                    <EmailResponsable>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/EmailResponsable)">
+                                <xsl:value-of select="$Start/group/root[1]/EmailResponsable"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EmailResponsable>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Start/group/root[1]/RFC)!=0">
+                            <RFC>
+                                <xsl:value-of select="$Start/group/root[1]/RFC"/>
+                            </RFC>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <RFC>
+                                <xsl:value-of select="'0'"/>
+                            </RFC>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <EsAcreedor>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/EsAcreedor)">
+                                <xsl:value-of select="$Start/group/root[1]/EsAcreedor"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EsAcreedor>
+                    <AceptaDevoluciones>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/root[1]/AceptaDevoluciones)">
+                                <xsl:value-of select="$Start/group/root[1]/AceptaDevoluciones"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </AceptaDevoluciones>
+                    <SetID>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Heb2bProveedorProjectSubscriberVariables/SETID"/>
+                    </SetID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/casePack.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/tipos.xsd" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/Catalogo/Tipos/tipos.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/Catalogo/Tipos/tipos.xsd" schemaLocation="/Resources/EIM/Services/Catalogo/Tipos/tipos.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/tipos.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/tipos.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/casePack.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/casePack.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>Heb2bCasePackSubscriber Processes/Main Process/Update_CasePack_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:casePack_root"/>
+    <pd:startX>28</pd:startX>
+    <pd:startY>403</pd:startY>
+    <pd:returnBindings>
+        <records>
+            <xsl:value-of select="$i"/>
+        </records>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="records" type="xsd:int"/>
+    </pd:endType>
+    <pd:endX>934</pd:endX>
+    <pd:endY>400</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx4:MSG_Container"/>
+        <Schema0>
+            <xsd:element name="error_record" type="xsd:int"/>
+        </Schema0>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389288706730</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>76</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>722</pd:width>
+        <pd:height>786</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/CasePackVariables/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Retry Group on Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Retry Group on Error</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Retry Group on Error</pd:from>
+            <pd:to>Java Code</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>ErrorProcess</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns:GlobalVariables/CasePackVariables/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Retry</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Retry Group on Error">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>136</pd:x>
+            <pd:y>24</pd:y>
+            <pd:width>565</pd:width>
+            <pd:height>439</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Start/casePack_root/casePack</pd:over>
+                <pd:iterationElementSlot>item</pd:iterationElementSlot>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Query</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Delete Record</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Update Record</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Insert Record</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>SendErrorTechnical</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Query</pd:from>
+                <pd:to>Null</pd:to>
+                <pd:xpathDescription>ERROR</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-65536</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC-Query-1</pd:from>
+                <pd:to>Update Record</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>count($JDBC-Query-1/resultSet/Record) &gt; 0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC-Query-1</pd:from>
+                <pd:to>Insert Record</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null-1</pd:from>
+                <pd:to>JDBC-Query-1</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>count($JDBC-Query/resultSet/Record)&gt;0 and ($item/casePack/AuditType='A' or $item/casePack/AuditType='C' )</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null-1</pd:from>
+                <pd:to>Delete Record</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$item/casePack/AuditType='D' and count($JDBC-Query/resultSet/Record)&gt;0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Query</pd:from>
+                <pd:to>Map Data</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Map Data</pd:from>
+                <pd:to>Insert_REGISTROINTEGRACIONES_HEB2B</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Map Data</pd:from>
+                <pd:to>Null-1</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>($Map-Data/root/IdArticulo  !="ERROR"   
+and $Map-Data/root/IdProveedor  !="ERROR" 
+and $Map-Data/root/IdUnidadCompra  !="ERROR" )</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Insert_REGISTROINTEGRACIONES_HEB2B</pd:from>
+                <pd:to>SendErrorTechnical</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Update Record">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>538</pd:x>
+                <pd:y>167</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBHEB2B/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <statement>UPDATE CasePack SET  IdPMM = ?, IdArticulo = ?, IdProveedor = ?, IdUnidadCompra = ?, CantidadUnidadesCasePack = ?, CantidadUnidadesInnerPack = ?, CantidadInnerPacks = ?, EstiloPrepack = ?, EsActivo = ?, EsPrimario = ?
+WHERE LTRIM(IdPMM) = ?
+and idarticulo = (select id from articulo(nolock) where sku = ?)
+and idproveedor = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>IdPMM1</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdArticulo</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdProveedor</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdUnidadCompra</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>CantidadUnidadesCasePack</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>CantidadUnidadesInnerPack</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>CantidadInnerPacks</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>EstiloPrepack</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>EsActivo</parameterName>
+                            <dataType>BIT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>EsPrimario</parameterName>
+                            <dataType>BIT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdPMM</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>SKU</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdProveedor2</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <IdPMM1>
+                            <xsl:value-of select="$item/casePack/casePackId"/>
+                        </IdPMM1>
+                        <IdArticulo>
+                            <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdArticulo"/>
+                        </IdArticulo>
+                        <IdProveedor>
+                            <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdProveedor"/>
+                        </IdProveedor>
+                        <IdUnidadCompra>
+                            <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdUnidad"/>
+                        </IdUnidadCompra>
+                        <CantidadUnidadesCasePack>
+                            <xsl:value-of select="$item/casePack/cantidadUnidadesCasePack"/>
+                        </CantidadUnidadesCasePack>
+                        <CantidadUnidadesInnerPack>
+                            <xsl:value-of select="$item/casePack/cantidadUnidadesInnerPack"/>
+                        </CantidadUnidadesInnerPack>
+                        <CantidadInnerPacks>
+                            <xsl:value-of select="$item/casePack/cantidadInnerPacks"/>
+                        </CantidadInnerPacks>
+                        <EstiloPrepack>
+                            <xsl:value-of select="if(string-length($item/casePack/estiloPrepack)!=0)&#xA;then &#xA;$item/casePack/estiloPrepack&#xA;else&#xA;0"/>
+                        </EstiloPrepack>
+                        <EsActivo>
+                            <xsl:value-of select="$item/casePack/esActivo"/>
+                        </EsActivo>
+                        <EsPrimario>
+                            <xsl:value-of select="$item/casePack/esPrimario"/>
+                        </EsPrimario>
+                        <IdPMM>
+                            <xsl:value-of select="$item/casePack/casePackId"/>
+                        </IdPMM>
+                        <SKU>
+                            <xsl:value-of select="$item/casePack/articuloId"/>
+                        </SKU>
+                        <IdProveedor2>
+                            <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdProveedor"/>
+                        </IdProveedor2>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Insert Record">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>531</pd:x>
+                <pd:y>90</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBHEB2B/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <statement>INSERT INTO CasePack(IdPMM, IdArticulo, IdProveedor, IdUnidadCompra, CantidadUnidadesCasePack, CantidadUnidadesInnerPack, CantidadInnerPacks, EstiloPrepack, EsActivo, EsPrimario)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? )</statement>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>IdPMM</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdArticulo</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdProveedor</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdUnidadCompra</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>CantidadUnidadesCasePack</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>CantidadUnidadesInnerPack</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>CantidadInnerPacks</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>EstiloPrepack</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>EsActivo</parameterName>
+                            <dataType>BIT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>EsPrimario</parameterName>
+                            <dataType>BIT</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <IdPMM>
+                            <xsl:value-of select="$item/casePack/casePackId"/>
+                        </IdPMM>
+                        <IdArticulo>
+                            <xsl:choose>
+                                <xsl:when test="exists($JDBC-Query/resultSet/Record[1]/IdArticulo)">
+                                    <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdArticulo"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdArticulo>
+                        <IdProveedor>
+                            <xsl:choose>
+                                <xsl:when test="exists($JDBC-Query/resultSet/Record[1]/IdProveedor)">
+                                    <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdProveedor"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdProveedor>
+                        <IdUnidadCompra>
+                            <xsl:choose>
+                                <xsl:when test="exists($JDBC-Query/resultSet/Record[1]/IdUnidad)">
+                                    <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdUnidad"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdUnidadCompra>
+                        <CantidadUnidadesCasePack>
+                            <xsl:value-of select="$item/casePack/cantidadUnidadesCasePack"/>
+                        </CantidadUnidadesCasePack>
+                        <CantidadUnidadesInnerPack>
+                            <xsl:value-of select="$item/casePack/cantidadUnidadesInnerPack"/>
+                        </CantidadUnidadesInnerPack>
+                        <CantidadInnerPacks>
+                            <xsl:value-of select="$item/casePack/cantidadInnerPacks"/>
+                        </CantidadInnerPacks>
+                        <xsl:choose>
+                            <xsl:when test="$item/casePack/estiloPrepack !=''">
+                                <EstiloPrepack>
+                                    <xsl:value-of select="$item/casePack/estiloPrepack"/>
+                                </EstiloPrepack>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <EstiloPrepack xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <EsActivo>
+                            <xsl:value-of select="$item/casePack/esActivo"/>
+                        </EsActivo>
+                        <EsPrimario>
+                            <xsl:value-of select="$item/casePack/esPrimario"/>
+                        </EsPrimario>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Delete Record">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>516</pd:x>
+                <pd:y>246</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBHEB2B/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <statement>UPDATE CasePack SET EsActivo = 0
+WHERE LTRIM(IdPMM) = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>Id_PMM</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <Id_PMM>
+                            <xsl:value-of select="$item/casePack/casePackId"/>
+                        </Id_PMM>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="JDBC Query">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>200</pd:x>
+                <pd:y>253</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBHEB2B/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/Database/DBHEB2B/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <statement>SELECT a.Id as IdArticulo, p.Id as IdProveedor, u.Id as IdUnidad
+FROM Articulo a(nolock), Proveedor p(nolock), UnidadMedidaArticulo u(nolock)
+WHERE a.sku = ?
+AND p.IdPMM = ?
+AND u.IdPMM = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>Sku</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdPMM</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdPMMU</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>IdArticulo</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>IdProveedor</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>IdUnidad</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <Sku>
+                            <xsl:value-of select="$item/casePack/articuloId"/>
+                        </Sku>
+                        <IdPMM>
+                            <xsl:value-of select="$item/casePack/proveedorId"/>
+                        </IdPMM>
+                        <IdPMMU>
+                            <xsl:value-of select="$item/casePack/unidadCompraId"/>
+                        </IdPMMU>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="JDBC-Query-1">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>362</pd:x>
+                <pd:y>87</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBHEB2B/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/Database/DBHEB2B/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <statement>select * from CasePack(nolock)
+where LTRIM(IdPMM) = ?
+and idarticulo = (select id from articulo(nolock) where sku = ?)
+and idproveedor = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>SKU</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>idProveedor</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>Id</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>IdArticulo</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>IdProveedor</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>IdPMM</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>IdUnidadCompra</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>CantidadUnidadesCasePack</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>CantidadUnidadesInnerPack</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>CantidadInnerPacks</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>EstiloPrepack</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>EsActivo</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>EsPrimario</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <id>
+                            <xsl:value-of select="$item/casePack/casePackId"/>
+                        </id>
+                        <SKU>
+                            <xsl:value-of select="$item/casePack/articuloId"/>
+                        </SKU>
+                        <idProveedor>
+                            <xsl:choose>
+                                <xsl:when test="exists($JDBC-Query/resultSet/Record[1]/IdProveedor)">
+                                    <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdProveedor"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </idProveedor>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Null">
+                <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                <pd:resourceType>ae.activities.null</pd:resourceType>
+                <pd:x>201</pd:x>
+                <pd:y>408</pd:y>
+                <config/>
+                <pd:inputBindings/>
+            </pd:activity>
+            <pd:activity name="Insert_REGISTROINTEGRACIONES_HEB2B">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>448</pd:x>
+                <pd:y>340</pd:y>
+                <config>
+                    <processName>/Heb2bCasePackSubscriber Processes/Sub Process/Insert_REGISTROINTEGRACIONES_HEB2B.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <Descripcion>
+                            <xsl:value-of select="concat (&quot;ERROR, Campos Requeridos: &quot;, &#xA;if ($Map-Data/root/IdArticulo  =&quot;ERROR&quot; ) then concat(&quot;Articulo = &quot;,tib:trim($item/casePack/articuloId),&quot;,&quot;) else &quot;&quot; &#xA;,if ($Map-Data/root/IdProveedor  =&quot;ERROR&quot; ) then concat(&quot; Proveedor = &quot;,tib:trim($item/casePack/proveedorId),&quot;,&quot;) else &quot;&quot; &#xA;,if ($Map-Data/root/IdUnidadCompra  =&quot;ERROR&quot; ) then concat(&quot; UnidadCompra = &quot;,tib:trim($item/casePack/unidadCompraId),&quot;,&quot;) else &quot;&quot;)"/>
+                        </Descripcion>
+                        <CasepackId>
+                            <xsl:value-of select="$item/casePack/casePackId"/>
+                        </CasepackId>
+                        <sku>
+                            <xsl:value-of select="$item/casePack/articuloId"/>
+                        </sku>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Map Data">
+                <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+                <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+                <pd:x>301</pd:x>
+                <pd:y>254</pd:y>
+                <config>
+                    <element>
+                        <xsd:element name="root">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="IdArticulo" type="xsd:string"/>
+                                    <xsd:element name="IdProveedor" type="xsd:string"/>
+                                    <xsd:element name="IdUnidadCompra" type="xsd:string"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </element>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <xsl:choose>
+                            <xsl:when test="string-length($JDBC-Query/resultSet/Record[1]/IdArticulo) > 0">
+                                <IdArticulo>
+                                    <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdArticulo"/>
+                                </IdArticulo>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <IdArticulo>
+                                    <xsl:value-of select="&quot;ERROR&quot;"/>
+                                </IdArticulo>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="string-length($JDBC-Query/resultSet/Record[1]/IdProveedor) > 0">
+                                <IdProveedor>
+                                    <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdProveedor"/>
+                                </IdProveedor>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <IdProveedor>
+                                    <xsl:value-of select="&quot;ERROR&quot;"/>
+                                </IdProveedor>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="string-length($JDBC-Query/resultSet/Record[1]/IdUnidad) > 0">
+                                <IdUnidadCompra>
+                                    <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/IdUnidad"/>
+                                </IdUnidadCompra>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <IdUnidadCompra>
+                                    <xsl:value-of select="&quot;ERROR&quot;"/>
+                                </IdUnidadCompra>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Null-1">
+                <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                <pd:resourceType>ae.activities.null</pd:resourceType>
+                <pd:x>219</pd:x>
+                <pd:y>89</pd:y>
+                <config/>
+                <pd:inputBindings/>
+            </pd:activity>
+            <pd:activity name="SendErrorTechnical">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>601</pd:x>
+                <pd:y>337</pd:y>
+                <config>
+                    <processName>/Heb2bCasePackSubscriber Processes/Sub Process/SendErrorTechnical.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <message>
+                            <xsl:value-of select="$Start/casePack_root/jmsMessage"/>
+                        </message>
+                        <queuename>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Destinations/Queues/GLB_CasePack_QUEUE"/>
+                        </queuename>
+                        <xsl:if test="$Start/casePack_root/deliveryCount">
+                            <deliveryCount>
+                                <xsl:value-of select="$Start/casePack_root/deliveryCount"/>
+                            </deliveryCount>
+                        </xsl:if>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>437</pd:x>
+            <pd:y>709</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/CasePackVariables/GLB_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Retry">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>573</pd:x>
+            <pd:y>709</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>288</pd:x>
+            <pd:y>713</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <pfx4:MSG_Container>
+                    <pfx4:Header>
+                        <pfx4:ProjectName>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                        </pfx4:ProjectName>
+                        <pfx4:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </pfx4:Source_Domain>
+                        <pfx4:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </pfx4:Destination_Domain>
+                        <pfx4:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                        </pfx4:Transaction_Type>
+                        <pfx4:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </pfx4:TimeStamp>
+                    </pfx4:Header>
+                    <pfx4:Body>
+                        <pfx4:ErrorManagementSchema>
+                            <pfx4:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </pfx4:inrtn_id>
+                            <pfx4:inrtn_instn_nm>
+                                <xsl:value-of select="$_processContext/ns2:ProcessContext/ProcessId"/>
+                            </pfx4:inrtn_instn_nm>
+                            <pfx4:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                            </pfx4:inrtn_err_rtn_desc>
+                            <pfx4:inrtn_msg_body>
+                                <xsl:value-of select="$Start/casePack_root/casePack[1]/casePackId"/>
+                            </pfx4:inrtn_msg_body>
+                            <pfx4:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx4:cre8_ts>
+                            <pfx4:u_code>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                            </pfx4:u_code>
+                            <pfx4:sev_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                            </pfx4:sev_id>
+                        </pfx4:ErrorManagementSchema>
+                    </pfx4:Body>
+                </pfx4:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Java Code">
+            <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+            <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+            <pd:x>433</pd:x>
+            <pd:y>587</pd:y>
+            <config>
+                <fullsource>package Heb2bCasePackSubscriberProcesses.MainProcess.Update_CasePack_Main;
+import java.util.*;
+import java.io.*;
+public class Update_CasePack_MainJavaCode{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String ERROR_CODE = "";
+	protected String ERRORS = "";
+	protected String TYPE_ERROR = "";
+	public String getERROR_CODE() {
+		return ERROR_CODE;
+	}
+	public void setERROR_CODE(String val) {
+		ERROR_CODE = val;
+	}
+	public String getERRORS() {
+		return ERRORS;
+	}
+	public void setERRORS(String val) {
+		ERRORS = val;
+	}
+	public String getTYPE_ERROR() {
+		return TYPE_ERROR;
+	}
+	public void setTYPE_ERROR(String val) {
+		TYPE_ERROR = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public Update_CasePack_MainJavaCode() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String ERROR_CODE
+	In  : String ERRORS
+	Out : String TYPE_ERROR
+* Available Variables: DO NOT MODIFY *****/
+     
+	  TYPE_ERROR="false";
+           String [] ErrorArray  = ERRORS.split(",");
+
+     for (int i = 0; i &lt; ErrorArray.length; i++) {
+	if ((ErrorArray[i]).equals(ERROR_CODE))
+	{
+         TYPE_ERROR="true" ;
+         break;
+         }
+ 
+	
+ }   }
+}
+</fullsource>
+                <fileName>Update_CasePack_MainJavaCode</fileName>
+                <packageName>Heb2bCasePackSubscriberProcesses.MainProcess.Update_CasePack_Main</packageName>
+                <outputData>
+                    <row>
+                        <fieldName>TYPE_ERROR</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </outputData>
+                <inputData>
+                    <row>
+                        <fieldName>ERROR_CODE</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                    <row>
+                        <fieldName>ERRORS</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </inputData>
+                <byteCode>
+                    <class>
+                        <name>Update_CasePack_MainJavaCode</name>
+                        <byteCode>yv66vgAAADEANQkACwAiCQALACMJAAsAJAoADAAlCAAmCAAnCAAoCgApACoKACkAKwgALAcALQcALgEACkVSUk9SX0NPREUBABJMamF2YS9sYW5nL1N0cmluZzsBAAZFUlJPUlMBAApUWVBFX0VSUk9SAQANZ2V0RVJST1JfQ09ERQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADXNldEVSUk9SX0NPREUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAAlnZXRFUlJPUlMBAAlzZXRFUlJPUlMBAA1nZXRUWVBFX0VSUk9SAQANc2V0VFlQRV9FUlJPUgEABjxpbml0PgEAAygpVgEABmludm9rZQEACkV4Y2VwdGlvbnMHAC8BAApTb3VyY2VGaWxlAQAhVXBkYXRlX0Nhc2VQYWNrX01haW5KYXZhQ29kZS5qYXZhDAANAA4MAA8ADgwAEAAODAAbABwBAAABAAVmYWxzZQEAASwHADAMADEAMgwAMwA0AQAEdHJ1ZQEAXkhlYjJiQ2FzZVBhY2tTdWJzY3JpYmVyUHJvY2Vzc2VzL01haW5Qcm9jZXNzL1VwZGF0ZV9DYXNlUGFja19NYWluL1VwZGF0ZV9DYXNlUGFja19NYWluSmF2YUNvZGUBABBqYXZhL2xhbmcvT2JqZWN0AQATamF2YS9sYW5nL0V4Y2VwdGlvbgEAEGphdmEvbGFuZy9TdHJpbmcBAAVzcGxpdAEAJyhMamF2YS9sYW5nL1N0cmluZzspW0xqYXZhL2xhbmcvU3RyaW5nOwEABmVxdWFscwEAFShMamF2YS9sYW5nL09iamVjdDspWgAhAAsADAAAAAMABAANAA4AAAAEAA8ADgAAAAQAEAAOAAAACAABABEAEgABABMAAAAdAAEAAQAAAAUqtAABsAAAAAEAFAAAAAYAAQAAAAoAAQAVABYAAQATAAAAIgACAAIAAAAGKiu1AAGxAAAAAQAUAAAACgACAAAADQAFAA4AAQAXABIAAQATAAAAHQABAAEAAAAFKrQAArAAAAABABQAAAAGAAEAAAAQAAEAGAAWAAEAEwAAACIAAgACAAAABiortQACsQAAAAEAFAAAAAoAAgAAABMABQAUAAEAGQASAAEAEwAAAB0AAQABAAAABSq0AAOwAAAAAQAUAAAABgABAAAAFgABABoAFgABABMAAAAiAAIAAgAAAAYqK7UAA7EAAAABABQAAAAKAAIAAAAZAAUAGgABABsAHAABABMAAAA/AAIAAQAAABcqtwAEKhIFtQABKhIFtQACKhIFtQADsQAAAAEAFAAAABYABQAAABwABAAGAAoABwAQAAgAFgAdAAEAHQAcAAIAEwAAAGkAAgADAAAANSoSBrUAAyq0AAISB7YACEwDPRwrvqIAHyscMiq0AAG2AAmZAAwqEgq1AAOnAAmEAgGn/+GxAAAAAQAUAAAAIgAIAAAAJQAGACYAEAAoABgAKQAlACsAKwAsAC4AKAA0ADAAHgAAAAQAAQAfAAEAIAAAAAIAIQ==</byteCode>
+                    </class>
+                </byteCode>
+            </config>
+            <pd:inputBindings>
+                <javaCodeActivityInput>
+                    <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                        <ERROR_CODE>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </ERROR_CODE>
+                    </xsl:if>
+                    <ERRORS>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/CasePackVariables/GLB_ConditionForSuspend"/>
+                    </ERRORS>
+                </javaCodeActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>936</pd:x>
+        <pd:y>490</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                </messageCode>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>133</pd:x>
+        <pd:y>876</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="GenerateError">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>255</pd:x>
+        <pd:y>875</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                </messageCode>
+                <data>
+                    <pfx4:MSG_Container>
+                        <pfx4:Header>
+                            <pfx4:ProjectName>
+                                <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                            </pfx4:ProjectName>
+                            <pfx4:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx4:Source_Domain>
+                            <pfx4:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx4:Destination_Domain>
+                            <pfx4:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                            </pfx4:Transaction_Type>
+                            <pfx4:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx4:TimeStamp>
+                        </pfx4:Header>
+                        <pfx4:Body>
+                            <pfx4:ErrorManagementSchema>
+                                <pfx4:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </pfx4:inrtn_id>
+                                <pfx4:inrtn_instn_nm>
+                                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                                </pfx4:inrtn_instn_nm>
+                                <pfx4:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="concat(&quot;Existe un porblema al procesar el mensaje del CasePack:  &quot;,$item/casePack/casePackId ,&quot;.&quot;)"/>
+                                </pfx4:inrtn_err_rtn_desc>
+                                <pfx4:inrtn_msg_body>
+                                    <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                                </pfx4:inrtn_msg_body>
+                                <pfx4:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </pfx4:cre8_ts>
+                                <pfx4:u_code>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_UCODE_DATA"/>
+                                </pfx4:u_code>
+                                <pfx4:sev_id>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                                </pfx4:sev_id>
+                            </pfx4:ErrorManagementSchema>
+                        </pfx4:Body>
+                    </pfx4:MSG_Container>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not(exists($_error/ns2:ErrorReport))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>GenerateError</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

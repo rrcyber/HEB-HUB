@@ -1,0 +1,815 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx="http://xmlns.heb.com/ei/MANUCOSTOBTS_INFORMATION" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/MANUCOSTOBTS_INFORMATION.xsd" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms">
+    <xsd:import namespace="http://xmlns.heb.com/ei/MANUCOSTOBTS_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/MANUCOSTOBTS_INFORMATION_SOAP.xsd"/>
+    <pd:name>Processes/Main Process/InsertaInformacion_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:MSG_CONTAINER"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>203</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>551</pd:endX>
+    <pd:endY>202</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1376497232970</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>136</pd:x>
+        <pd:y>4</pd:y>
+        <pd:width>335</pd:width>
+        <pd:height>383</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:MANUCOSTOBTS</pd:over>
+            <pd:iterationElementSlot>array</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>InsertaManu_ReporteCostoBTS</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>InsertaManu_ReporteCostoBTS</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Error Process</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>InsertaManu_ReporteCostoBTS</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-52480</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Error Process</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>contains($_error/ns:ErrorReport/MsgCode,'100030')</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="InsertaManu_ReporteCostoBTS">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>286</pd:x>
+            <pd:y>63</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SRD201001.sharedjdbc</jdbcSharedConfig>
+                <statement>insert into Manu_ReporteCostoBTS (MRC_Cliente,MRC_Fecha_Ini, MRC_Fecha_Fin, MRC_Fecha_Cruze,MRC_Num_Caja,MRC_Tipo_Caja,MRC_Num_Linea, MRC_Num_Item, MRC_Num_Sku, 
+MRC_UPC,MRC_Size,MRC_Clave_UT,MRC_Desc_Prod_USA,MRC_Desc_Prod_MX,MRC_Cant_Prod, MRC_Unidad_Medida,MRC_Cant_Per_Pack, 
+MRC_Clave_Moneda, MRC_Pre_Uni_UMC_US, MRC_Valor_Fact_ME,MRC_Tipo_Cambio,MRC_Factor_Mon_Ext, MRC_Prec_Uni_UMC,MRC_Gasto_Total_Caja,
+MRC_Gasto_Total_UMC,MRC_Landed_Cost_UMC,MRC_GI_UMC,MRC_Porc_GI,MRC_Arancel_UMC,MRC_Porc_Arancel_UMC, 
+MRC_Pais_Origen,MRC_Certi_Origen, MRC_Gasto_Total_Pieza,MRC_Landed_Cost_Pieza,MRC_Clave_Incoterm,MRC_Nom_Proveedor,
+MRC_Fraccion,MRC_Aduana, MRC_Patente, MRC_Pedimiento, MRC_Orden_Partida, MRC_Pais_Facturacion, MRC_Num_Pedido, MRC_Suc_HEB, 
+MRC_WH_HEB,MRC_Num_Maway,MRC_Num_Fact, MRC_Fecha_Fact, MRC_Departamento,
+MRC_Categoria,MRC_Division,MRC_Cargo_Almacenaje,MRC_Cargo_Transporte,MRC_Seguros_Fact, MRC_Embalajes_Fact, 
+MRC_Costo_BTS,MRC_Mov_Local,MRC_Etiquetado,MRC_Certificado_BTS,MRC_Transf_USMX,MRC_Carga_Descarga,MRC_Combustible,
+MRC_Tiempo_extra,MRC_IGI,MRC_DTA,MRC_PRV,MRC_ECI,MRC_IEPS,MRC_CuotaFija,MRC_Insp_Sagarpa,FleteMexicano,OtrosGastos,
+MRC_IVAHonorarios, MRC_Flete,MRC_Pedimento,FechaProceso)
+values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,convert(date,getdate()))
+
+
+
+</statement>
+                <batchUpdate>false</batchUpdate>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>MRC_Cliente</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Fecha_ini</parameterName>
+                        <dataType>DATE</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Fecha_Fin</parameterName>
+                        <dataType>DATE</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Fecha_Cruze</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Num_Caja</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Tipo_Caja</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Num_Linea</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Num_Item</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Num_Sku</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_UPC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Size</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Clave_UT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Desc_Prod_USA</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Desc_Prod_MX</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Cant_Prod</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Unidad_Medida</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Cant_Per_Pack</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Clave_Moneda</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Pre_Uni_UMC_US</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Valor_Fact_ME</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Tipo_Cambio</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Factor_Mon_Ext</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Prec_Uni_UMC</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Gasto_Total_Caja</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Gasto_Total_UMC</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Landed_Cost_UMC</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_GI_UMC</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Porc_GI</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Arancel_UMC</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Porc_Arancel_UMC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Pais_Origen</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Certi_Origen</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Gasto_Total_Pieza</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Landed_Cost_Pieza</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Clave_Incoterm</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Nom_Proveedor</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Fraccion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Aduana</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Patente</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Pedimento</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Orden_Partida</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Pais_Facturacion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Num_Pedido</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Suc_HEB</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_WH_HEB</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Num_Maway</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Num_Fact</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Fecha_Fact</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Departamento</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Categoria</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Division</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Cargo_Almacenaje</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Cargo_Transporte</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Seguros_Fact</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Embalajes_Fact</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Costo_BTS</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Mov_Local</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Etiquetado</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Certificado_BTS</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Transf_USMX</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Carga_Descarga</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Combustible</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Tiempo_extra</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_IGI</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_DTA</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_PRV</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_ECI</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_IEPS</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_CuotaFija</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MRC_Insp_Sagarpa</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FleteMexicano</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>OtrosGastos</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>IVAHonorarios</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>IVAFleteMexicano</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>IVAPedimento</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <xsl:for-each select="$array/pfx:MANUCOSTOBTS">
+                    <jdbcUpdateActivityInput>
+                        <MRC_Cliente>
+                            <xsl:copy-of select="pfx:MRC_CLIENTE/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_CLIENTE"/>
+                        </MRC_Cliente>
+                        <MRC_Fecha_ini>
+                            <xsl:copy-of select="pfx:MRC_FECHA_INI/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_FECHA_INI"/>
+                        </MRC_Fecha_ini>
+                        <MRC_Fecha_Fin>
+                            <xsl:copy-of select="pfx:MRC_FECHA_FIN/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_FECHA_FIN"/>
+                        </MRC_Fecha_Fin>
+                        <MRC_Fecha_Cruze>
+                            <xsl:copy-of select="pfx:MRC_Fecha_Cruze/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Fecha_Cruze"/>
+                        </MRC_Fecha_Cruze>
+                        <MRC_Num_Caja>
+                            <xsl:copy-of select="pfx:MRC_Num_Caja/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Num_Caja"/>
+                        </MRC_Num_Caja>
+                        <MRC_Tipo_Caja>
+                            <xsl:copy-of select="pfx:MRC_Tipo_Caja/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Tipo_Caja"/>
+                        </MRC_Tipo_Caja>
+                        <MRC_Num_Linea>
+                            <xsl:copy-of select="pfx:MRC_Num_Linea/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Num_Linea"/>
+                        </MRC_Num_Linea>
+                        <MRC_Num_Item>
+                            <xsl:copy-of select="pfx:MRC_Num_Item/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Num_Item"/>
+                        </MRC_Num_Item>
+                        <MRC_Num_Sku>
+                            <xsl:copy-of select="pfx:MRC_Num_Sku/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Num_Sku"/>
+                        </MRC_Num_Sku>
+                        <MRC_UPC>
+                            <xsl:copy-of select="pfx:MRC_UPC/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_UPC"/>
+                        </MRC_UPC>
+                        <MRC_Size>
+                            <xsl:copy-of select="pfx:MRC_Size/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Size"/>
+                        </MRC_Size>
+                        <MRC_Clave_UT>
+                            <xsl:copy-of select="pfx:MRC_Clave_UT/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Clave_UT"/>
+                        </MRC_Clave_UT>
+                        <MRC_Desc_Prod_USA>
+                            <xsl:copy-of select="pfx:MRC_Desc_Prod_USA/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Desc_Prod_USA"/>
+                        </MRC_Desc_Prod_USA>
+                        <MRC_Desc_Prod_MX>
+                            <xsl:copy-of select="pfx:MRC_Desc_Prod_MX/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Desc_Prod_MX"/>
+                        </MRC_Desc_Prod_MX>
+                        <MRC_Cant_Prod>
+                            <xsl:copy-of select="pfx:MRC_Cant_Prod/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Cant_Prod"/>
+                        </MRC_Cant_Prod>
+                        <MRC_Unidad_Medida>
+                            <xsl:copy-of select="pfx:MRC_Unidad_Medida/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Unidad_Medida"/>
+                        </MRC_Unidad_Medida>
+                        <MRC_Cant_Per_Pack>
+                            <xsl:copy-of select="pfx:MRC_Cant_Per_Pack/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Cant_Per_Pack"/>
+                        </MRC_Cant_Per_Pack>
+                        <MRC_Clave_Moneda>
+                            <xsl:copy-of select="pfx:MRC_Clave_Moneda/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Clave_Moneda"/>
+                        </MRC_Clave_Moneda>
+                        <MRC_Pre_Uni_UMC_US>
+                            <xsl:copy-of select="pfx:MRC_Pre_Uni_UMC_US/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Pre_Uni_UMC_US"/>
+                        </MRC_Pre_Uni_UMC_US>
+                        <MRC_Valor_Fact_ME>
+                            <xsl:copy-of select="pfx:MRC_Valor_Fact_ME/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Valor_Fact_ME"/>
+                        </MRC_Valor_Fact_ME>
+                        <MRC_Tipo_Cambio>
+                            <xsl:copy-of select="pfx:MRC_Tipo_Cambio/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Tipo_Cambio"/>
+                        </MRC_Tipo_Cambio>
+                        <MRC_Factor_Mon_Ext>
+                            <xsl:copy-of select="pfx:MRC_Factor_Mon_Ext/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Factor_Mon_Ext"/>
+                        </MRC_Factor_Mon_Ext>
+                        <MRC_Prec_Uni_UMC>
+                            <xsl:copy-of select="pfx:MRC_Prec_Uni_UMC/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Prec_Uni_UMC"/>
+                        </MRC_Prec_Uni_UMC>
+                        <MRC_Gasto_Total_Caja>
+                            <xsl:copy-of select="pfx:MRC_Gasto_Total_Caja/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Gasto_Total_Caja"/>
+                        </MRC_Gasto_Total_Caja>
+                        <MRC_Gasto_Total_UMC>
+                            <xsl:copy-of select="pfx:MRC_Gasto_Total_UMC/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Gasto_Total_UMC"/>
+                        </MRC_Gasto_Total_UMC>
+                        <MRC_Landed_Cost_UMC>
+                            <xsl:copy-of select="pfx:MRC_Landed_Cost_UMC/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Landed_Cost_UMC"/>
+                        </MRC_Landed_Cost_UMC>
+                        <MRC_GI_UMC>
+                            <xsl:copy-of select="pfx:MRC_GI_UMC/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_GI_UMC"/>
+                        </MRC_GI_UMC>
+                        <MRC_Porc_GI>
+                            <xsl:copy-of select="pfx:MRC_Porc_GI/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Porc_GI"/>
+                        </MRC_Porc_GI>
+                        <MRC_Arancel_UMC>
+                            <xsl:copy-of select="pfx:MRC_Arancel_UMC/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Arancel_UMC"/>
+                        </MRC_Arancel_UMC>
+                        <MRC_Porc_Arancel_UMC>
+                            <xsl:copy-of select="pfx:MRC_Porc_Arancel_UMC/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Porc_Arancel_UMC"/>
+                        </MRC_Porc_Arancel_UMC>
+                        <MRC_Pais_Origen>
+                            <xsl:copy-of select="pfx:MRC_Pais_Origen/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Pais_Origen"/>
+                        </MRC_Pais_Origen>
+                        <MRC_Certi_Origen>
+                            <xsl:copy-of select="pfx:MRC_Certi_Origen/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Certi_Origen"/>
+                        </MRC_Certi_Origen>
+                        <MRC_Gasto_Total_Pieza>
+                            <xsl:copy-of select="pfx:MRC_Gasto_Total_Pieza/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Gasto_Total_Pieza"/>
+                        </MRC_Gasto_Total_Pieza>
+                        <MRC_Landed_Cost_Pieza>
+                            <xsl:copy-of select="pfx:MRC_Landed_Cost_Pieza/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Landed_Cost_Pieza"/>
+                        </MRC_Landed_Cost_Pieza>
+                        <MRC_Clave_Incoterm>
+                            <xsl:copy-of select="pfx:MRC_Clave_Incoterm/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Clave_Incoterm"/>
+                        </MRC_Clave_Incoterm>
+                        <MRC_Nom_Proveedor>
+                            <xsl:copy-of select="pfx:MRC_Nom_Proveedor/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Nom_Proveedor"/>
+                        </MRC_Nom_Proveedor>
+                        <MRC_Fraccion>
+                            <xsl:copy-of select="pfx:MRC_Fraccion/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Fraccion"/>
+                        </MRC_Fraccion>
+                        <MRC_Aduana>
+                            <xsl:copy-of select="pfx:MRC_Aduana/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Aduana"/>
+                        </MRC_Aduana>
+                        <MRC_Patente>
+                            <xsl:copy-of select="pfx:MRC_Patente/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Patente"/>
+                        </MRC_Patente>
+                        <MRC_Pedimento>
+                            <xsl:copy-of select="pfx:MRC_Pedimiento/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Pedimiento"/>
+                        </MRC_Pedimento>
+                        <MRC_Orden_Partida>
+                            <xsl:copy-of select="pfx:MRC_Orden_Partida/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Orden_Partida"/>
+                        </MRC_Orden_Partida>
+                        <MRC_Pais_Facturacion>
+                            <xsl:copy-of select="pfx:MRC_Pais_Facturacion/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Pais_Facturacion"/>
+                        </MRC_Pais_Facturacion>
+                        <MRC_Num_Pedido>
+                            <xsl:value-of select="if (empty(pfx:MRC_Num_Pedido))&#xA;then 0&#xA;else pfx:MRC_Num_Pedido"/>
+                        </MRC_Num_Pedido>
+                        <MRC_Suc_HEB>
+                            <xsl:copy-of select="pfx:MRC_Suc_HEB/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Suc_HEB"/>
+                        </MRC_Suc_HEB>
+                        <MRC_WH_HEB>
+                            <xsl:copy-of select="pfx:MRC_WH_HEB/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_WH_HEB"/>
+                        </MRC_WH_HEB>
+                        <MRC_Num_Maway>
+                            <xsl:copy-of select="pfx:MRC_Num_Maway/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Num_Maway"/>
+                        </MRC_Num_Maway>
+                        <MRC_Num_Fact>
+                            <xsl:copy-of select="pfx:MRC_Num_Fact/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Num_Fact"/>
+                        </MRC_Num_Fact>
+                        <MRC_Fecha_Fact>
+                            <xsl:copy-of select="pfx:MRC_Fecha_Fact/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Fecha_Fact"/>
+                        </MRC_Fecha_Fact>
+                        <MRC_Departamento>
+                            <xsl:copy-of select="pfx:MRC_Departamento/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Departamento"/>
+                        </MRC_Departamento>
+                        <MRC_Categoria>
+                            <xsl:copy-of select="pfx:MRC_Categoria/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Categoria"/>
+                        </MRC_Categoria>
+                        <MRC_Division>
+                            <xsl:copy-of select="pfx:MRC_Division/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Division"/>
+                        </MRC_Division>
+                        <MRC_Cargo_Almacenaje>
+                            <xsl:copy-of select="pfx:MRC_Cargo_Almacenaje/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Cargo_Almacenaje"/>
+                        </MRC_Cargo_Almacenaje>
+                        <MRC_Cargo_Transporte>
+                            <xsl:copy-of select="pfx:MRC_Cargo_Transporte/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Cargo_Transporte"/>
+                        </MRC_Cargo_Transporte>
+                        <MRC_Seguros_Fact>
+                            <xsl:copy-of select="pfx:MRC_Seguros_Fact/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Seguros_Fact"/>
+                        </MRC_Seguros_Fact>
+                        <MRC_Embalajes_Fact>
+                            <xsl:copy-of select="pfx:MRC_Embalajes_Fact/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Embalajes_Fact"/>
+                        </MRC_Embalajes_Fact>
+                        <MRC_Costo_BTS>
+                            <xsl:copy-of select="pfx:MRC_Costo_BTS/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Costo_BTS"/>
+                        </MRC_Costo_BTS>
+                        <MRC_Mov_Local>
+                            <xsl:copy-of select="pfx:MRC_Mov_Local/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Mov_Local"/>
+                        </MRC_Mov_Local>
+                        <MRC_Etiquetado>
+                            <xsl:copy-of select="pfx:MRC_Etiquetado/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Etiquetado"/>
+                        </MRC_Etiquetado>
+                        <MRC_Certificado_BTS>
+                            <xsl:copy-of select="pfx:MRC_Certificado_BTS/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Certificado_BTS"/>
+                        </MRC_Certificado_BTS>
+                        <MRC_Transf_USMX>
+                            <xsl:copy-of select="pfx:MRC_Transf_USMX/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Transf_USMX"/>
+                        </MRC_Transf_USMX>
+                        <MRC_Carga_Descarga>
+                            <xsl:copy-of select="pfx:MRC_Carga_Descarga/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Carga_Descarga"/>
+                        </MRC_Carga_Descarga>
+                        <MRC_Combustible>
+                            <xsl:copy-of select="pfx:MRC_Combustible/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Combustible"/>
+                        </MRC_Combustible>
+                        <MRC_Tiempo_extra>
+                            <xsl:copy-of select="pfx:MRC_Tiempo_extra/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Tiempo_extra"/>
+                        </MRC_Tiempo_extra>
+                        <MRC_IGI>
+                            <xsl:copy-of select="pfx:MRC_IGI/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_IGI"/>
+                        </MRC_IGI>
+                        <MRC_DTA>
+                            <xsl:copy-of select="pfx:MRC_DTA/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_DTA"/>
+                        </MRC_DTA>
+                        <MRC_PRV>
+                            <xsl:copy-of select="pfx:MRC_PRV/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_PRV"/>
+                        </MRC_PRV>
+                        <MRC_ECI>
+                            <xsl:copy-of select="pfx:MRC_ECI/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_ECI"/>
+                        </MRC_ECI>
+                        <MRC_IEPS>
+                            <xsl:copy-of select="pfx:MRC_IEPS/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_IEPS"/>
+                        </MRC_IEPS>
+                        <MRC_CuotaFija>
+                            <xsl:copy-of select="pfx:MRC_CuotaFija/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_CuotaFija"/>
+                        </MRC_CuotaFija>
+                        <MRC_Insp_Sagarpa>
+                            <xsl:copy-of select="pfx:MRC_Insp_Sagarpa/@xsi:nil"/>
+                            <xsl:value-of select="pfx:MRC_Insp_Sagarpa"/>
+                        </MRC_Insp_Sagarpa>
+                        <FleteMexicano>
+                            <xsl:copy-of select="pfx:FleteMexicano/@xsi:nil"/>
+                            <xsl:value-of select="pfx:FleteMexicano"/>
+                        </FleteMexicano>
+                        <OtrosGastos>
+                            <xsl:copy-of select="pfx:OtrosGastos/@xsi:nil"/>
+                            <xsl:value-of select="pfx:OtrosGastos"/>
+                        </OtrosGastos>
+                        <IVAHonorarios>
+                            <xsl:copy-of select="pfx:IVAHonorarios/@xsi:nil"/>
+                            <xsl:value-of select="pfx:IVAHonorarios"/>
+                        </IVAHonorarios>
+                        <IVAFleteMexicano>
+                            <xsl:copy-of select="pfx:IVAFleteMexicano/@xsi:nil"/>
+                            <xsl:value-of select="pfx:IVAFleteMexicano"/>
+                        </IVAFleteMexicano>
+                        <IVAPedimento>
+                            <xsl:value-of select="0"/>
+                        </IVAPedimento>
+                    </jdbcUpdateActivityInput>
+                </xsl:for-each>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>289</pd:x>
+            <pd:y>196</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Error Process">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>413</pd:x>
+            <pd:y>332</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns12:MSG_Container>
+                    <ns12:Header>
+                        <ns12:ProjectName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </ns12:ProjectName>
+                        <ns12:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </ns12:Source_Domain>
+                        <ns12:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </ns12:Destination_Domain>
+                        <ns12:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/TransactionType"/>
+                        </ns12:Transaction_Type>
+                        <ns12:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns12:TimeStamp>
+                    </ns12:Header>
+                    <ns12:Body>
+                        <ns12:ErrorManagementSchema>
+                            <ns12:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </ns12:inrtn_id>
+                            <ns12:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                            </ns12:inrtn_instn_nm>
+                            <ns12:inrtn_err_rtn_desc>
+                                <xsl:value-of select="concat('Existe un valor null validar el Trace del Error. ','En el SKU: ',&#xA;$array/pfx:MANUCOSTOBTS/pfx:MRC_Num_Sku,' ',$_error/ns:ErrorReport/StackTrace,&quot;&#xA;&quot;)"/>
+                            </ns12:inrtn_err_rtn_desc>
+                            <ns12:inrtn_msg_body>
+                                <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                            </ns12:inrtn_msg_body>
+                            <ns12:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                            </ns12:cre8_ts>
+                            <ns12:u_code>
+                                <xsl:value-of select="concat($_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns:ErrorReport/MsgCode)"/>
+                            </ns12:u_code>
+                            <ns12:sev_id>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                            </ns12:sev_id>
+                        </ns12:ErrorManagementSchema>
+                    </ns12:Body>
+                </ns12:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>193</pd:x>
+            <pd:y>331</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns0:ActivityInput xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns0:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,1672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="www.tibco.com/plugin/Timer" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/schemas/IdentityManagement_mx/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx="http://xmlns.heb.com/ei/PARTNER_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PARTNER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PARTNER_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/IdentityManagement_mx/Shared Resources/Schema Definitions/Custom/Schema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/RecordFromPS.xsd"/>
+    <pd:name>PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_Selection_Process.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>27</pd:startX>
+    <pd:startY>289</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1035</pd:endX>
+    <pd:endY>235</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Variable2>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence/>
+                </xsd:complexType>
+            </xsd:element>
+        </Variable2>
+        <varProcess>
+            <xsd:element name="bProcessed" type="xsd:string"/>
+        </varProcess>
+        <varCurrentEmpl>
+            <xsd:element name="strEmpl" type="xsd:string"/>
+        </varCurrentEmpl>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1268939340178</pd:targetNamespace>
+    <pd:group name="Group Procesa Seleccion People Soft">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>206</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>786</pd:width>
+        <pd:height>573</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$New-Records-PeopleSoft-JDBC-Query/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>current_People_Soft_Record</pd:iterationElementSlot>
+            <pd:indexSlot>indexPS</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:xpathDescription>Ver Datos Completos</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Join-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Error-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Select Header Employee MX</pd:from>
+            <pd:to>Add-Emp-Header</pd:to>
+            <pd:xpathDescription>No existe</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($Select-Header-Employee-MX/resultSet/Record) = 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Select Header Employee MX</pd:from>
+            <pd:to>Employee_Data_Verify_Changes</pd:to>
+            <pd:xpathDescription>Si existe</pd:xpathDescription>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Employee_Data_Verify-Complete</pd:from>
+            <pd:to>Select Header Employee MX</pd:to>
+            <pd:xpathDescription>Informacion Completa</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Employee_Data_Verify-Complete/result = 1</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Employee_Data_Verify-Complete</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:xpathDescription>info Incompleta</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Employee_Data_Verify-Complete/result =0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Employee_Data_Verify_Changes</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:xpathDescription>Info Repetida</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Employee_Data_Verify_Changes/result =1</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Employee_Data_Verify_Changes</pd:from>
+            <pd:to>Upd-Emp-Header</pd:to>
+            <pd:xpathDescription>info NO repetida</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>Employee_Data_Verify-Complete</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Upd-Emp-Header</pd:from>
+            <pd:to>Join</pd:to>
+            <pd:lineType>Straight</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Upd-Emp-Header/jdbcUpdateActivityOutput/noOfUpdates &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Add-Emp-Header</pd:from>
+            <pd:to>Join</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Add-Emp-Header/jdbcUpdateActivityOutput/noOfUpdates &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Join</pd:from>
+            <pd:to>Cancel-Status_AD</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Add-Emp-Detail</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Add-Emp-Detail/jdbcUpdateActivityOutput/noOfUpdates &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Add-Emp-Detail</pd:from>
+            <pd:to>Error-1</pd:to>
+            <pd:xpathDescription>Error on UPD Detail</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Cancel-Status_AD</pd:from>
+            <pd:to>Add-Emp-Detail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Add-Emp-Header</pd:from>
+            <pd:to>Error-1</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Upd-Emp-Header</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Employee_Data_Verify-Complete</pd:from>
+            <pd:to>Call_PSToMDMMXDB</pd:to>
+            <pd:xpathDescription>InformacionCompleta</pd:xpathDescription>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Employee_Data_Verify-Complete/result = 1</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Call_PSToMDMMXDB</pd:from>
+            <pd:to>Join-1</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Select Header Employee MX">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>349</pd:x>
+            <pd:y>333</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>Select top 1 SURNAME,GIVENAME,DISPLAY_NAME,EMPL_ID,PHONE,PRIMARY_NID,EMAIL_ADDR,EFF_DT,EFF_SEQ,DEP_DESCR,JOBCODE_DESCR,DEPT_ID,JOB_CD,EMPL_STAT,EMPLOYEE_TYPE,
+	        NAME,NATIONAL_ID,COMPANY,LOCATION_ID,LOCATION_DESCR,LAST_UPDATE_DT,TIPO_CONTRATO,CITY,COMPANY_DESCR,Manager_Id from PS_EMPL_DATA_MX where EMPL_ID=?</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>pEmpId</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>SURNAME</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>GIVENAME</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>DISPLAY_NAME</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EMPL_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>PHONE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>PRIMARY_NID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EMAIL_ADDR</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EFF_DT</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EFF_SEQ</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>DEP_DESCR</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>JOBCODE_DESCR</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>DEPT_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>JOB_CD</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EMPL_STAT</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EMPLOYEE_TYPE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>NAME</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>NATIONAL_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>COMPANY</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>LOCATION_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>LOCATION_DESCR</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>LAST_UPDATE_DT</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>TIPO_CONTRATO</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>CITY</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>COMPANY_DESCR</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>Manager_Id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <pEmpId>
+                        <xsl:choose>
+                            <xsl:when test="exists($Map-Data/pfx2:EMPLOYEE/pfx2:EMPL_ID)">
+                                <xsl:value-of select="$Map-Data/pfx2:EMPLOYEE/pfx2:EMPL_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </pEmpId>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Employee_Data_Verify_Changes">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>559</pd:x>
+            <pd:y>177</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_Data_Verify_Changes.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <String_PS>
+                        <xsl:value-of select="concat(tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:SURNAME),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:GIVENAME),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:DISPLAY_NAME),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:PHONE),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:PRIMARY_NID),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:EMAIL_ADDR),&#xA;substring(tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:EFF_DT), 1,10),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:DEP_DESCR),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:JOBCODE_DESCR),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:DEPT_ID),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:JOB_CD),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:EMPL_STAT),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:EMPLOYEE_TYPE),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:NAME),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:NATIONAL_ID),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:COMPANY),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:LOCATION_ID),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:LOCATION_DESCR),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:TIPO_CONTRATO),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:CITY),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:COMPANY_DESCR),&#xA;tib:trim($Map-Data/pfx2:EMPLOYEE/pfx2:MANAGER_ID))"/>
+                    </String_PS>
+                    <String_Stage>
+                        <xsl:value-of select="concat(tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/SURNAME),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/GIVENAME),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/DISPLAY_NAME),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/PHONE),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/PRIMARY_NID),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/EMAIL_ADDR),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/EFF_DT),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/DEP_DESCR),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/JOBCODE_DESCR),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/DEPT_ID),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/JOB_CD),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/EMPL_STAT),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/EMPLOYEE_TYPE),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/NAME),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/NATIONAL_ID),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/COMPANY),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/LOCATION_ID),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/LOCATION_DESCR),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/TIPO_CONTRATO),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/CITY),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/COMPANY_DESCR),&#xA;tib:trim($Select-Header-Employee-MX/resultSet/Record[1]/Manager_Id))"/>
+                    </String_Stage>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Join">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>552</pd:x>
+            <pd:y>421</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Join-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>873</pd:x>
+            <pd:y>174</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Employee_Data_Verify-Complete">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>354</pd:x>
+            <pd:y>63</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_Data_Verify_Complete.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data/pfx2:EMPLOYEE"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>254</pd:x>
+            <pd:y>63</pd:y>
+            <config>
+                <element ref="pfx2:EMPLOYEE"/>
+            </config>
+            <pd:inputBindings>
+                <pfx2:EMPLOYEE>
+                    <pfx2:SURNAME>
+                        <xsl:value-of select="translate(translate($current_People_Soft_Record/Record/SURNAME,'ÑñáéíóúÁÉÍÓÚ#±´?','NnaeiouAEIOU n  '),'%','')"/>
+                    </pfx2:SURNAME>
+                    <pfx2:GIVENAME>
+                        <xsl:value-of select="translate(translate($current_People_Soft_Record/Record/GIVENAME,'ÑñáéíóúÁÉÍÓÚ#±´?','NnaeiouAEIOU n  '),'%','')"/>
+                    </pfx2:GIVENAME>
+                    <pfx2:DISPLAY_NAME>
+                        <xsl:value-of select="translate(translate($current_People_Soft_Record/Record/DISPLAY_NAME,'ÑñáéíóúÁÉÍÓÚ#±´?','NnaeiouAEIOU n  '),'%','')"/>
+                    </pfx2:DISPLAY_NAME>
+                    <pfx2:EMPL_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_ID"/>
+                    </pfx2:EMPL_ID>
+                    <pfx2:PHONE>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/PHONE"/>
+                    </pfx2:PHONE>
+                    <pfx2:PRIMARY_NID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/PRIMARY_NID"/>
+                    </pfx2:PRIMARY_NID>
+                    <pfx2:EMAIL_ADDR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMAIL_ADDR"/>
+                    </pfx2:EMAIL_ADDR>
+                    <pfx2:EFF_DT>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EFF_DT"/>
+                    </pfx2:EFF_DT>
+                    <pfx2:EFF_SEQ>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EFF_SEQ"/>
+                    </pfx2:EFF_SEQ>
+                    <pfx2:DEP_DESCR>
+                        <xsl:value-of select="translate($current_People_Soft_Record/Record/DEP_DESCR, 'ÑñáéíóúÁÉÍÓÚ#±´?', 'NnaeiouAEIOU n  ')"/>
+                    </pfx2:DEP_DESCR>
+                    <pfx2:JOBCODE_DESCR>
+                        <xsl:value-of select="translate(translate($current_People_Soft_Record/Record/JOBCODE_DESCR,'ÑñáéíóúÁÉÍÓÚ#±´?','NnaeiouAEIOU n  '),'%','')"/>
+                    </pfx2:JOBCODE_DESCR>
+                    <pfx2:DEPT_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/DEPT_ID"/>
+                    </pfx2:DEPT_ID>
+                    <pfx2:JOB_CD>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/JOB_CD"/>
+                    </pfx2:JOB_CD>
+                    <pfx2:EMPL_STAT>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_STAT"/>
+                    </pfx2:EMPL_STAT>
+                    <pfx2:EMPLOYEE_TYPE>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPLOYEE_TYPE"/>
+                    </pfx2:EMPLOYEE_TYPE>
+                    <pfx2:NAME>
+                        <xsl:value-of select="translate(translate($current_People_Soft_Record/Record/NAME,'ÑñáéíóúÁÉÍÓÚ#±´?','NnaeiouAEIOU n  '),'%','')"/>
+                    </pfx2:NAME>
+                    <pfx2:NATIONAL_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/NATIONAL_ID"/>
+                    </pfx2:NATIONAL_ID>
+                    <pfx2:COMPANY>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/COMPANY"/>
+                    </pfx2:COMPANY>
+                    <pfx2:LOCATION_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LOCATION_ID"/>
+                    </pfx2:LOCATION_ID>
+                    <pfx2:LOCATION_DESCR>
+                        <xsl:value-of select="translate(translate($current_People_Soft_Record/Record/LOCATION_DESCR,'ÑñáéíóúÁÉÍÓÚ#±´?','NnaeiouAEIOU n  '),'%','')"/>
+                    </pfx2:LOCATION_DESCR>
+                    <pfx2:LAST_UPDATE_DT>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LAST_UPDATE_DT"/>
+                    </pfx2:LAST_UPDATE_DT>
+                    <pfx2:TIPO_CONTRATO>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/TIPO_DE_CONTRATO"/>
+                    </pfx2:TIPO_CONTRATO>
+                    <xsl:if test="$current_People_Soft_Record/Record/TIPO_DE_MOVIMIENTO">
+                        <pfx2:Operacion_PS>
+                            <xsl:value-of select="$current_People_Soft_Record/Record/TIPO_DE_MOVIMIENTO"/>
+                        </pfx2:Operacion_PS>
+                    </xsl:if>
+                    <xsl:if test="$current_People_Soft_Record/Record/CITY">
+                        <pfx2:CITY>
+                            <xsl:value-of select="$current_People_Soft_Record/Record/CITY"/>
+                        </pfx2:CITY>
+                    </xsl:if>
+                    <pfx2:COMPANY_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/COMPANY_DESCR"/>
+                    </pfx2:COMPANY_DESCR>
+                    <xsl:if test="$current_People_Soft_Record/Record/STD_HOURS">
+                        <pfx2:STD_HOURS>
+                            <xsl:value-of select="$current_People_Soft_Record/Record/STD_HOURS"/>
+                        </pfx2:STD_HOURS>
+                    </xsl:if>
+                    <xsl:if test="$current_People_Soft_Record/Record/MANAGER_ID">
+                        <pfx2:MANAGER_ID>
+                            <xsl:value-of select="$current_People_Soft_Record/Record/MANAGER_ID"/>
+                        </pfx2:MANAGER_ID>
+                    </xsl:if>
+                </pfx2:EMPLOYEE>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Upd-Emp-Header">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>552</pd:x>
+            <pd:y>286</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>Update PS_EMPL_DATA_MX set SURNAME=?,GIVENAME=?,DISPLAY_NAME=?,PHONE=?,PRIMARY_NID=?,EMAIL_ADDR=?,EFF_DT=substring(?,1,10),EFF_SEQ=?,DEP_DESCR=?,JOBCODE_DESCR=?,DEPT_ID=?,JOB_CD=?,EMPL_STAT=?,EMPLOYEE_TYPE=?,
+	        NAME=replace(?,',',' '),NATIONAL_ID=?,COMPANY=?,LOCATION_ID=?,LOCATION_DESCR=?,LAST_UPDATE_DT=substring(?,1,10),TIPO_CONTRATO=?,CITY=?,COMPANY_DESCR=?,Manager_id=? where EMPL_ID=?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>SURNAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>GIVENAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DISPLAY_NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PHONE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRIMARY_NID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMAIL_ADDR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_SEQ</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEP_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOBCODE_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEPT_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOB_CD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_STAT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPLOYEE_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NATIONAL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LAST_UPDATE_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>tipoContrato</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CITY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MANAGER_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <SURNAME>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/SURNAME"/>
+                    </SURNAME>
+                    <GIVENAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/GIVENAME)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/GIVENAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </GIVENAME>
+                    <DISPLAY_NAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/DISPLAY_NAME)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/DISPLAY_NAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </DISPLAY_NAME>
+                    <PHONE>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/PHONE)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/PHONE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PHONE>
+                    <PRIMARY_NID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/PRIMARY_NID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/PRIMARY_NID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PRIMARY_NID>
+                    <EMAIL_ADDR>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EMAIL_ADDR)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EMAIL_ADDR"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EMAIL_ADDR>
+                    <EFF_DT>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EFF_DT)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EFF_DT"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EFF_DT>
+                    <EFF_SEQ>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EFF_SEQ)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EFF_SEQ"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EFF_SEQ>
+                    <DEP_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/DEP_DESCR"/>
+                    </DEP_DESCR>
+                    <JOBCODE_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/JOBCODE_DESCR"/>
+                    </JOBCODE_DESCR>
+                    <DEPT_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/DEPT_ID"/>
+                    </DEPT_ID>
+                    <JOB_CD>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/JOB_CD"/>
+                    </JOB_CD>
+                    <EMPL_STAT>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_STAT"/>
+                    </EMPL_STAT>
+                    <EMPLOYEE_TYPE>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPLOYEE_TYPE"/>
+                    </EMPLOYEE_TYPE>
+                    <NAME>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/NAME"/>
+                    </NAME>
+                    <NATIONAL_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/NATIONAL_ID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/NATIONAL_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </NATIONAL_ID>
+                    <COMPANY>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/COMPANY"/>
+                    </COMPANY>
+                    <LOCATION_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LOCATION_ID"/>
+                    </LOCATION_ID>
+                    <LOCATION_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LOCATION_DESCR"/>
+                    </LOCATION_DESCR>
+                    <LAST_UPDATE_DT>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/LAST_UPDATE_DT)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/LAST_UPDATE_DT"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LAST_UPDATE_DT>
+                    <tipoContrato>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/TIPO_DE_CONTRATO"/>
+                    </tipoContrato>
+                    <CITY>
+                        <xsl:value-of select="substring($current_People_Soft_Record/Record/CITY, 1,30)"/>
+                    </CITY>
+                    <COMPANY_DESCR>
+                        <xsl:value-of select="substring($current_People_Soft_Record/Record/COMPANY_DESCR, 1,30)"/>
+                    </COMPANY_DESCR>
+                    <MANAGER_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/MANAGER_ID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/MANAGER_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </MANAGER_ID>
+                    <EMPL_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Add-Emp-Header">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>344</pd:x>
+            <pd:y>520</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>insert into PS_EMPL_DATA_MX  (SURNAME
+           ,GIVENAME
+           ,DISPLAY_NAME
+           ,PHONE
+           ,PRIMARY_NID
+           ,EMAIL_ADDR
+           ,EFF_DT
+           ,EFF_SEQ
+           ,DEP_DESCR
+           ,JOBCODE_DESCR
+           ,DEPT_ID
+           ,JOB_CD
+           ,EMPL_STAT
+           ,EMPLOYEE_TYPE
+           ,NAME
+           ,NATIONAL_ID
+           ,COMPANY
+           ,LOCATION_ID
+           ,LOCATION_DESCR
+           ,LAST_UPDATE_DT
+            ,EMPL_ID
+            ,TIPO_CONTRATO,CITY,COMPANY_DESCR ,Manager_id)  values(?,?,?,?,?,?,substring(?,1,10),?,?,?,?,?,?,?,replace(?,',',' '),?,?,?,?,substring(?,1,10),?,?,?,?,?)</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>SURNAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>GIVENAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DISPLAY_NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PHONE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRIMARY_NID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMAIL_ADDR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_SEQ</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEP_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOBCODE_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEPT_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOB_CD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_STAT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPLOYEE_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NATIONAL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LAST_UPDATE_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TIPO_CONTRATO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CITY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MANAGER_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <SURNAME>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/SURNAME"/>
+                    </SURNAME>
+                    <GIVENAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/GIVENAME)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/GIVENAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </GIVENAME>
+                    <DISPLAY_NAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/DISPLAY_NAME)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/DISPLAY_NAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </DISPLAY_NAME>
+                    <PHONE>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/PHONE)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/PHONE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PHONE>
+                    <PRIMARY_NID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/PRIMARY_NID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/PRIMARY_NID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PRIMARY_NID>
+                    <EMAIL_ADDR>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EMAIL_ADDR)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EMAIL_ADDR"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EMAIL_ADDR>
+                    <EFF_DT>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EFF_DT)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EFF_DT"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EFF_DT>
+                    <EFF_SEQ>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EFF_SEQ)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EFF_SEQ"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EFF_SEQ>
+                    <DEP_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/DEP_DESCR"/>
+                    </DEP_DESCR>
+                    <JOBCODE_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/JOBCODE_DESCR"/>
+                    </JOBCODE_DESCR>
+                    <DEPT_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/DEPT_ID"/>
+                    </DEPT_ID>
+                    <JOB_CD>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/JOB_CD"/>
+                    </JOB_CD>
+                    <EMPL_STAT>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_STAT"/>
+                    </EMPL_STAT>
+                    <EMPLOYEE_TYPE>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPLOYEE_TYPE"/>
+                    </EMPLOYEE_TYPE>
+                    <NAME>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/NAME"/>
+                    </NAME>
+                    <NATIONAL_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/NATIONAL_ID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/NATIONAL_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </NATIONAL_ID>
+                    <COMPANY>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/COMPANY"/>
+                    </COMPANY>
+                    <LOCATION_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LOCATION_ID"/>
+                    </LOCATION_ID>
+                    <LOCATION_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LOCATION_DESCR"/>
+                    </LOCATION_DESCR>
+                    <LAST_UPDATE_DT>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/LAST_UPDATE_DT)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/LAST_UPDATE_DT"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LAST_UPDATE_DT>
+                    <EMPL_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                    <TIPO_CONTRATO>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/TIPO_DE_CONTRATO"/>
+                    </TIPO_CONTRATO>
+                    <CITY>
+                        <xsl:choose>
+                            <xsl:when test="exists(substring($current_People_Soft_Record/Record/CITY, 1,30))">
+                                <xsl:value-of select="substring($current_People_Soft_Record/Record/CITY, 1,30)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </CITY>
+                    <COMPANY_DESCR>
+                        <xsl:value-of select="substring($current_People_Soft_Record/Record/COMPANY_DESCR, 1,30)"/>
+                    </COMPANY_DESCR>
+                    <MANAGER_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/MANAGER_ID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/MANAGER_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </MANAGER_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Add-Emp-Detail">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:description/>
+            <pd:x>870</pd:x>
+            <pd:y>423</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>insert into PS_EMPL_DATA_DETAIL_MX  
+(SURNAME
+           ,GIVENAME
+           ,DISPLAY_NAME
+           ,PHONE
+           ,PRIMARY_NID
+           ,EMAIL_ADDR
+           ,EFF_DT
+           ,EFF_SEQ
+           ,DEP_DESCR
+           ,JOBCODE_DESCR
+           ,DEPT_ID
+           ,JOB_CD
+           ,EMPL_STAT
+           ,EMPLOYEE_TYPE
+           ,NAME
+           ,NATIONAL_ID
+           ,COMPANY
+           ,LOCATION_ID
+           ,LOCATION_DESCR
+           ,LAST_UPDATE_DT
+            ,EMPL_ID   
+            ,INSERTEDDATE
+            ,Status_AD
+            ,TIPO_CONTRATO ,Operacion_PS,CITY,COMPANY_DESCR,Manager_id)
+values(?,?,?,?,?,?,substring(?,1,10),?,?,?,?,?,?,?,replace(?,',',' '),?,?,?,?,substring(?,1,10),?,sysdatetime(),'L',?,?,?,?,?)</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>SURNAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>GIVENAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DISPLAY_NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PHONE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRIMARY_NID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMAIL_ADDR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EFF_SEQ</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEP_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOBCODE_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DEPT_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>JOB_CD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_STAT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPLOYEE_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>NATIONAL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LAST_UPDATE_DT</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TIPO_CONTRATO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>OPERACION_PS</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CITY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>COMPANY_DESCR</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>MANAGER_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <SURNAME>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/SURNAME"/>
+                    </SURNAME>
+                    <GIVENAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/GIVENAME)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/GIVENAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </GIVENAME>
+                    <DISPLAY_NAME>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/DISPLAY_NAME)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/DISPLAY_NAME"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </DISPLAY_NAME>
+                    <PHONE>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/PHONE)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/PHONE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PHONE>
+                    <PRIMARY_NID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/PRIMARY_NID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/PRIMARY_NID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PRIMARY_NID>
+                    <EMAIL_ADDR>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EMAIL_ADDR)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EMAIL_ADDR"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EMAIL_ADDR>
+                    <EFF_DT>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EFF_DT)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EFF_DT"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EFF_DT>
+                    <EFF_SEQ>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/EFF_SEQ)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/EFF_SEQ"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </EFF_SEQ>
+                    <DEP_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/DEP_DESCR"/>
+                    </DEP_DESCR>
+                    <JOBCODE_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/JOBCODE_DESCR"/>
+                    </JOBCODE_DESCR>
+                    <DEPT_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/DEPT_ID"/>
+                    </DEPT_ID>
+                    <JOB_CD>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/JOB_CD"/>
+                    </JOB_CD>
+                    <EMPL_STAT>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_STAT"/>
+                    </EMPL_STAT>
+                    <EMPLOYEE_TYPE>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPLOYEE_TYPE"/>
+                    </EMPLOYEE_TYPE>
+                    <NAME>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/NAME"/>
+                    </NAME>
+                    <NATIONAL_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/NATIONAL_ID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/NATIONAL_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </NATIONAL_ID>
+                    <COMPANY>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/COMPANY"/>
+                    </COMPANY>
+                    <LOCATION_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LOCATION_ID"/>
+                    </LOCATION_ID>
+                    <LOCATION_DESCR>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/LOCATION_DESCR"/>
+                    </LOCATION_DESCR>
+                    <LAST_UPDATE_DT>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/LAST_UPDATE_DT)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/LAST_UPDATE_DT"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LAST_UPDATE_DT>
+                    <EMPL_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                    <TIPO_CONTRATO>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/TIPO_DE_CONTRATO"/>
+                    </TIPO_CONTRATO>
+                    <OPERACION_PS>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/TIPO_DE_MOVIMIENTO)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/TIPO_DE_MOVIMIENTO"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </OPERACION_PS>
+                    <CITY>
+                        <xsl:choose>
+                            <xsl:when test="exists(substring($current_People_Soft_Record/Record/CITY, 1,30))">
+                                <xsl:value-of select="substring($current_People_Soft_Record/Record/CITY, 1,30)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </CITY>
+                    <COMPANY_DESCR>
+                        <xsl:value-of select="substring($current_People_Soft_Record/Record/COMPANY_DESCR,1,30)"/>
+                    </COMPANY_DESCR>
+                    <MANAGER_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_People_Soft_Record/Record/MANAGER_ID)">
+                                <xsl:value-of select="$current_People_Soft_Record/Record/MANAGER_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </MANAGER_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Error-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>867</pd:x>
+            <pd:y>520</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Cancel-Status_AD">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>674</pd:x>
+            <pd:y>420</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>Update PS_EMPL_DATA_DETAIL_MX set  Status_AD='X'
+	          where EMPL_ID=? and Status_AD='L'</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <EMPL_ID>
+                        <xsl:value-of select="$current_People_Soft_Record/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Call_PSToMDMMXDB">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>597</pd:x>
+            <pd:y>107</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/PS_To_MDMMXDB.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data/pfx2:EMPLOYEE"/>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="New Records PeopleSoft JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>124</pd:x>
+        <pd:y>306</pd:y>
+        <config>
+            <timeout>%%Connections/DB/DBINTEGRACIONES/ORACLE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/DB/DBINTEGRACIONES/ORACLE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Oracle/DBPS JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT  CASE  A.ACTION
+        WHEN  'HIR' THEN  'A'
+        WHEN  'REH' THEN  'A'
+        WHEN  'TER' THEN  'B'
+        WHEN  'CTC' THEN  'M'
+        WHEN  'XFR' THEN  'M'
+        WHEN  'POS' THEN  'M'
+        WHEN  'PRO' THEN  'M'
+        ELSE  A.ACTION  END "TIPO_DE_MOVIMIENTO",
+        CASE  B.LAST_NAME
+        WHEN  ' '   THEN  INITCAP(TRANSLATE(B.SECOND_LAST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '))
+        ELSE   INITCAP(TRANSLATE(B.LAST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '))
+        ||' '||INITCAP(TRANSLATE(B.SECOND_LAST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC ')) END "SURNAME",
+        INITCAP(TRANSLATE(B.FIRST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC ')) "GIVENAME",
+        initcap(CASE instr(TRANSLATE(B.FIRST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '),' ') WHEN 0 THEN TRANSLATE(B.FIRST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC ') ELSE  SUBSTR(TRANSLATE(B.FIRST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '),1,(instr(TRANSLATE(B.FIRST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '),' ')-1)) END )
+        ||' '||       CASE  B.LAST_NAME
+        WHEN  ' '   THEN  INITCAP(TRANSLATE(B.SECOND_LAST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '))
+        ELSE   INITCAP(TRANSLATE(B.LAST_NAME,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC ')) END "DISPLAY_NAME",        
+        A.EMPLID                                        "EMPL_ID",
+        C.PHONE                                                   "PHONE",
+        D.NATIONAL_ID                                     "PRIMARY_NID",
+        E.EMAIL_ADDR                                       "EMAIL_ADDR",
+        A.EFFDT                                                           "EFF_DT",
+        A.EFFSEQ                                         "EFF_SEQ",
+        TRANSLATE(F.DESCR,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC ') "DEP_DESCR",
+        TRANSLATE(G.DESCR,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC ') "JOBCODE_DESCR",
+        F.DEPTID                                    "DEPT_ID",
+        
+        G.JOBCODE                                              "JOB_CD",
+        
+        A.EMPL_STATUS                    "EMPL_STAT",
+        A.HOLIDAY_SCHEDULE                        "EMPLOYEE_TYPE",
+        initcap(TRANSLATE(B.NAME,',ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-',' naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '))   "NAME",
+        SUBSTR(H.NATIONAL_ID,11,3)         "NATIONAL_ID",
+        A.COMPANY                                            "COMPANY",
+        J.DESCR "COMPANY_DESCR",
+        
+        SUBSTR(A.LOCATION,1,5)                                  "LOCATION_ID",
+        REPLACE(REPLACE(REPLACE(REPLACE(TRANSLATE(I.DESCR,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC '),' (ASI)',''),' (CAM)',''),'(ASI)',''),'(CAM)','')                "LOCATION_DESCR",
+        TRANSLATE(I.CITY,'ñáéíóúàèìòùãõâêîôôäëïöüçÑÿÉÿÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÿÖÜÇ-','naeiouaeiouaoaeiooaeioucNAEIOUAEIOUAOAEIOOAEIOUC ') "CITY",
+        TRUNC(A.ACTION_DT)                                        "LAST_UPDATE_DT",
+        A.GP_PAYGROUP                                  "TIPO_DE_CONTRATO",
+		A.STD_HOURS                                      "STD_HOURS",
+        MANAGER.EMPLID  "MANAGER_ID"
+FROM  PS_JOB              A
+JOIN  PS_PERSONAL_DATA    B ON A.EMPLID = B.EMPLID
+LEFT
+JOIN  PS_PERSONAL_PHONE   C ON A.EMPLID = C.EMPLID AND C.PHONE_TYPE = 'WORK'
+LEFT
+JOIN  PS_PERS_NID         D ON A.EMPLID = D.EMPLID AND D.NATIONAL_ID_TYPE  = 'IMSS'
+LEFT
+JOIN  PS_EMAIL_ADDRESSES  E ON A.EMPLID = E.EMPLID AND E_ADDR_TYPE = 'BUSN'
+JOIN  PS_DEPT_TBL         F ON A.DEPTID = F.DEPTID
+JOIN  PS_JOBCODE_TBL      G ON A.JOBCODE = G.JOBCODE
+LEFT
+JOIN  PS_PERS_NID         H ON A.EMPLID = H.EMPLID AND H.NATIONAL_ID_TYPE  = 'RFC'
+JOIN  PS_LOCATION_TBL     I ON A.LOCATION = I.LOCATION
+JOIN  PS_COMPANY_TBL      J ON  A.COMPANY = J.COMPANY
+OUTER APPLY (
+  SELECT B.EMPLID,
+         B.POSITION_ENTRY_DT
+	FROM	  PS_JOB B
+  JOIN    PS_PERSONAL_DATA    C ON B.EMPLID = C.EMPLID
+  WHERE		B.POSITION_NBR = A.REPORTS_TO
+		  AND B.EFFDT = (SELECT MAX(C.EFFDT) FROM PS_JOB C WHERE B.EMPLID = C.EMPLID)
+		  AND B.EFFSEQ = (SELECT MAX(D.EFFSEQ) FROM PS_JOB D WHERE B.EMPLID = D.EMPLID AND B.EFFDT = D.EFFDT)
+		  AND B.HR_STATUS='A'  
+      AND B.POSITION_ENTRY_DT =(SELECT MAX(E.POSITION_ENTRY_DT) FROM PS_JOB  E  WHERE B.POSITION_NBR = E.POSITION_NBR)
+	) MANAGER
+WHERE     A.EFFDT   =   (SELECT MAX(K.EFFDT)  FROM  PS_JOB                        K WHERE A.EMPLID    = K.EMPLID     )
+      AND A.EFFSEQ  =   (SELECT MAX(L.EFFSEQ) FROM  PS_JOB          L WHERE A.EMPLID    = L.EMPLID    AND A.EFFDT       = L.EFFDT)
+      AND G.EFFDT   =   (SELECT MAX(M.EFFDT)  FROM  PS_JOBCODE_TBL M WHERE G.JOBCODE    = M.JOBCODE   AND M.EFF_STATUS = 'A')
+      AND I.EFFDT   =   (SELECT MAX(N.EFFDT)  FROM  PS_LOCATION_TBL N WHERE I.LOCATION  = N.LOCATION  AND N.EFF_STATUS  = 'A')
+      AND J.EFFDT   =   (SELECT MAX(O.EFFDT)  FROM  PS_COMPANY_TBL  O WHERE J.COMPANY   = O.COMPANY   AND O.EFF_STATUS  = 'A')
+      AND A.ACTION          IN  ('HIR','REH','TER','XFR','CTC','POS','PRO')  
+      AND (
+            (
+              TRUNC(A.EFFDT)       = TRUNC(SYSDATE-?)
+           )
+            OR
+            (
+              TRUNC(A.ACTION_DT)  = TRUNC(SYSDATE-?)
+              AND
+              TRUNC(A.EFFDT)        &lt;= TRUNC(SYSDATE-?)
+            )
+          )  
+ORDER BY  TIPO_DE_MOVIMIENTO,EFF_DT,TO_NUMBER(A.EMPLID)
+</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Days_To_Include</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Days_To_Include2</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Days_To_Include3</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>TIPO_DE_MOVIMIENTO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SURNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>GIVENAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DISPLAY_NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PHONE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRIMARY_NID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMAIL_ADDR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EFF_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EFF_SEQ</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEP_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>JOBCODE_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEPT_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>JOB_CD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPL_STAT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPLOYEE_TYPE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NATIONAL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>COMPANY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>COMPANY_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LOCATION_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LOCATION_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LAST_UPDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TIPO_DE_CONTRATO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>STD_HOURS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>MANAGER_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <Days_To_Include>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Days_To_Get_Records"/>
+                </Days_To_Include>
+                <Days_To_Include2>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Days_To_Get_Records"/>
+                </Days_To_Include2>
+                <Days_To_Include3>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Days_To_Get_Records"/>
+                </Days_To_Include3>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Group Procesa Seleccion People Soft</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>New Records PeopleSoft JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>New Records PeopleSoft JDBC Query</pd:from>
+        <pd:to>Group Procesa Seleccion People Soft</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

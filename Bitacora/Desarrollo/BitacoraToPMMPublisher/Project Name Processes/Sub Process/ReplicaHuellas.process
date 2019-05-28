@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/ReplicaHuellas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ReplicaHuellas" schemaLocation="/Shared Resources/Schema Definitions/Custom/ReplicaHuellas.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/ReplicaHuellas.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>36</pd:startX>
+    <pd:startY>148</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>733</pd:endX>
+    <pd:endY>151</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1456234251419</pd:targetNamespace>
+    <pd:activity name="Select Replica">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>195</pd:x>
+        <pd:y>148</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-Connection-WFCDB.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT 
+REGID,
+SCAN_SOCIOID,
+SCAN_DEDOTIPO,
+SCAN_TEMPLATEDEDO,
+ISNULL(SCAN_FECHAREG, NULL) AS 'SCAN_FECHAREG',
+'TIBCO' AS 'SCAN_USUARIOREG',
+GETDATE() AS 'SCAN_FECHAMOD',
+'TIBCO' AS 'SCAN_USUARIOMOD'
+FROM FINGER_TEMPLATE  (nolock)
+WHERE SCAN_FECHAREG &gt;= DATEADD(HOUR, -1, GETDATE())
+OR SCAN_FECHAMOD &gt;= DATEADD(HOUR, -1, GETDATE())
+ORDER BY SCAN_FECHAREG DESC</statement>
+            <wizardData/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>REGID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_SOCIOID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_DEDOTIPO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_TEMPLATEDEDO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>text</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_FECHAREG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_USUARIOREG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_FECHAMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCAN_USUARIOMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map ReplicaHuellasALTA">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>414</pd:x>
+        <pd:y>44</pd:y>
+        <config>
+            <element ref="pfx:ReplicaHuellas"/>
+        </config>
+        <pd:inputBindings>
+            <pfx:ReplicaHuellas>
+                <xsl:for-each select="$Select-Replica/resultSet/Record">
+                    <pfx:ITEM>
+                        <pfx:REGID>
+                            <xsl:value-of select="REGID"/>
+                        </pfx:REGID>
+                        <pfx:SCAN_SOCIOID>
+                            <xsl:value-of select="SCAN_SOCIOID"/>
+                        </pfx:SCAN_SOCIOID>
+                        <pfx:SCAN_DEDOTIPO>
+                            <xsl:value-of select="SCAN_DEDOTIPO"/>
+                        </pfx:SCAN_DEDOTIPO>
+                        <pfx:SCAN_TEMPLATEDEDO>
+                            <xsl:value-of select="SCAN_TEMPLATEDEDO"/>
+                        </pfx:SCAN_TEMPLATEDEDO>
+                        <pfx:SCAN_FECHAREG>
+                            <xsl:value-of select="SCAN_FECHAREG"/>
+                        </pfx:SCAN_FECHAREG>
+                        <pfx:SCAN_USUARIOREG>
+                            <xsl:value-of select="SCAN_USUARIOREG"/>
+                        </pfx:SCAN_USUARIOREG>
+                        <pfx:SCAN_FECHAMOD>
+                            <xsl:value-of select="SCAN_FECHAMOD"/>
+                        </pfx:SCAN_FECHAMOD>
+                        <pfx:SCAN_USUARIOMOD>
+                            <xsl:value-of select="SCAN_USUARIOMOD"/>
+                        </pfx:SCAN_USUARIOMOD>
+                    </pfx:ITEM>
+                </xsl:for-each>
+            </pfx:ReplicaHuellas>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Topic Publisher ALTA">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>589</pd:x>
+        <pd:y>53</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Topics/GLB.STORE.REPLICA.HUELLAS.TOPIC%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS-Connection-MX.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx:ReplicaHuellas"/>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <Body>
+                    <pfx:ReplicaHuellas>
+                        <xsl:copy-of select="$Map-ReplicaHuellasALTA/pfx:ReplicaHuellas/pfx:ITEM"/>
+                    </pfx:ReplicaHuellas>
+                </Body>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>445</pd:x>
+        <pd:y>148</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Select Replica</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Select Replica</pd:from>
+        <pd:to>Map ReplicaHuellasALTA</pd:to>
+        <pd:xpathDescription>Con datos</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Select-Replica/resultSet/Record)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Topic Publisher ALTA</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Select Replica</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>Sin datos</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map ReplicaHuellasALTA</pd:from>
+        <pd:to>JMS Topic Publisher ALTA</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

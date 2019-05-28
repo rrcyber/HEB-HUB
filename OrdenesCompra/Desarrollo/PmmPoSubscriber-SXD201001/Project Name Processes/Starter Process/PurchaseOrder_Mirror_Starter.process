@@ -1,0 +1,772 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns3="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_MIRROR_COMPLETED" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/error" xmlns:pfx6="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_MIRROR_COMPLETED"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Starter Process/PurchaseOrder_Mirror_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>65</pd:x>
+        <pd:y>215</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Properties/GLB_MAX_SESSIONS%%</maxSessions>
+                <destination>%%Destinations/Queues/PMM_PO_MIRROR%%</destination>
+                <selector>JMSCorrelationID='PO'</selector>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection Mex.sharedjmscon</ConnectionReference>
+            <_sequenceKey/>
+            <_customId/>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1107</pd:endX>
+    <pd:endY>219</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1448660840157</pd:targetNamespace>
+    <pd:group name="Retry Group on Error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>541</pd:x>
+        <pd:y>19</pd:y>
+        <pd:width>348</pd:width>
+        <pd:height>378</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/pfx:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>PurchaseOrder_Mirror_Insert_Main</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Is Error Data</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Validate-Error/ErrorCode='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PurchaseOrder_Mirror_Insert_Main</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch</pd:from>
+            <pd:to>Validate Error</pd:to>
+            <pd:xpathDescription>is Error</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>ErrorProcess</pd:to>
+            <pd:xpathDescription>Count =3</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/pfx:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate-Error-1</pd:to>
+            <pd:xpathDescription>No</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:xpathDescription>Is Technical Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="PurchaseOrder_Mirror_Insert_Main">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>646</pd:x>
+            <pd:y>75</pd:y>
+            <config>
+                <processName>/Project Name Processes/Main Process/PurchaseOrder_Mirror_Insert_Main.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ROOT>
+                    <Ordencompra>
+                        <xsl:value-of select="$Render-XML/xmlString"/>
+                    </Ordencompra>
+                </ROOT>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>721</pd:x>
+            <pd:y>327</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>819</pd:x>
+            <pd:y>326</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/SendException.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Exception>
+                    <Domain>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/Domain"/>
+                    </Domain>
+                    <Deployment>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/Deployment"/>
+                    </Deployment>
+                    <Project>
+                        <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                    </Project>
+                    <EngineName>
+                        <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                    </EngineName>
+                    <TimeStamp>
+                        <xsl:value-of select="current-dateTime()"/>
+                    </TimeStamp>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                    </xsl:if>
+                    <Message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                    </Message>
+                </Exception>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>639</pd:x>
+            <pd:y>163</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Generate-Error-1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>627</pd:x>
+            <pd:y>328</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns3:ActivityInput>
+                    <xsl:if test="$_error/ns:ErrorReport/Msg">
+                        <message>
+                            <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                        </message>
+                    </xsl:if>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns3:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Error">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>719</pd:x>
+            <pd:y>218</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="ErrorCode" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ErrorCode>
+                    <xsl:value-of select="contains($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_CONDITION_FOR_DATA_ERROR, $_error/ns:ErrorReport/MsgCode)"/>
+                </ErrorCode>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>991</pd:x>
+        <pd:y>216</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>700</pd:x>
+        <pd:y>469</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch-1">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>969</pd:x>
+        <pd:y>462</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=Exception</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Confirm-1">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>1106</pd:x>
+        <pd:y>333</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1100</pd:x>
+        <pd:y>464</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/SendException.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Catch-1/Exception"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>176</pd:x>
+        <pd:y>212</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx6:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JMS-Queue-Receiver/ns2:ActivityOutput/Body"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>296</pd:x>
+        <pd:y>212</pd:y>
+        <config>
+            <element ref="pfx6:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$Parse-XML/pfx6:MSG_CONTAINER">
+                <pfx6:MSG_CONTAINER>
+                    <xsl:for-each select="pfx6:Header">
+                        <pfx6:Header>
+                            <pfx6:ProjectName>
+                                <xsl:value-of select="pfx6:ProjectName"/>
+                            </pfx6:ProjectName>
+                            <xsl:if test="pfx6:Source_Domain">
+                                <pfx6:Source_Domain>
+                                    <xsl:value-of select="pfx6:Source_Domain"/>
+                                </pfx6:Source_Domain>
+                            </xsl:if>
+                            <xsl:if test="pfx6:Destination_Domain">
+                                <pfx6:Destination_Domain>
+                                    <xsl:value-of select="pfx6:Destination_Domain"/>
+                                </pfx6:Destination_Domain>
+                            </xsl:if>
+                            <xsl:if test="pfx6:Transaction_Type">
+                                <pfx6:Transaction_Type>
+                                    <xsl:value-of select="pfx6:Transaction_Type"/>
+                                </pfx6:Transaction_Type>
+                            </xsl:if>
+                            <pfx6:TimeStamp>
+                                <xsl:value-of select="pfx6:TimeStamp"/>
+                            </pfx6:TimeStamp>
+                        </pfx6:Header>
+                    </xsl:for-each>
+                    <xsl:for-each select="pfx6:Body">
+                        <pfx6:Body>
+                            <xsl:for-each select="pfx6:PURCHASE_ORDER">
+                                <pfx6:PURCHASE_ORDER>
+                                    <pfx6:PRIM_ORG_LVL_NUMBER>
+                                        <xsl:copy-of select="pfx6:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PRIM_ORG_LVL_NUMBER"/>
+                                    </pfx6:PRIM_ORG_LVL_NUMBER>
+                                    <pfx6:PMG_PO_NUMBER>
+                                        <xsl:copy-of select="pfx6:PMG_PO_NUMBER/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_PO_NUMBER"/>
+                                    </pfx6:PMG_PO_NUMBER>
+                                    <pfx6:PMG_STAT_CODE>
+                                        <xsl:copy-of select="pfx6:PMG_STAT_CODE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_STAT_CODE"/>
+                                    </pfx6:PMG_STAT_CODE>
+                                    <pfx6:VENDOR_NUMBER>
+                                        <xsl:copy-of select="pfx6:VENDOR_NUMBER/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:VENDOR_NUMBER"/>
+                                    </pfx6:VENDOR_NUMBER>
+                                    <pfx6:PMG_RELEASE_DATE>
+                                        <xsl:copy-of select="pfx6:PMG_RELEASE_DATE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_RELEASE_DATE"/>
+                                    </pfx6:PMG_RELEASE_DATE>
+                                    <pfx6:PMG_ENTRY_DATE>
+                                        <xsl:copy-of select="pfx6:PMG_ENTRY_DATE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_ENTRY_DATE"/>
+                                    </pfx6:PMG_ENTRY_DATE>
+                                    <pfx6:CURR_CODE>
+                                        <xsl:copy-of select="pfx6:CURR_CODE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:CURR_CODE"/>
+                                    </pfx6:CURR_CODE>
+                                    <pfx6:PMG_SHORT_CODE>
+                                        <xsl:copy-of select="pfx6:PMG_SHORT_CODE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_SHORT_CODE"/>
+                                    </pfx6:PMG_SHORT_CODE>
+                                    <pfx6:PMG_USER>
+                                        <xsl:copy-of select="pfx6:PMG_USER/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_USER"/>
+                                    </pfx6:PMG_USER>
+                                    <pfx6:VPC_PO_PROC_TIME>
+                                        <xsl:copy-of select="pfx6:VPC_PO_PROC_TIME/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:VPC_PO_PROC_TIME"/>
+                                    </pfx6:VPC_PO_PROC_TIME>
+                                    <pfx6:VPC_PO_SHIP_TIME>
+                                        <xsl:copy-of select="pfx6:VPC_PO_SHIP_TIME/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:VPC_PO_SHIP_TIME"/>
+                                    </pfx6:VPC_PO_SHIP_TIME>
+                                    <pfx6:PMG_PO_NOTES>
+                                        <xsl:copy-of select="pfx6:PMG_PO_NOTES/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_PO_NOTES"/>
+                                    </pfx6:PMG_PO_NOTES>
+                                    <pfx6:PMG_RECV_NOTES>
+                                        <xsl:copy-of select="pfx6:PMG_RECV_NOTES/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_RECV_NOTES"/>
+                                    </pfx6:PMG_RECV_NOTES>
+                                    <pfx6:PMG_CNCL_BY_DATE>
+                                        <xsl:copy-of select="pfx6:PMG_CNCL_BY_DATE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_CNCL_BY_DATE"/>
+                                    </pfx6:PMG_CNCL_BY_DATE>
+                                    <pfx6:PMG_EXP_RCT_DATE>
+                                        <xsl:copy-of select="pfx6:PMG_EXP_RCT_DATE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_EXP_RCT_DATE"/>
+                                    </pfx6:PMG_EXP_RCT_DATE>
+                                    <pfx6:VPC_EXT_PAY_DAYS>
+                                        <xsl:copy-of select="pfx6:VPC_EXT_PAY_DAYS/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:VPC_EXT_PAY_DAYS"/>
+                                    </pfx6:VPC_EXT_PAY_DAYS>
+                                    <pfx6:DMT_CODE>
+                                        <xsl:copy-of select="pfx6:DMT_CODE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:DMT_CODE"/>
+                                    </pfx6:DMT_CODE>
+                                    <pfx6:USR_TECH_KEY>
+                                        <xsl:copy-of select="pfx6:USR_TECH_KEY/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:USR_TECH_KEY"/>
+                                    </pfx6:USR_TECH_KEY>
+                                    <pfx6:PMG_LAST_CHG_DT>
+                                        <xsl:copy-of select="pfx6:PMG_LAST_CHG_DT/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_LAST_CHG_DT"/>
+                                    </pfx6:PMG_LAST_CHG_DT>
+                                    <pfx6:VPC_PO_REQUIRED>
+                                        <xsl:copy-of select="pfx6:VPC_PO_REQUIRED/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:VPC_PO_REQUIRED"/>
+                                    </pfx6:VPC_PO_REQUIRED>
+                                    <pfx6:PMG_TOT_PO_COST>
+                                        <xsl:copy-of select="pfx6:PMG_TOT_PO_COST/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_TOT_PO_COST"/>
+                                    </pfx6:PMG_TOT_PO_COST>
+                                    <pfx6:VENDOR_NAME>
+                                        <xsl:copy-of select="pfx6:VENDOR_NAME/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:VENDOR_NAME"/>
+                                    </pfx6:VENDOR_NAME>
+                                    <pfx6:PMG_TYPE_CODE>
+                                        <xsl:copy-of select="pfx6:PMG_TYPE_CODE/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:PMG_TYPE_CODE"/>
+                                    </pfx6:PMG_TYPE_CODE>
+                                    <pfx6:OCORIGINAL>
+                                        <xsl:copy-of select="pfx6:OCORIGINAL/@xsi:nil"/>
+                                        <xsl:value-of select="pfx6:OCORIGINAL"/>
+                                    </pfx6:OCORIGINAL>
+                                    <xsl:for-each select="pfx6:PURCHASE_ORDER_DISTRIBUTION">
+                                        <pfx6:PURCHASE_ORDER_DISTRIBUTION>
+                                            <xsl:for-each select="pfx6:ITEM">
+                                                <pfx6:ITEM>
+                                                    <pfx6:PMG_PO_NUMBER>
+                                                        <xsl:copy-of select="pfx6:PMG_PO_NUMBER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_PO_NUMBER"/>
+                                                    </pfx6:PMG_PO_NUMBER>
+                                                    <pfx6:DEPARTAMENT_ID>
+                                                        <xsl:copy-of select="pfx6:DEPARTAMENT_ID/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:DEPARTAMENT_ID"/>
+                                                    </pfx6:DEPARTAMENT_ID>
+                                                    <pfx6:ORG_LVL_NUMBER>
+                                                        <xsl:copy-of select="pfx6:ORG_LVL_NUMBER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:ORG_LVL_NUMBER"/>
+                                                    </pfx6:ORG_LVL_NUMBER>
+                                                    <pfx6:PRD_LVL_NUMBER>
+                                                        <xsl:copy-of select="pfx6:PRD_LVL_NUMBER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PRD_LVL_NUMBER"/>
+                                                    </pfx6:PRD_LVL_NUMBER>
+                                                    <pfx6:PMG_SELL_QTY>
+                                                        <xsl:copy-of select="pfx6:PMG_SELL_QTY/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_SELL_QTY"/>
+                                                    </pfx6:PMG_SELL_QTY>
+                                                    <pfx6:SLL_UNITS_PER_INNER>
+                                                        <xsl:copy-of select="pfx6:SLL_UNITS_PER_INNER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:SLL_UNITS_PER_INNER"/>
+                                                    </pfx6:SLL_UNITS_PER_INNER>
+                                                    <pfx6:PMG_RELEASE_DATE>
+                                                        <xsl:copy-of select="pfx6:PMG_RELEASE_DATE/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_RELEASE_DATE"/>
+                                                    </pfx6:PMG_RELEASE_DATE>
+                                                </pfx6:ITEM>
+                                            </xsl:for-each>
+                                        </pfx6:PURCHASE_ORDER_DISTRIBUTION>
+                                    </xsl:for-each>
+                                    <xsl:for-each select="pfx6:PURCHASE_ORDER_DETAIL">
+                                        <pfx6:PURCHASE_ORDER_DETAIL>
+                                            <xsl:for-each select="pfx6:ITEM">
+                                                <pfx6:ITEM>
+                                                    <pfx6:PRIM_ORG_LVL_NUMBER>
+                                                        <xsl:copy-of select="pfx6:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PRIM_ORG_LVL_NUMBER"/>
+                                                    </pfx6:PRIM_ORG_LVL_NUMBER>
+                                                    <pfx6:PMG_PO_NUMBER>
+                                                        <xsl:copy-of select="pfx6:PMG_PO_NUMBER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_PO_NUMBER"/>
+                                                    </pfx6:PMG_PO_NUMBER>
+                                                    <pfx6:PMG_STATUS_A>
+                                                        <xsl:copy-of select="pfx6:PMG_STATUS_A/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_STATUS_A"/>
+                                                    </pfx6:PMG_STATUS_A>
+                                                    <pfx6:PMG_STATUS>
+                                                        <xsl:copy-of select="pfx6:PMG_STATUS/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_STATUS"/>
+                                                    </pfx6:PMG_STATUS>
+                                                    <pfx6:PRD_LVL_NUMBER>
+                                                        <xsl:copy-of select="pfx6:PRD_LVL_NUMBER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PRD_LVL_NUMBER"/>
+                                                    </pfx6:PRD_LVL_NUMBER>
+                                                    <pfx6:PMG_SELL_QTY>
+                                                        <xsl:copy-of select="pfx6:PMG_SELL_QTY/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_SELL_QTY"/>
+                                                    </pfx6:PMG_SELL_QTY>
+                                                    <pfx6:PMG_PACK_QTY>
+                                                        <xsl:copy-of select="pfx6:PMG_PACK_QTY/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_PACK_QTY"/>
+                                                    </pfx6:PMG_PACK_QTY>
+                                                    <pfx6:PMG_RETAIL>
+                                                        <xsl:copy-of select="pfx6:PMG_RETAIL/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_RETAIL"/>
+                                                    </pfx6:PMG_RETAIL>
+                                                    <pfx6:PMG_SELL_COST>
+                                                        <xsl:copy-of select="pfx6:PMG_SELL_COST/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_SELL_COST"/>
+                                                    </pfx6:PMG_SELL_COST>
+                                                    <pfx6:NUMBER_OF_INNERS>
+                                                        <xsl:copy-of select="pfx6:NUMBER_OF_INNERS/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:NUMBER_OF_INNERS"/>
+                                                    </pfx6:NUMBER_OF_INNERS>
+                                                    <pfx6:PMG_TOTAL_INNERS>
+                                                        <xsl:copy-of select="pfx6:PMG_TOTAL_INNERS/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_TOTAL_INNERS"/>
+                                                    </pfx6:PMG_TOTAL_INNERS>
+                                                    <pfx6:SLL_UNITS_PER_INNER>
+                                                        <xsl:copy-of select="pfx6:SLL_UNITS_PER_INNER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:SLL_UNITS_PER_INNER"/>
+                                                    </pfx6:SLL_UNITS_PER_INNER>
+                                                    <pfx6:VPC_CASE_QTY>
+                                                        <xsl:copy-of select="pfx6:VPC_CASE_QTY/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:VPC_CASE_QTY"/>
+                                                    </pfx6:VPC_CASE_QTY>
+                                                    <pfx6:PMG_FREE_QTY>
+                                                        <xsl:copy-of select="pfx6:PMG_FREE_QTY/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_FREE_QTY"/>
+                                                    </pfx6:PMG_FREE_QTY>
+                                                    <pfx6:PMG_UNIT_NLC_COST>
+                                                        <xsl:copy-of select="pfx6:PMG_UNIT_NLC_COST/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_UNIT_NLC_COST"/>
+                                                    </pfx6:PMG_UNIT_NLC_COST>
+                                                    <pfx6:TXS_CODE>
+                                                        <xsl:copy-of select="pfx6:TXS_CODE/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:TXS_CODE"/>
+                                                    </pfx6:TXS_CODE>
+                                                    <pfx6:TXS_RATE>
+                                                        <xsl:copy-of select="pfx6:TXS_RATE/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:TXS_RATE"/>
+                                                    </pfx6:TXS_RATE>
+                                                    <pfx6:PMG_PACK_COST>
+                                                        <xsl:copy-of select="pfx6:PMG_PACK_COST/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_PACK_COST"/>
+                                                    </pfx6:PMG_PACK_COST>
+                                                    <pfx6:VPC_CASE_PACK_ID>
+                                                        <xsl:copy-of select="pfx6:VPC_CASE_PACK_ID/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:VPC_CASE_PACK_ID"/>
+                                                    </pfx6:VPC_CASE_PACK_ID>
+                                                    <pfx6:PMG_DTL_TECH_KEY>
+                                                        <xsl:copy-of select="pfx6:PMG_DTL_TECH_KEY/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_DTL_TECH_KEY"/>
+                                                    </pfx6:PMG_DTL_TECH_KEY>
+                                                    <pfx6:PMG_SEQ_NUM>
+                                                        <xsl:copy-of select="pfx6:PMG_SEQ_NUM/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_SEQ_NUM"/>
+                                                    </pfx6:PMG_SEQ_NUM>
+                                                    <pfx6:VPC_CST_START>
+                                                        <xsl:copy-of select="pfx6:VPC_CST_START/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:VPC_CST_START"/>
+                                                    </pfx6:VPC_CST_START>
+                                                    <pfx6:PMG_CANCEL_PQTY>
+                                                        <xsl:copy-of select="pfx6:PMG_CANCEL_PQTY/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PMG_CANCEL_PQTY"/>
+                                                    </pfx6:PMG_CANCEL_PQTY>
+                                                    <pfx6:TOT_CHG_EFFECT>
+                                                        <xsl:copy-of select="pfx6:TOT_CHG_EFFECT/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:TOT_CHG_EFFECT"/>
+                                                    </pfx6:TOT_CHG_EFFECT>
+                                                    <pfx6:TOT_ALL_EFFECT>
+                                                        <xsl:copy-of select="pfx6:TOT_ALL_EFFECT/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:TOT_ALL_EFFECT"/>
+                                                    </pfx6:TOT_ALL_EFFECT>
+                                                    <pfx6:PRD_UPC>
+                                                        <xsl:copy-of select="pfx6:PRD_UPC/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PRD_UPC"/>
+                                                    </pfx6:PRD_UPC>
+                                                    <pfx6:PRD_NAME_FULL>
+                                                        <xsl:copy-of select="pfx6:PRD_NAME_FULL/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PRD_NAME_FULL"/>
+                                                    </pfx6:PRD_NAME_FULL>
+                                                    <pfx6:INNER_PACK_ID>
+                                                        <xsl:copy-of select="pfx6:INNER_PACK_ID/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:INNER_PACK_ID"/>
+                                                    </pfx6:INNER_PACK_ID>
+                                                    <pfx6:VPC_CASE_WGT_UOM>
+                                                        <xsl:copy-of select="pfx6:VPC_CASE_WGT_UOM/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:VPC_CASE_WGT_UOM"/>
+                                                    </pfx6:VPC_CASE_WGT_UOM>
+                                                    <pfx6:PRD_EST_NUMBER>
+                                                        <xsl:copy-of select="pfx6:PRD_EST_NUMBER/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:PRD_EST_NUMBER"/>
+                                                    </pfx6:PRD_EST_NUMBER>
+                                                    <pfx6:VPC_BUY_MULTIPLE>
+                                                        <xsl:copy-of select="pfx6:VPC_BUY_MULTIPLE/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx6:VPC_BUY_MULTIPLE"/>
+                                                    </pfx6:VPC_BUY_MULTIPLE>
+                                                </pfx6:ITEM>
+                                            </xsl:for-each>
+                                        </pfx6:PURCHASE_ORDER_DETAIL>
+                                    </xsl:for-each>
+                                    <xsl:if test="pfx6:STO_REF_NUMBER">
+                                        <pfx6:STO_REF_NUMBER>
+                                            <xsl:copy-of select="pfx6:STO_REF_NUMBER/@xsi:nil"/>
+                                            <xsl:value-of select="pfx6:STO_REF_NUMBER"/>
+                                        </pfx6:STO_REF_NUMBER>
+                                    </xsl:if>
+                                </pfx6:PURCHASE_ORDER>
+                            </xsl:for-each>
+                            <xsl:for-each select="pfx6:Fault">
+                                <pfx6:Fault>
+                                    <xsl:if test="pfx6:Code">
+                                        <pfx6:Code>
+                                            <xsl:value-of select="pfx6:Code"/>
+                                        </pfx6:Code>
+                                    </xsl:if>
+                                    <xsl:if test="pfx6:Reason">
+                                        <pfx6:Reason>
+                                            <xsl:value-of select="pfx6:Reason"/>
+                                        </pfx6:Reason>
+                                    </xsl:if>
+                                    <xsl:if test="pfx6:Detail">
+                                        <pfx6:Detail>
+                                            <xsl:value-of select="pfx6:Detail"/>
+                                        </pfx6:Detail>
+                                    </xsl:if>
+                                </pfx6:Fault>
+                            </xsl:for-each>
+                        </pfx6:Body>
+                    </xsl:for-each>
+                </pfx6:MSG_CONTAINER>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>426</pd:x>
+        <pd:y>215</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>true</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term ref="pfx6:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Map-Data/pfx6:MSG_CONTAINER"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch-1</pd:from>
+        <pd:to>ErrorProcess-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess-1</pd:from>
+        <pd:to>Confirm-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>Retry Group on Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>Project Name Processes/Sub Process/setTomaFisica.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="toma_fisica_estado" type="xsd:int"/>
+                    <xsd:element name="STOREID" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>99</pd:startX>
+    <pd:startY>87</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <toma_fisica_estado>
+                <xsl:value-of select="$Set--Toma/group/STOREID[STOREID=$Start/group/STOREID]/PHY_STATUS"/>
+            </toma_fisica_estado>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>547</pd:endX>
+    <pd:endY>84</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1464112124084</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.CriticalSectionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>199</pd:x>
+        <pd:y>5</pd:y>
+        <pd:width>237</pd:width>
+        <pd:height>145</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>criticalSection</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:scope>single</pd:scope>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>GetVariable</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Set  Toma</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>GetVariable</pd:from>
+            <pd:to>Set  Toma</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Set  Toma">
+            <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+            <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+            <pd:description>Asiganamos a la variable compartida de TOMA el valor que recibimos de PMM</pd:description>
+            <pd:x>368</pd:x>
+            <pd:y>86</pd:y>
+            <config>
+                <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+                <showResult>true</showResult>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <xsl:for-each xmlns:xsl="http://www.w3.org/1999/XSL/Transform" select="$GetVariable/group/STOREID">
+                        <STOREID>
+                            <STOREID>
+                                <xsl:value-of select="STOREID"/>
+                            </STOREID>
+                            <xsl:if test="DESCRIPTION">
+                                <DESCRIPTION>
+                                    <xsl:value-of select="DESCRIPTION"/>
+                                </DESCRIPTION>
+                            </xsl:if>
+                            <URL>
+                                <xsl:value-of select="URL"/>
+                            </URL>
+                            <xsl:choose>
+                                <xsl:when test="current()/STOREID=$Start/group/STOREID">
+                                    <xsl:if test="$Start/group/toma_fisica_estado">
+                                        <PHY_STATUS>
+                                            <xsl:value-of select="$Start/group/toma_fisica_estado"/>
+                                        </PHY_STATUS>
+                                    </xsl:if>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:if test="PHY_STATUS">
+                                        <PHY_STATUS>
+                                            <xsl:value-of select="PHY_STATUS"/>
+                                        </PHY_STATUS>
+                                    </xsl:if>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </STOREID>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="GetVariable">
+            <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+            <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+            <pd:x>280</pd:x>
+            <pd:y>85</pd:y>
+            <config>
+                <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

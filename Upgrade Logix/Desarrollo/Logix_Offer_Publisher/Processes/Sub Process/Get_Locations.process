@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns14="www.tibco.com/plugin/Sleep" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx5="http://xmlns.heb.com/ei/OFFER_LIST_RESPONSE" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd" xmlns:pfx3="http://www.tibco.com/schemas/CopientOfferExportServer/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/OFFER_LIST_RESPONSE" schemaLocation="/Shared Resources/Schema Definitions/Custom/LOCATIONS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Sub Process/Get_Locations.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="IncentiveID" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>79</pd:startX>
+    <pd:startY>195</pd:startY>
+    <pd:returnBindings>
+        <pfx5:Auxilary>
+            <xsl:for-each select="$MapResult/AccumulatedOutput/pfx5:Auxilary/LocationGroup">
+                <LocationGroup>
+                    <xsl:copy-of select="Header"/>
+                    <xsl:copy-of select="Locations"/>
+                </LocationGroup>
+            </xsl:for-each>
+        </pfx5:Auxilary>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx5:Auxilary"/>
+    <pd:endX>662</pd:endX>
+    <pd:endY>191</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx6:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <CustomerData>
+            <xsd:element name="PRODUCTS" type="xsd:string"/>
+        </CustomerData>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1403558436899</pd:targetNamespace>
+    <pd:group name="Group Get Products">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>274</pd:x>
+        <pd:y>87</pd:y>
+        <pd:width>309</pd:width>
+        <pd:height>197</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$JDBC-Query-Location-Group/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>IGroup</pd:iterationElementSlot>
+            <pd:indexSlot>contador</pd:indexSlot>
+            <pd:outSlot>MapResult</pd:outSlot>
+            <pd:activityOutputName>Map LocationGroup</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query Locations</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map LocationGroup</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query Locations</pd:from>
+            <pd:to>Map LocationGroup</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Query Locations">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>362</pd:x>
+            <pd:y>201</pd:y>
+            <config>
+                <timeout>%%Connections/Database/LOGIX/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/LOGIX/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/LOGIX.sharedjdbc</jdbcSharedConfig>
+                <statement>Select L.LocationID,
+ L.ExtLocationCode,
+ L.LocationName,
+ L.Address1,
+ L.Address2,
+ L.City,
+ L.State,
+ L.Zip,
+ L.TestingLocation,
+ L.LastUpdate,
+ L.StatusFlag,
+ L.CountryID,
+ L.ContactName,
+ L.PhoneNumber,
+ L.GenIPL,
+ L.LastIPL,
+ L.CMOADeployStatus,
+ L.EngineID,
+ L.BannerID
+ from [LogixRT].[dbo].[OfferLocations] OL
+INNER JOIN [LogixRT].[dbo].[LocationGroups] LG ON OL.LocationGroupID = LG.LocationGroupID 
+INNER JOIN [LogixRT].[dbo].[LocGroupItems] LGI ON LG.LocationGroupID = LGI.LocationGroupID 
+INNER JOIN [LogixRT].[dbo].[Locations] L ON LGI.LocationID = L.LocationID
+where OL.OfferID = ? and LGI.LocationGroupID = ? and LGI.Deleted != 1</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>OFFER_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOCATION_GROUP_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>LocationID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>ExtLocationCode</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>LocationName</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>Address1</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>Address2</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>City</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>State</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>Zip</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>TestingLocation</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>LastUpdate</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>StatusFlag</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>CountryID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>ContactName</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>PhoneNumber</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>GenIPL</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>LastIPL</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>CMOADeployStatus</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>EngineID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>BannerID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <OFFER_ID>
+                        <xsl:value-of select="$Start/IncentiveID"/>
+                    </OFFER_ID>
+                    <LOCATION_GROUP_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-Query-Location-Group/resultSet/Record[$contador]/LocationGroupID)">
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/LocationGroupID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOCATION_GROUP_ID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map LocationGroup">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>485</pd:x>
+            <pd:y>194</pd:y>
+            <config>
+                <element ref="pfx5:Auxilary"/>
+            </config>
+            <pd:inputBindings>
+                <pfx5:Auxilary>
+                    <LocationGroup>
+                        <Header>
+                            <LocationGroupID>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/LocationGroupID"/>
+                            </LocationGroupID>
+                            <Name>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/Name"/>
+                            </Name>
+                            <Description>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/Description"/>
+                            </Description>
+                            <CreatedDate>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/CreatedDate"/>
+                            </CreatedDate>
+                            <ExtGroupID>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/ExtGroupID"/>
+                            </ExtGroupID>
+                            <ExtSeqNum>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/ExtSeqNum"/>
+                            </ExtSeqNum>
+                            <ExtExcluded>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/ExtExcluded"/>
+                            </ExtExcluded>
+                            <AllLocations>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/AllLocations"/>
+                            </AllLocations>
+                            <LastUpdate>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/LastUpdate"/>
+                            </LastUpdate>
+                            <StatusFlag>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/StatusFlag"/>
+                            </StatusFlag>
+                            <TCRMAStatusFlag>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/TCRMAStatusFlag"/>
+                            </TCRMAStatusFlag>
+                            <EngineID>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/EngineID"/>
+                            </EngineID>
+                            <BannerID>
+                                <xsl:value-of select="$JDBC-Query-Location-Group/resultSet/Record[$contador]/BannerID"/>
+                            </BannerID>
+                        </Header>
+                        <Locations>
+                            <xsl:for-each select="$JDBC-Query-Locations/resultSet/Record">
+                                <Location>
+                                    <Header>
+                                        <LocationID>
+                                            <xsl:value-of select="LocationID"/>
+                                        </LocationID>
+                                        <xsl:if test="ExtLocationCode">
+                                            <ExtLocationCode>
+                                                <xsl:value-of select="ExtLocationCode"/>
+                                            </ExtLocationCode>
+                                        </xsl:if>
+                                        <xsl:if test="LocationName">
+                                            <LocationName>
+                                                <xsl:value-of select="LocationName"/>
+                                            </LocationName>
+                                        </xsl:if>
+                                        <xsl:if test="Address1">
+                                            <Address1>
+                                                <xsl:value-of select="Address1"/>
+                                            </Address1>
+                                        </xsl:if>
+                                        <xsl:if test="Address2">
+                                            <Address2>
+                                                <xsl:value-of select="Address2"/>
+                                            </Address2>
+                                        </xsl:if>
+                                        <xsl:if test="City">
+                                            <City>
+                                                <xsl:value-of select="City"/>
+                                            </City>
+                                        </xsl:if>
+                                        <xsl:if test="State">
+                                            <State>
+                                                <xsl:value-of select="State"/>
+                                            </State>
+                                        </xsl:if>
+                                        <xsl:if test="Zip">
+                                            <Zip>
+                                                <xsl:value-of select="Zip"/>
+                                            </Zip>
+                                        </xsl:if>
+                                        <TestingLocation>
+                                            <xsl:value-of select="TestingLocation"/>
+                                        </TestingLocation>
+                                        <xsl:if test="LastUpdate">
+                                            <LastUpdate>
+                                                <xsl:value-of select="LastUpdate"/>
+                                            </LastUpdate>
+                                        </xsl:if>
+                                        <xsl:if test="StatusFlag">
+                                            <StatusFlag>
+                                                <xsl:value-of select="StatusFlag"/>
+                                            </StatusFlag>
+                                        </xsl:if>
+                                        <CountryID>
+                                            <xsl:value-of select="CountryID"/>
+                                        </CountryID>
+                                        <xsl:if test="ContactName">
+                                            <ContactName>
+                                                <xsl:value-of select="ContactName"/>
+                                            </ContactName>
+                                        </xsl:if>
+                                        <xsl:if test="PhoneNumber">
+                                            <PhoneNumber>
+                                                <xsl:value-of select="PhoneNumber"/>
+                                            </PhoneNumber>
+                                        </xsl:if>
+                                        <GenIPL>
+                                            <xsl:value-of select="GenIPL"/>
+                                        </GenIPL>
+                                        <xsl:if test="LastIPL">
+                                            <LastIPL>
+                                                <xsl:value-of select="LastIPL"/>
+                                            </LastIPL>
+                                        </xsl:if>
+                                        <xsl:if test="CMOADeployStatus">
+                                            <CMOADeployStatus>
+                                                <xsl:value-of select="CMOADeployStatus"/>
+                                            </CMOADeployStatus>
+                                        </xsl:if>
+                                        <xsl:if test="EngineID">
+                                            <EngineID>
+                                                <xsl:value-of select="EngineID"/>
+                                            </EngineID>
+                                        </xsl:if>
+                                        <xsl:if test="BannerID">
+                                            <BannerID>
+                                                <xsl:value-of select="BannerID"/>
+                                            </BannerID>
+                                        </xsl:if>
+                                    </Header>
+                                </Location>
+                            </xsl:for-each>
+                        </Locations>
+                    </LocationGroup>
+                </pfx5:Auxilary>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="JDBC Query Location Group">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>192</pd:x>
+        <pd:y>202</pd:y>
+        <config>
+            <timeout>%%Connections/Database/LOGIX/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/LOGIX/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/LOGIX.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>INCENTIVE_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <statement>Select 
+LG.LocationGroupID, 
+LG.Name, 
+LG.Description, 
+LG.CreatedDate, 
+LG.ExtGroupID, 
+LG.ExtSeqNum, 
+LG.ExtExcluded, 
+LG.AllLocations, 
+LG.LastUpdate, 
+LG.StatusFlag, 
+LG.TCRMAStatusFlag, 
+LG.EngineID, 
+LG.BannerID 
+from [LogixRT].[dbo].[OfferLocations] OL
+INNER JOIN [LogixRT].[dbo].[LocationGroups] LG ON OL.LocationGroupID = LG.LocationGroupID 
+where OL.OfferID = ? and LG.Deleted != 1 and OL.Deleted != 1</statement>
+            <wizardData>#Mon Jun 30 16:38:14 CDT 2014&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=Select \nLG.LocationGroupID, \nLG.Name, \nLG.Description, \nLG.CreatedDate, \nLG.ExtGroupID, \nLG.ExtSeqNum, \nLG.ExtExcluded, \nLG.AllLocations, \nLG.LastUpdate, \nLG.StatusFlag, \nLG.TCRMAStatusFlag, \nLG.EngineID, \nLG.BannerID \nfrom [LogixRT].[dbo].[OfferLocations] OL\nINNER JOIN [LogixRT].[dbo].[LocationGroups] LG ON OL.LocationGroupID \= LG.LocationGroupID \nwhere OL.OfferID \= ? and LG.Deleted \!\= 1 and OL.Deleted \!\= 1;&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>LocationGroupID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Name</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Description</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CreatedDate</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ExtGroupID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ExtSeqNum</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ExtExcluded</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AllLocations</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LastUpdate</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>StatusFlag</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TCRMAStatusFlag</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EngineID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BannerID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <INCENTIVE_ID>
+                    <xsl:value-of select="$Start/IncentiveID"/>
+                </INCENTIVE_ID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>239</pd:x>
+        <pd:y>331</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="tib:render-xml($_error/ns:ErrorReport, 0,0)"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>82</pd:x>
+        <pd:y>329</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=JDBCSQLException namespace=http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions</fault>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC Query Location Group</pd:from>
+        <pd:to>Group Get Products</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query Location Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Get Products</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

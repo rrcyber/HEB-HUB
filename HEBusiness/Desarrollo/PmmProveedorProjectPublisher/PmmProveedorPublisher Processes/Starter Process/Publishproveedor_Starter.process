@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/bajarArchivos" xmlns:ns12="www.tibco.com/plugin/Sleep" xmlns:pfx="http://xmlns.heb.com/ei/error" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx5="http://xmlns.heb.com/ei/PMM_RECIBOLIST_DATA" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx2="http://xmlns.heb.com/ei/PMM_DIMENSION_DATA" xmlns:pfx6="http://xmlns.heb.com/ei/PMM_VENDOR_DATA">
+    <xsd:import namespace="http://xmlns.heb.com/ei/error" schemaLocation="/Resources/EIM/Services/error/error.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_DIMENSION_DATA"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_RECIBOLIST_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_RECIBOLIST_DATA_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_VENDOR_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_VENDOR_DATA_SOAP.xsd"/>
+    <pd:name>PmmProveedorPublisher Processes/Starter Process/Publishproveedor_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>66</pd:x>
+        <pd:y>198</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>%%Connections/JMS/Properties/GLB_ACK_MOD%%</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_VENDOR_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS-Connection-USA.sharedjmscon</ConnectionReference>
+            <OutDataxsdString ref="pfx6:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>824</pd:endX>
+    <pd:endY>195</pd:endY>
+    <pd:errorSchemas>
+        <error ref="pfx4:ErrorManagementSchema"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1387385907540</pd:targetNamespace>
+    <pd:activity name="Catch-1">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>274</pd:x>
+        <pd:y>317</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>679</pd:x>
+        <pd:y>194</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>494</pd:x>
+        <pd:y>314</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:MSG_Container>
+                <pfx4:Header>
+                    <pfx4:ProjectName>
+                        <xsl:value-of select="&quot;&quot;"/>
+                    </pfx4:ProjectName>
+                    <pfx4:TimeStamp>
+                        <xsl:value-of select="&quot;&quot;"/>
+                    </pfx4:TimeStamp>
+                </pfx4:Header>
+                <pfx4:Body>
+                    <pfx4:ErrorManagementSchema>
+                        <pfx4:inrtn_id>
+                            <xsl:value-of select="1"/>
+                        </pfx4:inrtn_id>
+                        <pfx4:inrtn_instn_nm>
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </pfx4:inrtn_instn_nm>
+                        <pfx4:inrtn_err_rtn_desc>
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </pfx4:inrtn_err_rtn_desc>
+                        <pfx4:inrtn_msg_body>
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </pfx4:inrtn_msg_body>
+                        <pfx4:cre8_ts>
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </pfx4:cre8_ts>
+                        <pfx4:sev_id>
+                            <xsl:value-of select="1"/>
+                        </pfx4:sev_id>
+                    </pfx4:ErrorManagementSchema>
+                </pfx4:Body>
+            </pfx4:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>163</pd:x>
+        <pd:y>121</pd:y>
+        <pd:width>403</pd:width>
+        <pd:height>137</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$JMS-Queue-Receiver/ns3:ActivityOutput/Body/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:PMM_VENDOR/pfx6:ITEM</pd:over>
+            <pd:iterationElementSlot>ProveedorList</pd:iterationElementSlot>
+            <pd:indexSlot>indexarray</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>ProvedorDataPMM</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PublishReciboFactura_Main</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ProvedorDataPMM</pd:from>
+            <pd:to>PublishReciboFactura_Main</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="PublishReciboFactura_Main">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>442</pd:x>
+            <pd:y>198</pd:y>
+            <config>
+                <processName>/PmmProveedorPublisher Processes/Main Process/PublishProveedor_Main.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <xsl:for-each select="$ProvedorDataPMM/group/root">
+                        <root>
+                            <IdPMM>
+                                <xsl:value-of select="IdPMM"/>
+                            </IdPMM>
+                            <Nombre>
+                                <xsl:value-of select="translate(Nombre, '&amp;', 'Y')"/>
+                            </Nombre>
+                            <Calle>
+                                <xsl:value-of select="Calle"/>
+                            </Calle>
+                            <Colonia>
+                                <xsl:value-of select="Colonia"/>
+                            </Colonia>
+                            <Pais>
+                                <xsl:value-of select="Pais"/>
+                            </Pais>
+                            <Municipio>
+                                <xsl:value-of select="Municipio"/>
+                            </Municipio>
+                            <Estado>
+                                <xsl:value-of select="Estado"/>
+                            </Estado>
+                            <IdMoneda>
+                                <xsl:value-of select="IdMoneda"/>
+                            </IdMoneda>
+                            <CodigoPostal>
+                                <xsl:value-of select="CodigoPostal"/>
+                            </CodigoPostal>
+                            <TelelfonoPrincipal>
+                                <xsl:value-of select="TelelfonoPrincipal"/>
+                            </TelelfonoPrincipal>
+                            <ContactoPrincipal>
+                                <xsl:value-of select="ContactoPrincipal"/>
+                            </ContactoPrincipal>
+                            <GLN>
+                                <xsl:value-of select="GLN"/>
+                            </GLN>
+                            <Fax>
+                                <xsl:value-of select="Fax"/>
+                            </Fax>
+                            <EmailResponsable>
+                                <xsl:value-of select="EmailResponsable"/>
+                            </EmailResponsable>
+                            <RFC>
+                                <xsl:value-of select="RFC"/>
+                            </RFC>
+                            <EsAcreedor>
+                                <xsl:value-of select="EsAcreedor"/>
+                            </EsAcreedor>
+                            <AceptaDevoluciones>
+                                <xsl:value-of select="AceptaDevoluciones"/>
+                            </AceptaDevoluciones>
+                        </root>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ProvedorDataPMM">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>285</pd:x>
+            <pd:y>198</pd:y>
+            <config>
+                <processName>/PmmProveedorPublisher Processes/Sub Process/ProvedorDataPMM.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <root>
+                        <vendor_number>
+                            <xsl:value-of select="$ProveedorList/pfx6:ITEM/pfx6:VENDOR_NUMBER"/>
+                        </vendor_number>
+                        <Nombre>
+                            <xsl:value-of select="$ProveedorList/pfx6:ITEM/pfx6:VENDOR_NAME"/>
+                        </Nombre>
+                        <CodigoPostal>
+                            <xsl:value-of select="$ProveedorList/pfx6:ITEM/pfx6:BAS_ZIP"/>
+                        </CodigoPostal>
+                        <Pais>
+                            <xsl:value-of select="$ProveedorList/pfx6:ITEM/pfx6:CNTRY_CODE"/>
+                        </Pais>
+                        <audit_number>
+                            <xsl:value-of select="$ProveedorList/pfx6:ITEM/pfx6:AUDIT_NUMBER"/>
+                        </audit_number>
+                        <EmailResponsable>
+                            <xsl:value-of select="$ProveedorList/pfx6:ITEM/pfx6:PRYMARY_EMAIL"/>
+                        </EmailResponsable>
+                    </root>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Catch-1</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

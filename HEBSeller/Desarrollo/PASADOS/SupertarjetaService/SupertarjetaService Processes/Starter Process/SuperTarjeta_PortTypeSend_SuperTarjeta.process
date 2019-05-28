@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:ns="http://xmlns.heb.com/ei/Supertarjeta" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlPfx="http://xmlns.example.com/1418946732074" xmlns:pfx="http://xmlns.heb.com/ei/ProviderFaultSchema">
+    <wsdl:import namespace="http://xmlns.example.com/1418946732074" location="/Shared Resources/WSDL/SuperTarjetaService.wsdl"/>
+    <pd:name>SupertarjetaService Processes/Starter Process/SuperTarjeta_PortTypeSend_SuperTarjeta.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="wsdlPfx:Send_SuperTarjeta_Request"/>
+    <pd:startX>150</pd:startX>
+    <pd:startY>65</pd:startY>
+    <pd:returnBindings>
+        <wsdlPfx:Send_SuperTarjeta_Replay>
+            <Replay>
+                <xsl:copy-of select="$Call-Process-Send/ns1:SupertarjetaOut"/>
+            </Replay>
+        </wsdlPfx:Send_SuperTarjeta_Replay>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="wsdlPfx:Send_SuperTarjeta_Replay"/>
+    <pd:endX>450</pd:endX>
+    <pd:endY>64</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="wsdlPfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1418947269714</pd:targetNamespace>
+    <pd:activity name="Call Process Send">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>296</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <processName>/SupertarjetaService Processes/Main Process/Send_Supertarjeta_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/wsdlPfx:Send_SuperTarjeta_Request/Request/ns:SupertarjetaIn"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 11">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>153</pd:x>
+        <pd:y>189</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <data>
+                    <wsdlPfx:Fault>
+                        <Fault>
+                            <pfx:ProviderSOAPFault>
+                                <pfx:FaultCode>
+                                    <xsl:value-of select="11"/>
+                                </pfx:FaultCode>
+                                <pfx:FaultString>
+                                    <xsl:value-of select="&quot;Los Datos de Entrada son Incorrectos, Favor de Validarlos&quot;"/>
+                                </pfx:FaultString>
+                                <pfx:FaultActor>
+                                    <xsl:value-of select="&quot;Web Service Super Tarjeta&quot;"/>
+                                </pfx:FaultActor>
+                            </pfx:ProviderSOAPFault>
+                        </Fault>
+                    </wsdlPfx:Fault>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Process Send</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Process Send</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Fault 11</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

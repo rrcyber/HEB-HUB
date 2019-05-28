@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/MESSAGE_REPLY" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://xmlns.heb.com/ei/Message_Request" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns4="http://xmlns.heb.com/ei/SPGFaultSchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://www.heb.com/ei/MexicoDigitalInvoiceService">
+    <wsdl:import namespace="http://www.heb.com/ei/MexicoDigitalInvoiceService" location="/Shared Resources/WSDL/Abstract/MexicoDigitalInvoiceService.wsdl"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Main Process/Get_Message_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="pfx:MESSAGE_REQUEST"/>
+    <pd:startX>162</pd:startX>
+    <pd:startY>67</pd:startY>
+    <pd:returnBindings>
+        <pfx:MESSAGE_REPLY>
+            <parameters>
+                <ns2:MESSAGE_REPLY>
+                    <ns2:RESPONSE_BACK>
+                        <xsl:value-of select="concat(&quot;Hello &quot;, $Start/pfx:MESSAGE_REQUEST/parameters/ns1:MESSAGE_REQUEST/ns1:NAME, &quot;!&quot;)"/>
+                    </ns2:RESPONSE_BACK>
+                </ns2:MESSAGE_REPLY>
+            </parameters>
+        </pfx:MESSAGE_REPLY>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="pfx:MESSAGE_REPLY"/>
+    <pd:endX>460</pd:endX>
+    <pd:endY>66</pd:endY>
+    <pd:errorSchemas>
+        <WSDLError wsMsgRef="pfx:FAULT"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1299021573484</pd:targetNamespace>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>159</pd:x>
+        <pd:y>166</pd:y>
+        <config>
+            <faultName>WSDLError</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns3:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns3:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <pfx:FAULT>
+                        <fault>
+                            <ns4:SPGSOAPFault>
+                                <ns4:FaultCode>
+                                    <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                                </ns4:FaultCode>
+                                <ns4:FaultString>
+                                    <xsl:value-of select="$_error/ns3:ErrorReport/Msg"/>
+                                </ns4:FaultString>
+                                <ns4:SPGSOAPErrorMsg>
+                                    <ns4:Message>
+                                        <xsl:value-of select="$_error/ns3:ErrorReport/Msg"/>
+                                    </ns4:Message>
+                                    <ns4:MessageId>
+                                        <xsl:value-of select="tib:render-xml($_error/ns3:ErrorReport/Data)"/>
+                                    </ns4:MessageId>
+                                    <xsl:if test="$_error/ns3:ErrorReport/MsgCode">
+                                        <ns4:ErrorCode>
+                                            <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                                        </ns4:ErrorCode>
+                                    </xsl:if>
+                                </ns4:SPGSOAPErrorMsg>
+                            </ns4:SPGSOAPFault>
+                        </fault>
+                    </pfx:FAULT>
+                </data>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetContext">
+        <pd:type>com.tibco.ae.tools.palettes.servicepalette.GetContextActivity</pd:type>
+        <pd:resourceType>service.activity.getContext</pd:resourceType>
+        <pd:x>317</pd:x>
+        <pd:y>72</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/WSS Security/Context Resource.contextResource</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>GetContext</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetContext</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

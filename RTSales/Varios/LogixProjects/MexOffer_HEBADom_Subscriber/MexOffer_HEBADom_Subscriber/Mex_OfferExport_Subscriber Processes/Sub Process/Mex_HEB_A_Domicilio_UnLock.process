@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>Mex_OfferExport_Subscriber Processes/Sub Process/Mex_HEB_A_Domicilio_UnLock.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Offer"/>
+    <pd:startX>51</pd:startX>
+    <pd:startY>68</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>336</pd:endX>
+    <pd:endY>67</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1334065193357</pd:targetNamespace>
+    <pd:activity name="Combo UnLock">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>187</pd:x>
+        <pd:y>67</pd:y>
+        <config>
+            <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+            <statement>update ComboEncabezado
+set BanderaTIBCO = 1
+where ComboLocoId = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>ComboLocoId</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <ComboLocoId>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                            <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </ComboLocoId>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Combo UnLock</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Combo UnLock</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

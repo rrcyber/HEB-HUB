@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns22="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns3="http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalFormato.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalRegion.xsd" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursales.xsd" xmlns:pfx2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulos.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursales.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/JerarquiaSucursales.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalRegion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalRegion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalFormato.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalFormato.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulos.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Articulos.xsd"/>
+    <pd:name>Heb2bArticulosSubscriber/Starter Process/ProcessArticulosSubscriber_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>65</pd:x>
+        <pd:y>269</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Properties/GLB_ACK_MOD%%</maxSessions>
+                <destination>%%Destinations/Queues/GLB_ARTICULOS_QUEUE%%</destination>
+                <receiverTimeout/>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>481</pd:endX>
+    <pd:endY>273</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1387380424680</pd:targetNamespace>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>240</pd:x>
+        <pd:y>361</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns:MSG_Container>
+                <ns:Header>
+                    <ns:ProjectName>
+                        <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                    </ns:ProjectName>
+                    <ns:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </ns:Source_Domain>
+                    <ns:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </ns:Destination_Domain>
+                    <ns:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                    </ns:Transaction_Type>
+                    <ns:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                    </ns:TimeStamp>
+                </ns:Header>
+                <ns:Body>
+                    <ns:ErrorManagementSchema>
+                        <ns:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns:inrtn_id>
+                        <ns:inrtn_instn_nm>
+                            <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                        </ns:inrtn_instn_nm>
+                        <ns:inrtn_err_rtn_desc>
+                            <xsl:value-of select="$Catch/ns3:XMLParseException/msg"/>
+                        </ns:inrtn_err_rtn_desc>
+                        <ns:inrtn_msg_body>
+                            <xsl:value-of select="$JMS-Queue-Receiver/pfx2:ActivityOutput/Body"/>
+                        </ns:inrtn_msg_body>
+                        <ns:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns:cre8_ts>
+                        <xsl:if test="$Catch/ns3:XMLParseException/msgCode">
+                            <ns:u_code>
+                                <xsl:value-of select="$Catch/ns3:XMLParseException/msgCode"/>
+                            </ns:u_code>
+                        </xsl:if>
+                        <ns:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns:sev_id>
+                    </ns:ErrorManagementSchema>
+                </ns:Body>
+            </ns:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>143</pd:x>
+        <pd:y>359</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>false</catchAll>
+            <fault>localname=XMLParseException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>377</pd:x>
+        <pd:y>271</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>174</pd:x>
+        <pd:y>269</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx6:resultSet"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JMS-Queue-Receiver/pfx2:ActivityOutput/Body"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetChanges_Articulos_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>278</pd:x>
+        <pd:y>270</pd:y>
+        <config>
+            <processName>/Heb2bArticulosSubscriber/Main Process/SetChanges_Articulos_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <resultSet>
+                    <xsl:for-each select="$Parse-XML/resultSet/Record">
+                        <Record>
+                            <PRD_LVL_CHILD>
+                                <xsl:value-of select="PRD_LVL_CHILD"/>
+                            </PRD_LVL_CHILD>
+                            <PRD_NAME_FULL>
+                                <xsl:value-of select="PRD_NAME_FULL"/>
+                            </PRD_NAME_FULL>
+                            <UNIDAD_MEDIDA>
+                                <xsl:value-of select="UNIDAD_MEDIDA"/>
+                            </UNIDAD_MEDIDA>
+                            <CAPACIDADMEDIDA>
+                                <xsl:value-of select="CAPACIDADMEDIDA"/>
+                            </CAPACIDADMEDIDA>
+                            <UNIDAD_VENTA>
+                                <xsl:value-of select="UNIDAD_VENTA"/>
+                            </UNIDAD_VENTA>
+                            <UNIDAD_COMPRA>
+                                <xsl:value-of select="UNIDAD_COMPRA"/>
+                            </UNIDAD_COMPRA>
+                            <STATUSARTICULO>
+                                <xsl:value-of select="STATUSARTICULO"/>
+                            </STATUSARTICULO>
+                            <ESESTILO>
+                                <xsl:value-of select="ESESTILO"/>
+                            </ESESTILO>
+                            <PRD_LVL_PARENT>
+                                <xsl:value-of select="PRD_LVL_PARENT"/>
+                            </PRD_LVL_PARENT>
+                            <PRD_LVL_NUMBER>
+                                <xsl:value-of select="PRD_LVL_NUMBER"/>
+                            </PRD_LVL_NUMBER>
+                            <CICLOVIDA>
+                                <xsl:value-of select="CICLOVIDA"/>
+                            </CICLOVIDA>
+                            <NIVEL>
+                                <xsl:value-of select="NIVEL"/>
+                            </NIVEL>
+                            <AUDIT_NUMBER>
+                                <xsl:value-of select="AUDIT_NUMBER"/>
+                            </AUDIT_NUMBER>
+                            <AUDIT_TYPE>
+                                <xsl:value-of select="AUDIT_TYPE"/>
+                            </AUDIT_TYPE>
+                            <CODIGOBARRAS>
+                                <xsl:value-of select="CODIGOBARRAS"/>
+                            </CODIGOBARRAS>
+                            <MARCAARTICULO>
+                                <xsl:value-of select="MARCAARTICULO"/>
+                            </MARCAARTICULO>
+                            <TIPOMARCAARTICULO>
+                                <xsl:value-of select="TIPOMARCAARTICULO"/>
+                            </TIPOMARCAARTICULO>
+                            <TIPOBODEGA>
+                                <xsl:value-of select="TIPOBODEGA"/>
+                            </TIPOBODEGA>
+                            <xsl:if test="DIVISION">
+                                <DIVISION>
+                                    <xsl:value-of select="DIVISION"/>
+                                </DIVISION>
+                            </xsl:if>
+                            <DEPARTAMENTO>
+                                <xsl:value-of select="DEPARTAMENTO"/>
+                            </DEPARTAMENTO>
+                            <CATEGORIA>
+                                <xsl:value-of select="CATEGORIA"/>
+                            </CATEGORIA>
+                            <SUBCATEGORIA>
+                                <xsl:value-of select="SUBCATEGORIA"/>
+                            </SUBCATEGORIA>
+                            <SEGMENTO>
+                                <xsl:value-of select="SEGMENTO"/>
+                            </SEGMENTO>
+                            <MODELOARTICULO>
+                                <xsl:value-of select="MODELOARTICULO"/>
+                            </MODELOARTICULO>
+                            <IdEstilo>
+                                <xsl:value-of select="IdEstilo"/>
+                            </IdEstilo>
+                            <Liga>
+                                <xsl:value-of select="Liga"/>
+                            </Liga>
+                            <AUDIT_DATE>
+                                <xsl:value-of select="AUDIT_DATE"/>
+                            </AUDIT_DATE>
+                        </Record>
+                    </xsl:for-each>
+                </resultSet>
+                <jmsMessage>
+                    <xsl:value-of select="$JMS-Queue-Receiver/pfx2:ActivityOutput/Body"/>
+                </jmsMessage>
+                <xsl:choose>
+                    <xsl:when test="exists($JMS-Queue-Receiver/pfx2:ActivityOutput/JMSProperties/pfx2:JMSXDeliveryCount)">
+                        <deliveryCount>
+                            <xsl:value-of select="$JMS-Queue-Receiver/pfx2:ActivityOutput/JMSProperties/pfx2:JMSXDeliveryCount +1"/>
+                        </deliveryCount>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <deliveryCount>
+                            <xsl:value-of select="1"/>
+                        </deliveryCount>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ConfirmError">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>376</pd:x>
+        <pd:y>360</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>SetChanges_Articulos_Main</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetChanges_Articulos_Main</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>ConfirmError</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ConfirmError</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: ProcessArticulosSubscriber_Starter
+Fecha de creación: 15/01/2014
+Creado por: Juan Alberto Gonzalez Aguilar
+Variables globales:  GLB_QUEUEJSCLUSTER
+Descripción: 
+Proceso encargado de recibir datos de la queue GLB_QUEUEJSCLUSTER</pd:description>
+        <pd:x>284</pd:x>
+        <pd:y>66</pd:y>
+        <pd:width>549</pd:width>
+        <pd:height>113</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

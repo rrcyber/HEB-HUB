@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/FacturaHeader.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/FacturaHeader.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/FacturaHeader.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>Processes/Sub Process/SetFacturaToDemand.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:resultSet"/>
+    <pd:startX>51</pd:startX>
+    <pd:startY>207</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>686</pd:endX>
+    <pd:endY>208</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx2:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1433260758687</pd:targetNamespace>
+    <pd:group name="Transaction">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>163</pd:x>
+        <pd:y>42</pd:y>
+        <pd:width>419</pd:width>
+        <pd:height>317</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Iterate Header</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Iterate Header</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Iterate Header">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>203</pd:x>
+            <pd:y>70</pd:y>
+            <pd:width>337</pd:width>
+            <pd:height>266</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Start/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>Factura</pd:iterationElementSlot>
+                <pd:indexSlot>Index</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>SetFacturaDetail</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>SetFacturaHeader</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>SetFacturaDetail</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>SetFacturaHeader</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="SetFacturaDetail">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>345</pd:x>
+                <pd:y>255</pd:y>
+                <config>
+                    <processName>/Processes/Sub Process/SetFacturaDetail.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <HEADER>
+                        <EIF_FOLIO>
+                            <xsl:value-of select="$Factura/Record/EIF_FOLIO"/>
+                        </EIF_FOLIO>
+                        <EIF_SERIE>
+                            <xsl:value-of select="$Factura/Record/EIF_SERIE"/>
+                        </EIF_SERIE>
+                        <EIF_PROVEEDOR>
+                            <xsl:value-of select="$Factura/Record/EIF_PROVEEDOR"/>
+                        </EIF_PROVEEDOR>
+                        <EIF_SUCURSAL>
+                            <xsl:value-of select="$Factura/Record/EIF_SUCURSAL"/>
+                        </EIF_SUCURSAL>
+                    </HEADER>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="SetFacturaHeader">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>345</pd:x>
+                <pd:y>152</pd:y>
+                <config>
+                    <processName>/Processes/Sub Process/SetFacturaHeader.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <resultSet>
+                        <xsl:copy-of select="$Factura/Record"/>
+                    </resultSet>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>628</pd:x>
+        <pd:y>90</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=MSG_Container namespace=http://xmlns.heb.com/ei/ErrorManagementSchema</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>787</pd:x>
+        <pd:y>91</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <xsl:copy-of select="$Catch/pfx2:MSG_Container"/>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Transaction</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Transaction</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

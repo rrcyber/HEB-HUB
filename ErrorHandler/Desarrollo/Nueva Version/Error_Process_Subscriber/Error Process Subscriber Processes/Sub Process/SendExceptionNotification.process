@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/EmailCatalog.xsd" xmlns:pfx2="http://xmlns.tibco.com/body" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/ExceptionSchema.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/ExceptionSchema.xsd" schemaLocation="/SharedResources/Schemas/ExceptionSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/EmailCatalog.xsd" schemaLocation="/SharedResources/Schemas/EmailCatalog.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd"/>
+    <pd:name>Error Process Subscriber Processes/Sub Process/SendExceptionNotification.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx4:Exception"/>
+    <pd:startX>61</pd:startX>
+    <pd:startY>101</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>867</pd:endX>
+    <pd:endY>263</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1431455800193</pd:targetNamespace>
+    <pd:activity name="MapErrorType">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>212</pd:x>
+        <pd:y>99</pd:y>
+        <config>
+            <element>
+                <xsd:element name="ErrorType" type="xsd:string"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <ErrorType>
+                <xsl:value-of select="if (contains($Start/Exception/Code, 'BW-JDBC')) then $_globalVariables/ns:GlobalVariables/ExceptionTypes/TECHNICAL&#xA;else if (contains($Start/Exception/Code, 'BW-ENGINE')) then $_globalVariables/ns:GlobalVariables/ExceptionTypes/FUNCTIONAL&#xA;&#x9;else $_globalVariables/ns:GlobalVariables/ExceptionTypes/DATA"/>
+            </ErrorType>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send-Mail-1">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>864</pd:x>
+        <pd:y>110</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>mail.heb.com.mx</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns2:mailActivityInput>
+                <from>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Email/IntegracionesTIBCO"/>
+                </from>
+                <xsl:for-each select="$Call_SetDistributionList/Result/EmailDistributionList">
+                    <to>
+                        <xsl:value-of select="."/>
+                    </to>
+                </xsl:for-each>
+                <subject>
+                    <xsl:value-of select="concat('Exception TIBCO','  - ',$Start/Exception/Project,' - ','ERROR(S)' )"/>
+                </subject>
+                <pfx2:bodyElement>
+                    <bodyText>
+                        <xsl:value-of select="$Transform-XML/xmlString"/>
+                    </bodyText>
+                </pfx2:bodyElement>
+                <Headers>
+                    <Content-Type>
+                        <xsl:value-of select="'text/html'"/>
+                    </Content-Type>
+                </Headers>
+            </ns2:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_SetDistributionList">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>377</pd:x>
+        <pd:y>100</pd:y>
+        <config>
+            <processName>/Error Process Subscriber Processes/Sub Process/SetDistributionList.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ExeptionTypeProject>
+                <Project>
+                    <xsl:value-of select="$Start/Exception/Project"/>
+                </Project>
+                <ExceptionType>
+                    <xsl:value-of select="$MapErrorType/ErrorType"/>
+                </ExceptionType>
+            </ExeptionTypeProject>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>601</pd:x>
+        <pd:y>108</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <renderDefaultPrefix>true</renderDefaultPrefix>
+            <textEncoding>UTF-8</textEncoding>
+            <term>
+                <xsd:element name="ERROR_Container">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Header">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="ProjectName" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="TransactionType" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="ErrorSeverity" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="TimeStamp" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="InstanceName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                                        <xsd:element name="ErrorDescription" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="ErrorCode" type="xsd:string" minOccurs="0"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <ERROR_Container>
+                <Header>
+                    <ProjectName>
+                        <xsl:value-of select="$Start/Exception/Project"/>
+                    </ProjectName>
+                    <TransactionType>
+                        <xsl:value-of select="1"/>
+                    </TransactionType>
+                    <ErrorSeverity>
+                        <xsl:value-of select="2"/>
+                    </ErrorSeverity>
+                    <TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </TimeStamp>
+                    <InstanceName>
+                        <xsl:value-of select="$Start/Exception/Project"/>
+                    </InstanceName>
+                    <ErrorDescription>
+                        <xsl:value-of select="tib:render-xml($Start/Exception, 0, 0)"/>
+                    </ErrorDescription>
+                    <ErrorCode>
+                        <xsl:value-of select="$MapErrorType/ErrorType"/>
+                    </ErrorCode>
+                </Header>
+            </ERROR_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Transform XML">
+        <pd:type>com.tibco.plugin.xml.XMLTransformActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLTransformActivity</pd:resourceType>
+        <pd:x>748</pd:x>
+        <pd:y>109</pd:y>
+        <config>
+            <engine>TibcoXML</engine>
+            <inputStyle>text</inputStyle>
+            <stylesheet>/Shared Resources/Stylesheet/Exception.xslt</stylesheet>
+        </config>
+        <pd:inputBindings>
+            <textInput>
+                <xmlString>
+                    <xsl:value-of select="$Render-XML/xmlString"/>
+                </xmlString>
+            </textInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>MapErrorType</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send-Mail-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>MapErrorType</pd:from>
+        <pd:to>Call_SetDistributionList</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_SetDistributionList</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:xpathDescription>DistributionList&gt;0</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Call_SetDistributionList/Result/EmailDistributionList)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_SetDistributionList</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>NoDistributionLIst</pd:xpathDescription>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>Transform XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Transform XML</pd:from>
+        <pd:to>Send-Mail-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

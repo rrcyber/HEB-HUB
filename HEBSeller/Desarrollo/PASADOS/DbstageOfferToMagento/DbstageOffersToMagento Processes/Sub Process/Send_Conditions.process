@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Send_Conditions.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="last_complete_promo" type="xsd:string"/>
+                    <xsd:element name="run_id" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>145</pd:startX>
+    <pd:startY>281</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>759</pd:endX>
+    <pd:endY>272</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1413469599915</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>227</pd:x>
+        <pd:y>119</pd:y>
+        <pd:width>440</pd:width>
+        <pd:height>297</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (1)</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>Group (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Group (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>373</pd:x>
+            <pd:y>176</pd:y>
+            <pd:width>210</pd:width>
+            <pd:height>190</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-Query/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>promo</pd:iterationElementSlot>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert Magento</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Magento</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null</pd:from>
+                <pd:to>end</pd:to>
+                <pd:xpathDescription>Primary Key</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$_error_JDBC-Insert-Magento/ActivityErrors/pfx3:JDBCSQLException/sqlState = 23000</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Magento</pd:from>
+                <pd:to>Null</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-65536</pd:lineColor>
+                <pd:conditionType>error</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null</pd:from>
+                <pd:to>Generate Error</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert Magento">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>491</pd:x>
+                <pd:y>240</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/MAGENTO/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_MAGENTO.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO entrepids_if_flex_promo_cond (promo_id, group_id, prod_qty, min_prod_qty, if_run_id)
+VALUES(?, ?, ?, ?, ?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>promo_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>group_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>prod_qty</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>prod_min_qty</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>if_run_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <promo_id>
+                            <xsl:value-of select="$promo/Record/promo_id"/>
+                        </promo_id>
+                        <group_id>
+                            <xsl:value-of select="$promo/Record/group_id"/>
+                        </group_id>
+                        <prod_qty>
+                            <xsl:value-of select="$promo/Record/prod_qty"/>
+                        </prod_qty>
+                        <prod_min_qty>
+                            <xsl:value-of select="$promo/Record/prod_min_qty"/>
+                        </prod_min_qty>
+                        <if_run_id xsi:nil="true"/>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Null">
+                <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                <pd:resourceType>ae.activities.null</pd:resourceType>
+                <pd:x>406</pd:x>
+                <pd:y>312</pd:y>
+                <config/>
+                <pd:inputBindings/>
+            </pd:activity>
+            <pd:activity name="Generate Error">
+                <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+                <pd:resourceType>ae.activities.throw</pd:resourceType>
+                <pd:x>527</pd:x>
+                <pd:y>312</pd:y>
+                <config>
+                    <faultName/>
+                </config>
+                <pd:inputBindings>
+                    <ns12:ActivityInput>
+                        <message>
+                            <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                        </message>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <messageCode>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </messageCode>
+                        </xsl:if>
+                    </ns12:ActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC Query">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>299</pd:x>
+            <pd:y>210</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT c.promo_id
+      ,c.group_id
+      ,c.prod_qty
+      ,c.prod_min_qty
+FROM mag_import_flex_promo p with (nolock)
+JOIN mag_import_flex_promo_cond c with (nolock) ON (p.promo_id = c.promo_id)
+WHERE control_date IS NULL
+AND complete_promo IS NOT NULL
+AND p.complete_promo &lt;= ?</statement>
+                <optionalOrNillable>true</optionalOrNillable>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>promo_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>group_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>prod_qty</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>prod_min_qty</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>last_complete_promo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <last_complete_promo>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;,$Start/group/last_complete_promo)"/>
+                    </last_complete_promo>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

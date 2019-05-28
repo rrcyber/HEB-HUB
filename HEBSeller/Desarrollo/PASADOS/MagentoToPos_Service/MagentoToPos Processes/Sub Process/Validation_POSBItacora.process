@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.tibco.com/body" xmlns:pfx2="http://www.tibco.com/schemas/MagentoToPosService/Shared Resources/Schema Definitions/Custom/Schema1.xsd" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/MagentoToPosService/Shared Resources/Schema Definitions/Custom/Schema1.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Request_Insert.xsd"/>
+    <pd:name>MagentoToPos Processes/Sub Process/Validation_POSBItacora.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:Request_Insert"/>
+    <pd:startX>43</pd:startX>
+    <pd:startY>593</pd:startY>
+    <pd:returnBindings>
+        <Records>
+            <xsl:choose>
+                <xsl:when test="string-length($Call_Validation_RTSales/ticket)!=0">
+                    <Ticket>
+                        <xsl:value-of select="$Call_Validation_RTSales/ticket"/>
+                    </Ticket>
+                </xsl:when>
+                <xsl:when test="string-length($Get_POSBitacora/resultSet/Record[1]/TicketGeneradoPOS)!=0">
+                    <Ticket>
+                        <xsl:value-of select="$Get_POSBitacora/resultSet/Record[1]/TicketGeneradoPOS"/>
+                    </Ticket>
+                </xsl:when>
+                <xsl:otherwise>
+                    <Ticket>
+                        <xsl:value-of select="'0'"/>
+                    </Ticket>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="string-length($Update_POSBitacora/jdbcUpdateActivityOutput/noOfUpdates)!=0">
+                    <Result>
+                        <xsl:value-of select="'1'"/>
+                    </Result>
+                </xsl:when>
+                <xsl:when test="string-length($Insert_POSBitacora/jdbcUpdateActivityOutput/noOfUpdates)!=0">
+                    <Result>
+                        <xsl:value-of select="'1'"/>
+                    </Result>
+                </xsl:when>
+                <xsl:when test="string-length($Call_Validation_RTSales/ticket)!=0">
+                    <Result>
+                        <xsl:value-of select="'1'"/>
+                    </Result>
+                </xsl:when>
+                <xsl:otherwise>
+                    <Result>
+                        <xsl:value-of select="'0'"/>
+                    </Result>
+                </xsl:otherwise>
+            </xsl:choose>
+        </Records>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Records">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Ticket" type="xsd:string"/>
+                    <xsd:element name="Result" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>637</pd:endX>
+    <pd:endY>593</pd:endY>
+    <pd:errorSchemas>
+        <Fault ref="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1441923782997</pd:targetNamespace>
+    <pd:activity name="Get_POSBitacora">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>214</pd:x>
+        <pd:y>592</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/Connection_SXD2010107.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT * FROM ECOM_POSBITACORA
+where NumeroPedido = ?
+and nMontoTotal = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>NumeroPedido</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>nMontoTotal</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <optionalOrNillable>true</optionalOrNillable>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>idPOSBitacora</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>idSucursal</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NumeroPedido</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>nMontoTotal</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Estatus</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TicketGeneradoPOS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>dtFechaCreacion</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>dtFechaMod</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <NumeroPedido>
+                    <xsl:value-of select="$Start/pfx2:Request_Insert/pfx2:NumeroPedido"/>
+                </NumeroPedido>
+                <nMontoTotal>
+                    <xsl:value-of select="$Start/pfx2:Request_Insert/pfx2:nMontoTotal"/>
+                </nMontoTotal>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Insert_POSBitacora">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>512</pd:x>
+        <pd:y>592</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>insert into ECOM_POSBITACORA values (?,?,?,?,?,?,?)</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/Connection_SXD2010107.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>idSucursal</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>NumeroPedido</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>nMontoTotal</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Estatus</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TicketGeneradoPOS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>dtFechaCreacion</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>dtFechaMod</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <idSucursal>
+                    <xsl:value-of select="$Start/pfx2:Request_Insert/pfx2:idSucursal"/>
+                </idSucursal>
+                <NumeroPedido>
+                    <xsl:value-of select="$Start/pfx2:Request_Insert/pfx2:NumeroPedido"/>
+                </NumeroPedido>
+                <nMontoTotal>
+                    <xsl:value-of select="$Start/pfx2:Request_Insert/pfx2:nMontoTotal"/>
+                </nMontoTotal>
+                <Estatus>
+                    <xsl:value-of select="'1'"/>
+                </Estatus>
+                <TicketGeneradoPOS>
+                    <xsl:value-of select="''"/>
+                </TicketGeneradoPOS>
+                <dtFechaCreacion>
+                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                </dtFechaCreacion>
+                <dtFechaMod>
+                    <xsl:value-of select="''"/>
+                </dtFechaMod>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_Validation_RTSales">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>214</pd:x>
+        <pd:y>741</pd:y>
+        <config>
+            <processName>/MagentoToPos Processes/Sub Process/Validation_RTSales.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pedido>
+                <xsl:value-of select="$Start/pfx2:Request_Insert/pfx2:NumeroPedido"/>
+            </pedido>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update_POSBitacora">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>398</pd:x>
+        <pd:y>441</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/Connection_SXD2010107.sharedjdbc</jdbcSharedConfig>
+            <statement>update ecom_posbitacora set estatus = ?
+where NumeroPedido = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Estatus</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Pedido</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <Estatus>
+                    <xsl:value-of select="'1'"/>
+                </Estatus>
+                <Pedido>
+                    <xsl:value-of select="$Start/pfx2:Request_Insert/pfx2:NumeroPedido"/>
+                </Pedido>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 01">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>398</pd:x>
+        <pd:y>125</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <pfx:Code>
+                            <xsl:value-of select="'Fault 01'"/>
+                        </pfx:Code>
+                        <pfx:Reason>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/MagentoToPos_Error/Fault_01"/>
+                        </pfx:Reason>
+                    </pfx:Fault>
+                </data>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>357</pd:x>
+        <pd:y>683</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Send Mail">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>397</pd:x>
+        <pd:y>272</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>%%MailConfiguration/Host%%</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns3:mailActivityInput>
+                <from>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/MailConfiguration/From"/>
+                </from>
+                <to>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/MailConfiguration/To"/>
+                </to>
+                <subject>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/MailConfiguration/Subject"/>
+                </subject>
+                <pfx3:bodyElement>
+                    <bodyText>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/MailConfiguration/Body"/>
+                    </bodyText>
+                </pfx3:bodyElement>
+            </ns3:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_POSBitacora</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_POSBitacora</pd:from>
+        <pd:to>Insert_POSBitacora</pd:to>
+        <pd:xpathDescription>No Result</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_POSBitacora</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_POSBitacora</pd:from>
+        <pd:to>Call_Validation_RTSales</pd:to>
+        <pd:xpathDescription>Estatus 1</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Get_POSBitacora/resultSet/Record[1]/Estatus = 1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_Validation_RTSales</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_POSBitacora</pd:from>
+        <pd:to>Update_POSBitacora</pd:to>
+        <pd:xpathDescription>Estatus 2 o 3</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Get_POSBitacora/resultSet/Record[1]/Estatus = 2 or $Get_POSBitacora/resultSet/Record[1]/Estatus = 3</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_POSBitacora</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_POSBitacora</pd:from>
+        <pd:to>Send Mail</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-52429</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_POSBitacora</pd:from>
+        <pd:to>Send Mail</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-52429</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_POSBitacora</pd:from>
+        <pd:to>Send Mail</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-52429</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_POSBitacora</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>Estatus 4</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Get_POSBitacora/resultSet/Record[1]/Estatus = 4</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Mail</pd:from>
+        <pd:to>Fault 01</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

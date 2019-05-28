@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/schemas/PmmReprocesamientoAuditNumber/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx="http://xmlns.heb.com/ei/PMM_RECIBO_DATA">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/schemas/PmmReprocesamientoAuditNumber/Shared Resources/Schema Definitions/Custom/Schema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Reprocesamiento_export.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/PMM_RECIBO_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_RECIBO_DATA_SOAP.xsd"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Starter Process/Reproceso_OrdenCompraSubscriber_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>79</pd:x>
+        <pd:y>105</pd:y>
+        <config>
+            <StartTime>1449074109000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%Reproces_Config/GBL_RETRY_DELAY%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>559</pd:endX>
+    <pd:endY>105</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1449071953555</pd:targetNamespace>
+    <pd:activity name="ReprocesoQueueReceiver">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>219</pd:x>
+        <pd:y>103</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/Reproceso/ReprocesoQueueReceiver.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ReprocesoQueueSender">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>390</pd:x>
+        <pd:y>103</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/Reproceso/ReprocesoQueueSender.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>ReprocesoQueueReceiver</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ReprocesoQueueReceiver</pd:from>
+        <pd:to>ReprocesoQueueSender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ReprocesoQueueSender</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

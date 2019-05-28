@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://www.tibco.com/schemas/PmmToProductVarPulisher/Shared Resources/Schema Definitions/Custom/Schema.xsd2" xmlns:pfx="http://www.tibco.com/schemas/PmmToProductVarPulisher/Shared Resources/Schema Definitions/Custom/Schema.xsd">
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmToProductVarPulisher/Shared Resources/Schema Definitions/Custom/Schema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmToProductVarPulisher/Shared Resources/Schema Definitions/Custom/Schema.xsd2" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM.pmgvqtee.xsd"/>
+    <pd:name>PmmPOPublisher Processes/Sub Process/getData.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="pmg_po_number" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>86</pd:startX>
+    <pd:startY>61</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xsl:for-each select="$getPMM.pmgvqtee/resultSet/Record">
+                <group>
+                    <ORG_LVL_NUMBER>
+                        <xsl:value-of select="ORG_LVL_NUMBER"/>
+                    </ORG_LVL_NUMBER>
+                    <PMG_PO_NUMBER>
+                        <xsl:value-of select="PMG_PO_NUMBER"/>
+                    </PMG_PO_NUMBER>
+                    <PRD_LVL_NUMBER_1>
+                        <xsl:value-of select="PRD_LVL_NUMBER_1"/>
+                    </PRD_LVL_NUMBER_1>
+                    <PRD_LVL_NUMBER_2>
+                        <xsl:value-of select="PRD_LVL_NUMBER_2"/>
+                    </PRD_LVL_NUMBER_2>
+                    <PMG_SELL_QTY>
+                        <xsl:value-of select="PMG_SELL_QTY"/>
+                    </PMG_SELL_QTY>
+                </group>
+            </xsl:for-each>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="group" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ORG_LVL_NUMBER" type="xsd:double"/>
+                                <xsd:element name="PMG_PO_NUMBER" type="xsd:double"/>
+                                <xsd:element name="PRD_LVL_NUMBER_1" type="xsd:string"/>
+                                <xsd:element name="PRD_LVL_NUMBER_2" type="xsd:string"/>
+                                <xsd:element name="PMG_SELL_QTY" type="xsd:double"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>439</pd:endX>
+    <pd:endY>65</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371154323265</pd:targetNamespace>
+    <pd:activity name="getPMM.pmgvqtee">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>271</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <timeout>300</timeout>
+            <commit>false</commit>
+            <maxRows>0</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT TRIM(B.ORG_LVL_NUMBER) as ORG_LVL_NUMBER, TRIM(A.PMG_PO_NUMBER) as PMG_PO_NUMBER, TRIM(E.PRD_LVL_NUMBER) as PRD_LVL_NUMBER_1, TRIM(D.PRD_LVL_NUMBER) as PRD_LVL_NUMBER_2  , TRIM(A.PMG_SELL_QTY) as PMG_SELL_QTY
+from PMM.pmgvqtee A
+inner join pmm.orgmstee B on A.org_lvl_child = B.org_lvl_Child 
+inner join pmm.PMGDTLEE C on A.PMG_DTL_TECH_KEY = C.PMG_DTL_TECH_KEY
+inner join pmm.PRDMSTEE D on A.prd_lvl_child = D.PRD_LVL_Child
+inner join pmm.PRDMSTEE E on C.SPP_SET_PARENT = E.PRD_LVL_Child
+
+where C.SPP_SET_PARENT is not null and A.PMG_SELL_QTY &gt; 0	
+and C.pmg_po_number =  ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/PMM JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <processInSubsets>false</processInSubsets>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PMG_PO_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>ORG_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_PO_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER_1</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER_2</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_SELL_QTY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <PMG_PO_NUMBER>
+                    <xsl:value-of select="$Start/group/pmg_po_number"/>
+                </PMG_PO_NUMBER>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>getPMM.pmgvqtee</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getPMM.pmgvqtee</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

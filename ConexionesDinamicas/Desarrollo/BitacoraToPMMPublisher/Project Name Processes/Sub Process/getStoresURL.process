@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Project Name Processes/Sub Process/getStoresURL.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>89</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                <ITEM>
+                    <STOREID>
+                        <xsl:value-of select="STOREID"/>
+                    </STOREID>
+                    <xsl:if test="DESCRIPTION">
+                        <DESCRIPTION>
+                            <xsl:value-of select="DESCRIPTION"/>
+                        </DESCRIPTION>
+                    </xsl:if>
+                    <URL>
+                        <xsl:value-of select="URL"/>
+                    </URL>
+                </ITEM>
+            </xsl:for-each>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="STOREID" type="xsd:string"/>
+                                <xsd:element name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="URL" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>450</pd:endX>
+    <pd:endY>64</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1363048007401</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>240</pd:x>
+        <pd:y>62</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT STOREID, DESCRIPTION, URL
+FROM INT_STORES</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>STOREID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>numeric</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DESCRIPTION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>URL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetVariable">
+        <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+        <pd:x>353</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                    <STOREID>
+                        <STOREID>
+                            <xsl:value-of select="STOREID"/>
+                        </STOREID>
+                        <xsl:if test="DESCRIPTION">
+                            <DESCRIPTION>
+                                <xsl:value-of select="DESCRIPTION"/>
+                            </DESCRIPTION>
+                        </xsl:if>
+                        <URL>
+                            <xsl:value-of select="URL"/>
+                        </URL>
+                    </STOREID>
+                </xsl:for-each>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>243</pd:x>
+        <pd:y>171</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>SetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetVariable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

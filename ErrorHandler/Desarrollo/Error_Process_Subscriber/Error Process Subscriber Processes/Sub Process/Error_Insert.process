@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns="http://www.tibco.com/pe/EngineTypes">
+    <pd:name>Error Process Subscriber Processes/Sub Process/Error_Insert.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="header" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="project_Name" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="source_Domain" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="destination_Domain" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="transaction_Type" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="timeStamp" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="body" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="inrtn_id" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="inrtn_instn_nm" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="inrtn_err_rtn_desc" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="inrtn_msg_body" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="cre8_ts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                                <xsd:element name="u_code" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="sev_id" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="fault" minOccurs="0">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="code" type="xsd:string" minOccurs="0"/>
+                                            <xsd:element name="reason" type="xsd:string" minOccurs="0"/>
+                                            <xsd:element name="detail" type="xsd:string" minOccurs="0"/>
+                                        </xsd:sequence>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>156</pd:startX>
+    <pd:startY>134</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>457</pd:endX>
+    <pd:endY>136</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1390840848202</pd:targetNamespace>
+    <pd:activity name="JDBC Insert-Error-Details">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>314</pd:x>
+        <pd:y>134</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO DBSDI.dbo.TIB_LOG_ERROR (ERROR_DATE
+      , SEVERITY
+      , PROCESS
+      ,SERVICE_NAME
+      ,ERROR_CODE
+      ,DESCRIPTION_ERROR
+      ,MESSAGE_ERROR
+      ,ATT1
+      ,ATT2)
+VALUES (?, ? ,? ,?
+		,? ,? ,? ,? ,?)</statement>
+            <batchUpdate>true</batchUpdate>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>ERROR_DATE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SEVERITY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PROCESS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SERVICE_NAME</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERROR_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>DESCRIPTION_ERROR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>MESSAGE_ERROR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ATT1</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ATT2</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <Record>
+                    <ERROR_DATE>
+                        <xsl:value-of select="$Start/group/body/cre8_ts[1]"/>
+                    </ERROR_DATE>
+                    <SEVERITY>
+                        <xsl:value-of select="if ($Start/group/body/sev_id =  1 ) then 'HIGH'&#xA;else if ($Start/group/body/sev_id =  2 ) then 'MEDIA' &#xA;else if ($Start/group/body/sev_id =  3 ) then 'LOW' &#xA;else $Start/group/body/sev_id"/>
+                    </SEVERITY>
+                    <PROCESS>
+                        <xsl:value-of select="$Start/group/header/project_Name"/>
+                    </PROCESS>
+                    <SERVICE_NAME>
+                        <xsl:value-of select="concat($Start/group/header/project_Name, &quot; :: &quot; , $Start/group/body/inrtn_instn_nm)"/>
+                    </SERVICE_NAME>
+                    <ERROR_CODE>
+                        <xsl:value-of select="$Start/group/body/u_code"/>
+                    </ERROR_CODE>
+                    <DESCRIPTION_ERROR>
+                        <xsl:value-of select="substring($Start/group/body/inrtn_err_rtn_desc, 0, 3999)"/>
+                    </DESCRIPTION_ERROR>
+                    <MESSAGE_ERROR>
+                        <xsl:value-of select="$Start/group/body/inrtn_msg_body"/>
+                    </MESSAGE_ERROR>
+                    <ATT1>
+                        <xsl:value-of select="substring($Start/group/body/fault/reason, 0, 249)"/>
+                    </ATT1>
+                    <ATT2>
+                        <xsl:value-of select="substring($Start/group/body/fault/detail, 0, 249)"/>
+                    </ATT2>
+                </Record>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Insert-Error-Details</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Insert-Error-Details</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

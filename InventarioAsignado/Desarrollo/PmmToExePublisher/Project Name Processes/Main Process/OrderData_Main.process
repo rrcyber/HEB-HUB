@@ -1,0 +1,1206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns1="http://www.tibco.com/schemas/MapeoVendor/Shared Resources/Schema Definitions/Custom/INPUT_FIELDS.xsd">
+    <pd:name>Project Name Processes/Main Process/OrderData_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>27</pd:startX>
+    <pd:startY>194</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1723</pd:endX>
+    <pd:endY>250</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <CountHeader>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="headers" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </CountHeader>
+        <From_Loc9101>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="countLIN" type="xsd:string"/>
+                        <xsd:element name="msg" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </From_Loc9101>
+        <PedidoData>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="msg1" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </PedidoData>
+        <From_Loc9071>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="countLIN" type="xsd:string"/>
+                        <xsd:element name="msg" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </From_Loc9071>
+        <Count>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="LinDetails" type="xsd:string"/>
+                        <xsd:element name="TotalLin9071" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="TotalLin9101" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="iteration" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Count>
+        <Pedido_Data>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="msg1" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Pedido_Data>
+        <PedidoData2>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="msg2" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </PedidoData2>
+        <Pedido_Data2>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="msg2" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Pedido_Data2>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1373493741778</pd:targetNamespace>
+    <pd:activity name="Get_Header">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>418</pd:x>
+        <pd:y>204</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC PMM_Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>select distinct from_loc, trf_number numPedido, audit_number, dee1.atr_code ordertype, 'ORDER' || '|' || 'H' || '|' ||
+          case when trf.from_loc=9071 then '90' 
+               when trf.from_loc=9101 then '91' 
+          end || '|' ||
+          case when trf.from_loc = 9101 then '01'
+               when trf.from_loc = 9071 then '71'
+          end || '|' || trf.to_loc || '|' ||
+        substr(dee1.atr_code,4,4) 
+        || '|' || to_char(date_created,'DD/MM/YYYY') || '|' || '0001' || 
+        '|' || '|||' || '' || '|' || '01' || '|' || to_char(date_created,'DD/MM/YYYY') || '|' || '0001' || '|' || '||' ||--char(10)
+        'S 00' || substr(trf.to_loc,2,3) || '000000000' || '001' ||
+        case when trf.from_loc=9071 then 'W 00907W 00907'
+             when trf.from_loc=9101 then 'W 00901W 00901' 
+        end || lpad(trim(to_char(trf_number)),8,'0') || lpad(trim(to_char(trf_number)),9,'0') || 
+        '|' || 'A' || '|' || to_char(sysdate,'DD/MM/YYYY') || '|' || '0001' || '|' cadena --char(10) cadena
+  from pmm.sditrfdte trf left join pmm.prdmstee S on trf.prd_lvl_child = S.PRD_LVL_CHILD
+                         inner join pmm.prdmstee prd on /*(case when S.SPP_SET_PRD_CHILD is null then S.PRD_LVL_CHILD
+                                                        else S.SPP_SET_PRD_CHILD end) =*/
+                                                     nvl(S.SPP_SET_PRD_CHILD, S.PRD_LVL_CHILD) = prd.prd_lvl_child
+                         left join pmm.BASATPEE pee1 on  pee1.prd_lvl_child = decode(prd.prd_lvl_id,0,prd.prd_lvl_parent,prd.prd_lvl_child) 
+                         inner join pmm.BASACDEE dee1 on pee1.atr_hdr_tech_key = dee1.atr_hdr_tech_key and pee1.atr_cod_tech_key = dee1.atr_cod_tech_key 
+    where trf.action_code='00' and trf.from_loc in (9101,9071)
+    and pee1.atr_hdr_tech_key = 76 --&lt;--FLOWTYPE 
+    and pee1.ATR_TYP_TECH_KEY = 66 --&lt;-- 'TIPO5 MANEJO CAT'
+    and trf.download_date_1 is null
+    and trf.date_created &gt;= trunc(sysdate-?)</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>DIAS_ATRAS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>FROM_LOC</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NUMPEDIDO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AUDIT_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ORDERTYPE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CADENA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <DIAS_ATRAS>
+                    <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/TIMER_CONF/DIAS_ATRAS"/>
+                </DIAS_ATRAS>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>502</pd:x>
+        <pd:y>44</pd:y>
+        <pd:width>963</pd:width>
+        <pd:height>406</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get_Header/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>pedidolist</pd:iterationElementSlot>
+            <pd:indexSlot>indexarray</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_Detail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Leftover2-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Out_Init</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Out2_Init</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Leftover-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_9071</pd:from>
+            <pd:to>Msg_Out</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($Count/root/TotalLin9071+ $Count/root/LinDetails+1 &lt;=3000 and$Count/root/iteration!=$CountHeader/root/headers)or($From_Loc9071/root/msg='')</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_9101</pd:from>
+            <pd:to>Msg_Out2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($Count/root/TotalLin9101+ $Count/root/LinDetails+ 1 &lt;=3000 and$Count/root/iteration!=$CountHeader/root/headers)or($From_Loc9101/root/msg='')</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Trailer</pd:from>
+            <pd:to>Msg_9071</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($pedidolist/Record/FROM_LOC =9071)or($Count/root/iteration=$CountHeader/root/headers)</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Trailer</pd:from>
+            <pd:to>Msg_9101</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($pedidolist/Record/FROM_LOC =9101)or($Count/root/iteration=$CountHeader/root/headers)</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Detail</pd:from>
+            <pd:to>countDetails</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Leftover</pd:from>
+            <pd:to>SetTotalLin</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SetTotalLin</pd:from>
+            <pd:to>Null-2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Leftover2</pd:from>
+            <pd:to>SetTotal_Lin</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SetTotal_Lin</pd:from>
+            <pd:to>Null-3</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Out</pd:from>
+            <pd:to>Msg_Leftover-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_Out2</pd:from>
+            <pd:to>Msg_Leftover2-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Send MXRSC_7901</pd:from>
+            <pd:to>Msg_Out2_Init</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Send MXRSC_9701</pd:from>
+            <pd:to>Msg_Out_Init</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_9101</pd:from>
+            <pd:to>Msg_Leftover2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($Count/root/TotalLin9101 + $Count/root/LinDetails+ 1 &gt; 3000) or (($Count/root/iteration=$CountHeader/root/headers) and($From_Loc9101/root/msg!=''))</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Msg_9071</pd:from>
+            <pd:to>Msg_Leftover</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($Count/root/TotalLin9071+ $Count/root/LinDetails+1 &gt; 3000) or (($Count/root/iteration=$CountHeader/root/headers) and($From_Loc9071/root/msg!=''))</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>countDetails</pd:from>
+            <pd:to>GroupDetails</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>GroupDetails</pd:from>
+            <pd:to>Get_Trailer</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-2</pd:from>
+            <pd:to>Send MXRSC_9701</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-2</pd:from>
+            <pd:to>Msg_Out_Init</pd:to>
+            <pd:xpathDescription>String-length=0</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>string-length(concat($PedidoData2/root/msg2,$PedidoData/root/msg1))=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-3</pd:from>
+            <pd:to>Send MXRSC_7901</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-3</pd:from>
+            <pd:to>Msg_Out2_Init</pd:to>
+            <pd:xpathDescription>String-length=0</pd:xpathDescription>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>string-length(concat($Pedido_Data2/root/msg2,$Pedido_Data/root/msg1))=0</pd:xpath>
+        </pd:transition>
+        <pd:activity name="countDetails">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>560</pd:x>
+            <pd:y>128</pd:y>
+            <config>
+                <variableName>Count</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <LinDetails>
+                        <xsl:value-of select="count($Get_Detail/resultSet/Record/DETAIL)"/>
+                    </LinDetails>
+                    <TotalLin9071>
+                        <xsl:value-of select="$From_Loc9071/root/countLIN + $Count/root/TotalLin9071"/>
+                    </TotalLin9071>
+                    <TotalLin9101>
+                        <xsl:value-of select="$From_Loc9101/root/countLIN + $Count/root/TotalLin9101"/>
+                    </TotalLin9101>
+                    <iteration>
+                        <xsl:value-of select="$indexarray"/>
+                    </iteration>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_9071">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>825</pd:x>
+            <pd:y>136</pd:y>
+            <config>
+                <variableName>From_Loc9071</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <countLIN>
+                        <xsl:value-of select="2+$Count/root/LinDetails"/>
+                    </countLIN>
+                    <msg>
+                        <xsl:value-of select="concat($pedidolist/Record/CADENA,&quot;&#xA;&quot;,$Details/AccumulatedOutput,$Get_Trailer/resultSet/Record/TRAILER,&quot;&#xA;&quot;)"/>
+                    </msg>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_9101">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>849</pd:x>
+            <pd:y>329</pd:y>
+            <config>
+                <variableName>From_Loc9101</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <countLIN>
+                        <xsl:value-of select="2 + $Count/root/LinDetails"/>
+                    </countLIN>
+                    <msg>
+                        <xsl:value-of select="concat($pedidolist/Record/CADENA,&quot;&#xA;&quot;,$Details/AccumulatedOutput,$Get_Trailer/resultSet/Record/TRAILER, &quot;&#xA;&quot;)"/>
+                    </msg>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Leftover">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>955</pd:x>
+            <pd:y>111</pd:y>
+            <config>
+                <variableName>PedidoData</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg1>
+                        <xsl:value-of select="if($pedidolist/Record/FROM_LOC=9071)then ($From_Loc9071/root/msg) else ''"/>
+                    </msg1>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Out">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>966</pd:x>
+            <pd:y>200</pd:y>
+            <config>
+                <variableName>PedidoData2</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg2>
+                        <xsl:value-of select="if($pedidolist/Record/FROM_LOC=9071)then (concat($PedidoData2/root/msg2,$PedidoData/root/msg1, $From_Loc9071/root/msg)) else (concat($PedidoData2/root/msg2,$PedidoData/root/msg1))"/>
+                    </msg2>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Leftover2">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>940</pd:x>
+            <pd:y>265</pd:y>
+            <config>
+                <variableName>Pedido_Data</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg1>
+                        <xsl:value-of select="if($pedidolist/Record/FROM_LOC=9101)then ($From_Loc9101/root/msg) else ''"/>
+                    </msg1>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Out2">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>940</pd:x>
+            <pd:y>387</pd:y>
+            <config>
+                <variableName>Pedido_Data2</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg2>
+                        <xsl:value-of select="if ($pedidolist/Record/FROM_LOC=9101) then (concat($Pedido_Data2/root/msg2,$Pedido_Data/root/msg1, $From_Loc9101/root/msg)) else (concat($Pedido_Data2/root/msg2,$Pedido_Data/root/msg1))"/>
+                    </msg2>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Send MXRSC_9701">
+            <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+            <pd:x>1288</pd:x>
+            <pd:y>157</pd:y>
+            <config>
+                <PermittedMessageType>Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Queues/GLB_MXRSC_9701_OUTBOUND_QUEUE%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            </config>
+            <pd:inputBindings>
+                <ns0:ActivityInput>
+                    <Body>
+                        <xsl:value-of select="concat(concat(tib:pad('EXceed 2000',19,' '),'|',&#xA;tib:pad('Customer Order 1.0',19,' '),'|',&#xA;tib:pad(' ',19,' '),'|',&#xA;tib:pad(' ',19,' '),'|'),&quot;&#xA;&quot;,if($Count/root/iteration=$CountHeader/root/headers)then (concat($PedidoData2/root/msg2,$PedidoData/root/msg1)) else ($PedidoData2/root/msg2))"/>
+                    </Body>
+                </ns0:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Send MXRSC_7901">
+            <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+            <pd:x>1251</pd:x>
+            <pd:y>256</pd:y>
+            <config>
+                <PermittedMessageType>Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Queues/GLB_MXRSC_7901_OUTBOUND_QUEUE%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            </config>
+            <pd:inputBindings>
+                <ns0:ActivityInput>
+                    <Body>
+                        <xsl:value-of select="concat(concat(tib:pad('EXceed 2000',19,' '),'|',&#xA;tib:pad('Customer Order 1.0',19,' '),'|',&#xA;tib:pad(' ',19,' '),'|',&#xA;tib:pad(' ',19,' '),'|'),&quot;&#xA;&quot;,if($Count/root/iteration=$CountHeader/root/headers)then (concat($Pedido_Data2/root/msg2,$Pedido_Data/root/msg1)) else ($Pedido_Data2/root/msg2))"/>
+                    </Body>
+                </ns0:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_Trailer">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>691</pd:x>
+            <pd:y>137</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC PMM_Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>select DISTINCT from_loc,  'ORDER' || '|' || 'T' || '|' ||
+          case when trf.from_loc=9071 then '90' 
+               when trf.from_loc=9101 then '91' 
+          end || '|' ||
+          case when trf.from_loc = 9101 then '01'
+               when trf.from_loc = 9071 then '71'
+          end || '|'  || trf.to_loc ||  '|'  || substr(dee1.atr_code,4,4)  || '|' ||lpad(?,5,'0') || '|' 
+          || NVL(lpad(?,9,'0'), 0) || '|' || '0' || '|' || '0' || '|' ||' ' || '|' trailer
+from pmm.sditrfdte trf left join pmm.prdmstee S on trf.prd_lvl_child = S.PRD_LVL_CHILD
+                         inner join pmm.prdmstee prd on nvl(S.SPP_SET_PRD_CHILD, S.PRD_LVL_CHILD) = prd.prd_lvl_child
+                         left join pmm.BASATPEE pee1 on  pee1.prd_lvl_child = decode(prd.prd_lvl_id,0,prd.prd_lvl_parent,prd.prd_lvl_child) 
+                         inner join pmm.BASACDEE dee1 on pee1.atr_hdr_tech_key = dee1.atr_hdr_tech_key and pee1.atr_cod_tech_key = dee1.atr_cod_tech_key 
+    where trf.action_code='00' and trf.from_loc in (9101,9071)
+    and pee1.atr_hdr_tech_key = 76 --&lt;--FLOWTYPE 
+    and pee1.ATR_TYP_TECH_KEY = 66 --&lt;-- 'TIPO MANEJO CAT'
+    and dee1.atr_code = ?
+    and trf.trf_number=?</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>numLineas</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>sum_quantity</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>order_type</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>numPedido</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>FROM_LOC</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>TRAILER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <numLineas>
+                        <xsl:value-of select="$Count/root/LinDetails"/>
+                    </numLineas>
+                    <sum_quantity>
+                        <xsl:choose>
+                            <xsl:when test="exists(sum($Get_Detail/resultSet/Record/QUANTITY))">
+                                <xsl:value-of select="sum($Get_Detail/resultSet/Record/QUANTITY)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </sum_quantity>
+                    <order_type>
+                        <xsl:choose>
+                            <xsl:when test="exists($pedidolist/Record/ORDERTYPE)">
+                                <xsl:value-of select="$pedidolist/Record/ORDERTYPE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </order_type>
+                    <numPedido>
+                        <xsl:value-of select="$pedidolist/Record/NUMPEDIDO"/>
+                    </numPedido>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_Detail">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>557</pd:x>
+            <pd:y>253</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC PMM_Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>select  distinct  Quantity, a.prd_lvl_number, case when vpc.number_of_inners &gt; 1 then replace(lpad(vpc.inv_units_per_inner,4),' ',0) else decode(prd.prd_style_ind,'T',decode(vpc.spp_set_parent,null,replace(lpad(vpc.vpc_buy_multiple ,4),' ',0),replace(lpad(vpc.vpc_case_qty ,4),' ',0)),'F',decode(prd.prd_lvl_id,0,decode(vpc.spp_set_parent,null,replace(lpad(vpc.vpc_buy_multiple ,4),' ',0),replace(lpad(vpc.vpc_case_qty ,4),' ',0)),replace(lpad(vpc.vpc_case_qty ,4),' ',0))) end as FactorEmpaque, 
+                                              
+  'ORDER' || '|' || 'D' || '|' || lpad(trim(to_char(a.prd_lvl_number)),7,'0') || '|' || lpad(trim(to_char(Quantity)),7,'0') || '|' 
+             || '004' || '|' || 'N' || '|' || '|||||' || case when vpc.number_of_inners &gt; 1 then lpad(round(to_number(trim(vpc.inv_units_per_inner))),4,'0') else decode(prd.prd_style_ind,'T',decode(vpc.spp_set_parent,null,lpad(round(to_number(trim(vpc.vpc_buy_multiple))),4,'0'),lpad(round(to_number(trim(vpc.vpc_case_qty))),4,'0')),'F',decode(prd.prd_lvl_id,0,decode(vpc.spp_set_parent,null,lpad(round(to_number(trim(vpc.vpc_buy_multiple))),4,'0'),lpad(round(to_number(trim(vpc.vpc_case_qty))),4,'0')),lpad(round(to_number(trim(vpc.vpc_case_qty))),4,'0')))
+              end || '|' || '' || '|' || '' || '|' || '' || '|' || '||||' || '' || '|' ||  
+              ''  || '|' || '||||'    || '' || '|' || '' || '|' || '||||' ||'REG07A'   ||
+              '|' || 'A' ||   '|'     || 'N'|| '|'  DETAIL
+from   pmm.sditrfdte a
+       INNER JOIN pmm.prdmstee prd on a.prd_lvl_child = prd.PRD_LVL_CHILD
+       inner join pmm.vpcprdee vpc on vpc.prd_lvl_child = decode(prd.prd_lvl_id,0,prd.prd_lvl_parent,nvl(prd.SPP_SET_PRD_CHILD, prd.PRD_LVL_CHILD))  
+                  and vpc.vpc_case_qty = decode(prd.prd_lvl_id,0,1,vpc.vpc_case_qty)
+                  and vpc.inner_pk_tech_key = decode(prd.prd_lvl_id,0,vpc.inner_pk_tech_key,a.inner_pk_tech_key)
+             left join pmm.BASATPEE pee1 on  pee1.prd_lvl_child = decode(prd.prd_lvl_id,0,prd.prd_lvl_parent,nvl( prd.SPP_SET_PRD_CHILD, prd.PRD_LVL_CHILD )) 
+              inner join pmm.BASACDEE dee1 on pee1.atr_hdr_tech_key = dee1.atr_hdr_tech_key and pee1.atr_cod_tech_key = dee1.atr_cod_tech_key
+    where a.action_code='00' and a.from_loc  =?
+    and pee1.atr_hdr_tech_key = 76 --&lt;--FLOWTYPE 
+    and pee1.ATR_TYP_TECH_KEY = 66 --&lt;-- 'TIPO MANEJO CAT'
+                AND a.trf_number=?
+                and dee1.atr_code =?</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>from_loc</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>numPedido</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>order_type</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>QUANTITY</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>FACTOREMPAQUE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>DETAIL</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <from_loc>
+                        <xsl:choose>
+                            <xsl:when test="exists($pedidolist/Record/FROM_LOC)">
+                                <xsl:value-of select="$pedidolist/Record/FROM_LOC"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </from_loc>
+                    <numPedido>
+                        <xsl:value-of select="$pedidolist/Record/NUMPEDIDO"/>
+                    </numPedido>
+                    <order_type>
+                        <xsl:choose>
+                            <xsl:when test="exists($pedidolist/Record/ORDERTYPE)">
+                                <xsl:value-of select="$pedidolist/Record/ORDERTYPE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </order_type>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="SetTotalLin">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>1042</pd:x>
+            <pd:y>111</pd:y>
+            <config>
+                <variableName>Count</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <LinDetails>
+                        <xsl:value-of select="0"/>
+                    </LinDetails>
+                    <TotalLin9071>
+                        <xsl:value-of select="0"/>
+                    </TotalLin9071>
+                    <xsl:if test="$Count/root/TotalLin9101">
+                        <TotalLin9101>
+                            <xsl:value-of select="$Count/root/TotalLin9101"/>
+                        </TotalLin9101>
+                    </xsl:if>
+                    <iteration>
+                        <xsl:value-of select="if($Count/root/iteration=$CountHeader/root/headers)then ($Count/root/iteration) else 0"/>
+                    </iteration>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="SetTotal_Lin">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>1037</pd:x>
+            <pd:y>266</pd:y>
+            <config>
+                <variableName>Count</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <LinDetails>
+                        <xsl:value-of select="0"/>
+                    </LinDetails>
+                    <xsl:if test="$Count/root/TotalLin9071">
+                        <TotalLin9071>
+                            <xsl:value-of select="$Count/root/TotalLin9071"/>
+                        </TotalLin9071>
+                    </xsl:if>
+                    <TotalLin9101>
+                        <xsl:value-of select="0"/>
+                    </TotalLin9101>
+                    <iteration>
+                        <xsl:value-of select="if($Count/root/iteration=$CountHeader/root/headers)then ($Count/root/iteration) else 0"/>
+                    </iteration>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Leftover-1">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>1112</pd:x>
+            <pd:y>199</pd:y>
+            <config>
+                <variableName>PedidoData</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg1>
+                        <xsl:value-of select="''"/>
+                    </msg1>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Leftover2-1">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>1127</pd:x>
+            <pd:y>385</pd:y>
+            <config>
+                <variableName>Pedido_Data</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg1>
+                        <xsl:value-of select="''"/>
+                    </msg1>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Out2_Init">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>1253</pd:x>
+            <pd:y>344</pd:y>
+            <config>
+                <variableName>Pedido_Data2</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg2>
+                        <xsl:value-of select="''"/>
+                    </msg2>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Msg_Out_Init">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>1396</pd:x>
+            <pd:y>192</pd:y>
+            <config>
+                <variableName>PedidoData2</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <msg2>
+                        <xsl:value-of select="''"/>
+                    </msg2>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="GroupDetails">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>582</pd:x>
+            <pd:y>246</pd:y>
+            <pd:width>216</pd:width>
+            <pd:height>185</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Get_Detail/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>detailList</pd:iterationElementSlot>
+                <pd:indexSlot>indexDetail</pd:indexSlot>
+                <pd:outSlot>Details</pd:outSlot>
+                <pd:activityOutputName>Map Data</pd:activityOutputName>
+                <pd:accumulateOutput>true</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Validator_Main</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Map Data</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Validator_Main</pd:from>
+                <pd:to>Map Data</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Map Data">
+                <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+                <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+                <pd:x>737</pd:x>
+                <pd:y>345</pd:y>
+                <config>
+                    <element>
+                        <xsd:element name="root">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="details" type="xsd:string"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </element>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <details>
+                            <xsl:value-of select="concat($detailList/Record/DETAIL,&quot;&#xA;&quot;)"/>
+                        </details>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Validator_Main">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>652</pd:x>
+                <pd:y>345</pd:y>
+                <config>
+                    <processName>/Project Name Processes/Main Process/Validator_Main.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <ns1:INPUT_DATA>
+                        <ns1:ID>
+                            <xsl:value-of select="$detailList/Record/PRD_LVL_NUMBER"/>
+                        </ns1:ID>
+                        <ns1:TYPE>
+                            <xsl:value-of select="'ORDER'"/>
+                        </ns1:TYPE>
+                        <ns1:HI>
+                            <xsl:value-of select="''"/>
+                        </ns1:HI>
+                        <ns1:TI>
+                            <xsl:value-of select="''"/>
+                        </ns1:TI>
+                        <ns1:BREAKPACKFLAG>
+                            <xsl:value-of select="''"/>
+                        </ns1:BREAKPACKFLAG>
+                        <ns1:MANDATORYFLOWTHRUPRODUCT>
+                            <xsl:value-of select="''"/>
+                        </ns1:MANDATORYFLOWTHRUPRODUCT>
+                        <ns1:FLOWTYPE>
+                            <xsl:value-of select="''"/>
+                        </ns1:FLOWTYPE>
+                        <ns1:ORDERTYPE>
+                            <xsl:value-of select="''"/>
+                        </ns1:ORDERTYPE>
+                        <ns1:UPC>
+                            <xsl:value-of select="''"/>
+                        </ns1:UPC>
+                        <ns1:TRF_NUMBER>
+                            <xsl:value-of select="$pedidolist/Record/NUMPEDIDO"/>
+                        </ns1:TRF_NUMBER>
+                        <ns1:FACTOREMPAQUE>
+                            <xsl:value-of select="round($detailList/Record/FACTOREMPAQUE)"/>
+                        </ns1:FACTOREMPAQUE>
+                    </ns1:INPUT_DATA>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="Null-2">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>1144</pd:x>
+            <pd:y>113</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Null-3">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>1108</pd:x>
+            <pd:y>266</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="InitTotalLin">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>232</pd:x>
+        <pd:y>109</pd:y>
+        <config>
+            <variableName>Count</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <LinDetails>
+                    <xsl:value-of select="0"/>
+                </LinDetails>
+                <TotalLin9071>
+                    <xsl:value-of select="0"/>
+                </TotalLin9071>
+                <TotalLin9101>
+                    <xsl:value-of select="0"/>
+                </TotalLin9101>
+                <iteration>
+                    <xsl:value-of select="0"/>
+                </iteration>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="InitcountLin9071">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>235</pd:x>
+        <pd:y>194</pd:y>
+        <config>
+            <variableName>From_Loc9071</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <countLIN>
+                    <xsl:value-of select="0"/>
+                </countLIN>
+                <msg>
+                    <xsl:value-of select="''"/>
+                </msg>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="InitcountLin9101">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>235</pd:x>
+        <pd:y>288</pd:y>
+        <config>
+            <variableName>From_Loc9101</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <countLIN>
+                    <xsl:value-of select="0"/>
+                </countLIN>
+                <msg>
+                    <xsl:value-of select="''"/>
+                </msg>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>113</pd:x>
+        <pd:y>196</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="countHeaders">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>415</pd:x>
+        <pd:y>292</pd:y>
+        <config>
+            <variableName>CountHeader</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <headers>
+                    <xsl:value-of select="count($Get_Header/resultSet/Record)"/>
+                </headers>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Order_update">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1586</pd:x>
+        <pd:y>250</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/Order_update.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:for-each select="$Get_Header/resultSet/Record">
+                    <ITEM>
+                        <trf_number>
+                            <xsl:value-of select="tib:trim(NUMPEDIDO)"/>
+                        </trf_number>
+                        <AUDIT_NUMBER>
+                            <xsl:value-of select="tib:trim(AUDIT_NUMBER)"/>
+                        </AUDIT_NUMBER>
+                    </ITEM>
+                </xsl:for-each>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>413</pd:x>
+        <pd:y>511</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Order_update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InitTotalLin</pd:from>
+        <pd:to>Get_Header</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InitcountLin9101</pd:from>
+        <pd:to>Get_Header</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InitcountLin9071</pd:from>
+        <pd:to>Get_Header</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>InitTotalLin</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>InitcountLin9071</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>InitcountLin9101</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Header</pd:from>
+        <pd:to>countHeaders</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>countHeaders</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:xpathDescription>COUNT&gt;0</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$CountHeader/root/headers&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Order_update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>countHeaders</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

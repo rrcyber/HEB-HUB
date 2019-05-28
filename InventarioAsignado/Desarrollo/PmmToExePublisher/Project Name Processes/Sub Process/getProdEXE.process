@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <pd:name>Project Name Processes/Sub Process/getProdEXE.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="PROD_ID" type="xsd:string"/>
+                    <xsd:element name="UNIT_SHIP_CASE" type="xsd:string"/>
+                    <xsd:element name="FROM_LOC" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>132</pd:startX>
+    <pd:startY>194</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:for-each select="$JDBC-Query-1-1/resultSet/Record | $JDBC-Query/resultSet/Record | $JDBC-Query-1/resultSet/Record">
+                <ITEM>
+                    <PROD_ID>
+                        <xsl:value-of select="PROD_ID"/>
+                    </PROD_ID>
+                </ITEM>
+            </xsl:for-each>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="PROD_ID" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>837</pd:endX>
+    <pd:endY>198</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1376514946068</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>307</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>401</pd:width>
+        <pd:height>362</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC-Query-1-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Query-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Query-1</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>JDBC-Query-1</pd:to>
+            <pd:xpathDescription>Frescos</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/group/FROM_LOC=number($_globalVariables/ns:GlobalVariables/FROM_LOC/WH_PERISHABLES)</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>JDBC Query</pd:to>
+            <pd:xpathDescription>Secos</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/group/FROM_LOC=number($_globalVariables/ns:GlobalVariables/FROM_LOC/WH_DRY)</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Query-1-1</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:xpathDescription>COUNT&gt;0</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($JDBC-Query-1-1/resultSet/Record)&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Query-1-1</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Query-1-1</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Curved</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>539</pd:x>
+            <pd:y>130</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>618</pd:x>
+            <pd:y>133</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Query">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>618</pd:x>
+            <pd:y>60</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>select prod_id 
+  from iprdd where trim(prod_id)=?
+  and unit_ship_cse=?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC EXE WH_DRY.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>PROD_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UNIT_SHIP_CASE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PROD_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <PROD_ID>
+                        <xsl:value-of select="$Start/group/PROD_ID"/>
+                    </PROD_ID>
+                    <UNIT_SHIP_CASE>
+                        <xsl:value-of select="$Start/group/UNIT_SHIP_CASE"/>
+                    </UNIT_SHIP_CASE>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC-Query-1">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>481</pd:x>
+            <pd:y>235</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>select prod_id 
+  from iprdd where trim(prod_id)=?
+  and unit_ship_cse=?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-EXE-WH_FRESH.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>PROD_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UNIT_SHIP_CASE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PROD_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <PROD_ID>
+                        <xsl:value-of select="$Start/group/PROD_ID"/>
+                    </PROD_ID>
+                    <UNIT_SHIP_CASE>
+                        <xsl:value-of select="$Start/group/UNIT_SHIP_CASE"/>
+                    </UNIT_SHIP_CASE>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>485</pd:x>
+            <pd:y>61</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="JDBC-Query-1-1">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>377</pd:x>
+            <pd:y>97</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT  id as PROD_ID FROM exe_log
+WHERE id = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC EXE Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>PROD_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PROD_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <PROD_ID>
+                        <xsl:value-of select="concat(tib:trim($Start/group/PROD_ID), tib:trim($Start/group/UNIT_SHIP_CASE))"/>
+                    </PROD_ID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>380</pd:x>
+            <pd:y>309</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

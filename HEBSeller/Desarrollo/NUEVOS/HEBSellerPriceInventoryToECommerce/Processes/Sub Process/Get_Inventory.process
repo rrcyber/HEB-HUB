@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://xmlns.heb.com/ei/Inventory" xmlns:pfx="http://xmlns.heb.com/ei/PriceInventory" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Inventory" schemaLocation="/Shared Resources/Schema Definitions/Custom/ENTREPIDS_IF_STOCK.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO_PRICEINVENTORY.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory"/>
+    <pd:name>Processes/Sub Process/Get_Inventory.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:BitacoraPropuestaArticuloPriceInventory"/>
+    <pd:startX>136</pd:startX>
+    <pd:startY>95</pd:startY>
+    <pd:returnBindings>
+        <Propuestas>
+            <xsl:for-each select="$JDBC-PropuestaInventory/resultSet/Record">
+                <pfx2:entrepids_if_stock>
+                    <pfx2:product_sku>
+                        <xsl:value-of select="product_sku"/>
+                    </pfx2:product_sku>
+                    <pfx2:website>
+                        <xsl:value-of select="website"/>
+                    </pfx2:website>
+                    <pfx2:product_qty>
+                        <xsl:choose>
+                            <xsl:when test="exists(product_qty)">
+                                <xsl:value-of select="product_qty"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </pfx2:product_qty>
+                </pfx2:entrepids_if_stock>
+            </xsl:for-each>
+        </Propuestas>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Propuestas">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx2:entrepids_if_stock" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>550</pd:endX>
+    <pd:endY>96</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1518634750295</pd:targetNamespace>
+    <pd:activity name="StatusEnEnvio">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>278</pd:x>
+        <pd:y>95</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Set_EstatusPropuesta.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:copy-of select="$Start/pfx:BitacoraPropuestaArticuloPriceInventory"/>
+                <IdEstatus>
+                    <xsl:value-of select="10"/>
+                </IdEstatus>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC PropuestaInventory">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>414</pd:x>
+        <pd:y>96</pd:y>
+        <config>
+            <timeout>%%Connections/Database/dbHEB2B/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/dbHEB2B/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/dbHEB2B.sharedjdbc</jdbcSharedConfig>
+            <statement>select  distinct  RTRIM(a.sku) 'product_sku', 'HEB_' + S2.IdPMM 'website', d.Existencia 'product_qty'
+FROM PropuestaArticuloPriceInventoryDetail D 
+       JOIN PropuestaArticuloPriceInventory P ON D.IdPropuestaArticuloPriceInventory = P.Id
+       JOIN Articulo A on  P.IdArticulo = A.Id
+       JOIN Proveedor V on  P.IdProveedor = V.Id
+       join dbheb2b..Sucursal S2 on  D.IdSucursal= S2.Id or isnull(D.IdSucursal,0)=0
+       join dbheb2b..Formato  F1 on  D.IdFormato = F1.Id or isnull(D.IdSucursal,0)=0
+       join dbheb2b..Cluster  C1 on  D.IdCluster = C1.Id or isnull(D.IdSucursal,0)=0
+where D.Id = ?
+and  P.EsPriceInventory = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Id</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EsPriceInventory</parameterName>
+                    <dataType>BIT</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>product_sku</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>website</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>product_qty</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <Id>
+                    <xsl:copy-of select="$Start/pfx:BitacoraPropuestaArticuloPriceInventory/pfx:IdPropuestaDetalle/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:BitacoraPropuestaArticuloPriceInventory/pfx:IdPropuestaDetalle"/>
+                </Id>
+                <EsPriceInventory>
+                    <xsl:copy-of select="$Start/pfx:BitacoraPropuestaArticuloPriceInventory/pfx:EsPriceInventory/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:BitacoraPropuestaArticuloPriceInventory/pfx:EsPriceInventory"/>
+                </EsPriceInventory>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>StatusEnEnvio</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>StatusEnEnvio</pd:from>
+        <pd:to>JDBC PropuestaInventory</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC PropuestaInventory</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

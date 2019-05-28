@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <pd:name>Utility Services/Custom Functions/DateRangeValidator.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="PARAMETER_INPUT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="INITIAL_DATE" type="xsd:date"/>
+                    <xsd:element name="FINAL_DATE" type="xsd:date"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>216</pd:startX>
+    <pd:startY>129</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="tib:compare-date($Start/PARAMETER_INPUT/INITIAL_DATE, $Start/PARAMETER_INPUT/FINAL_DATE) = 1">
+                <PARAMETER_OUTPUT>
+                    <VALID>
+                        <xsl:value-of select="false()"/>
+                    </VALID>
+                    <CODE>
+                        <xsl:value-of select="$Get_Response_Message/MESSAGE/CODE"/>
+                    </CODE>
+                    <DESCRIPTION>
+                        <xsl:value-of select="$Get_Response_Message/MESSAGE/DESCRIPTION"/>
+                    </DESCRIPTION>
+                </PARAMETER_OUTPUT>
+            </xsl:when>
+            <xsl:when test="(tib:compare-date(tib:add-to-date(current-date(), 0, 0, -$_globalVariables/ns:GlobalVariables/MIG_DATE_RANGE), $Start/PARAMETER_INPUT/INITIAL_DATE) = 1) or(tib:compare-date(tib:add-to-date($Start/PARAMETER_INPUT/INITIAL_DATE, 0, 0, $_globalVariables/ns:GlobalVariables/MIG_DATE_RANGE), $Start/PARAMETER_INPUT/FINAL_DATE) = -1)">
+                <PARAMETER_OUTPUT>
+                    <VALID>
+                        <xsl:value-of select="false()"/>
+                    </VALID>
+                    <CODE>
+                        <xsl:value-of select="$Get_Response_Message-1/MESSAGE/CODE"/>
+                    </CODE>
+                    <DESCRIPTION>
+                        <xsl:value-of select="$Get_Response_Message-1/MESSAGE/DESCRIPTION"/>
+                    </DESCRIPTION>
+                </PARAMETER_OUTPUT>
+            </xsl:when>
+            <xsl:otherwise>
+                <PARAMETER_OUTPUT>
+                    <VALID>
+                        <xsl:value-of select="true()"/>
+                    </VALID>
+                </PARAMETER_OUTPUT>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="PARAMETER_OUTPUT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="VALID" type="xsd:boolean"/>
+                    <xsd:element name="CODE" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>602</pd:endX>
+    <pd:endY>129</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1304346990326</pd:targetNamespace>
+    <pd:activity name="Get_Response_Message">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>347</pd:x>
+        <pd:y>80</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Get_Response_Message.process</processName>
+        </config>
+        <pd:inputBindings>
+            <CODE>
+                <xsl:value-of select="&quot;ERR9001&quot;"/>
+            </CODE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_Response_Message-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>348</pd:x>
+        <pd:y>176</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Get_Response_Message.process</processName>
+        </config>
+        <pd:inputBindings>
+            <CODE>
+                <xsl:value-of select="&quot;ERR9002&quot;"/>
+            </CODE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Join">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>482</pd:x>
+        <pd:y>128</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_Response_Message</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_Response_Message-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Response_Message</pd:from>
+        <pd:to>Join</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Response_Message-1</pd:from>
+        <pd:to>Join</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Join</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

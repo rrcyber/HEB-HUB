@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://xmlns.heb.com/ei/SalidaSP" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/Supertarjeta" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx6="http://xmlns.heb.com/ei/Resultsets">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Supertarjeta" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaIn.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SalidaSP" schemaLocation="/Shared Resources/Schema Definitions/Custom/SalidaSP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SupertarjetaOut" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Resultsets" schemaLocation="/Shared Resources/Schema Definitions/Custom/Resultsets.xsd"/>
+    <pd:name>SupertarjetaService Processes/Sub Process/Send_Supertarjeta.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:SupertarjetaIn"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>127</pd:startY>
+    <pd:returnBindings>
+        <pfx4:SupertarjetaOut>
+            <xsl:for-each select="$Parse-XML/Resultsets/ResultSet1/Record1">
+                <pfx4:Resultset>
+                    <pfx4:Resultado>
+                        <xsl:value-of select="tib:trim(RESULTADO)"/>
+                    </pfx4:Resultado>
+                    <pfx4:MontoDisp>
+                        <xsl:value-of select="tib:trim(MONTO_DISP)"/>
+                    </pfx4:MontoDisp>
+                    <pfx4:AutorizacionId>
+                        <xsl:value-of select="tib:trim(AUTORIZACIONID)"/>
+                    </pfx4:AutorizacionId>
+                    <pfx4:Status>
+                        <xsl:value-of select="tib:trim(STATUS)"/>
+                    </pfx4:Status>
+                    <pfx4:MontoDispFormat>
+                        <xsl:value-of select="tib:trim(MONTO_DISPFORMAT)"/>
+                    </pfx4:MontoDispFormat>
+                </pfx4:Resultset>
+            </xsl:for-each>
+        </pfx4:SupertarjetaOut>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx4:SupertarjetaOut"/>
+    <pd:endX>446</pd:endX>
+    <pd:endY>124</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412351419698</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>174</pd:x>
+        <pd:y>267</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>320</pd:x>
+        <pd:y>270</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <pfx:MSG_Container>
+                        <pfx:Header>
+                            <pfx:ProjectName>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                            </pfx:ProjectName>
+                            <pfx:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx:Source_Domain>
+                            <pfx:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx:Destination_Domain>
+                            <pfx:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/TransactionType"/>
+                            </pfx:Transaction_Type>
+                            <pfx:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx:TimeStamp>
+                        </pfx:Header>
+                        <pfx:Body>
+                            <pfx:ErrorManagementSchema>
+                                <pfx:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </pfx:inrtn_id>
+                                <pfx:inrtn_instn_nm>
+                                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                                </pfx:inrtn_instn_nm>
+                                <pfx:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                                </pfx:inrtn_err_rtn_desc>
+                                <pfx:inrtn_msg_body>
+                                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                                </pfx:inrtn_msg_body>
+                                <pfx:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </pfx:cre8_ts>
+                                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                                    <pfx:u_code>
+                                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                                    </pfx:u_code>
+                                </xsl:if>
+                                <pfx:sev_id>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                                </pfx:sev_id>
+                            </pfx:ErrorManagementSchema>
+                        </pfx:Body>
+                    </pfx:MSG_Container>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>163</pd:x>
+        <pd:y>134</pd:y>
+        <config>
+            <timeout>%%Connections/Database/HEBCARD/GLB_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/HEBCARD/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBCARD.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>HEBCARD</catalog>
+            <ProcedureName>spProcesaSuperTarjeta;1</ProcedureName>
+            <useSchema>false</useSchema>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TARJETAID</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>char</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@MONTOSOLICITADO</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>char</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@EFFDT</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TIPOMOV</colName>
+                    <colType>1</colType>
+                    <dataType>5</dataType>
+                    <typeName>smallint</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@USUARIOID</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@SUCURSAL</colName>
+                    <colType>1</colType>
+                    <dataType>5</dataType>
+                    <typeName>smallint</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TIPOMOVORIG</colName>
+                    <colType>1</colType>
+                    <dataType>5</dataType>
+                    <typeName>smallint</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TipoSaldo</colName>
+                    <colType>1</colType>
+                    <dataType>5</dataType>
+                    <typeName>smallint</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TransaccionID</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <TARJETAID>
+                        <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:TarjetaId"/>
+                    </TARJETAID>
+                    <MONTOSOLICITADO>
+                        <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:MontoSolicitado"/>
+                    </MONTOSOLICITADO>
+                    <EFFDT>
+                        <xsl:value-of select="tib:create-dateTime(substring($Start/pfx2:SupertarjetaIn/pfx2:EFFDT, 1, 4), substring($Start/pfx2:SupertarjetaIn/pfx2:EFFDT, 6, 2), substring($Start/pfx2:SupertarjetaIn/pfx2:EFFDT, 9, 2), substring($Start/pfx2:SupertarjetaIn/pfx2:EFFDT, 12, 2), substring($Start/pfx2:SupertarjetaIn/pfx2:EFFDT, 15, 2), substring($Start/pfx2:SupertarjetaIn/pfx2:EFFDT, 18, 2), substring($Start/pfx2:SupertarjetaIn/pfx2:EFFDT, 21, 3))"/>
+                    </EFFDT>
+                    <TIPOMOV>
+                        <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:TipoMov"/>
+                    </TIPOMOV>
+                    <USUARIOID>
+                        <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:UsuarioId"/>
+                    </USUARIOID>
+                    <SUCURSAL>
+                        <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:Sucursal"/>
+                    </SUCURSAL>
+                    <xsl:choose>
+                        <xsl:when test="$Start/pfx2:SupertarjetaIn/pfx2:TipoMovOrig !=''">
+                            <TIPOMOVORIG>
+                                <xsl:copy-of select="$Start/pfx2:SupertarjetaIn/pfx2:TipoMovOrig/@xsi:nil"/>
+                                <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:TipoMovOrig"/>
+                            </TIPOMOVORIG>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <TIPOMOVORIG xsi:nil="true"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="$Start/pfx2:SupertarjetaIn/pfx2:TipoSaldo !=''">
+                            <TipoSaldo>
+                                <xsl:copy-of select="$Start/pfx2:SupertarjetaIn/pfx2:TipoSaldo/@xsi:nil"/>
+                                <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:TipoSaldo"/>
+                            </TipoSaldo>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <TipoSaldo xsi:nil="true"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <TransaccionID>
+                        <xsl:copy-of select="$Start/pfx2:SupertarjetaIn/pfx2:PedidoID/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx2:SupertarjetaIn/pfx2:PedidoID"/>
+                    </TransaccionID>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>311</pd:x>
+        <pd:y>125</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term>
+                <xsd:element name="Resultsets">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="ResultSet1">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="Record1">
+                                            <xsd:complexType>
+                                                <xsd:sequence>
+                                                    <xsd:element name="RESULTADO" type="xsd:short"/>
+                                                    <xsd:element name="MONTO_DISP" type="xsd:int"/>
+                                                    <xsd:element name="AUTORIZACIONID" type="xsd:string"/>
+                                                    <xsd:element name="STATUS" type="xsd:string"/>
+                                                    <xsd:element name="MONTO_DISPFORMAT" type="xsd:decimal"/>
+                                                </xsd:sequence>
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JDBC-Call-Procedure/resultSet/UnresolvedResultsets"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

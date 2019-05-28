@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:pfx2="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Send_PromoAhorro.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>147</pd:startX>
+    <pd:startY>273</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <last_completed_promo>
+                <xsl:value-of select="max($JDBC-Query/resultSet/Record/completed_promo)"/>
+            </last_completed_promo>
+            <xsl:choose>
+                <xsl:when test="count($JDBC-Query/resultSet/Record)>0">
+                    <xsl:if test="not(($JDBC-Call-Procedure/resultSet/outputSet/Run_ID=(&quot;true&quot;)) or ($JDBC-Call-Procedure/resultSet/outputSet/Run_ID=(&quot;1&quot;)))">
+                        <run_id>
+                            <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/Run_ID"/>
+                        </run_id>
+                    </xsl:if>
+                </xsl:when>
+            </xsl:choose>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="last_completed_promo" type="xsd:string"/>
+                    <xsd:element name="run_id" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1024</pd:endX>
+    <pd:endY>271</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1416415755626</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>244</pd:x>
+        <pd:y>115</pd:y>
+        <pd:width>693</pd:width>
+        <pd:height>298</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Insert-Magento-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>JDBC Call Procedure</pd:to>
+            <pd:xpathDescription>records</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($JDBC-Query/resultSet/Record)&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Call Procedure</pd:from>
+            <pd:to>Group (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (1)</pd:from>
+            <pd:to>JDBC-Insert-Magento-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Group (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>518</pd:x>
+            <pd:y>147</pd:y>
+            <pd:width>265</pd:width>
+            <pd:height>201</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-Query/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>promo</pd:iterationElementSlot>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert Magento</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Magento</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null-1</pd:from>
+                <pd:to>end</pd:to>
+                <pd:xpathDescription>Duplicate Key</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$_error_JDBC-Insert-Magento/ActivityErrors/pfx4:JDBCSQLException/sqlState = 23000</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Magento</pd:from>
+                <pd:to>Null-1</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-52429</pd:lineColor>
+                <pd:conditionType>error</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null-1</pd:from>
+                <pd:to>Generate Error</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert Magento">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>646</pd:x>
+                <pd:y>211</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/MAGENTO/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_MAGENTO.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO entrepids_if_promo_save (promo_id, segment_id, promo_name, source_promo_id, start_date, end_date, buy_amt, max_dsc_amt, discount_pct, banner_url, start_hour, end_hour, priority, group_id, chargebackDept, promo_type, if_run_id, discount_amt)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>promo_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>customer_group_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>promo_name</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>source_promo_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>start_date</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>end_date</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>buy_amt</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>max_dsc_amt</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>discount_pct</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>banner_url</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>start_hour</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>end_hour</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>prioridad</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>group_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>chargebackDept</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>promo_type</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>if_run_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>discount_amt</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <promo_id>
+                            <xsl:value-of select="$promo/Record/promo_id"/>
+                        </promo_id>
+                        <customer_group_id>
+                            <xsl:value-of select="$promo/Record/customer_group_id"/>
+                        </customer_group_id>
+                        <promo_name>
+                            <xsl:copy-of select="$promo/Record/promo_name/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/promo_name"/>
+                        </promo_name>
+                        <source_promo_id>
+                            <xsl:copy-of select="$promo/Record/source_promo_id/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/source_promo_id"/>
+                        </source_promo_id>
+                        <start_date>
+                            <xsl:copy-of select="$promo/Record/start_date/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/start_date"/>
+                        </start_date>
+                        <end_date>
+                            <xsl:copy-of select="$promo/Record/end_date/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/end_date"/>
+                        </end_date>
+                        <buy_amt>
+                            <xsl:copy-of select="$promo/Record/buy_amt/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/buy_amt"/>
+                        </buy_amt>
+                        <max_dsc_amt>
+                            <xsl:copy-of select="$promo/Record/max_dsc_amt/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/max_dsc_amt"/>
+                        </max_dsc_amt>
+                        <discount_pct>
+                            <xsl:copy-of select="$promo/Record/discount_pct/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/discount_pct"/>
+                        </discount_pct>
+                        <banner_url>
+                            <xsl:copy-of select="$promo/Record/banner_url/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/banner_url"/>
+                        </banner_url>
+                        <start_hour>
+                            <xsl:copy-of select="$promo/Record/start_hour/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/start_hour"/>
+                        </start_hour>
+                        <end_hour>
+                            <xsl:copy-of select="$promo/Record/end_hour/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/end_hour"/>
+                        </end_hour>
+                        <prioridad>
+                            <xsl:copy-of select="$promo/Record/Priority/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/Priority"/>
+                        </prioridad>
+                        <group_id>
+                            <xsl:copy-of select="$promo/Record/group_id/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/group_id"/>
+                        </group_id>
+                        <chargebackDept>
+                            <xsl:copy-of select="$promo/Record/chargebackDept/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/chargebackDept"/>
+                        </chargebackDept>
+                        <promo_type>
+                            <xsl:copy-of select="$promo/Record/promo_type/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/promo_type"/>
+                        </promo_type>
+                        <if_run_id xsi:nil="true"/>
+                        <discount_amt>
+                            <xsl:copy-of select="$promo/Record/discount_amt/@xsi:nil"/>
+                            <xsl:value-of select="$promo/Record/discount_amt"/>
+                        </discount_amt>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Null-1">
+                <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                <pd:resourceType>ae.activities.null</pd:resourceType>
+                <pd:x>551</pd:x>
+                <pd:y>293</pd:y>
+                <config/>
+                <pd:inputBindings/>
+            </pd:activity>
+            <pd:activity name="Generate Error">
+                <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+                <pd:resourceType>ae.activities.throw</pd:resourceType>
+                <pd:x>726</pd:x>
+                <pd:y>293</pd:y>
+                <config>
+                    <faultName/>
+                </config>
+                <pd:inputBindings>
+                    <ns12:ActivityInput>
+                        <message>
+                            <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                        </message>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <messageCode>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </messageCode>
+                        </xsl:if>
+                    </ns12:ActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC Query">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>337</pd:x>
+            <pd:y>263</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT promo_id
+      ,customer_group_id
+      ,promo_name
+      ,source_promo_id
+      ,start_date
+      ,end_date
+      ,buy_amt
+      ,max_dsc_amt
+      ,discount_pct
+      ,banner_url
+      ,start_hour
+      ,end_hour
+      ,Priority
+      ,group_id
+      ,completed_promo
+      ,chargebackDept
+      ,promo_type
+      ,discount_amt
+FROM mag_import_promo_Save
+WHERE control_date IS NULL
+AND completed_promo IS NOT NULL</statement>
+                <optionalOrNillable>true</optionalOrNillable>
+                <Prepared_Param_DataType/>
+                <wizardData/>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>promo_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>customer_group_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>promo_name</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>source_promo_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>start_date</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>end_date</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>buy_amt</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>max_dsc_amt</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>discount_pct</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>banner_url</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>start_hour</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>end_hour</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>Priority</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>group_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>completed_promo</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>chargebackDept</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>promo_type</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>discount_amt</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Call Procedure">
+            <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+            <pd:x>460</pd:x>
+            <pd:y>272</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <schema>dbo</schema>
+                <catalog>DBSTAGE</catalog>
+                <ProcedureName>usp_GetNew_run_id;1</ProcedureName>
+                <commit>true</commit>
+                <parameterTypes>
+                    <parameter>
+                        <colName>@RETURN_VALUE</colName>
+                        <colType>5</colType>
+                        <dataType>4</dataType>
+                        <typeName>int</typeName>
+                    </parameter>
+                    <parameter>
+                        <colName>@Run_ID</colName>
+                        <colType>2</colType>
+                        <dataType>12</dataType>
+                        <typeName>varchar</typeName>
+                    </parameter>
+                </parameterTypes>
+            </config>
+            <pd:inputBindings>
+                <inputs>
+                    <inputSet>
+                        <Run_ID>
+                            <xsl:value-of select="''"/>
+                        </Run_ID>
+                    </inputSet>
+                </inputs>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>397</pd:x>
+            <pd:y>359</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="JDBC-Insert-Magento-1">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>841</pd:x>
+            <pd:y>259</pd:y>
+            <config>
+                <timeout>%%Connections/Database/MAGENTO/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_MAGENTO.sharedjdbc</jdbcSharedConfig>
+                <statement>UPDATE entrepids_if_flex_sku_invalid SET if_run_id = ?
+WHERE promo_type = 'PRAHORRO'</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>if_run_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <if_run_id>
+                        <xsl:copy-of select="$JDBC-Call-Procedure/resultSet/outputSet/RETURN_VALUE/@xsi:nil"/>
+                        <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/RETURN_VALUE"/>
+                    </if_run_id>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

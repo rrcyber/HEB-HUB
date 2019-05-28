@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx12="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Pedido.xsd" xmlns:pfx11="http://xmlns.heb.com/ei/Pedido" xmlns:pfx10="http://xmlns.heb.com/ei/PedidoResponse" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://xmlns.heb.com/ei/SalidaSP" xmlns:pfx4="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/Supertarjeta" xmlns:pfx9="http://xmlns.heb.com/ei/PedidoRequest" xmlns:pfx8="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam" xmlns:pfx7="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx6="http://xmlns.heb.com/ei/Resultsets">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Supertarjeta" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaIn.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SalidaSP" schemaLocation="/Shared Resources/Schema Definitions/Custom/SalidaSP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SupertarjetaOut" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Resultsets" schemaLocation="/Shared Resources/Schema Definitions/Custom/Resultsets.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoRequest" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoRequest.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoResponse" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoResponse.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Pedido" schemaLocation="/Shared Resources/Schema Definitions/Custom/Pedido.xsd"/>
+    <pd:name>MagentoToPedidos_Service Processes/Sub Process/Send_Detail.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx11:Pedido"/>
+    <pd:startX>113</pd:startX>
+    <pd:startY>180</pd:startY>
+    <pd:returnBindings>
+        <pfx10:PedidoResponse>
+            <pfx10:Codigo>
+                <xsl:value-of select="'001'"/>
+            </pfx10:Codigo>
+            <pfx10:Descripcion>
+                <xsl:value-of select="'Exito'"/>
+            </pfx10:Descripcion>
+        </pfx10:PedidoResponse>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>862</pd:endX>
+    <pd:endY>185</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412351419698</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>745</pd:x>
+        <pd:y>372</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1020</pd:x>
+        <pd:y>372</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Detalle">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>227</pd:x>
+        <pd:y>8</pd:y>
+        <pd:width>547</pd:width>
+        <pd:height>327</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx11:Pedido/pfx11:Detalle</pd:over>
+            <pd:iterationElementSlot>detalle</pd:iterationElementSlot>
+            <pd:indexSlot>j</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Insert Detail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>promos</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Insert Detail</pd:from>
+            <pd:to>promos</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Insert Detail">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>320</pd:x>
+            <pd:y>180</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO eCom_PedidoProducto (IdItem,Pedido_ID, SKU, Nombre, UPC, Cant_ordenada, UM_ordenada, Cant_calculada, UM_producto, Precio_unitario, Monto_original, Cant_Entrega, Monto_Entrega, TipoProducto_ID, Estatus_Id, Ticket, FechaTicket,   GiftCard, FechaModificacion)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>IdItem</parameterName>
+                        <dataType>NUMERIC</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Pedido_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SKU</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Nombre</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UPC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Cant_ordenada</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UM_ordenada</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Cant_calculada</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>UM_producto</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Precio_Unitario</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Monto_original</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Cant_Entregada</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Monto_Entregada</parameterName>
+                        <dataType>DECIMAL</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TipoProducto_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Estatus_producto</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Ticket</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FechaTicket</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>GiftCard</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FechaModificacion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:choose>
+                        <xsl:when test="$detalle/pfx11:Detalle/pfx11:IdItem!='null'">
+                            <IdItem>
+                                <xsl:choose>
+                                    <xsl:when test="exists($detalle/pfx11:Detalle/pfx11:IdItem)">
+                                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:IdItem"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </IdItem>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <IdItem xsi:nil="true"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <Pedido_id>
+                        <xsl:value-of select="$Start/pfx11:Pedido/pfx11:Encabezado/pfx11:IdPedido"/>
+                    </Pedido_id>
+                    <SKU>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:Sku"/>
+                    </SKU>
+                    <Nombre>
+                        <xsl:value-of select="if(contains($detalle/pfx11:Detalle/pfx11:NombreProducto,'|'))&#xA;then&#xA;translate($detalle/pfx11:Detalle/pfx11:NombreProducto,'|','&amp;')&#xA;else&#xA;$detalle/pfx11:Detalle/pfx11:NombreProducto"/>
+                    </Nombre>
+                    <UPC>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:Upc"/>
+                    </UPC>
+                    <Cant_ordenada>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:CantidadOrdenada"/>
+                    </Cant_ordenada>
+                    <UM_ordenada>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:UnidadMedidaOrdenado"/>
+                    </UM_ordenada>
+                    <Cant_calculada>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:CantidadCalculada"/>
+                    </Cant_calculada>
+                    <UM_producto>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:UnidadMedidaProducto"/>
+                    </UM_producto>
+                    <Precio_Unitario>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:PrecioUnitario"/>
+                    </Precio_Unitario>
+                    <Monto_original>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:MontoTotalOriginal"/>
+                    </Monto_original>
+                    <Cant_Entregada>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:CantidadEntregada"/>
+                    </Cant_Entregada>
+                    <xsl:choose>
+                        <xsl:when test="$detalle/pfx11:Detalle/pfx11:MontoTotalEntrega!='null'">
+                            <Monto_Entregada>
+                                <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:MontoTotalEntrega"/>
+                            </Monto_Entregada>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <Monto_Entregada xsi:nil="true"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <TipoProducto_ID>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:TipoProducto"/>
+                    </TipoProducto_ID>
+                    <Estatus_producto>
+                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:Estatus"/>
+                    </Estatus_producto>
+                    <xsl:choose>
+                        <xsl:when test="$detalle/pfx11:Detalle/pfx11:Ticket!='null'">
+                            <Ticket>
+                                <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:Ticket"/>
+                            </Ticket>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <Ticket xsi:nil="true"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="$detalle/pfx11:Detalle/pfx11:FechaTicket!='null'">
+                            <FechaTicket>
+                                <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:FechaTicket"/>
+                            </FechaTicket>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <FechaTicket xsi:nil="true"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="$detalle/pfx11:Detalle/pfx11:GiftCard!='null'">
+                            <GiftCard>
+                                <xsl:choose>
+                                    <xsl:when test="exists($detalle/pfx11:Detalle/pfx11:GiftCard)">
+                                        <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:GiftCard"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </GiftCard>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <GiftCard xsi:nil="true"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <FechaModificacion>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </FechaModificacion>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="promos">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>409</pd:x>
+            <pd:y>95</pd:y>
+            <pd:width>226</pd:width>
+            <pd:height>155</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$detalle/pfx11:Detalle/pfx11:Promociones</pd:over>
+                <pd:iterationElementSlot>promo</pd:iterationElementSlot>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert Promo</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Promo</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert Promo">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>528</pd:x>
+                <pd:y>181</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO eCom_PedidoPromocion (IdItem,Pedido_ID, Promo_id, SKU, Monto_desc, Chargeback_depto, FechaModificacion)
+VALUES (?, ?, ?, ?, ?, ?,?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>IdItem</parameterName>
+                            <dataType>NUMERIC</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Pedido_ID</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Promo_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>SKU</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Monto_desc</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Chargeback_depto</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>FechaModificacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <xsl:choose>
+                            <xsl:when test="$detalle/pfx11:Detalle/pfx11:IdItem !=0">
+                                <IdItem>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($detalle/pfx11:Detalle/pfx11:IdItem)">
+                                            <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:IdItem"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </IdItem>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <IdItem xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <Pedido_ID>
+                            <xsl:value-of select="$Start/pfx11:Pedido/pfx11:Encabezado/pfx11:IdPedido"/>
+                        </Pedido_ID>
+                        <Promo_id>
+                            <xsl:value-of select="$promo/pfx11:Promociones/pfx11:IdPromo"/>
+                        </Promo_id>
+                        <SKU>
+                            <xsl:value-of select="$detalle/pfx11:Detalle/pfx11:Sku"/>
+                        </SKU>
+                        <Monto_desc>
+                            <xsl:value-of select="$promo/pfx11:Promociones/pfx11:MontoDescuento"/>
+                        </Monto_desc>
+                        <Chargeback_depto>
+                            <xsl:value-of select="$promo/pfx11:Promociones/pfx11:Chargeback_Department"/>
+                        </Chargeback_depto>
+                        <FechaModificacion>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </FechaModificacion>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>893</pd:x>
+        <pd:y>373</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <Code>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </Code>
+                </xsl:if>
+                <Message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>879</pd:x>
+        <pd:y>465</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Fault-12">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>390</pd:x>
+        <pd:y>409</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <pfx:Code>
+                            <xsl:value-of select="'Fault 12'"/>
+                        </pfx:Code>
+                        <pfx:Reason>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/Mensajes/Fault_12"/>
+                        </pfx:Reason>
+                    </pfx:Fault>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault-11">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>589</pd:x>
+        <pd:y>412</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <pfx:Code>
+                            <xsl:value-of select="'Fault 11'"/>
+                        </pfx:Code>
+                        <pfx:Reason>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/Mensajes/Fault_13"/>
+                        </pfx:Reason>
+                    </pfx:Fault>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Detalle</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Detalle</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "Fault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Detalle</pd:from>
+        <pd:to>Fault-12</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Detalle</pd:from>
+        <pd:to>Fault-11</pd:to>
+        <pd:xpathDescription>No Insert</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JDBC-Insert-Promo/jdbcUpdateActivityOutput/noOfUpdates=0</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

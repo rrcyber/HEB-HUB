@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:pfx="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx2="http://xmlns.heb.com.mx/1369930841350" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns2="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:ns3="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions">
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Sub Process/Insert_PSPUNCHSOFFLINE.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="AssociateId" type="xsd:string"/>
+                    <xsd:element name="StoreId" type="xsd:string"/>
+                    <xsd:element name="DeviceId" type="xsd:string"/>
+                    <xsd:element name="PunchDateTime" type="xsd:string"/>
+                    <xsd:element name="Estatus" type="xsd:string"/>
+                    <xsd:element name="Huella" type="xsd:string"/>
+                    <xsd:element name="AssociateIdRequest" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>104</pd:startX>
+    <pd:startY>165</pd:startY>
+    <pd:returnBindings>
+        <IsPunchInserted>
+            <xsl:value-of select="if($InsertPS_PUNCHS214/resultSet/outputSet/PS_PUNCHSID>0 and&#xA;$Insert_-PS_PUNCHS65/jdbcUpdateActivityOutput/noOfUpdates>0 )&#xA;then 1 &#xA;else if ($Insert_-PS_PUNCHS65/jdbcUpdateActivityOutput/noOfUpdates>0)&#xA;then 0&#xA;else -1"/>
+        </IsPunchInserted>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="IsPunchInserted" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>565</pd:endX>
+    <pd:endY>159</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx2:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371739971286</pd:targetNamespace>
+    <pd:activity name="InsertPS_PUNCHS214">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>317</pd:x>
+        <pd:y>165</pd:y>
+        <config>
+            <timeout>%%Connections/Database/Kronos214/QueryTimeOut%%</timeout>
+            <maxRows>%%Connections/Database/Kronos214/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos214.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>wfcdb</catalog>
+            <ProcedureName>WKFK_InsertPS_PUNCHS;1</ProcedureName>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@PS_PUNCHSID</colName>
+                    <colType>2</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@TS</colName>
+                    <colType>2</colType>
+                    <dataType>93</dataType>
+                    <typeName>smalldatetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@NUMERO</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>nvarchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@ZONAHORARIO</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>nvarchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@SITIO</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>nvarchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LECTOR</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>nvarchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@ESTATUS</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>nvarchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FECHAHORA</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>smalldatetime</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <PS_PUNCHSID>
+                        <xsl:value-of select="0"/>
+                    </PS_PUNCHSID>
+                    <TS>
+                        <xsl:value-of select="current-dateTime()"/>
+                    </TS>
+                    <NUMERO>
+                        <xsl:value-of select="$Start/root/AssociateId"/>
+                    </NUMERO>
+                    <ZONAHORARIO>
+                        <xsl:value-of select="'13008'"/>
+                    </ZONAHORARIO>
+                    <SITIO>
+                        <xsl:value-of select="$Start/root/StoreId"/>
+                    </SITIO>
+                    <LECTOR>
+                        <xsl:value-of select="$Start/root/DeviceId"/>
+                    </LECTOR>
+                    <ESTATUS>
+                        <xsl:value-of select="$Start/root/Estatus"/>
+                    </ESTATUS>
+                    <FECHAHORA>
+                        <xsl:value-of select="tib:parse-dateTime('yyyy-MM-dd HH:mm:ss', $Start/root/PunchDateTime)"/>
+                    </FECHAHORA>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Insert_ PS_PUNCHS65">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>317</pd:x>
+        <pd:y>316</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>insert into PS_PUNCHS(PS_PUNCHSID,NUMERO,FECHAYHORA,ZONAHORARIO,SITIO,LECTOR,ESTATUS,TIMESTAMPS,HUELLA)
+values                                (?,?,?,?,?,?,?,getdate(),?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PUNCHSID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>NUMERO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>FECHAHORA</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ZONAHORARIO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SITIO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>LECTOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ESTATUS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>HUELLA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <PUNCHSID>
+                    <xsl:value-of select="if($Start/root/AssociateId =0)&#xA;then '-1'&#xA;else  $InsertPS_PUNCHS214/resultSet/outputSet/PS_PUNCHSID"/>
+                </PUNCHSID>
+                <NUMERO>
+                    <xsl:value-of select="if($Start/root/AssociateId = '0' ) &#xA;then $Start/root/AssociateIdRequest&#xA;else $Start/root/AssociateId"/>
+                </NUMERO>
+                <FECHAHORA>
+                    <xsl:value-of select="tib:parse-dateTime('yyyy-MM-dd HH:mm:ss', $Start/root/PunchDateTime)"/>
+                </FECHAHORA>
+                <ZONAHORARIO>
+                    <xsl:value-of select="'13008'"/>
+                </ZONAHORARIO>
+                <SITIO>
+                    <xsl:value-of select="$Start/root/StoreId"/>
+                </SITIO>
+                <LECTOR>
+                    <xsl:value-of select="$Start/root/DeviceId"/>
+                </LECTOR>
+                <ESTATUS>
+                    <xsl:value-of select="if($Start/root/AssociateId=0)&#xA;then '99'&#xA;else $Start/root/Estatus"/>
+                </ESTATUS>
+                <HUELLA>
+                    <xsl:value-of select="if ($Start/root/AssociateId =0)&#xA;then $Start/root/Huella&#xA;else  ''"/>
+                </HUELLA>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 28">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>320</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx:ActivityInput>
+                <data>
+                    <pfx2:Fault>
+                        <Fault>
+                            <ns2:ProviderSOAPFault>
+                                <ns2:FaultCode>
+                                    <xsl:value-of select="28"/>
+                                </ns2:FaultCode>
+                                <ns2:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/Mensajes/Fault_28"/>
+                                </ns2:FaultString>
+                                <ns2:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns2:FaultActor>
+                                <ns2:ProviderSOAPErrorMsg>
+                                    <ns2:Message>
+                                        <xsl:value-of select="&quot;Error al insertar datos en BD de Webclock&quot;"/>
+                                    </ns2:Message>
+                                    <ns2:MessageId>
+                                        <xsl:value-of select="$Start/root/StoreId"/>
+                                    </ns2:MessageId>
+                                    <ns2:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;SocioId: &quot;,$Start/root/AssociateId,&quot;SucursalId: &quot;,$Start/root/StoreId)"/>
+                                    </ns2:ErrorCode>
+                                </ns2:ProviderSOAPErrorMsg>
+                            </ns2:ProviderSOAPFault>
+                        </Fault>
+                    </pfx2:Fault>
+                </data>
+            </pfx:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>509</pd:x>
+        <pd:y>225</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx:ActivityInput>
+                <data>
+                    <pfx2:Fault>
+                        <Fault>
+                            <ns2:ProviderSOAPFault>
+                                <ns2:FaultCode>
+                                    <xsl:value-of select="10"/>
+                                </ns2:FaultCode>
+                                <ns2:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/Mensajes/Fault_10"/>
+                                </ns2:FaultString>
+                                <ns2:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns2:FaultActor>
+                                <ns2:ProviderSOAPErrorMsg>
+                                    <ns2:Message>
+                                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                    </ns2:Message>
+                                    <ns2:MessageId>
+                                        <xsl:value-of select="$Start/root/StoreId"/>
+                                    </ns2:MessageId>
+                                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                        <ns2:ErrorCode>
+                                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                        </ns2:ErrorCode>
+                                    </xsl:if>
+                                </ns2:ProviderSOAPErrorMsg>
+                            </ns2:ProviderSOAPFault>
+                        </Fault>
+                    </pfx2:Fault>
+                </data>
+            </pfx:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 31">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>316</pd:x>
+        <pd:y>449</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx:ActivityInput>
+                <data>
+                    <pfx2:Fault>
+                        <Fault>
+                            <ns2:ProviderSOAPFault>
+                                <ns2:FaultCode>
+                                    <xsl:value-of select="31"/>
+                                </ns2:FaultCode>
+                                <ns2:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/Mensajes/Fault_31"/>
+                                </ns2:FaultString>
+                                <ns2:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns2:FaultActor>
+                                <ns2:ProviderSOAPErrorMsg>
+                                    <ns2:Message>
+                                        <xsl:value-of select="&quot;Error al insertar datos en BD de Webclock&quot;"/>
+                                    </ns2:Message>
+                                    <ns2:MessageId>
+                                        <xsl:value-of select="$Start/root/StoreId"/>
+                                    </ns2:MessageId>
+                                    <ns2:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;SocioId: &quot;,$Start/root/AssociateId,&quot;SucursalId: &quot;,$Start/root/StoreId)"/>
+                                    </ns2:ErrorCode>
+                                </ns2:ProviderSOAPErrorMsg>
+                            </ns2:ProviderSOAPFault>
+                        </Fault>
+                    </pfx2:Fault>
+                </data>
+            </pfx:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>InsertPS_PUNCHS214</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/root/AssociateId !=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Insert_ PS_PUNCHS65</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InsertPS_PUNCHS214</pd:from>
+        <pd:to>Insert_ PS_PUNCHS65</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_ PS_PUNCHS65</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InsertPS_PUNCHS214</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InsertPS_PUNCHS214</pd:from>
+        <pd:to>Fault 28</pd:to>
+        <pd:xpathDescription>No Insert</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$InsertPS_PUNCHS214/resultSet/outputSet/PS_PUNCHSID=-1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_ PS_PUNCHS65</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_ PS_PUNCHS65</pd:from>
+        <pd:to>Fault 31</pd:to>
+        <pd:xpathDescription>No insert</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Insert_-PS_PUNCHS65/jdbcUpdateActivityOutput/noOfUpdates=0</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,867 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com.mx/1369930841350" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://xmlns.heb.com/ei/WebClock4Kronos/ProcessPartnerTransfer_Reply" xmlns:ns1="http://xmlns.heb.com/ei/WebClock4Kronos/ProcessPartnerTransfer_Request" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns3="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:pfx2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns32="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:pfx3="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Main Process/ProcessPartnerTransfer.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="pfx:ProcessPartnerTransfer_Request"/>
+    <pd:startX>28</pd:startX>
+    <pd:startY>157</pd:startY>
+    <pd:returnBindings>
+        <pfx:ProcessPartnerTransfer_Reply>
+            <Reply>
+                <ns:ProcessPartnerTransfer_Reply>
+                    <ns:IsRecordSuccessful>
+                        <xsl:value-of select="if($JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates>0)&#xA;then &quot;true&quot;&#xA;else &quot;false&quot;"/>
+                    </ns:IsRecordSuccessful>
+                    <ns:Message>
+                        <xsl:value-of select="if($JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates>0)&#xA;then $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_33&#xA;else $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_34"/>
+                    </ns:Message>
+                </ns:ProcessPartnerTransfer_Reply>
+            </Reply>
+        </pfx:ProcessPartnerTransfer_Reply>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="pfx:ProcessPartnerTransfer_Reply"/>
+    <pd:endX>785</pd:endX>
+    <pd:endY>160</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1370021438138</pd:targetNamespace>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>606</pd:x>
+        <pd:y>158</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>update socios
+set
+SOCIO_FECHAEFECTIVA=?,
+SOCIO_USUARIOMOD=?,
+SOCIO_FECHAMOD=GetDate(),
+SOCIO_SUCURSALID =?,
+SOCIO_SEGUNDASUC = ?,
+SOCIO_SEGUNDODEP = ?
+where socio_id = ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SOCIO_FECHAEFECTIVA</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SOCIO_USUARIOMOD</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SUCURSALID</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SOCIO_SEGUNDASUC</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SOCIO_SEGUNDODEP</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>socio_id</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <SOCIO_FECHAEFECTIVA>
+                    <xsl:value-of select="concat($Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:FECHA_INICIAL,'T',$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:HORA_INICIAL)"/>
+                </SOCIO_FECHAEFECTIVA>
+                <SOCIO_USUARIOMOD>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:ManagerId"/>
+                </SOCIO_USUARIOMOD>
+                <SUCURSALID>
+                    <xsl:choose>
+                        <xsl:when test="exists(if (count($Valida-SOCIOS_TRANSFERIDOS/resultSet/Record)>0)&#xA;then $Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetStoreId&#xA;else $Socios/resultSet/Record[1]/SOCIO_SUCURSALID)">
+                            <xsl:value-of select="if (count($Valida-SOCIOS_TRANSFERIDOS/resultSet/Record)>0)&#xA;then $Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetStoreId&#xA;else $Socios/resultSet/Record[1]/SOCIO_SUCURSALID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </SUCURSALID>
+                <SOCIO_SEGUNDASUC>
+                    <xsl:value-of select="if($Valida-SOCIOS_TRANSFERIDOS/resultSet/Record/ESTATUS=0)&#xA;then $Socios/resultSet/Record[1]/SOCIO_SEGUNDASUC&#xA;else $Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetStoreId"/>
+                </SOCIO_SEGUNDASUC>
+                <SOCIO_SEGUNDODEP>
+                    <xsl:value-of select="if($Valida-SOCIOS_TRANSFERIDOS/resultSet/Record/ESTATUS=0)&#xA;then $Socios/resultSet/Record[1]/SOCIO_SEGUNDODEP&#xA;else $Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetDepartmentId"/>
+                </SOCIO_SEGUNDODEP>
+                <socio_id>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:PartnerId"/>
+                </socio_id>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Insert Socios Transferidos">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>456</pd:x>
+        <pd:y>163</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>insert into SOCIOS_TRANSFERIDOS
+(EMPLID,SUCURSAL,DEPARTAMENTO,FECHA_INICIAL,HORA_INICIAL,FECHA_FINAL,HORA_FINAL,FECHA_REGISTRO,USUARIOID,ESTATUS)
+VALUES(?,?,?,?,?,?,?,GETDATE(),?,?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>EMPLID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SUCURSAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>DEPARTAMENTO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>FECHA_INICIAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>HORA_INICIAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>FECHA_FINAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>HORA_FINAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>USUARIOID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ESTATUS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <EMPLID>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:PartnerId"/>
+                </EMPLID>
+                <SUCURSAL>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetStoreId"/>
+                </SUCURSAL>
+                <DEPARTAMENTO>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetDepartmentId"/>
+                </DEPARTAMENTO>
+                <FECHA_INICIAL>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:FECHA_INICIAL"/>
+                </FECHA_INICIAL>
+                <HORA_INICIAL>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:HORA_INICIAL"/>
+                </HORA_INICIAL>
+                <FECHA_FINAL>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:FECHA_FINAL"/>
+                </FECHA_FINAL>
+                <HORA_FINAL>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:HORA_FINAL"/>
+                </HORA_FINAL>
+                <USUARIOID>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:ManagerId"/>
+                </USUARIOID>
+                <ESTATUS>
+                    <xsl:value-of select="1"/>
+                </ESTATUS>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>410</pd:x>
+        <pd:y>413</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>107</pd:x>
+        <pd:y>271</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>27</pd:x>
+        <pd:y>273</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <xsl:choose>
+                                <xsl:when test="string-length($_error)=0">
+                                    <ns32:ProviderSOAPFault>
+                                        <ns32:FaultCode>
+                                            <xsl:value-of select="10"/>
+                                        </ns32:FaultCode>
+                                        <ns32:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_10"/>
+                                        </ns32:FaultString>
+                                        <ns32:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns32:FaultActor>
+                                        <ns32:ProviderSOAPErrorMsg>
+                                            <xsl:if test="$_error/ns4:ErrorReport/Msg">
+                                                <ns32:Message>
+                                                    <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                                                </ns32:Message>
+                                            </xsl:if>
+                                            <ns32:MessageId>
+                                                <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request)"/>
+                                            </ns32:MessageId>
+                                            <xsl:if test="$_error/ns4:ErrorReport/MsgCode">
+                                                <ns32:ErrorCode>
+                                                    <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                                                </ns32:ErrorCode>
+                                            </xsl:if>
+                                        </ns32:ProviderSOAPErrorMsg>
+                                    </ns32:ProviderSOAPFault>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <ns32:ProviderSOAPFault>
+                                        <ns32:FaultCode>
+                                            <xsl:value-of select="34"/>
+                                        </ns32:FaultCode>
+                                        <ns32:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_34"/>
+                                        </ns32:FaultString>
+                                        <ns32:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns32:FaultActor>
+                                        <ns32:ProviderSOAPErrorMsg>
+                                            <xsl:if test="$_error/ns4:ErrorReport/Msg">
+                                                <ns32:Message>
+                                                    <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                                                </ns32:Message>
+                                            </xsl:if>
+                                            <ns32:MessageId>
+                                                <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request)"/>
+                                            </ns32:MessageId>
+                                            <xsl:if test="$_error/ns4:ErrorReport/MsgCode">
+                                                <ns32:ErrorCode>
+                                                    <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                                                </ns32:ErrorCode>
+                                            </xsl:if>
+                                        </ns32:ProviderSOAPErrorMsg>
+                                    </ns32:ProviderSOAPFault>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </pfx2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>454</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="10"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_10"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request)"/>
+                                    </ns32:MessageId>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </pfx2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 28">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>582</pd:x>
+        <pd:y>259</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="28"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_28"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="&quot;Error al Insertar datos en BD de WebClock&quot;"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request)"/>
+                                    </ns32:MessageId>
+                                    <ns32:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;SocioId: &quot;,$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:PartnerId,&quot;DepartamentoId: &quot;,$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetDepartmentId)"/>
+                                    </ns32:ErrorCode>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </pfx2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error-5">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>673</pd:x>
+        <pd:y>411</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>551</pd:x>
+        <pd:y>413</pd:y>
+        <config>
+            <processName>/Utility Service/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:MSG_Container>
+                <ns12:Header>
+                    <ns12:ProjectName>
+                        <xsl:value-of select="$_processContext/ns4:ProcessContext/ProjectName"/>
+                    </ns12:ProjectName>
+                    <ns12:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_SOURCE_DOMAIN"/>
+                    </ns12:Source_Domain>
+                    <ns12:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_DESTINATION_DOMAIN"/>
+                    </ns12:Destination_Domain>
+                    <ns12:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_TRANSACTION_TYPE"/>
+                    </ns12:Transaction_Type>
+                    <ns12:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns12:TimeStamp>
+                </ns12:Header>
+                <ns12:Body>
+                    <ns12:ErrorManagementSchema>
+                        <ns12:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns12:inrtn_id>
+                        <ns12:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns12:inrtn_instn_nm>
+                        <ns12:inrtn_err_rtn_desc>
+                            <xsl:value-of select="string($_error)"/>
+                        </ns12:inrtn_err_rtn_desc>
+                        <ns12:inrtn_msg_body>
+                            <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request)"/>
+                        </ns12:inrtn_msg_body>
+                        <ns12:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm;ss', current-dateTime())"/>
+                        </ns12:cre8_ts>
+                        <ns12:u_code>
+                            <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                        </ns12:u_code>
+                        <ns12:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns12:sev_id>
+                    </ns12:ErrorManagementSchema>
+                </ns12:Body>
+            </ns12:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 26">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>727</pd:x>
+        <pd:y>270</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="26"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_26"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="&quot;Error al Actualizar datos en BD de WebClock&quot;"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request)"/>
+                                    </ns32:MessageId>
+                                    <ns32:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;SocioId: &quot;,$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:PartnerId,&quot;DepartamentoId: &quot;,$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:TargetDepartmentId)"/>
+                                    </ns32:ErrorCode>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </pfx2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>547</pd:x>
+        <pd:y>503</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Valida SOCIOS_TRANSFERIDOS">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>296</pd:x>
+        <pd:y>162</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>select * from SOCIOS_TRANSFERIDOS
+where emplid = ?
+and estatus = '1'
+order by fecha_final desc</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>EMPLID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>REGID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPLID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SUCURSAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEPARTAMENTO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FECHA_INICIAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>HORA_INICIAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FECHA_FINAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>HORA_FINAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FECHA_REGISTRO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>USUARIOID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ESTATUS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <EMPLID>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:PartnerId"/>
+                </EMPLID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update-Socios_Transferidos">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>295</pd:x>
+        <pd:y>352</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>update socios_transferidos
+set fecha_final = ?, hora_final = ?, ESTATUS = '0'
+where emplid = ?
+and regid = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>fecha_final</parameterName>
+                    <dataType>DATE</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>hora_final</parameterName>
+                    <dataType>TIME</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>emplid</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>regid</parameterName>
+                    <dataType>BIGINT</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <fecha_final>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:FECHA_INICIAL"/>
+                </fecha_final>
+                <hora_final>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:HORA_INICIAL"/>
+                </hora_final>
+                <emplid>
+                    <xsl:choose>
+                        <xsl:when test="exists($Valida-SOCIOS_TRANSFERIDOS/resultSet/Record[1]/EMPLID)">
+                            <xsl:value-of select="$Valida-SOCIOS_TRANSFERIDOS/resultSet/Record[1]/EMPLID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </emplid>
+                <regid>
+                    <xsl:choose>
+                        <xsl:when test="exists($Valida-SOCIOS_TRANSFERIDOS/resultSet/Record[1]/REGID)">
+                            <xsl:value-of select="$Valida-SOCIOS_TRANSFERIDOS/resultSet/Record[1]/REGID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </regid>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Socios">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>175</pd:x>
+        <pd:y>156</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>select * from socios
+where SOCIO_ID = ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>REGID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_NOMBRE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_DEPTOID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_PUESTOID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_SUCURSALID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_ESTATUS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_FECHAREG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_FECHAEFECTIVA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_USUARIOREG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_FECHAMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_USUARIOMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_TIPOCONTRATO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_COMPANIA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_SEGUNDASUC</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_SEGUNDODEP</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_ZONAHORARIA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ESTATUS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SOCIO_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <SOCIO_ID>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerTransfer_Request/Request/ns1:ProcessPartnerTransfer_Request/ns1:PartnerId"/>
+                </SOCIO_ID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert Socios Transferidos</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert Socios Transferidos</pd:from>
+        <pd:to>Fault 28</pd:to>
+        <pd:xpathDescription>No Insert</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Insert-Socios-Transferidos/jdbcUpdateActivityOutput/noOfUpdates)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert Socios Transferidos</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>Fault 26</pd:to>
+        <pd:xpathDescription>No Update</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate-Error-5</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:xpathDescription>Client Fault</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "ProviderSOAPFault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Socios</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida SOCIOS_TRANSFERIDOS</pd:from>
+        <pd:to>Insert Socios Transferidos</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida SOCIOS_TRANSFERIDOS</pd:from>
+        <pd:to>Update-Socios_Transferidos</pd:to>
+        <pd:xpathDescription>Exist Socios Transferidos</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Valida-SOCIOS_TRANSFERIDOS/resultSet/Record)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida SOCIOS_TRANSFERIDOS</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update-Socios_Transferidos</pd:from>
+        <pd:to>Insert Socios Transferidos</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update-Socios_Transferidos</pd:from>
+        <pd:to>Fault 26</pd:to>
+        <pd:xpathDescription>No Update</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Update-Socios_Transferidos/jdbcUpdateActivityOutput/noOfUpdates)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Socios</pd:from>
+        <pd:to>Valida SOCIOS_TRANSFERIDOS</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Update_StatusOffers.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>127</pd:startX>
+    <pd:startY>84</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>501</pd:endX>
+    <pd:endY>87</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1416845443420</pd:targetNamespace>
+    <pd:activity name="JDBC Update Future Offers">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>252</pd:x>
+        <pd:y>95</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE mag_import_HistorialPromociones SET status = 'P'
+WHERE start_date &gt; getdate()</statement>
+            <Prepared_Param_DataType/>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Update Current Offers">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>388</pd:x>
+        <pd:y>94</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE mag_import_HistorialPromociones SET status = 'A'
+WHERE getdate() BETWEEN start_date and end_date
+AND status not in ('A', 'B')</statement>
+            <Prepared_Param_DataType/>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC Update Future Offers</pd:from>
+        <pd:to>JDBC Update Current Offers</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Update Future Offers</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update Current Offers</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

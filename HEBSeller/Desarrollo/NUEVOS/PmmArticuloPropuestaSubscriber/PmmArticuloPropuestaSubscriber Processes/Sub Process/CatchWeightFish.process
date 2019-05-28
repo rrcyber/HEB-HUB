@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>PmmArticuloPropuestaSubscriber Processes/Sub Process/CatchWeightFish.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="lvlnumber" type="xsd:string"/>
+                    <xsd:element name="Segmento" type="xsd:string"/>
+                    <xsd:element name="TipoCatchWeight" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>84</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>574</pd:endX>
+    <pd:endY>82</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1424123023633</pd:targetNamespace>
+    <pd:activity name="InsertSDIVALMSI">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>373</pd:x>
+        <pd:y>155</pd:y>
+        <config>
+            <processName>/PmmArticuloPropuestaSubscriber Processes/Sub Process/InsertSDIVALMSI.process</processName>
+        </config>
+        <pd:inputBindings>
+            <SDIVALMSISuc>
+                <LvlNumber>
+                    <xsl:value-of select="$Start/root/lvlnumber"/>
+                </LvlNumber>
+                <FieldCode>
+                    <xsl:value-of select="'FW'"/>
+                </FieldCode>
+                <Value>
+                    <xsl:value-of select="'T'"/>
+                </Value>
+            </SDIVALMSISuc>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetDepartamento">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>183</pd:x>
+        <pd:y>86</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Segmento" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$Start/root">
+                <root>
+                    <Segmento>
+                        <xsl:value-of select="substring(Segmento, 2, 3)"/>
+                    </Segmento>
+                </root>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetDepartamento</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InsertSDIVALMSI</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetDepartamento</pd:from>
+        <pd:to>InsertSDIVALMSI</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$GetDepartamento/root/Segmento = 220 and $Start/root/TipoCatchWeight = 'F'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetDepartamento</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

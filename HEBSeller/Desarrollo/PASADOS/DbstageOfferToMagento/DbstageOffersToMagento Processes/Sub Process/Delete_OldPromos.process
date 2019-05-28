@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType">
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Delete_OldPromos.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>215</pd:startX>
+    <pd:startY>140</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>828</pd:endX>
+    <pd:endY>146</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1415641803320</pd:targetNamespace>
+    <pd:activity name="JDBC Delete History">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>346</pd:x>
+        <pd:y>151</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>DELETE FROM mag_import_HistorialPromociones
+WHERE end_date &lt; getdate()</statement>
+            <Prepared_Param_DataType/>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC-DeleteHistoryPromo">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>496</pd:x>
+        <pd:y>146</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>delete hp from mag_import_historialPromociones hp
+left join mag_import_promo_save_hub w on hp.Promo_ID = w.source_promo_id 
+and hp.WebSite = w.website and hp.Promo_Type = w.promo_type
+where w.source_promo_id is null and hp.Promo_Type = 'PRAHORRO'</statement>
+            <Prepared_Param_DataType/>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC-DeleteHistoryPromo-1">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>680</pd:x>
+        <pd:y>145</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>delete hp from mag_import_historialPromociones hp
+left join mag_import_flex_promo_hub w on hp.Promo_ID = w.source_promo_id 
+and hp.WebSite = w.website and hp.Promo_Type = w.promo_type
+where w.source_promo_id is null and hp.Promo_Type &lt;&gt; 'PRAHORRO'</statement>
+            <Prepared_Param_DataType/>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC Delete History</pd:from>
+        <pd:to>JDBC-DeleteHistoryPromo</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-DeleteHistoryPromo</pd:from>
+        <pd:to>JDBC-DeleteHistoryPromo-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Delete History</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-DeleteHistoryPromo-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

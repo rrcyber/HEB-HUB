@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns02="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <pd:name>Heb2bCostoPropuestaPublisher/Starter Process/GetChangesCostoPropuestaSubscriber_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>149</pd:x>
+        <pd:y>333</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_INICIOCOSTOPROPUESTAS_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMSConnection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>968</pd:endX>
+    <pd:endY>335</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1391207574022</pd:targetNamespace>
+    <pd:group name="Retry on error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>248</pd:x>
+        <pd:y>119</pd:y>
+        <pd:width>363</pd:width>
+        <pd:height>418</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns1:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query</pd:to>
+            <pd:lineType>Straight</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65485</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$_globalVariables/ns1:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_ConditionForSuspend</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Error Process</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns1:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_RETRAY_DELAY</pd:xpath>
+        </pd:transition>
+        <pd:activity name="JDBC Query">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>417</pd:x>
+            <pd:y>223</pd:y>
+            <config>
+                <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/JDBC_HEBB/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT distinct(IdPropuestaCosto) FROM PropuestaCostoArticuloDetalle
+WHERE IDESTATUS = 9</statement>
+                <Prepared_Param_DataType/>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>IdPropuestaCosto</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>425</pd:x>
+            <pd:y>465</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_RETRAY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>529</pd:x>
+            <pd:y>465</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns02:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                    </message>
+                    <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns02:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>419</pd:x>
+            <pd:y>354</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Error Process">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>311</pd:x>
+            <pd:y>466</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns:MSG_Container>
+                    <ns:Header>
+                        <ns:ProjectName>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                        </ns:ProjectName>
+                        <ns:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </ns:Source_Domain>
+                        <ns:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </ns:Destination_Domain>
+                        <ns:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                        </ns:Transaction_Type>
+                        <ns:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns:TimeStamp>
+                    </ns:Header>
+                    <ns:Body>
+                        <ns:ErrorManagementSchema>
+                            <ns:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </ns:inrtn_id>
+                            <ns:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                            </ns:inrtn_instn_nm>
+                            <ns:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                            </ns:inrtn_err_rtn_desc>
+                            <ns:inrtn_msg_body>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                            </ns:inrtn_msg_body>
+                            <ns:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </ns:cre8_ts>
+                            <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                                <ns:u_code>
+                                    <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                                </ns:u_code>
+                            </xsl:if>
+                            <ns:sev_id>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                            </ns:sev_id>
+                        </ns:ErrorManagementSchema>
+                    </ns:Body>
+                </ns:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>774</pd:x>
+        <pd:y>168</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="CostoPropuesta_Publisher_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>787</pd:x>
+        <pd:y>342</pd:y>
+        <config>
+            <processName>/Heb2bCostoPropuestaPublisher/Main Process/CostoPropuesta_Publisher_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <CAMBIOS>
+                <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                    <CAMBIO>
+                        <ID>
+                            <xsl:value-of select="IdPropuestaCosto"/>
+                        </ID>
+                    </CAMBIO>
+                </xsl:for-each>
+            </CAMBIOS>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Retry on error</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry on error</pd:from>
+        <pd:to>CostoPropuesta_Publisher_Main</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC-Query/resultSet/Record) &gt; 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CostoPropuesta_Publisher_Main</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Retry on error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: GetChangesCostoPropuesta_Starter
+Fecha de creación: 05/02/2014
+Creado por: Liliana Garibay
+Variables globales: GLB_INICIODIVISION_QUEUE, GLB_MAX_RETRIES, GLB_RETRY_DELAY
+Descripción: Proceso utilizado para obtener cambios en el ID y proceder con la publicacion de los cambios a un Topic</pd:description>
+        <pd:x>362</pd:x>
+        <pd:y>57</pd:y>
+        <pd:width>704</pd:width>
+        <pd:height>95</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

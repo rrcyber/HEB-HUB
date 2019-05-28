@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="www.tibco.com/plugin/Timer" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx="http://xmlns.heb.com/ei/PARTNER_INFORMATION" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns3="http://www.tibco.com/schemas/IdentityManagement_mx/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PARTNER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PARTNER_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_PeopleSoft_PrepareRecords_Process.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>944</pd:endX>
+    <pd:endY>194</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx2:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <varProcess>
+            <xsd:element name="bProcessed" type="xsd:string"/>
+        </varProcess>
+        <varCurrentEmpl>
+            <xsd:element name="strEmpl" type="xsd:string"/>
+        </varCurrentEmpl>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1268939340178</pd:targetNamespace>
+    <pd:group name="Group Procesa Seleccion People Soft">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>248</pd:x>
+        <pd:y>3</pd:y>
+        <pd:width>635</pd:width>
+        <pd:height>425</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Select-Employee-Detail-Pends/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>current_Pend_toLDAP_Record</pd:iterationElementSlot>
+            <pd:indexSlot>ipends</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Create_String_Group_To_Remove_by_CJob</pd:to>
+            <pd:xpathDescription>Check Member Off</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Upd-Emp-Pend-Det</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Employee_PeopleSoft_To_ActiveDirectory</pd:from>
+            <pd:to>Add-Control-AD</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Add-Control-AD</pd:from>
+            <pd:to>Upd-Emp-Pend-Det</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Create_String_Group</pd:from>
+            <pd:to>Get_Telephone</pd:to>
+            <pd:xpathDescription>No Store</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Employee_PeopleSoft_To_ActiveDirectory</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:xpathDescription>Error on Record</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Create_String_Group</pd:from>
+            <pd:to>Get_StoreName</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>substring($current_Pend_toLDAP_Record/Record/LOCATION_ID,1,2)=$_globalVariables/ns1:GlobalVariables/ProjectConfig/PrefijoTienda</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_StoreName</pd:from>
+            <pd:to>Employee_PeopleSoft_To_ActiveDirectory</pd:to>
+            <pd:xpathDescription>WirhSucName</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_StoreName</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:xpathDescription>Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65485</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Telephone</pd:from>
+            <pd:to>Employee_PeopleSoft_To_ActiveDirectory</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Create_String_Group_To_Remove_by_CJob</pd:from>
+            <pd:to>Create_String_Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Employee_PeopleSoft_To_ActiveDirectory">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>589</pd:x>
+            <pd:y>160</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_PeopleSoft_To_ActiveDirectory_Process.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns3:EMPLOYEE>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/SURNAME">
+                        <ns3:SURNAME>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/SURNAME"/>
+                        </ns3:SURNAME>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/GIVENAME">
+                        <ns3:GIVENAME>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/GIVENAME"/>
+                        </ns3:GIVENAME>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/DISPLAY_NAME">
+                        <ns3:DISPLAY_NAME>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/DISPLAY_NAME"/>
+                        </ns3:DISPLAY_NAME>
+                    </xsl:if>
+                    <ns3:EMPL_ID>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EMPL_ID"/>
+                    </ns3:EMPL_ID>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/PHONE">
+                        <ns3:PHONE>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/PHONE"/>
+                        </ns3:PHONE>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/PRIMARY_NID">
+                        <ns3:PRIMARY_NID>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/PRIMARY_NID"/>
+                        </ns3:PRIMARY_NID>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/EMAIL_ADDR">
+                        <ns3:EMAIL_ADDR>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EMAIL_ADDR"/>
+                        </ns3:EMAIL_ADDR>
+                    </xsl:if>
+                    <ns3:EFF_DT>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EFF_DT"/>
+                    </ns3:EFF_DT>
+                    <ns3:EFF_SEQ>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EFF_SEQ"/>
+                    </ns3:EFF_SEQ>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/DEP_DESCR">
+                        <ns3:DEP_DESCR>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/DEP_DESCR"/>
+                        </ns3:DEP_DESCR>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/JOBCODE_DESCR">
+                        <ns3:JOBCODE_DESCR>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/JOBCODE_DESCR"/>
+                        </ns3:JOBCODE_DESCR>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/DEPT_ID">
+                        <ns3:DEPT_ID>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/DEPT_ID"/>
+                        </ns3:DEPT_ID>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/JOB_CD">
+                        <ns3:JOB_CD>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/JOB_CD"/>
+                        </ns3:JOB_CD>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/EMPL_STAT">
+                        <ns3:EMPL_STAT>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EMPL_STAT"/>
+                        </ns3:EMPL_STAT>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/EMPLOYEE_TYPE">
+                        <ns3:EMPLOYEE_TYPE>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EMPLOYEE_TYPE"/>
+                        </ns3:EMPLOYEE_TYPE>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/NAME">
+                        <ns3:NAME>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/NAME"/>
+                        </ns3:NAME>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/NATIONAL_ID">
+                        <ns3:NATIONAL_ID>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/NATIONAL_ID"/>
+                        </ns3:NATIONAL_ID>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/COMPANY">
+                        <ns3:COMPANY>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/COMPANY"/>
+                        </ns3:COMPANY>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/LOCATION_ID">
+                        <ns3:LOCATION_ID>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/LOCATION_ID"/>
+                        </ns3:LOCATION_ID>
+                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Get_StoreName/OutSuc/SucName)>0">
+                            <xsl:if test="$Get_StoreName/OutSuc/SucName">
+                                <ns3:LOCATION_DESCR>
+                                    <xsl:value-of select="$Get_StoreName/OutSuc/SucName"/>
+                                </ns3:LOCATION_DESCR>
+                            </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:if test="$current_Pend_toLDAP_Record/Record/LOCATION_DESCR">
+                                <ns3:LOCATION_DESCR>
+                                    <xsl:value-of select="$current_Pend_toLDAP_Record/Record/LOCATION_DESCR"/>
+                                </ns3:LOCATION_DESCR>
+                            </xsl:if>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <ns3:LAST_UPDATE_DT>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/LAST_UPDATE_DT"/>
+                    </ns3:LAST_UPDATE_DT>
+                    <ns3:MEMBEROFF>
+                        <xsl:value-of select="$Create_String_Group/stringMembers/stringMembers"/>
+                    </ns3:MEMBEROFF>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/TIPO_CONTRATO">
+                        <ns3:TIPO_CONTRATO>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/TIPO_CONTRATO"/>
+                        </ns3:TIPO_CONTRATO>
+                    </xsl:if>
+                    <ns3:MEMBER_TOREMOVE>
+                        <xsl:value-of select="$Create_String_Group_To_Remove/stringMembersToRemove"/>
+                    </ns3:MEMBER_TOREMOVE>
+                    <ns3:INSERTEDDATE>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/INSERTEDDATE"/>
+                    </ns3:INSERTEDDATE>
+                    <ns3:MEMBER_TOREMOVE_PUESTO>
+                        <xsl:value-of select="$Create_String_Group_To_Remove_by_CJob/stringMembersToRemove"/>
+                    </ns3:MEMBER_TOREMOVE_PUESTO>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/OPERACION_PS">
+                        <ns3:Operacion_PS>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/OPERACION_PS"/>
+                        </ns3:Operacion_PS>
+                    </xsl:if>
+                    <ns3:AtributoAdicional>
+                        <xsl:value-of select="$Create_String_Group/stringMembers/AdicionalAtributo"/>
+                    </ns3:AtributoAdicional>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/CITY">
+                        <ns3:CITY>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/CITY"/>
+                        </ns3:CITY>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/COMPANY_DESCR">
+                        <ns3:COMPANY_DESCR>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/COMPANY_DESCR"/>
+                        </ns3:COMPANY_DESCR>
+                    </xsl:if>
+                    <xsl:if test="$Get_Telephone/OutRecPhone/Phone">
+                        <ns3:PHONEASIG>
+                            <xsl:value-of select="$Get_Telephone/OutRecPhone/Phone"/>
+                        </ns3:PHONEASIG>
+                    </xsl:if>
+                    <xsl:if test="$current_Pend_toLDAP_Record/Record/MANAGER_ID">
+                        <ns3:MANAGER_ID>
+                            <xsl:value-of select="$current_Pend_toLDAP_Record/Record/MANAGER_ID"/>
+                        </ns3:MANAGER_ID>
+                    </xsl:if>
+                </ns3:EMPLOYEE>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Create_String_Group">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>457</pd:x>
+            <pd:y>59</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Create_String_Group.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Filtros>
+                    <JobCd>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/JOB_CD"/>
+                    </JobCd>
+                    <xsl:choose>
+                        <xsl:when test="substring($current_Pend_toLDAP_Record/Record/LOCATION_ID,1,2)=$_globalVariables/ns1:GlobalVariables/ProjectConfig/PrefijoTienda">
+                            <Ubicacion>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Ubica_Tienda"/>
+                            </Ubicacion>
+                        </xsl:when>
+                        <xsl:when test="substring($current_Pend_toLDAP_Record/Record/LOCATION_ID,1,2)=$_globalVariables/ns1:GlobalVariables/ProjectConfig/PrefijoOficina">
+                            <Ubicacion>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Ubica_Oficina"/>
+                            </Ubicacion>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <Ubicacion>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Ubica_Bodega"/>
+                            </Ubicacion>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="substring($current_Pend_toLDAP_Record/Record/TIPO_CONTRATO,1,1)=$_globalVariables/ns1:GlobalVariables/ProjectConfig/Puesto_Eventual">
+                            <TipoContrato>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Puesto_Eventual"/>
+                            </TipoContrato>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <TipoContrato>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Puesto_Fijo"/>
+                            </TipoContrato>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <EmplID>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EMPL_ID"/>
+                    </EmplID>
+                    <Depto>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/DEPT_ID"/>
+                    </Depto>
+                </Filtros>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Add-Control-AD">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>687</pd:x>
+            <pd:y>56</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>insert into Control_PS_AD_MX  (
+    EMPL_ID,
+    INSERTEDDATE_DETAIL,
+    INSERTEDDATE,
+    Resultado_AD,
+    Operacion_AD ,LOCATION_ID,DEPT_ID ,AD_Msg_Result)  
+values(?,?,SYSDATETIME(),?,?,?,?,?)</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>INSERTEDDATE_DETAIL</parameterName>
+                        <dataType>TIMESTAMP</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Resultado_AD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Operacion_AD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>locationid</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>deptid</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>String_Result_AD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <EMPL_ID>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                    <INSERTEDDATE_DETAIL>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/INSERTEDDATE"/>
+                    </INSERTEDDATE_DETAIL>
+                    <Resultado_AD>
+                        <xsl:value-of select="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 2,1)"/>
+                    </Resultado_AD>
+                    <Operacion_AD>
+                        <xsl:value-of select="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 1,1)"/>
+                    </Operacion_AD>
+                    <locationid>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_Pend_toLDAP_Record/Record/LOCATION_ID)">
+                                <xsl:value-of select="$current_Pend_toLDAP_Record/Record/LOCATION_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </locationid>
+                    <deptid>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_Pend_toLDAP_Record/Record/DEPT_ID)">
+                                <xsl:value-of select="$current_Pend_toLDAP_Record/Record/DEPT_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </deptid>
+                    <String_Result_AD>
+                        <xsl:value-of select="substring(substring-after($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, '-'), 1,20)"/>
+                    </String_Result_AD>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Upd-Emp-Pend-Det">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>801</pd:x>
+            <pd:y>56</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>Update PS_EMPL_DATA_DETAIL_MX set  Status_AD=?,Operacion_AD=?,Intentos_AD=Intentos_AD+?,Resultado_AD=?  where EMPL_ID=? and INSERTEDDATE=?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>STATUSAD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>OPERACIONAD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>INTENTOSAD</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>RESULTADOAD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>EMPL_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>INSERTEDDATE</parameterName>
+                        <dataType>TIMESTAMP</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:choose>
+                        <xsl:when test="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 2,1)=&quot;1&quot;">
+                            <STATUSAD>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Status_Enviado"/>
+                            </STATUSAD>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <STATUSAD>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Status_To_LDAP"/>
+                            </STATUSAD>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <OPERACIONAD>
+                        <xsl:value-of select="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 1,1)"/>
+                    </OPERACIONAD>
+                    <INTENTOSAD>
+                        <xsl:value-of select="1"/>
+                    </INTENTOSAD>
+                    <xsl:choose>
+                        <xsl:when test="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 1,1)='A'">
+                            <xsl:choose>
+                                <xsl:when test="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 2,1)='3'">
+                                    <RESULTADOAD>
+                                        <xsl:value-of select="'1'"/>
+                                    </RESULTADOAD>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <RESULTADOAD>
+                                        <xsl:value-of select="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 2,1)"/>
+                                    </RESULTADOAD>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <RESULTADOAD>
+                                <xsl:value-of select="substring($Employee_PeopleSoft_To_ActiveDirectory/resultOperation, 2,1)"/>
+                            </RESULTADOAD>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <EMPL_ID>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/EMPL_ID"/>
+                    </EMPL_ID>
+                    <INSERTEDDATE>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/INSERTEDDATE"/>
+                    </INSERTEDDATE>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>591</pd:x>
+            <pd:y>311</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Get_StoreName">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>350</pd:x>
+            <pd:y>312</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Get_StoreName.process</processName>
+            </config>
+            <pd:inputBindings>
+                <RecSuc>
+                    <SucId>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/LOCATION_ID"/>
+                    </SucId>
+                </RecSuc>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_Telephone">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>586</pd:x>
+            <pd:y>57</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Get_Telephone.process</processName>
+            </config>
+            <pd:inputBindings>
+                <RecPhone>
+                    <Location>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/LOCATION_ID"/>
+                    </Location>
+                    <JobCd>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/JOB_CD"/>
+                    </JobCd>
+                </RecPhone>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Create_String_Group_To_Remove_by_CJob">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>336</pd:x>
+            <pd:y>59</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Create_String_Group_To_Remove_by_CJob.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Filtros>
+                    <JobCd>
+                        <xsl:value-of select="$current_Pend_toLDAP_Record/Record/JOB_CD"/>
+                    </JobCd>
+                    <xsl:choose>
+                        <xsl:when test="substring($current_Pend_toLDAP_Record/Record/LOCATION_ID,1,2)=$_globalVariables/ns1:GlobalVariables/ProjectConfig/PrefijoTienda">
+                            <Ubicacion>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Ubica_Tienda"/>
+                            </Ubicacion>
+                        </xsl:when>
+                        <xsl:when test="substring($current_Pend_toLDAP_Record/Record/LOCATION_ID,1,2)=$_globalVariables/ns1:GlobalVariables/ProjectConfig/PrefijoOficina">
+                            <Ubicacion>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Ubica_Oficina"/>
+                            </Ubicacion>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <Ubicacion>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Ubica_Bodega"/>
+                            </Ubicacion>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="substring($current_Pend_toLDAP_Record/Record/TIPO_CONTRATO,1,1)=$_globalVariables/ns1:GlobalVariables/ProjectConfig/Puesto_Eventual">
+                            <TipoContrato>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Puesto_Eventual"/>
+                            </TipoContrato>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <TipoContrato>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Puesto_Fijo"/>
+                            </TipoContrato>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </Filtros>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Create_String_Group_To_Remove">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>112</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Create_String_Group_To_Remove.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Filtros>
+                <JobCd>
+                    <xsl:value-of select="'999980'"/>
+                </JobCd>
+                <Ubicacion>
+                    <xsl:value-of select="'N'"/>
+                </Ubicacion>
+                <TipoContrato>
+                    <xsl:value-of select="'N'"/>
+                </TipoContrato>
+            </Filtros>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Select Employee Detail Pends">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>111</pd:x>
+        <pd:y>231</pd:y>
+        <config>
+            <timeout>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>Select SURNAME,GIVENAME,DISPLAY_NAME,EMPL_ID,PHONE,PRIMARY_NID,EMAIL_ADDR,EFF_DT,EFF_SEQ,DEP_DESCR,JOBCODE_DESCR,DEPT_ID,JOB_CD,EMPL_STAT,EMPLOYEE_TYPE,NAME,NATIONAL_ID,COMPANY,LOCATION_ID,LOCATION_DESCR,LAST_UPDATE_DT,INSERTEDDATE,TIPO_CONTRATO,OPERACION_PS ,CITY,COMPANY_DESCR,MANAGER_ID
+from PS_EMPL_DATA_DETAIL_MX where (STATUS_AD=? or STATUS_AD='Z' ) AND CONVERT(DATE, EFF_DT, 126) &lt;= CONVERT(DATE, GetDate(), 126) and Intentos_AD &lt; 40 order by STATUS_AD</statement>
+            <wizardData>#Wed Apr 01 16:46:41 CST 2015&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=Select SURNAME,GIVENAME,DISPLAY_NAME,EMPL_ID,PHONE,PRIMARY_NID,EMAIL_ADDR,EFF_DT,EFF_SEQ,DEP_DESCR,JOBCODE_DESCR,DEPT_ID,JOB_CD,EMPL_STAT,EMPLOYEE_TYPE,\n\t        NAME,NATIONAL_ID,COMPANY,LOCATION_ID,LOCATION_DESCR,LAST_UPDATE_DT from PS_EMPL_DATA_DETAIL_MX where STATUS_AD\='L'&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+            <optionalOrNillable>false</optionalOrNillable>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>statusToLdap</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>SURNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>GIVENAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DISPLAY_NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PHONE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRIMARY_NID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMAIL_ADDR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EFF_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EFF_SEQ</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEP_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>JOBCODE_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEPT_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>JOB_CD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPL_STAT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPLOYEE_TYPE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NATIONAL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>COMPANY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LOCATION_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LOCATION_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LAST_UPDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>INSERTEDDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TIPO_CONTRATO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OPERACION_PS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>COMPANY_DESCR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>MANAGER_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <statusToLdap>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Status_To_LDAP"/>
+                </statusToLdap>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Create_String_Group_To_Remove</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Procesa Seleccion People Soft</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Select Employee Detail Pends</pd:from>
+        <pd:to>Group Procesa Seleccion People Soft</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Create_String_Group_To_Remove</pd:from>
+        <pd:to>Select Employee Detail Pends</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

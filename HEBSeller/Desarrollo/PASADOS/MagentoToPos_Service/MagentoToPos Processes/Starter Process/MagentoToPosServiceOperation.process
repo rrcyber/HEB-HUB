@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://xmlns.heb.com/ei/OrderResponse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/OrderRequest" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlPfx="http://xmlns.example.com/1426881872020">
+    <wsdl:import namespace="http://xmlns.example.com/1426881872020" location="/Shared Resources/WSDL/WSDL_MagentoToPos.wsdl"/>
+    <pd:name>MagentoToPos Processes/Starter Process/MagentoToPosServiceOperation.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="wsdlPfx:Request"/>
+    <pd:startX>148</pd:startX>
+    <pd:startY>65</pd:startY>
+    <pd:returnBindings>
+        <wsdlPfx:Replay>
+            <Replay>
+                <xsl:copy-of select="$Call_Send_Order/ns1:OrderResponse"/>
+            </Replay>
+        </wsdlPfx:Replay>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="wsdlPfx:Replay"/>
+    <pd:endX>453</pd:endX>
+    <pd:endY>65</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1426882163342</pd:targetNamespace>
+    <pd:activity name="Call_Send_Order">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>295</pd:x>
+        <pd:y>66</pd:y>
+        <config>
+            <processName>/MagentoToPos Processes/Main Process/Send_Order_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns:OrderRequest>
+                <ns:Order>
+                    <xsl:value-of select="$Start/wsdlPfx:Request/Request/ns:OrderRequest/ns:Order"/>
+                </ns:Order>
+            </ns:OrderRequest>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call_Send_Order</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_Send_Order</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

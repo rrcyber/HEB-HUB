@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/SDIConnection5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://xmlns.heb.com/ei/SDIRTVDTE_INFORMATION" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx3="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ADASDIConnection" xmlns:pfx4="http://xmlns.heb.com/ei/CARTON_INFORMATION" xmlns:pfx5="http://xmlns.heb.com/ei/CARTONANDRETURNS_INFORMATION" xmlns:pfx6="http://xmlns.heb.com/ei/TRANSFERS_INFORMATION" xmlns:pfx7="http://xmlns.heb.com/ei/TRANSFERENCES_INFORMATION" xmlns:pfx8="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION">
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIRTVDTE_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIRTVDTE_INFORMATION.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/SDIConnection5" schemaLocation="/AESchemas/ae/ADB/SDIConnection5.aeschema"/>
+    <xsd:import namespace="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ADASDIConnection" schemaLocation="/AESchemas/ae/ADB/ADASDIConnection.aeschema"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TRANSFERENCES_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/TRANSFERENCES_INFORMATION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION.xsd"/>
+    <pd:name>MexicoPMMTransactionalSubscriber Processes/Main Process/Purchase Order Reception/POReception_Insert_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx8:PURCHASE_ORDER_RECEPTION"/>
+    <pd:startX>158</pd:startX>
+    <pd:startY>152</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <TECH_KEY>
+                <xsl:value-of select="$Start/pfx3:PMM.HEB__P__SDIRTVDTE/TECH__KEY"/>
+            </TECH_KEY>
+            <AUDIT_NUMBER>
+                <xsl:value-of select="$Start/pfx3:PMM.HEB__P__SDIRTVDTE/AUDIT__NUMBER"/>
+            </AUDIT_NUMBER>
+            <RTV_NUMBER>
+                <xsl:value-of select="$Start/pfx3:PMM.HEB__P__SDIRTVDTE/RTV__NUMBER"/>
+            </RTV_NUMBER>
+            <PRD_LVL_CHILD>
+                <xsl:value-of select="$Start/pfx3:PMM.HEB__P__SDIRTVDTE/PRD__LVL__CHILD"/>
+            </PRD_LVL_CHILD>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>680</pd:endX>
+    <pd:endY>152</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1271864248109</pd:targetNamespace>
+    <pd:group name="Transaction Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>238</pd:x>
+        <pd:y>60</pd:y>
+        <pd:width>361</pd:width>
+        <pd:height>168</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Insert Record</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>POReception_Detail_Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Insert Record</pd:from>
+            <pd:to>POReception_Detail_Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Insert Record">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>347</pd:x>
+            <pd:y>152</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSDI/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSDI JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO SDIRCVSHE
+(RCV_SESSION_ID, TRAN_TYPE, ORG_LVL_NUMBER, RCV_DATE_SES_OPN, RCV_SESSION_STS, RCV_DATE_SES_CLO, DOWNLOAD_DATE, 
+PRINT_DATE, ORIG_POS_TECH_KEY, LASTUPDATE)
+VALUES
+(?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>RCV_SESSION_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TRAN_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ORG_LVL_NUMBER</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>RCV_DATE_SES_OPN</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>RCV_SESSION_STS</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>RCV_DATE_SES_CLO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>DOWNLOAD_DATE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PRINT_DATE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ORIG_POS_TECH_KEY</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <RCV_SESSION_ID>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:RCV_SESSION_ID"/>
+                    </RCV_SESSION_ID>
+                    <TRAN_TYPE>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:TRAN_TYPE"/>
+                    </TRAN_TYPE>
+                    <ORG_LVL_NUMBER>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:ORG_LVL_NUMBER"/>
+                    </ORG_LVL_NUMBER>
+                    <RCV_DATE_SES_OPN>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:RCV_DATE_SES_OPN"/>
+                    </RCV_DATE_SES_OPN>
+                    <RCV_SESSION_STS>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:RCV_SESSION_STS"/>
+                    </RCV_SESSION_STS>
+                    <RCV_DATE_SES_CLO>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:RCV_DATE_SES_CLO"/>
+                    </RCV_DATE_SES_CLO>
+                    <DOWNLOAD_DATE>
+                        <xsl:copy-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:DOWNLOAD_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:DOWNLOAD_DATE"/>
+                    </DOWNLOAD_DATE>
+                    <PRINT_DATE>
+                        <xsl:copy-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:PRINT_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:PRINT_DATE"/>
+                    </PRINT_DATE>
+                    <ORIG_POS_TECH_KEY>
+                        <xsl:copy-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:ORIG_POS_TECH_KEY/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:ORIG_POS_TECH_KEY"/>
+                    </ORIG_POS_TECH_KEY>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="POReception_Detail_Insert">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>497</pd:x>
+            <pd:y>152</pd:y>
+            <config>
+                <processName>/MexicoPMMTransactionalSubscriber Processes/Sub Process/Purchase Order Reception/POReception_Detail_Insert.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Start/pfx8:PURCHASE_ORDER_RECEPTION/pfx8:PURCHASE_ORDER_RECEPTION_DETAIL"/>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Transaction Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Transaction Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/AlertSchema.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/AlertSchema.xsd">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/AlertSchema.xsd" schemaLocation="/SharedResources/Schemas/AlertSchema.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/AlertSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/AlertSchema.xsd"/>
+    <pd:name>Error Process Subscriber Processes/Sub Process/SaveAlert.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:Alert"/>
+    <pd:startX>150</pd:startX>
+    <pd:startY>63</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>450</pd:endX>
+    <pd:endY>64</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1431706355751</pd:targetNamespace>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>280</pd:x>
+        <pd:y>66</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_SXD201080/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_SXD201080.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO DBSDI.dbo.TIB_LOG_ALERTS (PROJECT,ENGINE_NAME,ALERT_DATE,DESCRIPTION,COMPLETE_RECORD)
+VALUES (?,?,?,?,?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PROJECT</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ENGINE_NAME</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ALERT_DATE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>DESCRIPTION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>COMPLETE_RECORD</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <PROJECT>
+                    <xsl:value-of select="$Start/Alert/Project"/>
+                </PROJECT>
+                <ENGINE_NAME>
+                    <xsl:value-of select="$Start/Alert/EngineName"/>
+                </ENGINE_NAME>
+                <ALERT_DATE>
+                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', $Start/Alert/TimeStamp)"/>
+                </ALERT_DATE>
+                <DESCRIPTION>
+                    <xsl:value-of select="$Start/Alert/Message"/>
+                </DESCRIPTION>
+                <COMPLETE_RECORD>
+                    <xsl:value-of select="$Start/Alert/CompleteRecord"/>
+                </COMPLETE_RECORD>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

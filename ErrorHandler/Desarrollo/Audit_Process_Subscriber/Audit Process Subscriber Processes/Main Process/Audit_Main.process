@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx2="http://xmlns.heb.com/ei/error">
+    <xsd:import namespace="http://xmlns.heb.com/ei/error" schemaLocation="/Shared Resources/Schema Definitions/Common/AuditingSchema.xsd"/>
+    <pd:name>Audit Process Subscriber Processes/Main Process/Audit_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="XmlString" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>78</pd:startX>
+    <pd:startY>80</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>473</pd:endX>
+    <pd:endY>78</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1390597669984</pd:targetNamespace>
+    <pd:activity name="Error_Insert">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>340</pd:x>
+        <pd:y>79</pd:y>
+        <config>
+            <processName>/Audit Process Subscriber Processes/Sub Process/Audit_Insert.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:if test="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_id">
+                    <inrtn_id>
+                        <xsl:value-of select="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_id"/>
+                    </inrtn_id>
+                </xsl:if>
+                <xsl:if test="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_nm">
+                    <inrtn_nm>
+                        <xsl:value-of select="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_nm"/>
+                    </inrtn_nm>
+                </xsl:if>
+                <xsl:if test="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_instn_nm">
+                    <inrtn_instn_nm>
+                        <xsl:value-of select="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_instn_nm"/>
+                    </inrtn_instn_nm>
+                </xsl:if>
+                <xsl:if test="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_proc_id">
+                    <inrtn_proc_id>
+                        <xsl:value-of select="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_proc_id"/>
+                    </inrtn_proc_id>
+                </xsl:if>
+                <xsl:if test="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_rec_cnt">
+                    <inrtn_rec_cnt>
+                        <xsl:value-of select="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_rec_cnt"/>
+                    </inrtn_rec_cnt>
+                </xsl:if>
+                <xsl:if test="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_cre8_ts">
+                    <inrtn_cre8_ts>
+                        <xsl:value-of select="$Parse-XML/pfx2:AuditingSchema/pfx2:inrtn_cre8_ts"/>
+                    </inrtn_cre8_ts>
+                </xsl:if>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>211</pd:x>
+        <pd:y>78</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx2:AuditingSchema"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/root/XmlString"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Error_Insert</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error_Insert</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

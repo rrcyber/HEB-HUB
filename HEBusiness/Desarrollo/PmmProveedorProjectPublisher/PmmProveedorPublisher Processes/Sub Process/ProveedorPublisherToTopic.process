@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns12="www.tibco.com/plugin/Sleep" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/PMM_DIMENSION_DATA" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx5="http://xmlns.heb.com/ei/PMM_RECIBOFACTURA_DATA" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.heb.com/ei/PMM_DESCUENTO_DATA" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://xmlns.heb.com/ei/PMM_DIMENSION_CODIGO_DATA" xmlns:pfx6="http://xmlns.heb.com/ei/PMM_PROVEEDOR_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_DIMENSION_DATA"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_DIMENSION_CODIGO_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_DIMENSION_CODIGO_DATA_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_DESCUENTO_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_DESCUENTO_DATA_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_RECIBOFACTURA_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_RECIBOFACTURA_DATA_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_PROVEEDOR_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_PROVEEDOR_DATA_SOAP.xsd"/>
+    <pd:name>PmmProveedorPublisher Processes/Sub Process/ProveedorPublisherToTopic.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="IdPMM" type="xsd:string"/>
+                                <xsd:element name="Nombre" type="xsd:string"/>
+                                <xsd:element name="Calle" type="xsd:string"/>
+                                <xsd:element name="Colonia" type="xsd:string"/>
+                                <xsd:element name="Pais" type="xsd:string"/>
+                                <xsd:element name="Municipio" type="xsd:string"/>
+                                <xsd:element name="Estado" type="xsd:string"/>
+                                <xsd:element name="IdMoneda" type="xsd:string"/>
+                                <xsd:element name="CodigoPostal" type="xsd:string"/>
+                                <xsd:element name="TelelfonoPrincipal" type="xsd:string"/>
+                                <xsd:element name="ContactoPrincipal" type="xsd:string"/>
+                                <xsd:element name="GLN" type="xsd:string"/>
+                                <xsd:element name="Fax" type="xsd:string"/>
+                                <xsd:element name="EmailResponsable" type="xsd:string"/>
+                                <xsd:element name="RFC" type="xsd:string"/>
+                                <xsd:element name="EsAcreedor" type="xsd:string"/>
+                                <xsd:element name="AceptaDevoluciones" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>28</pd:startX>
+    <pd:startY>156</pd:startY>
+    <pd:returnBindings>
+        <records>
+            <xsl:value-of select="count($Start/group/root)"/>
+        </records>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="records" type="xsd:int"/>
+    </pd:endType>
+    <pd:endX>438</pd:endX>
+    <pd:endY>155</pd:endY>
+    <pd:errorSchemas>
+        <error ref="pfx3:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1387203281625</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>172</pd:x>
+        <pd:y>259</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>296</pd:x>
+        <pd:y>258</pd:y>
+        <config>
+            <faultName>error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <pfx3:MSG_Container>
+                        <pfx3:Header>
+                            <pfx3:ProjectName>
+                                <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                            </pfx3:ProjectName>
+                            <pfx3:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx3:Source_Domain>
+                            <pfx3:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx3:Destination_Domain>
+                            <pfx3:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                            </pfx3:Transaction_Type>
+                            <pfx3:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx3:TimeStamp>
+                        </pfx3:Header>
+                        <pfx3:Body>
+                            <pfx3:ErrorManagementSchema>
+                                <pfx3:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </pfx3:inrtn_id>
+                                <pfx3:inrtn_instn_nm>
+                                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                                </pfx3:inrtn_instn_nm>
+                                <pfx3:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                                </pfx3:inrtn_err_rtn_desc>
+                                <pfx3:inrtn_msg_body>
+                                    <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                                </pfx3:inrtn_msg_body>
+                                <pfx3:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </pfx3:cre8_ts>
+                                <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                                    <pfx3:u_code>
+                                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                                    </pfx3:u_code>
+                                </xsl:if>
+                                <pfx3:sev_id>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                                </pfx3:sev_id>
+                            </pfx3:ErrorManagementSchema>
+                        </pfx3:Body>
+                    </pfx3:MSG_Container>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Topic Publisher">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>302</pd:x>
+        <pd:y>163</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Topics/GLB_PROVEEDOR_TOPIC%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <Body>
+                    <xsl:value-of select="$Render-XML/xmlString"/>
+                </Body>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>166</pd:x>
+        <pd:y>155</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <term ref="pfx6:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <pfx6:MSG_CONTAINER>
+                <pfx6:Body>
+                    <xsl:for-each select="$Start/group/root">
+                        <pfx6:PMM_PROVEEDOR>
+                            <pfx6:IdPMM>
+                                <xsl:value-of select="IdPMM"/>
+                            </pfx6:IdPMM>
+                            <pfx6:Nombre>
+                                <xsl:value-of select="Nombre"/>
+                            </pfx6:Nombre>
+                            <pfx6:Calle>
+                                <xsl:value-of select="Calle"/>
+                            </pfx6:Calle>
+                            <pfx6:Colonia>
+                                <xsl:value-of select="Colonia"/>
+                            </pfx6:Colonia>
+                            <pfx6:Pais>
+                                <xsl:value-of select="Pais"/>
+                            </pfx6:Pais>
+                            <pfx6:Municipio>
+                                <xsl:value-of select="Municipio"/>
+                            </pfx6:Municipio>
+                            <pfx6:Estado>
+                                <xsl:value-of select="Estado"/>
+                            </pfx6:Estado>
+                            <pfx6:IdMoneda>
+                                <xsl:value-of select="IdMoneda"/>
+                            </pfx6:IdMoneda>
+                            <pfx6:CodigoPostal>
+                                <xsl:value-of select="CodigoPostal"/>
+                            </pfx6:CodigoPostal>
+                            <pfx6:TelelfonoPrincipal>
+                                <xsl:value-of select="TelelfonoPrincipal"/>
+                            </pfx6:TelelfonoPrincipal>
+                            <pfx6:ContactoPrincipal>
+                                <xsl:value-of select="ContactoPrincipal"/>
+                            </pfx6:ContactoPrincipal>
+                            <pfx6:GLN>
+                                <xsl:value-of select="GLN"/>
+                            </pfx6:GLN>
+                            <pfx6:Fax>
+                                <xsl:value-of select="Fax"/>
+                            </pfx6:Fax>
+                            <pfx6:EmailResponsable>
+                                <xsl:value-of select="EmailResponsable"/>
+                            </pfx6:EmailResponsable>
+                            <pfx6:RFC>
+                                <xsl:value-of select="RFC"/>
+                            </pfx6:RFC>
+                            <pfx6:EsAcreedor>
+                                <xsl:value-of select="EsAcreedor"/>
+                            </pfx6:EsAcreedor>
+                            <pfx6:AceptaDevoluciones>
+                                <xsl:value-of select="AceptaDevoluciones"/>
+                            </pfx6:AceptaDevoluciones>
+                        </pfx6:PMM_PROVEEDOR>
+                    </xsl:for-each>
+                </pfx6:Body>
+            </pfx6:MSG_CONTAINER>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>JMS Topic Publisher</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Topic Publisher</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

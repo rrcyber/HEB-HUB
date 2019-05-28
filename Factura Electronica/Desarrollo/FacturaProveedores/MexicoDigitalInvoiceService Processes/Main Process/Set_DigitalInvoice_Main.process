@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns5="http://xmlns.heb.com/ei/SPGFaultSchema" xmlns:pfx="http://www.heb.com/ei/MexicoDigitalInvoiceService" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:ns1="http://xmlns.heb.com/ei/DIGITAL_INVOICE_RESPONSE" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/CFD_SCHEMA" xmlns:pfx2="http://www.sat.gob.mx/cfd/2">
+    <wsdl:import namespace="http://www.heb.com/ei/MexicoDigitalInvoiceService" location="/Shared Resources/WSDL/Abstract/MexicoDigitalInvoiceService.wsdl"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Main Process/Set_DigitalInvoice_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="pfx:SET_DIGITAL_INVOICE_REQUEST"/>
+    <pd:startX>225</pd:startX>
+    <pd:startY>87</pd:startY>
+    <pd:returnBindings>
+        <pfx:SET_DIGITAL_INVOICE_RESPONSE>
+            <parameters>
+                <xsl:copy-of select="$Set_Digital_Invoice/ns1:SET_DIGITAL_INVOICE_RESPONSE"/>
+            </parameters>
+        </pfx:SET_DIGITAL_INVOICE_RESPONSE>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="pfx:SET_DIGITAL_INVOICE_RESPONSE"/>
+    <pd:endX>547</pd:endX>
+    <pd:endY>89</pd:endY>
+    <pd:errorSchemas>
+        <WSDError wsMsgRef="pfx:FAULT"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1302907865636</pd:targetNamespace>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>223</pd:x>
+        <pd:y>265</pd:y>
+        <config>
+            <faultName>WSDError</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns4:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <pfx:FAULT>
+                        <fault>
+                            <ns5:SPGSOAPFault>
+                                <xsl:if test="$_error/ns4:ErrorReport/MsgCode">
+                                    <ns5:FaultCode>
+                                        <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                                    </ns5:FaultCode>
+                                </xsl:if>
+                                <ns5:FaultString>
+                                    <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                                </ns5:FaultString>
+                                <ns5:FaultActor>
+                                    <xsl:value-of select="$_error/ns4:ErrorReport/StackTrace"/>
+                                </ns5:FaultActor>
+                                <ns5:SPGSOAPErrorMsg>
+                                    <ns5:Message>
+                                        <xsl:value-of select="$_error/ns4:ErrorReport/Class"/>
+                                    </ns5:Message>
+                                    <ns5:MessageId>
+                                        <xsl:value-of select="$_error/ns4:ErrorReport/ProcessStack"/>
+                                    </ns5:MessageId>
+                                    <ns5:ErrorCode>
+                                        <xsl:value-of select="$_error/ns4:ErrorReport/FullClass"/>
+                                    </ns5:ErrorCode>
+                                </ns5:SPGSOAPErrorMsg>
+                            </ns5:SPGSOAPFault>
+                        </fault>
+                    </pfx:FAULT>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Set_Digital_Invoice">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>387</pd:x>
+        <pd:y>88</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Set_Digital_Invoice.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/parameters/ns:SET_DIGITAL_INVOICE_REQUEST"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Set_Digital_Invoice</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Set_Digital_Invoice</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Set_Digital_Invoice</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

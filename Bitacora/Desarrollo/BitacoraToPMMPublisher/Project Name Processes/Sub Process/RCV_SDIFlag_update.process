@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <pd:name>Project Name Processes/Sub Process/RCV_SDIFlag_update.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="FOLIO" type="xsd:string"/>
+                    <xsd:element name="SUCURSAL" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>148</pd:startX>
+    <pd:startY>144</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>715</pd:endX>
+    <pd:endY>147</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1365099223381</pd:targetNamespace>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>257</pd:x>
+        <pd:y>57</pd:y>
+        <pd:width>414</pd:width>
+        <pd:height>483</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>397</pd:x>
+            <pd:y>485</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>590</pd:x>
+            <pd:y>485</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Group">
+            <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>293</pd:x>
+            <pd:y>95</pd:y>
+            <pd:width>323</pd:width>
+            <pd:height>337</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>transactionGroup</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:transactionType>JDBCTransaction</pd:transactionType>
+                <pd:includeCheckpoint>false</pd:includeCheckpoint>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Update SDIRCVHDI</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Update Bitacora</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Update SDIRCVDTI</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Update SDIRCVHDI</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Update SDIRCVDTI</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Update Bitacora</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Update SDIRCVDTI">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>441</pd:x>
+                <pd:y>271</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <statement>UPDATE SDIRCVDTI SET SDIFLAG = 1
+WHERE SDIFLAG = 0 AND RCV_SESSION_ID = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>FOLIO</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <FOLIO>
+                            <xsl:value-of select="$Start/root/FOLIO"/>
+                        </FOLIO>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="JDBC Update SDIRCVHDI">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>439</pd:x>
+                <pd:y>165</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <statement>UPDATE SDIRCVHDI SET SDIFLAG = 1
+WHERE SDIFLAG = 0 AND RCV_SESSION_ID = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>FOLIO</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <FOLIO>
+                            <xsl:value-of select="$Start/root/FOLIO"/>
+                        </FOLIO>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="JDBC Update Bitacora">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>446</pd:x>
+                <pd:y>361</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                    <statement>UPDATE MERC_BitacoraEventos SET sdi_flag = 1
+WHERE folio = ?
+AND sucursal = ?
+AND sdi_flag = 0</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>FOLIO</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>SUCURSAL</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <FOLIO>
+                            <xsl:value-of select="$Start/root/FOLIO"/>
+                        </FOLIO>
+                        <SUCURSAL>
+                            <xsl:value-of select="$Start/root/SUCURSAL"/>
+                        </SUCURSAL>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

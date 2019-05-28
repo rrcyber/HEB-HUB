@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:pfx="http://xmlns.heb.com/ei/IMPRESION_ETIQUETAS_DATA" xmlns:ns02="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/IMPRESION_ETIQUETAS_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/IMPRESION_ETIQUETAS_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Starter Process/Update_Tag_Request_Publisher_Starter.process</pd:name>
+    <pd:startName>Queue_Tag_Duplicate</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Queue_Tag_Duplicate">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>92</pd:x>
+        <pd:y>167</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/EMS/MIG_EMS_MAX_SESSIONS%%</maxSessions>
+                <destination>%%Destinations/Queues/GLB_TAG_DUPLICATE_UPDATE_QUEUE%%</destination>
+                <selector>%%Connections/JMS/EMS/MSG_SELEC_ID_STORES%%</selector>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <_customId>ns:ActivityOutput/JMSHeaders/ns:JMSCorrelationID</_customId>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <OutDataxsdString ref="pfx:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>716</pd:endX>
+    <pd:endY>165</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1415806220545</pd:targetNamespace>
+    <pd:group name="Group_Update_Tag_Request">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>173</pd:x>
+        <pd:y>3</pd:y>
+        <pd:width>351</pd:width>
+        <pd:height>305</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns1:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Update_Tag_Request</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Update_Tag_Request</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Update_Tag_Request</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Update_Tag_Request">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>337</pd:x>
+            <pd:y>78</pd:y>
+            <config>
+                <processName>/Project Name Processes/Main Process/Update_Tag_Request_Main.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Queue_Tag_Duplicate/ns:ActivityOutput/Body/pfx:MSG_CONTAINER"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>339</pd:x>
+            <pd:y>220</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>441</pd:x>
+            <pd:y>220</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns02:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns02:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>605</pd:x>
+        <pd:y>164</pd:y>
+        <config>
+            <ConfirmEvent>Queue_Tag_Duplicate</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Queue_Tag_Duplicate</pd:from>
+        <pd:to>Group_Update_Tag_Request</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group_Update_Tag_Request</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://xmlns.heb.com/ei/BITACORA_CITAS" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/BITACORA_CITAS" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_CITAS.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/Insert_CITA.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER"/>
+    <pd:startX>80</pd:startX>
+    <pd:startY>171</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1428</pd:endX>
+    <pd:endY>172</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Count>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="sumqty" type="xsd:double"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Count>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1512491618175</pd:targetNamespace>
+    <pd:activity name="JDBC PROV">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>285</pd:x>
+        <pd:y>171</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+            <statement>select case when XXX_ORIGEN like '%T%' then 'BP' else 'POR' end as TIPO , PRO_ORIGEN 
+from OPROV
+where PRO_PROVEEDOR =?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PROVEEDORID</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>TIPO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRO_ORIGEN</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <PROVEEDORID>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER"/>
+                </PROVEEDORID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>913</pd:x>
+        <pd:y>171</pd:y>
+        <config>
+            <element ref="pfx2:CITAS"/>
+        </config>
+        <pd:inputBindings>
+            <pfx2:CITAS>
+                <pfx2:ITEM>
+                    <pfx2:PROVEEDORID>
+                        <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER"/>
+                    </pfx2:PROVEEDORID>
+                    <pfx2:PROVEEDOR>
+                        <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NAME/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NAME"/>
+                    </pfx2:PROVEEDOR>
+                    <pfx2:DIA>
+                        <xsl:value-of select="''"/>
+                    </pfx2:DIA>
+                    <pfx2:HORA_CITA>
+                        <xsl:value-of select="''"/>
+                    </pfx2:HORA_CITA>
+                    <pfx2:ORDEN_COMPRA>
+                        <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER"/>
+                    </pfx2:ORDEN_COMPRA>
+                    <pfx2:FECHA_RECEPCION>
+                        <xsl:value-of select="tib:format-date('yyyyMMdd', substring($Start/pfx:PURCHASE_ORDER/pfx:PMG_EXP_RCT_DATE, 1,10))"/>
+                    </pfx2:FECHA_RECEPCION>
+                    <pfx2:QTY>
+                        <xsl:choose>
+                            <xsl:when test="exists($Count/root/sumqty)">
+                                <xsl:value-of select="$Count/root/sumqty"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </pfx2:QTY>
+                    <pfx2:TIPODISTRIBUCION>
+                        <xsl:choose>
+                            <xsl:when test="exists(if($Start/pfx:PURCHASE_ORDER/pfx:DMT_CODE = 1)&#xA;then 'POR'&#xA;else &#xA;'CONV')">
+                                <xsl:value-of select="if($Start/pfx:PURCHASE_ORDER/pfx:DMT_CODE = 1)&#xA;then 'POR'&#xA;else &#xA;'CONV'"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </pfx2:TIPODISTRIBUCION>
+                    <pfx2:BREAKPACK>
+                        <xsl:value-of select="if($JDBC-PROV/resultSet/Record/TIPO = 'BP')&#xA;then 'BP'&#xA;else &#xA;'NoBP'"/>
+                    </pfx2:BREAKPACK>
+                    <pfx2:FECHACITA>
+                        <xsl:value-of select="''"/>
+                    </pfx2:FECHACITA>
+                    <pfx2:BODEGA>
+                        <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PRIM_ORG_LVL_NUMBER"/>
+                    </pfx2:BODEGA>
+                    <pfx2:AREA_RECIBO>
+                        <xsl:value-of select="if($JDBC-PROV/resultSet/Record/PRO_ORIGEN='E')&#xA;then 'Importacion'&#xA;else 'Nacional'"/>
+                    </pfx2:AREA_RECIBO>
+                    <pfx2:ESTATUS_ORDEN>
+                        <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_STAT_CODE/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_STAT_CODE"/>
+                    </pfx2:ESTATUS_ORDEN>
+                    <pfx2:USUARIO_CREACION>
+                        <xsl:value-of select="'TIBCO'"/>
+                    </pfx2:USUARIO_CREACION>
+                    <pfx2:FECHA_CREACION>
+                        <xsl:value-of select="tib:format-dateTime('MM/dd/yyyy HH:mm:ss', current-dateTime())"/>
+                    </pfx2:FECHA_CREACION>
+                    <pfx2:USUARIO_MOD_REGISTRO>
+                        <xsl:value-of select="'N'"/>
+                    </pfx2:USUARIO_MOD_REGISTRO>
+                    <pfx2:FECHA_MOD_REGISTRO>
+                        <xsl:value-of select="''"/>
+                    </pfx2:FECHA_MOD_REGISTRO>
+                    <pfx2:ESTATUS_ENVIO_RCONTROL>
+                        <xsl:value-of select="'N'"/>
+                    </pfx2:ESTATUS_ENVIO_RCONTROL>
+                </pfx2:ITEM>
+            </pfx2:CITAS>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>355</pd:x>
+        <pd:y>24</pd:y>
+        <pd:width>474</pd:width>
+        <pd:height>279</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx:PURCHASE_ORDER/pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM</pd:over>
+            <pd:iterationElementSlot>Iteracion</pd:iterationElementSlot>
+            <pd:indexSlot>Iterate</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>FactorBP</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FactorBP</pd:from>
+            <pd:to>ARO_EMPORD</pd:to>
+            <pd:xpathDescription> </pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$FactorBP/resultSet !=''</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ARO_EMPORD</pd:from>
+            <pd:to>Sumatoria</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sumatoria</pd:from>
+            <pd:to>Assign</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FactorBP</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="FactorBP">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>430</pd:x>
+            <pd:y>87</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>select distinct articuloiD, FactorBreakPack 
+from ArticuloBreakPack aBP where  articuloiD = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>Atriculo</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>articuloiD</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>FactorBreakPack</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <Atriculo>
+                        <xsl:copy-of select="$Iteracion/pfx:ITEM/pfx:PRD_LVL_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Iteracion/pfx:ITEM/pfx:PRD_LVL_NUMBER"/>
+                    </Atriculo>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ARO_EMPORD">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>536</pd:x>
+            <pd:y>88</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ARO_EMPORD" type="xsd:double"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <ARO_EMPORD>
+                        <xsl:value-of select="if($Iteracion/pfx:ITEM/pfx:NUMBER_OF_INNERS=1)  &#xA;then round(number($Iteracion/pfx:ITEM/pfx:PMG_TOTAL_INNERS) div number($Iteracion/pfx:ITEM/pfx:VPC_BUY_MULTIPLE ) ) &#xA;else round(number($Iteracion/pfx:ITEM/pfx:PMG_PACK_QTY) div number($Iteracion/pfx:ITEM/pfx:VPC_BUY_MULTIPLE ) )"/>
+                    </ARO_EMPORD>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sumatoria">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>634</pd:x>
+            <pd:y>89</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="SUMATORIA" type="xsd:double"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <SUMATORIA>
+                        <xsl:value-of select="if($ARO_EMPORD/root/ARO_EMPORD !='')&#xA;then ($ARO_EMPORD/root/ARO_EMPORD * $FactorBP/resultSet/Record[1]/FactorBreakPack) div 100&#xA;else $ARO_EMPORD/root/ARO_EMPORD"/>
+                    </SUMATORIA>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Assign">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>744</pd:x>
+            <pd:y>90</pd:y>
+            <config>
+                <variableName>Count</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <sumqty>
+                        <xsl:value-of select="$Sumatoria/root/SUMATORIA + $Count/root/sumqty"/>
+                    </sumqty>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>433</pd:x>
+            <pd:y>232</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Assign-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>177</pd:x>
+        <pd:y>172</pd:y>
+        <config>
+            <variableName>Count</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <sumqty>
+                    <xsl:value-of select="0"/>
+                </sumqty>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-2">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>1306</pd:x>
+        <pd:y>172</pd:y>
+        <config>
+            <variableName>Count</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <sumqty>
+                    <xsl:value-of select="0"/>
+                </sumqty>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>989</pd:x>
+        <pd:y>78</pd:y>
+        <pd:width>238</pd:width>
+        <pd:height>170</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Upsert_CITABITACORA</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Upsert_CITABITACORA</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Upsert_CITABITACORA">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>1102</pd:x>
+            <pd:y>170</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/Upsert_CITABITACORA.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data/pfx2:CITAS"/>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Assign-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC PROV</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1</pd:from>
+        <pd:to>JDBC PROV</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-2</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>Assign-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

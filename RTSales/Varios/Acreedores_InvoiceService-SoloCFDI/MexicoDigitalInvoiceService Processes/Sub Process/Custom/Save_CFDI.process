@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx="http://xmlns.heb.com/ei/CFDI_SCHEMA" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.sat.gob.mx/cfd/3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/CFDI_SCHEMA" schemaLocation="/Shared Resources/Schema Definitions/Custom/CFDI_SCHEMA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" schemaLocation="/Shared Resources/WSDL/Concrete/MexicoDigitalInvoiceService.wsdl"/>
+    <xsd:import namespace="http://www.sat.gob.mx/cfd/3" schemaLocation="/Shared Resources/Schema Definitions/Custom/cfdv3.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Custom/Save_CFDI.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx:CDFI_CONTENT"/>
+                    <xsd:element name="Valida" type="xsd:string"/>
+                    <xsd:element name="SubArea" type="xsd:string"/>
+                    <xsd:element name="Referencia" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>294</pd:startX>
+    <pd:startY>145</pd:startY>
+    <pd:returnBindings>
+        <Result>
+            <ErrorDescription>
+                <xsl:value-of select="if($Call-Procedure/resultSet/outputSet/error_code='0')&#xA;then ' '&#xA;else $GetError/MESSAGE/DESCRIPTION"/>
+            </ErrorDescription>
+            <ErrorId>
+                <xsl:value-of select="if($Call-Procedure/resultSet/outputSet/error_code='0')&#xA;then 0&#xA;else $GetError/MESSAGE/CODE"/>
+            </ErrorId>
+        </Result>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Result">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ErrorDescription" type="xsd:string"/>
+                    <xsd:element name="ErrorId" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>805</pd:endX>
+    <pd:endY>150</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1303749954632</pd:targetNamespace>
+    <pd:activity name="Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>463</pd:x>
+        <pd:y>148</pd:y>
+        <config>
+            <timeout>%%Connections/Database/VISORFE/GBL_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/VISORFE/GBL_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spIns_SetCFDITypeAC;1</ProcedureName>
+            <useSchema>true</useSchema>
+            <oraObjects/>
+            <oraTables/>
+            <ConfigurationError>output schema is null</ConfigurationError>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@XML</colName>
+                    <colType>1</colType>
+                    <dataType>-1</dataType>
+                    <typeName>xml</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@Valida</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@SubArea</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@Ref_1</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@error_code</colName>
+                    <colType>2</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <XML>
+                        <xsl:value-of select="tib:render-xml($Start/group/pfx:CDFI_CONTENT/ns:Comprobante, true(), true())"/>
+                    </XML>
+                    <Valida>
+                        <xsl:value-of select="if ($Start/group/Valida = 'true' ) then 1 else 0"/>
+                    </Valida>
+                    <SubArea>
+                        <xsl:value-of select="$Start/group/SubArea"/>
+                    </SubArea>
+                    <Ref_1>
+                        <xsl:value-of select="$Start/group/Referencia"/>
+                    </Ref_1>
+                    <error_code>
+                        <xsl:value-of select="'0'"/>
+                    </error_code>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetError">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>631</pd:x>
+        <pd:y>203</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Get_Response_Message.process</processName>
+        </config>
+        <pd:inputBindings>
+            <CODE>
+                <xsl:value-of select="concat('ERR', string($Call-Procedure/resultSet/outputSet/error_code))"/>
+            </CODE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>630</pd:x>
+        <pd:y>92</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call-Procedure/resultSet/outputSet/error_code='0'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>GetError</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetError</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

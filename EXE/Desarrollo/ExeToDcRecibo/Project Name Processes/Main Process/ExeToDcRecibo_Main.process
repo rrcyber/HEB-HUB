@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Project Name Processes/Main Process/ExeToDcRecibo_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>63</pd:startX>
+    <pd:startY>401</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1063</pd:endX>
+    <pd:endY>406</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1502227648830</pd:targetNamespace>
+    <pd:activity name="ObtenerRegistros">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>194</pd:x>
+        <pd:y>402</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/ObtenerRegistros.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>324</pd:x>
+        <pd:y>402</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>391</pd:x>
+        <pd:y>14</pd:y>
+        <pd:width>439</pd:width>
+        <pd:height>351</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$ObtenerRegistros/Registros/Registro</pd:over>
+            <pd:iterationElementSlot>registro</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>ValidarDestino</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SendError</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Insert</pd:from>
+            <pd:to>Validate Error</pd:to>
+            <pd:xpathDescription>Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:xpathDescription>Technical Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>SendError</pd:to>
+            <pd:xpathDescription>Data Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Validate-Error/ErrorCode='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ValidarDestino</pd:from>
+            <pd:to>JDBC Insert</pd:to>
+            <pd:xpathDescription>no existe</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ValidarDestino</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:xpathDescription>existe</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>string-length($ValidarDestino/resultSet/Record[1]/DC_ID)&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>465</pd:x>
+            <pd:y>77</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="JDBC Insert">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>606</pd:x>
+            <pd:y>106</pd:y>
+            <config>
+                <timeout>%%Connections/Database/Interfase_01/TimeOut%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/Interfase_01.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO dc_recibo
+(dc_id, whse_id, po_id, prdd_id, prod_id, catch_wgt, rct_qty, unit_ship_cse, depdtim)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>dc_id</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>whse_id</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>po_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>prdd_id</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>prod_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>catch_wgt</parameterName>
+                        <dataType>DOUBLE</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>rct_qty</parameterName>
+                        <dataType>DOUBLE</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>unit_ship_cse</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>depdtim</parameterName>
+                        <dataType>TIMESTAMP</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <batchUpdate>true</batchUpdate>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:for-each select="$registro/Registro/Detalle">
+                        <Record>
+                            <dc_id>
+                                <xsl:value-of select="DC_ID"/>
+                            </dc_id>
+                            <whse_id>
+                                <xsl:value-of select="WHSE_ID"/>
+                            </whse_id>
+                            <po_id>
+                                <xsl:value-of select="../@PO_ID"/>
+                            </po_id>
+                            <prdd_id>
+                                <xsl:value-of select="PRDD_ID"/>
+                            </prdd_id>
+                            <prod_id>
+                                <xsl:value-of select="PROD_ID"/>
+                            </prod_id>
+                            <catch_wgt>
+                                <xsl:value-of select="CATCH_WGT"/>
+                            </catch_wgt>
+                            <rct_qty>
+                                <xsl:value-of select="RCT_QTY"/>
+                            </rct_qty>
+                            <unit_ship_cse>
+                                <xsl:value-of select="UNIT_SHIP_CSE"/>
+                            </unit_ship_cse>
+                            <depdtim>
+                                <xsl:value-of select="DEPDTIM"/>
+                            </depdtim>
+                        </Record>
+                    </xsl:for-each>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Error">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>611</pd:x>
+            <pd:y>214</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="ErrorCode" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ErrorCode>
+                    <xsl:value-of select="contains($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_CONDITION_FOR_SUSPEND, $_error/ns1:ErrorReport/MsgCode)"/>
+                </ErrorCode>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>549</pd:x>
+            <pd:y>310</pd:y>
+            <config>
+                <faultName>Exception</faultName>
+            </config>
+            <pd:inputBindings>
+                <ns13:ActivityInput>
+                    <data>
+                        <Exception>
+                            <Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                            </Domain>
+                            <Deployment>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                            </Deployment>
+                            <Project>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </Project>
+                            <EngineName>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                            </EngineName>
+                            <TimeStamp>
+                                <xsl:value-of select="current-dateTime()"/>
+                            </TimeStamp>
+                            <Code>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                            </Code>
+                            <Message>
+                                <xsl:value-of select="concat('  ERROR :   ' , tib:render-xml($_error/ns1:ErrorReport, 0, 0))"/>
+                            </Message>
+                        </Exception>
+                    </data>
+                </ns13:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="SendError">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>743</pd:x>
+            <pd:y>308</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/SendError.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns12:MSG_Container>
+                    <ns12:Header>
+                        <ns12:ProjectName>
+                            <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                        </ns12:ProjectName>
+                        <ns12:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/VariablesGenerales/SourceDomain"/>
+                        </ns12:Source_Domain>
+                        <ns12:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/VariablesGenerales/DestinationDomain"/>
+                        </ns12:Destination_Domain>
+                        <ns12:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/VariablesGenerales/TransactionType"/>
+                        </ns12:Transaction_Type>
+                        <ns12:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns12:TimeStamp>
+                    </ns12:Header>
+                    <ns12:Body>
+                        <ns12:ErrorManagementSchema>
+                            <ns12:inrtn_id>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                            </ns12:inrtn_id>
+                            <ns12:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                            </ns12:inrtn_instn_nm>
+                            <ns12:inrtn_err_rtn_desc>
+                                <xsl:value-of select="concat($_error/ns1:ErrorReport/Msg   ,'            ','No se logro insertar la siguiente informacion en la tabla dc_recibo por error de datos:    ',&#xA;'dc_id: '  ,$registro/Registro/Detalle[$i]/DC_ID,&quot;&#xA;&quot;,&#xA;'whse_id: ' ,$registro/Registro/Detalle[$i]/WHSE_ID,&quot;&#xA;&quot;,&#xA;'po_id: ' ,$registro/Registro/@PO_ID,&quot;&#xA;&quot;,&#xA;'prdd_id: ' ,$registro/Registro/Detalle[$i]/PRDD_ID,&quot;&#xA;&quot;,&#xA;'prod_id: ' ,$registro/Registro/Detalle[$i]/PROD_ID,&quot;&#xA;&quot;,&#xA;'catch_wgt: ' ,$registro/Registro/Detalle[$i]/CATCH_WGT,&quot;&#xA;&quot;,&#xA;'rct_qty: ' ,$registro/Registro/Detalle[$i]/RCT_QTY,&quot;&#xA;&quot;,&#xA;'unit_ship_cse: ' ,$registro/Registro/Detalle[$i]/UNIT_SHIP_CSE,&quot;&#xA;&quot;,&#xA;'depdtim: ' ,$registro/Registro/Detalle[$i]/DEPDTIM)"/>
+                            </ns12:inrtn_err_rtn_desc>
+                            <ns12:inrtn_msg_body>
+                                <xsl:value-of select="concat($_error/ns1:ErrorReport/Msg   ,'            ','No se logro insertar la siguiente informacion en la tabla dc_recibo por error de datos:    ',&#xA;'dc_id: '  ,$registro/Registro/Detalle[$i]/DC_ID,&quot;&#xA;&quot;,&#xA;'whse_id: ' ,$registro/Registro/Detalle[$i]/WHSE_ID,&quot;&#xA;&quot;,&#xA;'po_id: ' ,$registro/Registro/@PO_ID,&quot;&#xA;&quot;,&#xA;'prdd_id: ' ,$registro/Registro/Detalle[$i]/PRDD_ID,&quot;&#xA;&quot;,&#xA;'prod_id: ' ,$registro/Registro/Detalle[$i]/PROD_ID,&quot;&#xA;&quot;,&#xA;'catch_wgt: ' ,$registro/Registro/Detalle[$i]/CATCH_WGT,&quot;&#xA;&quot;,&#xA;'rct_qty: ' ,$registro/Registro/Detalle[$i]/RCT_QTY,&quot;&#xA;&quot;,&#xA;'unit_ship_cse: ' ,$registro/Registro/Detalle[$i]/UNIT_SHIP_CSE,&quot;&#xA;&quot;,&#xA;'depdtim: ' ,$registro/Registro/Detalle[$i]/DEPDTIM)"/>
+                            </ns12:inrtn_msg_body>
+                            <ns12:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                            </ns12:cre8_ts>
+                            <ns12:u_code>
+                                <xsl:value-of select="&quot;DATA-ERROR&quot;"/>
+                            </ns12:u_code>
+                            <ns12:sev_id>
+                                <xsl:value-of select="'2'"/>
+                            </ns12:sev_id>
+                        </ns12:ErrorManagementSchema>
+                    </ns12:Body>
+                </ns12:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ValidarDestino">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>469</pd:x>
+            <pd:y>237</pd:y>
+            <config>
+                <timeout>%%Connections/Database/Interfase_01/TimeOut%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/Interfase_01/MaxRows%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/Interfase_01.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT DC_ID
+FROM DC_RECIBO
+where load_date &gt; getdate() - 2
+AND dc_id = ?
+AND whse_id = ?
+AND po_id = ?</statement>
+                <wizardData>#Mon Sep 25 15:30:04 CDT 2017&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=SELECT D.DC_ID, D.WHSE_ID, D.PROD_ID, D.PRDD_ID, SUM(D.RCT_QTY/E.UNIT_SHIP_CSE) AS RCT_QTY, SUM(NVL(D.CATCH_WGT , 0)) AS CATCH_WGT, D.PO_ID, A.DEPDTIM, E.UNIT_SHIP_CSE \nfrom IAPT a  \ninner join IAPTD B on B.APPT_ID\= a.APPT_ID  \ninner join IRCT C  on C.APPT_ID \= B.APPT_ID and C.PO_ID \= B.PO_ID   \ninner join IRCTD D on D.RCPT_ID \= C.RCPT_ID and D.PO_ID \= C.PO_ID \ninner join IPOD E  on E.PO_ID \= D.PO_ID and E.PROD_ID \= D.PROD_ID and E.POD_ID \= D.POD_ID \nleft outer join (select distinct RCPT_ID, PO_ID \n\t\t\t\t from IRCTD  \n\t\t\t\t where nvl(RDST_ID, ' ') &lt;&gt; 'D' ) F on f.RCPT_ID \= C.RCPT_ID and F.PO_ID \= C.PO_ID \nwhere nvl(D.RDST_ID, ' ') \= 'D' \nand F.RCPT_ID is null \nand a.DEPDTIM between sysdate - 90 and sysdate\n--and a.DEPDTIM between sysdate - 30/1440 and sysdate\nGROUP BY D.DC_ID, D.WHSE_ID, D.PROD_ID, E.UNIT_SHIP_CSE, D.PO_ID, D.PRDD_ID, A.DEPDTIM&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>DC_ID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>dc_id</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>whse_id</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>po_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <dc_id>
+                        <xsl:value-of select="$registro/Registro/Detalle[1]/DC_ID"/>
+                    </dc_id>
+                    <whse_id>
+                        <xsl:value-of select="$registro/Registro/Detalle[1]/WHSE_ID"/>
+                    </whse_id>
+                    <po_id>
+                        <xsl:value-of select="$registro/Registro/@PO_ID"/>
+                    </po_id>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>ObtenerRegistros</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ObtenerRegistros</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>sin registros</pd:xpathDescription>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:xpathDescription>registros</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($ObtenerRegistros/Registros/Registro)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

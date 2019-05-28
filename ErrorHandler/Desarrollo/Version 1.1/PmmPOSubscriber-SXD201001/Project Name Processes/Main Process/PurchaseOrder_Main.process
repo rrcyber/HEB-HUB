@@ -1,0 +1,1385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://xmlns.tibco.com/body" xmlns:pfx3="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns4="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx5="http://xmlns.heb.com/ei/TABLE_HEADER" xmlns:pfx6="http://xmlns.heb.com/ei/TABLE_DETAIL" xmlns:pfx7="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" xmlns:pfx8="http://xmlns.heb.com/ei/TABLE_STOREORDER">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_HEADER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_HEADER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_DETAIL" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_DETAIL.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_TT_DISTRIBUCION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_STOREORDER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_STOREORDER.xsd"/>
+    <pd:name>Project Name Processes/Main Process/PurchaseOrder_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:MSG_CONTAINER"/>
+    <pd:startX>124</pd:startX>
+    <pd:startY>245</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xsl:if test="$PurchaseOrder_Cancel_Update/root/noOfUpdates">
+                <noOfUpdates>
+                    <xsl:value-of select="$PurchaseOrder_Cancel_Update/root/noOfUpdates"/>
+                </noOfUpdates>
+            </xsl:if>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="noOfUpdates" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1305</pd:endX>
+    <pd:endY>247</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1346687282036</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>499</pd:x>
+        <pd:y>2</pd:y>
+        <pd:width>522</pd:width>
+        <pd:height>479</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PurchaseOrder_Oorco_Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PurchaseOrder_Oaror_Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PurchaseOrder_Oorco_Update</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PurchaseOrder_Oaror_Update</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>getPONumber</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getPONumber</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getPONumber</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:xpathDescription>IF Order Exist</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$getPONumber/result/num=1</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Null-2</pd:to>
+            <pd:xpathDescription>PMG_STAT_CODE=4</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($getPONumber/result/status=4 or $getPONumber/result/status=11) and $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE=4</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>Map-Data-2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>Map-Data-3</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-2</pd:from>
+            <pd:to>Map-Data-4</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-2</pd:from>
+            <pd:to>Map-Data-5</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map-Data-2</pd:from>
+            <pd:to>PurchaseOrder_Oorco_Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map-Data-3</pd:from>
+            <pd:to>PurchaseOrder_Oaror_Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map-Data-4</pd:from>
+            <pd:to>PurchaseOrder_Oorco_Update</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map-Data-5</pd:from>
+            <pd:to>PurchaseOrder_Oaror_Update</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>554</pd:x>
+            <pd:y>237</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="group">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element ref="pfx3:PURCHASE_ORDER" minOccurs="0"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <xsl:for-each select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER">
+                        <pfx3:PURCHASE_ORDER>
+                            <pfx3:PRIM_ORG_LVL_NUMBER>
+                                <xsl:copy-of select="pfx3:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PRIM_ORG_LVL_NUMBER"/>
+                            </pfx3:PRIM_ORG_LVL_NUMBER>
+                            <pfx3:PMG_PO_NUMBER>
+                                <xsl:copy-of select="pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_PO_NUMBER"/>
+                            </pfx3:PMG_PO_NUMBER>
+                            <pfx3:PMG_STAT_CODE>
+                                <xsl:value-of select="if (pfx3:PMG_STAT_CODE = 4) then '4' else (if (pfx3:PMG_STAT_CODE = 7) then '11' else (if (pfx3:PMG_STAT_CODE = 5) then '8' else (if (pfx3:PMG_STAT_CODE = 6) then '8' else pfx3:PMG_STAT_CODE)))"/>
+                            </pfx3:PMG_STAT_CODE>
+                            <pfx3:VENDOR_NUMBER>
+                                <xsl:value-of select="tib:trim(pfx3:VENDOR_NUMBER)"/>
+                            </pfx3:VENDOR_NUMBER>
+                            <pfx3:PMG_RELEASE_DATE>
+                                <xsl:value-of select="if (string-length(pfx3:PMG_RELEASE_DATE) = 0) then '' else tib:format-date('yyyyMMdd', tib:parse-date('yyyy-MM-dd HH:mm:ss', pfx3:PMG_RELEASE_DATE))"/>
+                            </pfx3:PMG_RELEASE_DATE>
+                            <pfx3:PMG_ENTRY_DATE>
+                                <xsl:value-of select="if (string-length(pfx3:PMG_ENTRY_DATE) = 0) then '' else tib:format-date('yyyyMMdd', tib:parse-date('yyyy-MM-dd HH:mm:ss', pfx3:PMG_ENTRY_DATE))"/>
+                            </pfx3:PMG_ENTRY_DATE>
+                            <pfx3:CURR_CODE>
+                                <xsl:copy-of select="pfx3:CURR_CODE/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:CURR_CODE"/>
+                            </pfx3:CURR_CODE>
+                            <pfx3:PMG_SHORT_CODE>
+                                <xsl:copy-of select="pfx3:PMG_SHORT_CODE/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_SHORT_CODE"/>
+                            </pfx3:PMG_SHORT_CODE>
+                            <pfx3:PMG_USER>
+                                <xsl:value-of select="substring(pfx3:PMG_USER, 1,8)"/>
+                            </pfx3:PMG_USER>
+                            <pfx3:VPC_PO_PROC_TIME>
+                                <xsl:copy-of select="pfx3:VPC_PO_PROC_TIME/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_PO_PROC_TIME"/>
+                            </pfx3:VPC_PO_PROC_TIME>
+                            <pfx3:VPC_PO_SHIP_TIME>
+                                <xsl:copy-of select="pfx3:VPC_PO_SHIP_TIME/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_PO_SHIP_TIME"/>
+                            </pfx3:VPC_PO_SHIP_TIME>
+                            <pfx3:PMG_PO_NOTES>
+                                <xsl:copy-of select="pfx3:PMG_PO_NOTES/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_PO_NOTES"/>
+                            </pfx3:PMG_PO_NOTES>
+                            <pfx3:PMG_RECV_NOTES>
+                                <xsl:copy-of select="pfx3:PMG_RECV_NOTES/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_RECV_NOTES"/>
+                            </pfx3:PMG_RECV_NOTES>
+                            <pfx3:PMG_CNCL_BY_DATE>
+                                <xsl:value-of select="if (string-length(pfx3:PMG_CNCL_BY_DATE) = 0) then '' else tib:format-date('yyyyMMdd', tib:parse-date('yyyy-MM-dd HH:mm:ss', pfx3:PMG_CNCL_BY_DATE))"/>
+                            </pfx3:PMG_CNCL_BY_DATE>
+                            <pfx3:PMG_EXP_RCT_DATE>
+                                <xsl:value-of select="if (string-length(pfx3:PMG_EXP_RCT_DATE) = 0) then '' else tib:format-date('yyyyMMdd', tib:parse-date('yyyy-MM-dd HH:mm:ss', pfx3:PMG_EXP_RCT_DATE))"/>
+                            </pfx3:PMG_EXP_RCT_DATE>
+                            <pfx3:VPC_EXT_PAY_DAYS>
+                                <xsl:copy-of select="pfx3:VPC_EXT_PAY_DAYS/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_EXT_PAY_DAYS"/>
+                            </pfx3:VPC_EXT_PAY_DAYS>
+                            <pfx3:DMT_CODE>
+                                <xsl:copy-of select="pfx3:DMT_CODE/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:DMT_CODE"/>
+                            </pfx3:DMT_CODE>
+                            <pfx3:USR_TECH_KEY>
+                                <xsl:copy-of select="pfx3:USR_TECH_KEY/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:USR_TECH_KEY"/>
+                            </pfx3:USR_TECH_KEY>
+                            <pfx3:PMG_LAST_CHG_DT>
+                                <xsl:value-of select="if (string-length(pfx3:PMG_LAST_CHG_DT) = 0) then '' else tib:format-date('yyyyMMdd', tib:parse-date('yyyy-MM-dd HH:mm:ss', pfx3:PMG_LAST_CHG_DT))"/>
+                            </pfx3:PMG_LAST_CHG_DT>
+                            <pfx3:VPC_PO_REQUIRED>
+                                <xsl:copy-of select="pfx3:VPC_PO_REQUIRED/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_PO_REQUIRED"/>
+                            </pfx3:VPC_PO_REQUIRED>
+                            <pfx3:PMG_TOT_PO_COST>
+                                <xsl:copy-of select="pfx3:PMG_TOT_PO_COST/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_TOT_PO_COST"/>
+                            </pfx3:PMG_TOT_PO_COST>
+                            <pfx3:VENDOR_NAME>
+                                <xsl:copy-of select="pfx3:VENDOR_NAME/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VENDOR_NAME"/>
+                            </pfx3:VENDOR_NAME>
+                            <xsl:for-each select="pfx3:PURCHASE_ORDER_DISTRIBUTION">
+                                <pfx3:PURCHASE_ORDER_DISTRIBUTION>
+                                    <xsl:for-each select="pfx3:ITEM">
+                                        <pfx3:ITEM>
+                                            <pfx3:PMG_PO_NUMBER>
+                                                <xsl:copy-of select="pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_PO_NUMBER"/>
+                                            </pfx3:PMG_PO_NUMBER>
+                                            <pfx3:DEPARTAMENT_ID>
+                                                <xsl:copy-of select="pfx3:DEPARTAMENT_ID/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:DEPARTAMENT_ID"/>
+                                            </pfx3:DEPARTAMENT_ID>
+                                            <pfx3:ORG_LVL_NUMBER>
+                                                <xsl:copy-of select="pfx3:ORG_LVL_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:ORG_LVL_NUMBER"/>
+                                            </pfx3:ORG_LVL_NUMBER>
+                                            <pfx3:PRD_LVL_NUMBER>
+                                                <xsl:copy-of select="pfx3:PRD_LVL_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PRD_LVL_NUMBER"/>
+                                            </pfx3:PRD_LVL_NUMBER>
+                                            <pfx3:PMG_SELL_QTY>
+                                                <xsl:copy-of select="pfx3:PMG_SELL_QTY/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_SELL_QTY"/>
+                                            </pfx3:PMG_SELL_QTY>
+                                            <pfx3:SLL_UNITS_PER_INNER>
+                                                <xsl:copy-of select="pfx3:SLL_UNITS_PER_INNER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:SLL_UNITS_PER_INNER"/>
+                                            </pfx3:SLL_UNITS_PER_INNER>
+                                            <pfx3:PMG_RELEASE_DATE>
+                                                <xsl:copy-of select="pfx3:PMG_RELEASE_DATE/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_RELEASE_DATE"/>
+                                            </pfx3:PMG_RELEASE_DATE>
+                                        </pfx3:ITEM>
+                                    </xsl:for-each>
+                                </pfx3:PURCHASE_ORDER_DISTRIBUTION>
+                            </xsl:for-each>
+                            <xsl:for-each select="pfx3:PURCHASE_ORDER_DETAIL">
+                                <pfx3:PURCHASE_ORDER_DETAIL>
+                                    <xsl:for-each select="pfx3:ITEM">
+                                        <pfx3:ITEM>
+                                            <pfx3:PRIM_ORG_LVL_NUMBER>
+                                                <xsl:copy-of select="pfx3:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PRIM_ORG_LVL_NUMBER"/>
+                                            </pfx3:PRIM_ORG_LVL_NUMBER>
+                                            <pfx3:PMG_PO_NUMBER>
+                                                <xsl:copy-of select="pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_PO_NUMBER"/>
+                                            </pfx3:PMG_PO_NUMBER>
+                                            <pfx3:PMG_STATUS_A>
+                                                <xsl:copy-of select="pfx3:PMG_STATUS_A/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_STATUS_A"/>
+                                            </pfx3:PMG_STATUS_A>
+                                            <pfx3:PMG_STATUS>
+                                                <xsl:copy-of select="pfx3:PMG_STATUS/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_STATUS"/>
+                                            </pfx3:PMG_STATUS>
+                                            <pfx3:PRD_LVL_NUMBER>
+                                                <xsl:value-of select="tib:trim(pfx3:PRD_LVL_NUMBER)"/>
+                                            </pfx3:PRD_LVL_NUMBER>
+                                            <pfx3:PMG_SELL_QTY>
+                                                <xsl:copy-of select="pfx3:PMG_SELL_QTY/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_SELL_QTY"/>
+                                            </pfx3:PMG_SELL_QTY>
+                                            <pfx3:PMG_PACK_QTY>
+                                                <xsl:copy-of select="pfx3:PMG_PACK_QTY/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_PACK_QTY"/>
+                                            </pfx3:PMG_PACK_QTY>
+                                            <pfx3:PMG_RETAIL>
+                                                <xsl:copy-of select="pfx3:PMG_RETAIL/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_RETAIL"/>
+                                            </pfx3:PMG_RETAIL>
+                                            <pfx3:PMG_SELL_COST>
+                                                <xsl:copy-of select="pfx3:PMG_SELL_COST/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_SELL_COST"/>
+                                            </pfx3:PMG_SELL_COST>
+                                            <pfx3:NUMBER_OF_INNERS>
+                                                <xsl:copy-of select="pfx3:NUMBER_OF_INNERS/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:NUMBER_OF_INNERS"/>
+                                            </pfx3:NUMBER_OF_INNERS>
+                                            <pfx3:PMG_TOTAL_INNERS>
+                                                <xsl:copy-of select="pfx3:PMG_TOTAL_INNERS/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_TOTAL_INNERS"/>
+                                            </pfx3:PMG_TOTAL_INNERS>
+                                            <pfx3:SLL_UNITS_PER_INNER>
+                                                <xsl:copy-of select="pfx3:SLL_UNITS_PER_INNER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:SLL_UNITS_PER_INNER"/>
+                                            </pfx3:SLL_UNITS_PER_INNER>
+                                            <pfx3:VPC_CASE_QTY>
+                                                <xsl:copy-of select="pfx3:VPC_CASE_QTY/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:VPC_CASE_QTY"/>
+                                            </pfx3:VPC_CASE_QTY>
+                                            <pfx3:PMG_FREE_QTY>
+                                                <xsl:copy-of select="pfx3:PMG_FREE_QTY/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_FREE_QTY"/>
+                                            </pfx3:PMG_FREE_QTY>
+                                            <pfx3:PMG_UNIT_NLC_COST>
+                                                <xsl:copy-of select="pfx3:PMG_UNIT_NLC_COST/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_UNIT_NLC_COST"/>
+                                            </pfx3:PMG_UNIT_NLC_COST>
+                                            <pfx3:TXS_CODE>
+                                                <xsl:copy-of select="pfx3:TXS_CODE/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:TXS_CODE"/>
+                                            </pfx3:TXS_CODE>
+                                            <pfx3:TXS_RATE>
+                                                <xsl:copy-of select="pfx3:TXS_RATE/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:TXS_RATE"/>
+                                            </pfx3:TXS_RATE>
+                                            <pfx3:PMG_PACK_COST>
+                                                <xsl:copy-of select="pfx3:PMG_PACK_COST/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_PACK_COST"/>
+                                            </pfx3:PMG_PACK_COST>
+                                            <pfx3:VPC_CASE_PACK_ID>
+                                                <xsl:copy-of select="pfx3:VPC_CASE_PACK_ID/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:VPC_CASE_PACK_ID"/>
+                                            </pfx3:VPC_CASE_PACK_ID>
+                                            <pfx3:PMG_DTL_TECH_KEY>
+                                                <xsl:copy-of select="pfx3:PMG_DTL_TECH_KEY/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_DTL_TECH_KEY"/>
+                                            </pfx3:PMG_DTL_TECH_KEY>
+                                            <pfx3:PMG_SEQ_NUM>
+                                                <xsl:copy-of select="pfx3:PMG_SEQ_NUM/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_SEQ_NUM"/>
+                                            </pfx3:PMG_SEQ_NUM>
+                                            <pfx3:VPC_CST_START>
+                                                <xsl:copy-of select="pfx3:VPC_CST_START/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:VPC_CST_START"/>
+                                            </pfx3:VPC_CST_START>
+                                            <pfx3:PMG_CANCEL_PQTY>
+                                                <xsl:copy-of select="pfx3:PMG_CANCEL_PQTY/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PMG_CANCEL_PQTY"/>
+                                            </pfx3:PMG_CANCEL_PQTY>
+                                            <pfx3:TOT_CHG_EFFECT>
+                                                <xsl:copy-of select="pfx3:TOT_CHG_EFFECT/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:TOT_CHG_EFFECT"/>
+                                            </pfx3:TOT_CHG_EFFECT>
+                                            <pfx3:TOT_ALL_EFFECT>
+                                                <xsl:copy-of select="pfx3:TOT_ALL_EFFECT/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:TOT_ALL_EFFECT"/>
+                                            </pfx3:TOT_ALL_EFFECT>
+                                            <pfx3:PRD_UPC>
+                                                <xsl:copy-of select="pfx3:PRD_UPC/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PRD_UPC"/>
+                                            </pfx3:PRD_UPC>
+                                            <pfx3:PRD_NAME_FULL>
+                                                <xsl:copy-of select="pfx3:PRD_NAME_FULL/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PRD_NAME_FULL"/>
+                                            </pfx3:PRD_NAME_FULL>
+                                            <pfx3:INNER_PACK_ID>
+                                                <xsl:copy-of select="pfx3:INNER_PACK_ID/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:INNER_PACK_ID"/>
+                                            </pfx3:INNER_PACK_ID>
+                                            <pfx3:VPC_CASE_WGT_UOM>
+                                                <xsl:copy-of select="pfx3:VPC_CASE_WGT_UOM/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:VPC_CASE_WGT_UOM"/>
+                                            </pfx3:VPC_CASE_WGT_UOM>
+                                            <pfx3:PRD_EST_NUMBER>
+                                                <xsl:copy-of select="pfx3:PRD_EST_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:PRD_EST_NUMBER"/>
+                                            </pfx3:PRD_EST_NUMBER>
+                                            <pfx3:VPC_BUY_MULTIPLE>
+                                                <xsl:copy-of select="pfx3:VPC_BUY_MULTIPLE/@xsi:nil"/>
+                                                <xsl:value-of select="pfx3:VPC_BUY_MULTIPLE"/>
+                                            </pfx3:VPC_BUY_MULTIPLE>
+                                        </pfx3:ITEM>
+                                    </xsl:for-each>
+                                </pfx3:PURCHASE_ORDER_DETAIL>
+                            </xsl:for-each>
+                        </pfx3:PURCHASE_ORDER>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="PurchaseOrder_Oorco_Insert">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>918</pd:x>
+            <pd:y>69</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/PurchaseOrder_Oorco_Insert.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <xsl:copy-of select="$Map-Data-2/pfx5:HEADER_DATA"/>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="PurchaseOrder_Oaror_Insert">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>919</pd:x>
+            <pd:y>171</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/PurchaseOrder_Oaror_Insert.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data-3/pfx6:DETAIL_DATA"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="getPONumber">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>559</pd:x>
+            <pd:y>69</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/getPONumber.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:if test="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_PO_NUMBER">
+                        <orden>
+                            <xsl:value-of select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_PO_NUMBER"/>
+                        </orden>
+                    </xsl:if>
+                    <suc>
+                        <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9101') then '2160' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9071') then '2160' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                    </suc>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="PurchaseOrder_Oorco_Update">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>915</pd:x>
+            <pd:y>239</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/PurchaseOrder_Oorco_Update.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data-4/pfx5:HEADER_DATA"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>680</pd:x>
+            <pd:y>404</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="PurchaseOrder_Oaror_Update">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>904</pd:x>
+            <pd:y>337</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/PurchaseOrder_Oaror_Update.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data-5/pfx6:DETAIL_DATA"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>674</pd:x>
+            <pd:y>69</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Null-2">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>714</pd:x>
+            <pd:y>241</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Map-Data-2">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>801</pd:x>
+            <pd:y>67</pd:y>
+            <config>
+                <element ref="pfx5:HEADER_DATA"/>
+            </config>
+            <pd:inputBindings>
+                <pfx5:HEADER_DATA>
+                    <pfx5:ORC_SUCURSAL>
+                        <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9101') then '2160' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9071') then '2160' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                    </pfx5:ORC_SUCURSAL>
+                    <pfx5:ORC_ORDEN>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER"/>
+                    </pfx5:ORC_ORDEN>
+                    <pfx5:ORC_PROVEEDOR>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VENDOR_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VENDOR_NUMBER"/>
+                    </pfx5:ORC_PROVEEDOR>
+                    <pfx5:ORC_TICOMPRA>
+                        <xsl:value-of select="'S'"/>
+                    </pfx5:ORC_TICOMPRA>
+                    <pfx5:ORC_TIORD>
+                        <xsl:value-of select="'OC'"/>
+                    </pfx5:ORC_TIORD>
+                    <pfx5:ORC_FEORD>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE"/>
+                    </pfx5:ORC_FEORD>
+                    <pfx5:ORC_FEING>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_ENTRY_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_ENTRY_DATE"/>
+                    </pfx5:ORC_FEING>
+                    <pfx5:ORC_ESTADO>
+                        <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 4) then '4' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 7) then '11' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 5) then '8' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 6) then '8' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE)))"/>
+                    </pfx5:ORC_ESTADO>
+                    <pfx5:ORC_TIPOMON>
+                        <xsl:value-of select="if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/MXN, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/MXN, &quot;:&quot;)[2] else (if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/USD, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/USD, &quot;:&quot;)[2] else (if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/CAD, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/CAD, &quot;:&quot;)[2] else (if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/EUR, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/EUR, &quot;:&quot;)[2] else '')))"/>
+                    </pfx5:ORC_TIPOMON>
+                    <pfx5:ORC_TIPPAG>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_SHORT_CODE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_SHORT_CODE"/>
+                    </pfx5:ORC_TIPPAG>
+                    <pfx5:ORC_DESCUENTO>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_DESCUENTO>
+                    <pfx5:ORC_ULTCONSEC>
+                        <xsl:value-of select="1"/>
+                    </pfx5:ORC_ULTCONSEC>
+                    <pfx5:ORC_USUARIO>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_USER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_USER"/>
+                    </pfx5:ORC_USUARIO>
+                    <pfx5:ORC_TIENTREGA>
+                        <xsl:value-of select="number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_PROC_TIME)=0) then 0 else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_PROC_TIME) + number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_SHIP_TIME)=0) then 0 else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_SHIP_TIME )"/>
+                    </pfx5:ORC_TIENTREGA>
+                    <pfx5:ORC_DIST>
+                        <xsl:value-of select="'N'"/>
+                    </pfx5:ORC_DIST>
+                    <pfx5:ORC_DESCPRO>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_DESCPRO>
+                    <pfx5:ORC_TICAMBIO>
+                        <xsl:value-of select="10000"/>
+                    </pfx5:ORC_TICAMBIO>
+                    <pfx5:ORC_ENTRPARC>
+                        <xsl:value-of select="'S'"/>
+                    </pfx5:ORC_ENTRPARC>
+                    <pfx5:ORC_COMENTARIOS>
+                        <xsl:value-of select="if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NOTES)=0) then 'NA' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NOTES"/>
+                    </pfx5:ORC_COMENTARIOS>
+                    <pfx5:ORC_FECANCEL>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_CNCL_BY_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_CNCL_BY_DATE"/>
+                    </pfx5:ORC_FECANCEL>
+                    <pfx5:ORC_FEENVIO>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE"/>
+                    </pfx5:ORC_FEENVIO>
+                    <pfx5:ORC_FERECEP>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_EXP_RCT_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_EXP_RCT_DATE"/>
+                    </pfx5:ORC_FERECEP>
+                    <pfx5:ORC_ORDENINI>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER"/>
+                    </pfx5:ORC_ORDENINI>
+                    <pfx5:ORC_DESFIN>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_DESFIN>
+                    <pfx5:ORC_DIASPP>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_EXT_PAY_DAYS/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_EXT_PAY_DAYS"/>
+                    </pfx5:ORC_DIASPP>
+                    <pfx5:ORC_INDORDREC xsi:nil="true"/>
+                    <pfx5:ORC_SECUENCIA>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_SECUENCIA>
+                    <pfx5:ORC_CONVENIO>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:DMT_CODE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:DMT_CODE"/>
+                    </pfx5:ORC_CONVENIO>
+                    <pfx5:ORC_COMPRADOR>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:USR_TECH_KEY/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:USR_TECH_KEY"/>
+                    </pfx5:ORC_COMPRADOR>
+                    <pfx5:ORC_DISTAUTO>
+                        <xsl:value-of select="'S'"/>
+                    </pfx5:ORC_DISTAUTO>
+                    <pfx5:ORC_FECMOD>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_LAST_CHG_DT/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_LAST_CHG_DT"/>
+                    </pfx5:ORC_FECMOD>
+                    <pfx5:ORC_DEPTO>
+                        <xsl:value-of select="99"/>
+                    </pfx5:ORC_DEPTO>
+                    <pfx5:ORC_GENERADO xsi:nil="true"/>
+                    <pfx5:ORC_OOT>
+                        <xsl:value-of select="'A'"/>
+                    </pfx5:ORC_OOT>
+                    <pfx5:ORC_TIPOENVIO>
+                        <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_REQUIRED='T') then 'D' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_REQUIRED='F') then 'N' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_REQUIRED)"/>
+                    </pfx5:ORC_TIPOENVIO>
+                    <pfx5:XXX_ORIGEN xsi:nil="true"/>
+                    <pfx5:XXX_REMOTO xsi:nil="true"/>
+                </pfx5:HEADER_DATA>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map-Data-3">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>769</pd:x>
+            <pd:y>172</pd:y>
+            <config>
+                <element ref="pfx6:DETAIL_DATA"/>
+            </config>
+            <pd:inputBindings>
+                <pfx6:DETAIL_DATA>
+                    <xsl:for-each select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PURCHASE_ORDER_DETAIL/pfx3:ITEM">
+                        <pfx6:ITEM>
+                            <pfx6:ARO_SUCURSAL>
+                                <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9101') then '2160' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9071') then '2160' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                            </pfx6:ARO_SUCURSAL>
+                            <pfx6:ARO_ORDEN>
+                                <xsl:copy-of select="pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_PO_NUMBER"/>
+                            </pfx6:ARO_ORDEN>
+                            <pfx6:ARO_SUCREC>
+                                <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9101') then '2160' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9071') then '2160' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                            </pfx6:ARO_SUCREC>
+                            <pfx6:ARO_RECEPCION>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_RECEPCION>
+                            <pfx6:ARO_FEREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_FEREC>
+                            <pfx6:ARO_INTECAR>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECAR>
+                            <pfx6:ARO_INTECSU>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECSU>
+                            <pfx6:ARO_ARTICULO>
+                                <xsl:value-of select="tib:trim(pfx3:PRD_LVL_NUMBER)"/>
+                            </pfx6:ARO_ARTICULO>
+                            <pfx6:ARO_ARTORD>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ARTORD>
+                            <pfx6:ARO_PREEMPAQUE>
+                                <xsl:value-of select="''"/>
+                            </pfx6:ARO_PREEMPAQUE>
+                            <pfx6:PRD_LVL_NUMBER>
+                                <xsl:value-of select="''"/>
+                            </pfx6:PRD_LVL_NUMBER>
+                            <pfx6:ARO_ARTREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ARTREC>
+                            <pfx6:ARO_EMPORD>
+                                <xsl:value-of select="if(pfx3:NUMBER_OF_INNERS=1)  &#xA;then round(number(pfx3:PMG_TOTAL_INNERS) div number(pfx3:VPC_BUY_MULTIPLE ) ) &#xA;else round(number(pfx3:PMG_PACK_QTY) div number(pfx3:VPC_BUY_MULTIPLE ) )"/>
+                            </pfx6:ARO_EMPORD>
+                            <pfx6:ARO_EMPREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_EMPREC>
+                            <pfx6:ARO_ESTADO>
+                                <xsl:value-of select="if(pfx3:PMG_STATUS = 4) then '4' else (if(pfx3:PMG_STATUS = 7) then '11' else (if(pfx3:PMG_STATUS = 5) then '7' else (if(pfx3:PMG_STATUS = 6) then '7' else pfx3:PMG_STATUS)))"/>
+                            </pfx6:ARO_ESTADO>
+                            <pfx6:ARO_PRECIOVTA>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_RETAIL)=0) then 0 else (tib:round-fraction((pfx3:PMG_RETAIL  * 100), 0))"/>
+                            </pfx6:ARO_PRECIOVTA>
+                            <pfx6:ARO_COSTO>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_SELL_COST)=0) then 0 else (tib:round-fraction((pfx3:PMG_SELL_COST * 10000), 0))"/>
+                            </pfx6:ARO_COSTO>
+                            <pfx6:ARO_CXP>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_CXP>
+                            <pfx6:ARO_CONTAB>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_CONTAB>
+                            <pfx6:ARO_FACTCONV>
+                                <xsl:value-of select="if(pfx3:VPC_BUY_MULTIPLE > 1)&#xA;then pfx3:VPC_BUY_MULTIPLE&#xA;else&#xA;(&#xA;if(pfx3:NUMBER_OF_INNERS=1) &#xA;then (&#xA;&#x9;if(string-length(pfx3:SLL_UNITS_PER_INNER)=0) &#xA;&#x9;then 0 &#xA;&#x9;else  tib:round-fraction((pfx3:SLL_UNITS_PER_INNER * 100), 0)) &#xA;else (&#xA;&#x9;if(string-length(pfx3:VPC_CASE_QTY)=0) &#xA;&#x9;then 0 &#xA;&#x9;else  tib:round-fraction((pfx3:VPC_CASE_QTY * 100), 0))&#xA;)"/>
+                            </pfx6:ARO_FACTCONV>
+                            <pfx6:ARO_CANTSUG>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_CANTSUG>
+                            <pfx6:ARO_DIST>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_DIST>
+                            <pfx6:ARO_ACUMREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ACUMREC>
+                            <pfx6:ARO_TIREGI>
+                                <xsl:value-of select="'2'"/>
+                            </pfx6:ARO_TIREGI>
+                            <pfx6:ARO_CONSEC>
+                                <xsl:value-of select="1"/>
+                            </pfx6:ARO_CONSEC>
+                            <pfx6:ARO_INTECAR_D>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECAR_D>
+                            <pfx6:ARO_INTECSU_D>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECSU_D>
+                            <pfx6:ARO_DESCVAL>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_DESCVAL>
+                            <pfx6:ARO_DESCUENTO>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_DESCUENTO>
+                            <pfx6:ARO_SECUENCIA>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_SECUENCIA>
+                            <pfx6:ARO_COSTOFERTA>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_UNIT_NLC_COST)>0) then tib:round-fraction((number(pfx3:PMG_UNIT_NLC_COST)*10000),1) else 0"/>
+                            </pfx6:ARO_COSTOFERTA>
+                            <pfx6:ARO_DESCUENTO2>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_DESCUENTO2>
+                            <pfx6:ARO_EMPBONIF>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_EMPBONIF>
+                            <pfx6:ARO_ORDENSUC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ORDENSUC>
+                            <pfx6:ARO_BONIFREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_BONIFREC>
+                            <pfx6:ARO_COSTONETO>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_COSTONETO>
+                            <pfx6:ARO_TECLA>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_TECLA>
+                            <pfx6:ARO_EMPBONIFREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_EMPBONIFREC>
+                            <pfx6:ARO_FACTCONVREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_FACTCONVREC>
+                            <pfx6:ARO_INTECARC>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECARC>
+                            <pfx6:ARO_COSTBRUEMP>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_PACK_COST)=0) then 0 else (number(pfx3:PMG_PACK_COST) * 10000)"/>
+                            </pfx6:ARO_COSTBRUEMP>
+                            <pfx6:ARO_DESCPAC>
+                                <xsl:value-of select="round(100-(((number(pfx3:PMG_UNIT_NLC_COST)*10000) div (if(string-length(pfx3:PMG_SELL_COST)=0) then 0 else number(pfx3:PMG_SELL_COST)*10000))*100))"/>
+                            </pfx6:ARO_DESCPAC>
+                            <pfx6:ARO_FECOSTO>
+                                <xsl:copy-of select="pfx3:VPC_CST_START/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_CST_START"/>
+                            </pfx6:ARO_FECOSTO>
+                            <pfx6:ARO_ORIGINAL>
+                                <xsl:value-of select="'S'"/>
+                            </pfx6:ARO_ORIGINAL>
+                            <pfx6:ARO_BONIF>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_FREE_QTY)=0) then 0 else pfx3:PMG_FREE_QTY"/>
+                            </pfx6:ARO_BONIF>
+                            <pfx6:ARO_TIENTREGA>
+                                <xsl:value-of select="number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_PROC_TIME)=0) then 0 else ../../pfx3:VPC_PO_PROC_TIME) + number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_SHIP_TIME)=0) then 0 else ../../pfx3:VPC_PO_SHIP_TIME)"/>
+                            </pfx6:ARO_TIENTREGA>
+                            <pfx6:ARO_IEP xsi:nil="true"/>
+                            <pfx6:ARO_IVA xsi:nil="true"/>
+                            <pfx6:XXX_ORIGEN>
+                                <xsl:copy-of select="pfx3:VPC_CASE_PACK_ID/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_CASE_PACK_ID"/>
+                            </pfx6:XXX_ORIGEN>
+                            <pfx6:XXX_REMOTO xsi:nil="true"/>
+                            <pfx6:PMG_DTL_TECH_KEY>
+                                <xsl:copy-of select="pfx3:PMG_DTL_TECH_KEY/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_DTL_TECH_KEY"/>
+                            </pfx6:PMG_DTL_TECH_KEY>
+                            <pfx6:PMG_SEQ_NUM>
+                                <xsl:copy-of select="pfx3:PMG_SEQ_NUM/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_SEQ_NUM"/>
+                            </pfx6:PMG_SEQ_NUM>
+                        </pfx6:ITEM>
+                    </xsl:for-each>
+                </pfx6:DETAIL_DATA>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map-Data-4">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>815</pd:x>
+            <pd:y>240</pd:y>
+            <config>
+                <element ref="pfx5:HEADER_DATA"/>
+            </config>
+            <pd:inputBindings>
+                <pfx5:HEADER_DATA>
+                    <pfx5:ORC_SUCURSAL>
+                        <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9101') then '2160' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9071') then '2160' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                    </pfx5:ORC_SUCURSAL>
+                    <pfx5:ORC_ORDEN>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER"/>
+                    </pfx5:ORC_ORDEN>
+                    <pfx5:ORC_PROVEEDOR>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VENDOR_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VENDOR_NUMBER"/>
+                    </pfx5:ORC_PROVEEDOR>
+                    <pfx5:ORC_TICOMPRA>
+                        <xsl:value-of select="'S'"/>
+                    </pfx5:ORC_TICOMPRA>
+                    <pfx5:ORC_TIORD>
+                        <xsl:value-of select="'OC'"/>
+                    </pfx5:ORC_TIORD>
+                    <pfx5:ORC_FEORD>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE"/>
+                    </pfx5:ORC_FEORD>
+                    <pfx5:ORC_FEING>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_ENTRY_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_ENTRY_DATE"/>
+                    </pfx5:ORC_FEING>
+                    <pfx5:ORC_ESTADO>
+                        <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 4) then '4' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 7) then '11' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 5) then '8' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE = 6) then '8' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_STAT_CODE)))"/>
+                    </pfx5:ORC_ESTADO>
+                    <pfx5:ORC_TIPOMON>
+                        <xsl:value-of select="if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/MXN, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/MXN, &quot;:&quot;)[2] else (if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/USD, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/USD, &quot;:&quot;)[2] else (if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/CAD, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/CAD, &quot;:&quot;)[2] else (if(tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/EUR, &quot;:&quot;)[1]=$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:CURR_CODE) then tib:tokenize($_globalVariables/ns4:GlobalVariables/TIPO_MONEDA/EUR, &quot;:&quot;)[2] else '')))"/>
+                    </pfx5:ORC_TIPOMON>
+                    <pfx5:ORC_TIPPAG>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_SHORT_CODE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_SHORT_CODE"/>
+                    </pfx5:ORC_TIPPAG>
+                    <pfx5:ORC_DESCUENTO>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_DESCUENTO>
+                    <pfx5:ORC_ULTCONSEC>
+                        <xsl:value-of select="1"/>
+                    </pfx5:ORC_ULTCONSEC>
+                    <pfx5:ORC_USUARIO>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_USER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_USER"/>
+                    </pfx5:ORC_USUARIO>
+                    <pfx5:ORC_TIENTREGA>
+                        <xsl:value-of select="number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_PROC_TIME)=0) then 0 else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_PROC_TIME) + number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_SHIP_TIME)=0) then 0 else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_SHIP_TIME )"/>
+                    </pfx5:ORC_TIENTREGA>
+                    <pfx5:ORC_DIST>
+                        <xsl:value-of select="'N'"/>
+                    </pfx5:ORC_DIST>
+                    <pfx5:ORC_DESCPRO>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_DESCPRO>
+                    <pfx5:ORC_TICAMBIO>
+                        <xsl:value-of select="10000"/>
+                    </pfx5:ORC_TICAMBIO>
+                    <pfx5:ORC_ENTRPARC>
+                        <xsl:value-of select="'S'"/>
+                    </pfx5:ORC_ENTRPARC>
+                    <pfx5:ORC_COMENTARIOS>
+                        <xsl:value-of select="if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NOTES)=0) then 'NA' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NOTES"/>
+                    </pfx5:ORC_COMENTARIOS>
+                    <pfx5:ORC_FECANCEL>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_CNCL_BY_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_CNCL_BY_DATE"/>
+                    </pfx5:ORC_FECANCEL>
+                    <pfx5:ORC_FEENVIO>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_RELEASE_DATE"/>
+                    </pfx5:ORC_FEENVIO>
+                    <pfx5:ORC_FERECEP>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_EXP_RCT_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_EXP_RCT_DATE"/>
+                    </pfx5:ORC_FERECEP>
+                    <pfx5:ORC_ORDENINI>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_PO_NUMBER"/>
+                    </pfx5:ORC_ORDENINI>
+                    <pfx5:ORC_DESFIN>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_DESFIN>
+                    <pfx5:ORC_DIASPP>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_EXT_PAY_DAYS/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_EXT_PAY_DAYS"/>
+                    </pfx5:ORC_DIASPP>
+                    <pfx5:ORC_INDORDREC xsi:nil="true"/>
+                    <pfx5:ORC_SECUENCIA>
+                        <xsl:value-of select="0"/>
+                    </pfx5:ORC_SECUENCIA>
+                    <pfx5:ORC_CONVENIO>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:DMT_CODE/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:DMT_CODE"/>
+                    </pfx5:ORC_CONVENIO>
+                    <pfx5:ORC_COMPRADOR>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:USR_TECH_KEY/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:USR_TECH_KEY"/>
+                    </pfx5:ORC_COMPRADOR>
+                    <pfx5:ORC_DISTAUTO>
+                        <xsl:value-of select="'S'"/>
+                    </pfx5:ORC_DISTAUTO>
+                    <pfx5:ORC_FECMOD>
+                        <xsl:copy-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_LAST_CHG_DT/@xsi:nil"/>
+                        <xsl:value-of select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PMG_LAST_CHG_DT"/>
+                    </pfx5:ORC_FECMOD>
+                    <pfx5:ORC_DEPTO>
+                        <xsl:value-of select="99"/>
+                    </pfx5:ORC_DEPTO>
+                    <pfx5:ORC_GENERADO xsi:nil="true"/>
+                    <pfx5:ORC_OOT>
+                        <xsl:value-of select="'A'"/>
+                    </pfx5:ORC_OOT>
+                    <pfx5:ORC_TIPOENVIO>
+                        <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_REQUIRED='T') then 'D' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_REQUIRED='F') then 'N' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_REQUIRED)"/>
+                    </pfx5:ORC_TIPOENVIO>
+                    <pfx5:XXX_ORIGEN xsi:nil="true"/>
+                    <pfx5:XXX_REMOTO xsi:nil="true"/>
+                </pfx5:HEADER_DATA>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map-Data-5">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>792</pd:x>
+            <pd:y>339</pd:y>
+            <config>
+                <element ref="pfx6:DETAIL_DATA"/>
+            </config>
+            <pd:inputBindings>
+                <pfx6:DETAIL_DATA>
+                    <xsl:for-each xmlns:xsl="http://www.w3.org/1999/XSL/Transform" select="$Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PURCHASE_ORDER_DETAIL/pfx3:ITEM">
+                        <pfx6:ITEM>
+                            <pfx6:ARO_SUCURSAL>
+                                <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9101') then '2160' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9071') then '2160' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                            </pfx6:ARO_SUCURSAL>
+                            <pfx6:ARO_ORDEN>
+                                <xsl:copy-of select="pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_PO_NUMBER"/>
+                            </pfx6:ARO_ORDEN>
+                            <pfx6:ARO_SUCREC>
+                                <xsl:value-of select="if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9101') then '2160' else (if($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER='9071') then '2160' else $Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                            </pfx6:ARO_SUCREC>
+                            <pfx6:ARO_RECEPCION>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_RECEPCION>
+                            <pfx6:ARO_FEREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_FEREC>
+                            <pfx6:ARO_INTECAR>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECAR>
+                            <pfx6:ARO_INTECSU>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECSU>
+                            <pfx6:ARO_ARTICULO>
+                                <xsl:value-of select="tib:trim(pfx3:PRD_LVL_NUMBER)"/>
+                            </pfx6:ARO_ARTICULO>
+                            <pfx6:ARO_ARTORD>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ARTORD>
+                            <pfx6:ARO_PREEMPAQUE>
+                                <xsl:value-of select="''"/>
+                            </pfx6:ARO_PREEMPAQUE>
+                            <pfx6:PRD_LVL_NUMBER>
+                                <xsl:value-of select="''"/>
+                            </pfx6:PRD_LVL_NUMBER>
+                            <pfx6:ARO_ARTREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ARTREC>
+                            <pfx6:ARO_EMPORD>
+                                <xsl:value-of select="if(pfx3:NUMBER_OF_INNERS=1) &#xA;then round(number(pfx3:PMG_TOTAL_INNERS) div number( pfx3:VPC_BUY_MULTIPLE) ) &#xA;else round(number(pfx3:PMG_PACK_QTY) div number(pfx3:VPC_BUY_MULTIPLE )  )"/>
+                            </pfx6:ARO_EMPORD>
+                            <pfx6:ARO_EMPREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_EMPREC>
+                            <pfx6:ARO_ESTADO>
+                                <xsl:value-of select="if(pfx3:PMG_STATUS = 4) then '4' else (if(pfx3:PMG_STATUS = 7) then '11' else (if(pfx3:PMG_STATUS = 5) then '7' else (if(pfx3:PMG_STATUS = 6) then '7' else pfx3:PMG_STATUS)))"/>
+                            </pfx6:ARO_ESTADO>
+                            <pfx6:ARO_PRECIOVTA>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_RETAIL)=0) then 0 else (tib:round-fraction((pfx3:PMG_RETAIL  * 100), 0))"/>
+                            </pfx6:ARO_PRECIOVTA>
+                            <pfx6:ARO_COSTO>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_SELL_COST)=0) then 0 else (tib:round-fraction((pfx3:PMG_SELL_COST * 10000), 0))"/>
+                            </pfx6:ARO_COSTO>
+                            <pfx6:ARO_CXP>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_CXP>
+                            <pfx6:ARO_CONTAB>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_CONTAB>
+                            <pfx6:ARO_FACTCONV>
+                                <xsl:value-of select="if (pfx3:VPC_BUY_MULTIPLE > 0)&#xA;then pfx3:VPC_BUY_MULTIPLE &#xA;else&#xA;(&#xA;if(pfx3:NUMBER_OF_INNERS=1)&#xA;then (&#xA;&#x9;if(string-length(pfx3:SLL_UNITS_PER_INNER)=0) &#xA;&#x9;then 0&#xA;&#x9; else  tib:round-fraction((pfx3:SLL_UNITS_PER_INNER * 100), 0)) &#xA;else (&#xA;&#x9;if(string-length(pfx3:VPC_CASE_QTY)=0) &#xA;&#x9;then 0 &#xA;&#x9;else  tib:round-fraction((pfx3:VPC_CASE_QTY * 100), 0))&#xA;)"/>
+                            </pfx6:ARO_FACTCONV>
+                            <pfx6:ARO_CANTSUG>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_CANTSUG>
+                            <pfx6:ARO_DIST>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_DIST>
+                            <pfx6:ARO_ACUMREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ACUMREC>
+                            <pfx6:ARO_TIREGI>
+                                <xsl:value-of select="'2'"/>
+                            </pfx6:ARO_TIREGI>
+                            <pfx6:ARO_CONSEC>
+                                <xsl:value-of select="1"/>
+                            </pfx6:ARO_CONSEC>
+                            <pfx6:ARO_INTECAR_D>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECAR_D>
+                            <pfx6:ARO_INTECSU_D>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECSU_D>
+                            <pfx6:ARO_DESCVAL>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_DESCVAL>
+                            <pfx6:ARO_DESCUENTO>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_DESCUENTO>
+                            <pfx6:ARO_SECUENCIA>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_SECUENCIA>
+                            <pfx6:ARO_COSTOFERTA>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_UNIT_NLC_COST)>0) then tib:round-fraction((number(pfx3:PMG_UNIT_NLC_COST)*10000),1) else 0"/>
+                            </pfx6:ARO_COSTOFERTA>
+                            <pfx6:ARO_DESCUENTO2>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_DESCUENTO2>
+                            <pfx6:ARO_EMPBONIF>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_EMPBONIF>
+                            <pfx6:ARO_ORDENSUC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_ORDENSUC>
+                            <pfx6:ARO_BONIFREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_BONIFREC>
+                            <pfx6:ARO_COSTONETO>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_COSTONETO>
+                            <pfx6:ARO_TECLA>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_TECLA>
+                            <pfx6:ARO_EMPBONIFREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_EMPBONIFREC>
+                            <pfx6:ARO_FACTCONVREC>
+                                <xsl:value-of select="0"/>
+                            </pfx6:ARO_FACTCONVREC>
+                            <pfx6:ARO_INTECARC>
+                                <xsl:value-of select="'N'"/>
+                            </pfx6:ARO_INTECARC>
+                            <pfx6:ARO_COSTBRUEMP>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_PACK_COST)=0) then 0 else (number(pfx3:PMG_PACK_COST) * 10000)"/>
+                            </pfx6:ARO_COSTBRUEMP>
+                            <pfx6:ARO_DESCPAC>
+                                <xsl:value-of select="round(100-(((number(pfx3:PMG_UNIT_NLC_COST)*10000) div (if(string-length(pfx3:PMG_SELL_COST)=0) then 0 else number(pfx3:PMG_SELL_COST)*10000))*100))"/>
+                            </pfx6:ARO_DESCPAC>
+                            <pfx6:ARO_FECOSTO>
+                                <xsl:copy-of select="pfx3:VPC_CST_START/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_CST_START"/>
+                            </pfx6:ARO_FECOSTO>
+                            <pfx6:ARO_ORIGINAL>
+                                <xsl:value-of select="'S'"/>
+                            </pfx6:ARO_ORIGINAL>
+                            <pfx6:ARO_BONIF>
+                                <xsl:value-of select="if(string-length(pfx3:PMG_FREE_QTY)=0) then 0 else pfx3:PMG_FREE_QTY"/>
+                            </pfx6:ARO_BONIF>
+                            <pfx6:ARO_TIENTREGA>
+                                <xsl:value-of select="number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_PROC_TIME)=0) then 0 else ../../pfx3:VPC_PO_PROC_TIME) + number(if(string-length($Map-Data/group/pfx3:PURCHASE_ORDER/pfx3:VPC_PO_SHIP_TIME)=0) then 0 else ../../pfx3:VPC_PO_SHIP_TIME)"/>
+                            </pfx6:ARO_TIENTREGA>
+                            <pfx6:ARO_IEP xsi:nil="true"/>
+                            <pfx6:ARO_IVA xsi:nil="true"/>
+                            <pfx6:XXX_ORIGEN>
+                                <xsl:copy-of select="pfx3:VPC_CASE_PACK_ID/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:VPC_CASE_PACK_ID"/>
+                            </pfx6:XXX_ORIGEN>
+                            <pfx6:XXX_REMOTO xsi:nil="true"/>
+                            <pfx6:PMG_DTL_TECH_KEY>
+                                <xsl:copy-of select="pfx3:PMG_DTL_TECH_KEY/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_DTL_TECH_KEY"/>
+                            </pfx6:PMG_DTL_TECH_KEY>
+                            <pfx6:PMG_SEQ_NUM>
+                                <xsl:copy-of select="pfx3:PMG_SEQ_NUM/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_SEQ_NUM"/>
+                            </pfx6:PMG_SEQ_NUM>
+                        </pfx6:ITEM>
+                    </xsl:for-each>
+                </pfx6:DETAIL_DATA>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="PurchaseOrder_Cancel_Update">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>776</pd:x>
+        <pd:y>540</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/PurchaseOrder_Cancel_Update.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Map-Data-1/group/pfx5:HEADER_DATA"/>
+                <xsl:copy-of select="$Map-Data-1/group/pfx6:DETAIL_DATA"/>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map-Data-1">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>487</pd:x>
+        <pd:y>540</pd:y>
+        <config>
+            <element>
+                <xsd:element name="group">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="pfx5:HEADER_DATA"/>
+                            <xsd:element ref="pfx6:DETAIL_DATA"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <pfx5:HEADER_DATA>
+                    <pfx5:ORC_SUCURSAL>
+                        <xsl:value-of select="if($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PRIM_ORG_LVL_NUMBER='9101')then '2160' else (if($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PRIM_ORG_LVL_NUMBER='9071')then '2160' else $Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                    </pfx5:ORC_SUCURSAL>
+                    <pfx5:ORC_ORDEN>
+                        <xsl:copy-of select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_PO_NUMBER"/>
+                    </pfx5:ORC_ORDEN>
+                    <pfx5:ORC_PROVEEDOR xsi:nil="true"/>
+                    <pfx5:ORC_TICOMPRA xsi:nil="true"/>
+                    <pfx5:ORC_TIORD xsi:nil="true"/>
+                    <pfx5:ORC_FEORD xsi:nil="true"/>
+                    <pfx5:ORC_FEING xsi:nil="true"/>
+                    <pfx5:ORC_ESTADO>
+                        <xsl:value-of select="if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 4) then '4' else (if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 7) then '11' else (if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 5) then '8' else (if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 6) then '8' else $Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE)))"/>
+                    </pfx5:ORC_ESTADO>
+                    <pfx5:ORC_TIPOMON xsi:nil="true"/>
+                    <pfx5:ORC_TIPPAG xsi:nil="true"/>
+                    <pfx5:ORC_DESCUENTO xsi:nil="true"/>
+                    <pfx5:ORC_ULTCONSEC xsi:nil="true"/>
+                    <pfx5:ORC_USUARIO xsi:nil="true"/>
+                    <pfx5:ORC_TIENTREGA xsi:nil="true"/>
+                    <pfx5:ORC_DIST xsi:nil="true"/>
+                    <pfx5:ORC_DESCPRO xsi:nil="true"/>
+                    <pfx5:ORC_TICAMBIO xsi:nil="true"/>
+                    <pfx5:ORC_ENTRPARC xsi:nil="true"/>
+                    <pfx5:ORC_COMENTARIOS xsi:nil="true"/>
+                    <pfx5:ORC_FECANCEL xsi:nil="true"/>
+                    <pfx5:ORC_FEENVIO xsi:nil="true"/>
+                    <pfx5:ORC_FERECEP xsi:nil="true"/>
+                    <pfx5:ORC_ORDENINI xsi:nil="true"/>
+                    <pfx5:ORC_DESFIN xsi:nil="true"/>
+                    <pfx5:ORC_DIASPP xsi:nil="true"/>
+                    <pfx5:ORC_INDORDREC xsi:nil="true"/>
+                    <pfx5:ORC_SECUENCIA xsi:nil="true"/>
+                    <pfx5:ORC_CONVENIO xsi:nil="true"/>
+                    <pfx5:ORC_COMPRADOR xsi:nil="true"/>
+                    <pfx5:ORC_DISTAUTO xsi:nil="true"/>
+                    <pfx5:ORC_FECMOD>
+                        <xsl:value-of select="if (string-length($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_LAST_CHG_DT) = 0) then '' else tib:format-date('yyyyMMdd', tib:parse-date('yyyy-MM-dd HH:mm:ss', $Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_LAST_CHG_DT))"/>
+                    </pfx5:ORC_FECMOD>
+                    <pfx5:ORC_DEPTO xsi:nil="true"/>
+                    <pfx5:ORC_GENERADO xsi:nil="true"/>
+                    <pfx5:ORC_OOT xsi:nil="true"/>
+                    <pfx5:ORC_TIPOENVIO xsi:nil="true"/>
+                    <pfx5:XXX_ORIGEN xsi:nil="true"/>
+                    <pfx5:XXX_REMOTO xsi:nil="true"/>
+                </pfx5:HEADER_DATA>
+                <pfx6:DETAIL_DATA>
+                    <xsl:for-each select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER/pfx3:PURCHASE_ORDER_DETAIL/pfx3:ITEM">
+                        <pfx6:ITEM>
+                            <pfx6:ARO_SUCURSAL>
+                                <xsl:value-of select="if($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PRIM_ORG_LVL_NUMBER='9101')then '2160' else (if($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PRIM_ORG_LVL_NUMBER='9071')then '2160' else $Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PRIM_ORG_LVL_NUMBER)"/>
+                            </pfx6:ARO_SUCURSAL>
+                            <pfx6:ARO_ORDEN>
+                                <xsl:copy-of select="pfx3:PMG_PO_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:PMG_PO_NUMBER"/>
+                            </pfx6:ARO_ORDEN>
+                            <pfx6:ARO_SUCREC xsi:nil="true"/>
+                            <pfx6:ARO_RECEPCION xsi:nil="true"/>
+                            <pfx6:ARO_FEREC xsi:nil="true"/>
+                            <pfx6:ARO_INTECAR xsi:nil="true"/>
+                            <pfx6:ARO_INTECSU xsi:nil="true"/>
+                            <pfx6:ARO_ARTICULO xsi:nil="true"/>
+                            <pfx6:ARO_ARTORD xsi:nil="true"/>
+                            <pfx6:ARO_PREEMPAQUE>
+                                <xsl:value-of select="''"/>
+                            </pfx6:ARO_PREEMPAQUE>
+                            <pfx6:PRD_LVL_NUMBER>
+                                <xsl:value-of select="''"/>
+                            </pfx6:PRD_LVL_NUMBER>
+                            <pfx6:ARO_ARTREC xsi:nil="true"/>
+                            <pfx6:ARO_EMPORD xsi:nil="true"/>
+                            <pfx6:ARO_EMPREC xsi:nil="true"/>
+                            <pfx6:ARO_ESTADO>
+                                <xsl:value-of select="if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 4) then '4' else (if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 7) then '11' else (if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 5) then '8' else (if ($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 6) then '8' else $Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE)))"/>
+                            </pfx6:ARO_ESTADO>
+                            <pfx6:ARO_PRECIOVTA xsi:nil="true"/>
+                            <pfx6:ARO_COSTO xsi:nil="true"/>
+                            <pfx6:ARO_CXP xsi:nil="true"/>
+                            <pfx6:ARO_CONTAB xsi:nil="true"/>
+                            <pfx6:ARO_FACTCONV xsi:nil="true"/>
+                            <pfx6:ARO_CANTSUG xsi:nil="true"/>
+                            <pfx6:ARO_DIST xsi:nil="true"/>
+                            <pfx6:ARO_ACUMREC xsi:nil="true"/>
+                            <pfx6:ARO_TIREGI xsi:nil="true"/>
+                            <pfx6:ARO_CONSEC xsi:nil="true"/>
+                            <pfx6:ARO_INTECAR_D xsi:nil="true"/>
+                            <pfx6:ARO_INTECSU_D xsi:nil="true"/>
+                            <pfx6:ARO_DESCVAL xsi:nil="true"/>
+                            <pfx6:ARO_DESCUENTO xsi:nil="true"/>
+                            <pfx6:ARO_SECUENCIA xsi:nil="true"/>
+                            <pfx6:ARO_COSTOFERTA xsi:nil="true"/>
+                            <pfx6:ARO_DESCUENTO2 xsi:nil="true"/>
+                            <pfx6:ARO_EMPBONIF xsi:nil="true"/>
+                            <pfx6:ARO_ORDENSUC xsi:nil="true"/>
+                            <pfx6:ARO_BONIFREC xsi:nil="true"/>
+                            <pfx6:ARO_COSTONETO xsi:nil="true"/>
+                            <pfx6:ARO_TECLA xsi:nil="true"/>
+                            <pfx6:ARO_EMPBONIFREC xsi:nil="true"/>
+                            <pfx6:ARO_FACTCONVREC xsi:nil="true"/>
+                            <pfx6:ARO_INTECARC xsi:nil="true"/>
+                            <pfx6:ARO_COSTBRUEMP xsi:nil="true"/>
+                            <pfx6:ARO_DESCPAC xsi:nil="true"/>
+                            <pfx6:ARO_FECOSTO xsi:nil="true"/>
+                            <pfx6:ARO_ORIGINAL xsi:nil="true"/>
+                            <pfx6:ARO_BONIF xsi:nil="true"/>
+                            <pfx6:ARO_TIENTREGA xsi:nil="true"/>
+                            <pfx6:ARO_IEP xsi:nil="true"/>
+                            <pfx6:ARO_IVA xsi:nil="true"/>
+                            <pfx6:XXX_ORIGEN xsi:nil="true"/>
+                            <pfx6:XXX_REMOTO xsi:nil="true"/>
+                            <pfx6:PMG_DTL_TECH_KEY xsi:nil="true"/>
+                            <pfx6:PMG_SEQ_NUM xsi:nil="true"/>
+                        </pfx6:ITEM>
+                    </xsl:for-each>
+                </pfx6:DETAIL_DATA>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1136</pd:x>
+        <pd:y>469</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Map-Data-1</pd:from>
+        <pd:to>PurchaseOrder_Cancel_Update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PurchaseOrder_Cancel_Update</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map-Data-1</pd:to>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:PURCHASE_ORDER[1]/pfx3:PMG_STAT_CODE = 7</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PurchaseOrder_Cancel_Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

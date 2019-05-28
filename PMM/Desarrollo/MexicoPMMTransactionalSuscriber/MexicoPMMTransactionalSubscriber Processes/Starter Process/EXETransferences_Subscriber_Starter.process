@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx3="http://xmlns.heb.com/ei/INNER_PACK_INFORMATION" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/PRODUCT_CODE_INFORMATION" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:ns02="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx5="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_SOAP.xsd"/>
+    <pd:name>MexicoPMMTransactionalSubscriber Processes/Starter Process/EXETransferences_Subscriber_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>140</pd:x>
+        <pd:y>211</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Mexico/MIG_MAX_SESSIONS%%</maxSessions>
+                <destination>%%Destinations/Queues/EXE_SDITRFDTE_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection Mexico.sharedjmscon</ConnectionReference>
+            <OutDataxsdString>
+                <xsd:element name="TRANSFERENCES">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="EXE_SDITRFDTE">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="TRF_NUMBER" type="xsd:string"/>
+                                        <xsd:element name="TECH_KEY" type="xsd:string"/>
+                                        <xsd:element name="PRD_LVL_NUMBER" type="xsd:string"/>
+                                        <xsd:element name="PRD_UPC" type="xsd:string"/>
+                                        <xsd:element name="FROM_LOC" type="xsd:string"/>
+                                        <xsd:element name="TO_LOC" type="xsd:string"/>
+                                        <xsd:element name="QUANTITY" type="xsd:string"/>
+                                        <xsd:element name="SLL_UNITS_PER_INNER" type="xsd:string"/>
+                                        <xsd:element name="INNER_PACK_ID" type="xsd:string"/>
+                                        <xsd:element name="TRF_WEIGHT_UOM" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </OutDataxsdString>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>784</pd:endX>
+    <pd:endY>154</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1273678251231</pd:targetNamespace>
+    <pd:group name="Retry Group on Error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>255</pd:x>
+        <pd:y>31</pd:y>
+        <pd:width>330</pd:width>
+        <pd:height>348</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>EXETransferences_Insert_Main</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>EXETransferences_Insert_Main</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>EXETransferences_Insert_Main</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Straight</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Retry</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>ErrorHandlerMexico</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ErrorHandlerMexico</pd:from>
+            <pd:to>Retry</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="EXETransferences_Insert_Main">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>363</pd:x>
+            <pd:y>86</pd:y>
+            <config>
+                <processName>/MexicoPMMTransactionalSubscriber Processes/Main Process/EXE Transferences/EXETransferences_Insert_Main.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$JMS-Queue-Receiver/ns1:ActivityOutput/Body/TRANSFERENCES"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>366</pd:x>
+            <pd:y>219</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Retry">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>532</pd:x>
+            <pd:y>219</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns02:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns02:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorHandlerMexico">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>371</pd:x>
+            <pd:y>310</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorHandlerMexico.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <Project>
+                        <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                    </Project>
+                    <Tibcoprocess>
+                        <xsl:value-of select="$_error/ns:ErrorReport/ProcessStack"/>
+                    </Tibcoprocess>
+                    <MailSupport>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERR_EMAIL_TO"/>
+                    </MailSupport>
+                    <Tablename>
+                        <xsl:value-of select="&quot;EXE_SDITRFDTE&quot;"/>
+                    </Tablename>
+                    <MsgError>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </MsgError>
+                    <Queue>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/Destinations/Queues/EXE_SDITRFDTE_QUEUE"/>
+                    </Queue>
+                    <Info>
+                        <xsl:value-of select="tib:render-xml($JMS-Queue-Receiver/ns1:ActivityOutput/Body/TRANSFERENCES/EXE_SDITRFDTE)"/>
+                    </Info>
+                    <PublicationTable>
+                        <xsl:value-of select="&quot;SDITRFDTE&quot;"/>
+                    </PublicationTable>
+                    <sendmail>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ExceptionHandling/SENDMAIL"/>
+                    </sendmail>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>690</pd:x>
+        <pd:y>154</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Retry Group on Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

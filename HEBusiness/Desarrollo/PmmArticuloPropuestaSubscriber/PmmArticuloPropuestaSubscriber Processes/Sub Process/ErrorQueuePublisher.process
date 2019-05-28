@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns3="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Llaves.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Llaves.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Llaves.xsd"/>
+    <pd:name>PmmArticuloPropuestaSubscriber Processes/Sub Process/ErrorQueuePublisher.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Llaves"/>
+    <pd:startX>29</pd:startX>
+    <pd:startY>141</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>487</pd:endX>
+    <pd:endY>143</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1393365779755</pd:targetNamespace>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>183</pd:x>
+        <pd:y>141</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>true</validateInput>
+            <term ref="pfx:Llaves"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Llaves"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Queue Sender">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>333</pd:x>
+        <pd:y>142</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_ARTICULOERROR_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>%%Connections/JMS/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                <JMSExpiration>%%Connections/JMS/Properties/GLB_JMS_EXPIRATION%%</JMSExpiration>
+                <JMSPriority>%%Connections/JMS/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <Body>
+                    <xsl:value-of select="$Render-XML/xmlString"/>
+                </Body>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>172</pd:x>
+        <pd:y>270</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>358</pd:x>
+        <pd:y>272</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns2:MSG_Container>
+                <ns2:Header>
+                    <ns2:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </ns2:ProjectName>
+                    <ns2:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </ns2:Source_Domain>
+                    <ns2:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </ns2:Destination_Domain>
+                    <ns2:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                    </ns2:Transaction_Type>
+                    <ns2:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                    </ns2:TimeStamp>
+                </ns2:Header>
+                <ns2:Body>
+                    <ns2:ErrorManagementSchema>
+                        <ns2:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns2:inrtn_id>
+                        <ns2:inrtn_instn_nm>
+                            <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                        </ns2:inrtn_instn_nm>
+                        <ns2:inrtn_err_rtn_desc>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                        </ns2:inrtn_err_rtn_desc>
+                        <ns2:inrtn_msg_body>
+                            <xsl:value-of select="concat('Could not publish the message in the queue ', $_globalVariables/ns3:GlobalVariables/Destinations/Queues/GLB_ARTICULOERROR_QUEUE)"/>
+                        </ns2:inrtn_msg_body>
+                        <ns2:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns2:cre8_ts>
+                        <ns2:u_code>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </ns2:u_code>
+                        <ns2:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns2:sev_id>
+                    </ns2:ErrorManagementSchema>
+                </ns2:Body>
+            </ns2:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: ErrorQueuePublisher
+Fecha de creación: 17/02/2014
+Creado por: Victor Sanchez
+Variables globales: GLB_MAX_RETRIES, GLB_RETRY_DELAY
+Descripción: Proceso que coloca un mensaje en la queue 
+GLB_ARTICULOERROR_QUEUE para que
+ poseteriormente sea verificado si hubo errores en el import</pd:description>
+        <pd:x>238</pd:x>
+        <pd:y>53</pd:y>
+        <pd:width>475</pd:width>
+        <pd:height>104</pd:height>
+        <pd:fontName>Dialog.bold-plain-9</pd:fontName>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>dash</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

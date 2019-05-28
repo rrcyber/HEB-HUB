@@ -1,0 +1,935 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/FacturaHeader.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx2="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/FacturaHeader.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/FacturaHeader.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>Processes/Sub Process/SetFacturaHeader.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:resultSet"/>
+    <pd:startX>70</pd:startX>
+    <pd:startY>190</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>646</pd:endX>
+    <pd:endY>190</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns2:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1433261263462</pd:targetNamespace>
+    <pd:activity name="KEY">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>300</pd:x>
+        <pd:y>195</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>463</pd:x>
+        <pd:y>248</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <ns2:MSG_Container>
+                        <ns2:Header>
+                            <ns2:ProjectName>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                            </ns2:ProjectName>
+                            <ns2:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </ns2:Source_Domain>
+                            <ns2:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </ns2:Destination_Domain>
+                            <ns2:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/TransactionType"/>
+                            </ns2:Transaction_Type>
+                            <ns2:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                            </ns2:TimeStamp>
+                        </ns2:Header>
+                        <ns2:Body>
+                            <ns2:ErrorManagementSchema>
+                                <ns2:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </ns2:inrtn_id>
+                                <ns2:inrtn_instn_nm>
+                                    <xsl:value-of select="''"/>
+                                </ns2:inrtn_instn_nm>
+                                <ns2:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="concat(&#xA;'Message Code: ',$_error/ns:ErrorReport/MsgCode,&quot;&#xA;&quot;,&#xA;'Error Message: ',$_error/ns:ErrorReport/Msg,&quot;&#xA;&quot;,&#xA;'Error Class: ',$_error/ns:ErrorReport/Class,&quot;&#xA;&quot;,&#xA;tib:render-xml($_error/ns:ErrorReport/Data),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;'STACKTRACE: ',$_error/ns:ErrorReport/StackTrace,&quot;&#xA;&quot;&#xA;)"/>
+                                </ns2:inrtn_err_rtn_desc>
+                                <ns2:inrtn_msg_body>
+                                    <xsl:value-of select="concat(' MsgCode: ',$_error/ns:ErrorReport/MsgCode)"/>
+                                </ns2:inrtn_msg_body>
+                                <ns2:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                                </ns2:cre8_ts>
+                                <ns2:u_code>
+                                    <xsl:value-of select="concat($_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns:ErrorReport/MsgCode)"/>
+                                </ns2:u_code>
+                                <ns2:sev_id>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                                </ns2:sev_id>
+                            </ns2:ErrorManagementSchema>
+                        </ns2:Body>
+                    </ns2:MSG_Container>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Insert_SXD201126_UDT_REPENC-1">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>191</pd:x>
+        <pd:y>76</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DataBase_SXD201026/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>INSERT INTO IGPHEB.UDT_REPENC VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_SXD201126.sharedjdbc</jdbcSharedConfig>
+            <batchUpdate>false</batchUpdate>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>EIF_VERSION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FOLIO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_SERIE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FECEMISION</parameterName>
+                    <dataType>DATE</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_NOAPROB</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_NOCERTIF</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_NOMEMISOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_PROVEEDOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_SUCURSAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_OC</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_DEPTO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_SUBTOTAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_PORIVA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_VALIVA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_IEPS25</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_IEPS30</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_IEPS50</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_TOTAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_MONEDA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FECHAALTA</parameterName>
+                    <dataType>DATE</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FECHACONCILIACION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_REFORIGINAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_VOUCHERID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_ESTATUSCONCILIACION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_USUARIOCONCILIACION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_TIPORECXML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <EIF_VERSION>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_VERSION)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_VERSION"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_VERSION>
+                <EIF_FOLIO>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_FOLIO)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_FOLIO"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FOLIO>
+                <EIF_SERIE>
+                    <xsl:choose>
+                        <xsl:when test="exists(if(string-length($Start/resultSet/Record[1]/EIF_SERIE))&#xA;then&#xA;$Start/resultSet/Record[1]/EIF_SERIE&#xA;else&#xA;&quot;NULL&quot;)">
+                            <xsl:value-of select="if(string-length($Start/resultSet/Record[1]/EIF_SERIE))&#xA;then&#xA;$Start/resultSet/Record[1]/EIF_SERIE&#xA;else&#xA;&quot;NULL&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_SERIE>
+                <EIF_FECEMISION>
+                    <xsl:choose>
+                        <xsl:when test="exists(tib:left($Start/resultSet/Record[1]/EIF_FECEMISION, 10))">
+                            <xsl:value-of select="tib:left($Start/resultSet/Record[1]/EIF_FECEMISION, 10)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FECEMISION>
+                <EIF_NOAPROB>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_NOAPROB)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_NOAPROB"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_NOAPROB>
+                <EIF_NOCERTIF>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_NOCERTIF)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_NOCERTIF"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_NOCERTIF>
+                <EIF_NOMEMISOR>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_NOMEMISOR)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_NOMEMISOR"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_NOMEMISOR>
+                <EIF_PROVEEDOR>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_PROVEEDOR)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_PROVEEDOR"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_PROVEEDOR>
+                <EIF_SUCURSAL>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_SUCURSAL)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_SUCURSAL"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_SUCURSAL>
+                <EIF_OC>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_OC)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_OC"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_OC>
+                <EIF_DEPTO>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_DEPTO)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_DEPTO"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_DEPTO>
+                <EIF_SUBTOTAL>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_SUBTOTAL)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_SUBTOTAL"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_SUBTOTAL>
+                <EIF_PORIVA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_PORIVA)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_PORIVA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_PORIVA>
+                <EIF_VALIVA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_VALIVA)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_VALIVA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_VALIVA>
+                <EIF_IEPS25>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_IEPS25)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_IEPS25"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_IEPS25>
+                <EIF_IEPS30>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_IEPS30)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_IEPS30"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_IEPS30>
+                <EIF_IEPS50>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_IEPS50)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_IEPS50"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_IEPS50>
+                <EIF_TOTAL>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_TOTAL)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_TOTAL"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_TOTAL>
+                <EIF_MONEDA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_MONEDA)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_MONEDA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_MONEDA>
+                <EIF_FECHAALTA>
+                    <xsl:choose>
+                        <xsl:when test="exists(tib:left($Start/resultSet/Record[1]/EIF_FECHAALTA, 10))">
+                            <xsl:value-of select="tib:left($Start/resultSet/Record[1]/EIF_FECHAALTA, 10)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FECHAALTA>
+                <EIF_FECHACONCILIACION>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FECHACONCILIACION>
+                <EIF_REFORIGINAL>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_REFORIGINAL>
+                <EIF_VOUCHERID>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_VOUCHERID>
+                <EIF_ESTATUSCONCILIACION>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_ESTATUSCONCILIACION>
+                <EIF_USUARIOCONCILIACION>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_USUARIOCONCILIACION>
+                <EIF_TIPORECXML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_TIPORECXML)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_TIPORECXML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_TIPORECXML>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="INSERT HEADER">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>191</pd:x>
+        <pd:y>190</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Insert_SXD201026_UDT_REPENC">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>191</pd:x>
+        <pd:y>318</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DataBase_SXD201026/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>INSERT INTO IGPHEB.UDT_REPENC VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>EIF_VERSION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FOLIO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_SERIE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FECEMISION</parameterName>
+                    <dataType>DATE</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_NOAPROB</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_NOCERTIF</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_NOMEMISOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_PROVEEDOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_SUCURSAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_OC</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_DEPTO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_SUBTOTAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_PORIVA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_VALIVA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_IEPS25</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_IEPS30</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_IEPS50</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_TOTAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_MONEDA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FECHAALTA</parameterName>
+                    <dataType>DATE</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_FECHACONCILIACION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_REFORIGINAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_VOUCHERID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_ESTATUSCONCILIACION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_USUARIOCONCILIACION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EIF_TIPORECXML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_SXD201026.sharedjdbc</jdbcSharedConfig>
+            <batchUpdate>false</batchUpdate>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <EIF_VERSION>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_VERSION)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_VERSION"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_VERSION>
+                <EIF_FOLIO>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_FOLIO)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_FOLIO"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FOLIO>
+                <EIF_SERIE>
+                    <xsl:choose>
+                        <xsl:when test="exists(if(string-length($Start/resultSet/Record[1]/EIF_SERIE))&#xA;then&#xA;$Start/resultSet/Record[1]/EIF_SERIE&#xA;else&#xA;&quot;NULL&quot;)">
+                            <xsl:value-of select="if(string-length($Start/resultSet/Record[1]/EIF_SERIE))&#xA;then&#xA;$Start/resultSet/Record[1]/EIF_SERIE&#xA;else&#xA;&quot;NULL&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_SERIE>
+                <EIF_FECEMISION>
+                    <xsl:choose>
+                        <xsl:when test="exists(tib:left($Start/resultSet/Record[1]/EIF_FECEMISION, 10))">
+                            <xsl:value-of select="tib:left($Start/resultSet/Record[1]/EIF_FECEMISION, 10)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FECEMISION>
+                <EIF_NOAPROB>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_NOAPROB)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_NOAPROB"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_NOAPROB>
+                <EIF_NOCERTIF>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_NOCERTIF)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_NOCERTIF"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_NOCERTIF>
+                <EIF_NOMEMISOR>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_NOMEMISOR)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_NOMEMISOR"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_NOMEMISOR>
+                <EIF_PROVEEDOR>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_PROVEEDOR)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_PROVEEDOR"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_PROVEEDOR>
+                <EIF_SUCURSAL>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_SUCURSAL)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_SUCURSAL"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_SUCURSAL>
+                <EIF_OC>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_OC)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_OC"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_OC>
+                <EIF_DEPTO>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_DEPTO)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_DEPTO"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_DEPTO>
+                <EIF_SUBTOTAL>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_SUBTOTAL)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_SUBTOTAL"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_SUBTOTAL>
+                <EIF_PORIVA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_PORIVA)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_PORIVA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_PORIVA>
+                <EIF_VALIVA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_VALIVA)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_VALIVA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_VALIVA>
+                <EIF_IEPS25>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_IEPS25)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_IEPS25"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_IEPS25>
+                <EIF_IEPS30>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_IEPS30)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_IEPS30"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_IEPS30>
+                <EIF_IEPS50>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_IEPS50)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_IEPS50"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_IEPS50>
+                <EIF_TOTAL>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_TOTAL)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_TOTAL"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_TOTAL>
+                <EIF_MONEDA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_MONEDA)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_MONEDA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_MONEDA>
+                <EIF_FECHAALTA>
+                    <xsl:choose>
+                        <xsl:when test="exists(tib:left($Start/resultSet/Record[1]/EIF_FECHAALTA, 10))">
+                            <xsl:value-of select="tib:left($Start/resultSet/Record[1]/EIF_FECHAALTA, 10)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FECHAALTA>
+                <EIF_FECHACONCILIACION>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_FECHACONCILIACION>
+                <EIF_REFORIGINAL>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_REFORIGINAL>
+                <EIF_VOUCHERID>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_VOUCHERID>
+                <EIF_ESTATUSCONCILIACION>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_ESTATUSCONCILIACION>
+                <EIF_USUARIOCONCILIACION>
+                    <xsl:choose>
+                        <xsl:when test="exists(&quot;&quot;)">
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_USUARIOCONCILIACION>
+                <EIF_TIPORECXML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/resultSet/Record[1]/EIF_TIPORECXML)">
+                            <xsl:value-of select="$Start/resultSet/Record[1]/EIF_TIPORECXML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EIF_TIPORECXML>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>KEY</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_SXD201126_UDT_REPENC-1</pd:from>
+        <pd:to>KEY</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-52429</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>INSERT HEADER</pd:from>
+        <pd:to>Insert_SXD201126_UDT_REPENC-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>INSERT HEADER</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_SXD201126_UDT_REPENC-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>KEY</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>DuplicateKey</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>($_error_Insert_SXD201126_UDT_REPENC-1/ActivityErrors/pfx2:JDBCSQLException/sqlState = 23000) or ($_error_Insert_SXD201026_UDT_REPENC/ActivityErrors/pfx2:JDBCSQLException/sqlState = 23000)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>INSERT HEADER</pd:from>
+        <pd:to>Insert_SXD201026_UDT_REPENC</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_SXD201026_UDT_REPENC</pd:from>
+        <pd:to>KEY</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_SXD201026_UDT_REPENC</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

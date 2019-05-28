@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns3="http://www.tibco.com/pe/DeployedVarsType">
+    <pd:name>CopientOfferExportPublisher Processes/Starter Process/CopientOfferExportPublisher_Starter.process</pd:name>
+    <pd:startName>File Poller</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="File Poller">
+        <pd:type>com.tibco.plugin.file.FileEventSource</pd:type>
+        <pd:resourceType>ae.activities.FileEventSourceResource</pd:resourceType>
+        <pd:x>159</pd:x>
+        <pd:y>91</pd:y>
+        <config>
+            <pollInterval>%%PollingInterval%%</pollInterval>
+            <createEvent>true</createEvent>
+            <modifyEvent>false</modifyEvent>
+            <deleteEvent>false</deleteEvent>
+            <mode>only-files</mode>
+            <encoding>text</encoding>
+            <sortby>File Name</sortby>
+            <sortorder>descending</sortorder>
+            <includeCurrent>true</includeCurrent>
+            <fileName>%%FilePaths/FileName%%</fileName>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>469</pd:endX>
+    <pd:endY>92</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1247134072337</pd:targetNamespace>
+    <pd:activity name="Call Copient Offer Export Main Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>298</pd:x>
+        <pd:y>105</pd:y>
+        <config>
+            <processName>/CopientOfferExportPublisher Processes/Main Process/CopientOfferExportPublisher_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <FileName>
+                    <xsl:value-of select="$File-Poller/ns1:EventSourceOuputTextClass/fileInfo/fullName"/>
+                </FileName>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>295</pd:x>
+        <pd:y>239</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns2:MSG_Container>
+                <ns2:Header>
+                    <ns2:ProjectName>
+                        <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                    </ns2:ProjectName>
+                    <ns2:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/CopientOfferExportPublisher/Source_Domain"/>
+                    </ns2:Source_Domain>
+                    <ns2:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/CopientOfferExportPublisher/Destination_Domain"/>
+                    </ns2:Destination_Domain>
+                    <ns2:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/CopientOfferExportPublisher/Transaction_Type"/>
+                    </ns2:Transaction_Type>
+                    <ns2:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy -MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns2:TimeStamp>
+                </ns2:Header>
+                <ns2:Body>
+                    <ns2:ErrorManagementSchema>
+                        <ns2:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns2:inrtn_id>
+                        <ns2:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns2:inrtn_instn_nm>
+                        <ns2:inrtn_err_rtn_desc>
+                            <xsl:value-of select="string($_error)"/>
+                        </ns2:inrtn_err_rtn_desc>
+                        <ns2:inrtn_msg_body>
+                            <xsl:value-of select="$File-Poller/ns1:EventSourceOuputTextClass/fileInfo/fullName"/>
+                        </ns2:inrtn_msg_body>
+                        <ns2:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy -MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns2:cre8_ts>
+                        <ns2:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns2:sev_id>
+                    </ns2:ErrorManagementSchema>
+                </ns2:Body>
+            </ns2:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>File Poller</pd:from>
+        <pd:to>Call Copient Offer Export Main Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Copient Offer Export Main Process</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Copient Offer Export Main Process</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

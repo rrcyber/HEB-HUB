@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns22="http://xmlns.heb.com/ei/OutVenta" xmlns:ns5="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd5" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/Supertarjeta" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd2" xmlns:ns3="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CancelOut.xsd" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CancelIn.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Supertarjeta" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaIn.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SupertarjetaOut" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CancelIn.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CancelOut.xsd"/>
+    <pd:name>SupertarjetaService Processes/Main Process/Cancel_Supertarjeta_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:CancelIn"/>
+    <pd:startX>38</pd:startX>
+    <pd:startY>77</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Cancel_Supertarjeta/ns5:CancelOut"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx4:CancelOut"/>
+    <pd:endX>454</pd:endX>
+    <pd:endY>79</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx2:SupertarjetaOut"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412351440454</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>207</pd:x>
+        <pd:y>210</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=MSG_Container namespace=http://xmlns.heb.com/ei/ErrorManagementSchema</fault>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>321</pd:x>
+        <pd:y>211</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <xsl:when test="not (exists ($_error_Cancel_Supertarjeta/ns2:MSG_Container))">
+                    <ns2:MSG_Container>
+                        <ns2:Header>
+                            <ns2:ProjectName>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </ns2:ProjectName>
+                            <ns2:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </ns2:Source_Domain>
+                            <ns2:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </ns2:Destination_Domain>
+                            <ns2:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/TransactionType"/>
+                            </ns2:Transaction_Type>
+                            <ns2:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </ns2:TimeStamp>
+                        </ns2:Header>
+                        <ns2:Body>
+                            <ns2:ErrorManagementSchema>
+                                <ns2:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </ns2:inrtn_id>
+                                <ns2:inrtn_instn_nm>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                                </ns2:inrtn_instn_nm>
+                                <ns2:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                </ns2:inrtn_err_rtn_desc>
+                                <ns2:inrtn_msg_body>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                                </ns2:inrtn_msg_body>
+                                <ns2:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </ns2:cre8_ts>
+                                <ns2:u_code>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                </ns2:u_code>
+                                <ns2:sev_id>
+                                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                                </ns2:sev_id>
+                            </ns2:ErrorManagementSchema>
+                        </ns2:Body>
+                    </ns2:MSG_Container>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="$_error_Cancel_Supertarjeta/ns2:MSG_Container"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>444</pd:x>
+        <pd:y>211</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                </messageCode>
+                <data>
+                    <pfx2:SupertarjetaOut>
+                        <pfx2:Codigo>
+                            <xsl:value-of select="'002'"/>
+                        </pfx2:Codigo>
+                        <pfx2:Descripcion>
+                            <xsl:value-of select="'No se pudo conectar a la Base de Datos'"/>
+                        </pfx2:Descripcion>
+                    </pfx2:SupertarjetaOut>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>331</pd:x>
+        <pd:y>80</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:AuditingSchema>
+                <ns12:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns12:inrtn_id>
+                <ns12:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns12:inrtn_nm>
+                <ns12:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns12:inrtn_instn_nm>
+                <ns12:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns12:inrtn_proc_id>
+                <ns12:inrtn_rec_cnt>
+                    <xsl:value-of select="1"/>
+                </ns12:inrtn_rec_cnt>
+                <ns12:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                </ns12:inrtn_cre8_ts>
+            </ns12:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Cancel_Supertarjeta">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>195</pd:x>
+        <pd:y>76</pd:y>
+        <config>
+            <processName>/SupertarjetaService Processes/Sub Process/Cancel_Supertarjeta.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/ns4:CancelIn"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Cancel_Supertarjeta</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Cancel_Supertarjeta</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

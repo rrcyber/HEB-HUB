@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Validators/Get_Vendor_Status.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="INPUT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="VENDOR_NUMBER" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="VENDOR_RFC" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="ISBUREAU" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>249</pd:startX>
+    <pd:startY>111</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="$Call-Procedure/resultSet/outputSet/RETURN_VALUE=-1">
+                <RESULT>
+                    <STATUS>
+                        <xsl:value-of select="0"/>
+                    </STATUS>
+                    <xsl:if test="not(($Call-Procedure/resultSet/Resultsets/ResultSet1[ 1]/Record1[1]/IPR_TIPOPROV/@xsi:nil=(&quot;true&quot;)) or ($Call-Procedure/resultSet/Resultsets/ResultSet1[ 1]/Record1[1]/IPR_TIPOPROV/@xsi:nil=(&quot;1&quot;)))">
+                        <TYPE>
+                            <xsl:value-of select="$Call-Procedure/resultSet/Resultsets/ResultSet1[ 1]/Record1[1]/IPR_TIPOPROV"/>
+                        </TYPE>
+                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$Start/INPUT/ISBUREAU = 3">
+                            <CODE>
+                                <xsl:value-of select="&quot;INF0004&quot;"/>
+                            </CODE>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <CODE>
+                                <xsl:value-of select="&quot;INF0001&quot;"/>
+                            </CODE>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RESULT>
+            </xsl:when>
+            <xsl:when test="($Call-Procedure/resultSet/outputSet/RETURN_VALUE=0) and ($Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_STATUS !=1)">
+                <RESULT>
+                    <STATUS>
+                        <xsl:value-of select="$Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_STATUS"/>
+                    </STATUS>
+                    <xsl:if test="$Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_TIPOPROV">
+                        <TYPE>
+                            <xsl:value-of select="$Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_TIPOPROV"/>
+                        </TYPE>
+                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$Start/INPUT/ISBUREAU = 3">
+                            <CODE>
+                                <xsl:value-of select="&quot;INF0005&quot;"/>
+                            </CODE>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <CODE>
+                                <xsl:value-of select="&quot;INF0002&quot;"/>
+                            </CODE>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RESULT>
+            </xsl:when>
+            <xsl:otherwise>
+                <RESULT>
+                    <STATUS>
+                        <xsl:value-of select="$Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_STATUS"/>
+                    </STATUS>
+                    <xsl:if test="not(($Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_TIPOPROV/@xsi:nil=(&quot;true&quot;)) or ($Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_TIPOPROV/@xsi:nil=(&quot;1&quot;)))">
+                        <TYPE>
+                            <xsl:value-of select="$Call-Procedure/resultSet/Resultsets/ResultSet1[1]/Record1[1]/IPR_TIPOPROV"/>
+                        </TYPE>
+                    </xsl:if>
+                </RESULT>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="RESULT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="STATUS" type="xsd:int"/>
+                    <xsd:element name="TYPE" type="xsd:int" minOccurs="0"/>
+                    <xsd:element name="CODE" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>549</pd:endX>
+    <pd:endY>114</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1302544243731</pd:targetNamespace>
+    <pd:activity name="Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>390</pd:x>
+        <pd:y>112</pd:y>
+        <config>
+            <timeout>%%Connections/Database/VISORFE/GBL_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/VISORFE/GBL_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spSel_GetVendorStatus;1</ProcedureName>
+            <useSchema>true</useSchema>
+            <oraObjects/>
+            <oraTables/>
+            <ResultSets>
+                <ResultSet>
+                    <QueryOutputCachedSchemaColumns>IPR_STATUS</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>IPR_TIPOPROV</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                </ResultSet>
+            </ResultSets>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@VENDOR_ID</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@VENDOR_RFC</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <VENDOR_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/INPUT/VENDOR_NUMBER)">
+                                <xsl:value-of select="$Start/INPUT/VENDOR_NUMBER"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </VENDOR_ID>
+                    <VENDOR_RFC>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/INPUT/VENDOR_RFC)">
+                                <xsl:value-of select="$Start/INPUT/VENDOR_RFC"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </VENDOR_RFC>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

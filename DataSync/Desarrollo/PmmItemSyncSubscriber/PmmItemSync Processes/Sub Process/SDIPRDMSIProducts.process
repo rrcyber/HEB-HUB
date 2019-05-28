@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx="http://www.tibco.com/schemas/ItemSyncPMMPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:ns2="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd5" xmlns:pfx2="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd3" xmlns:pfx3="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd4" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/SDIPRDMSI.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx6="http://xmlns.heb.com/ei/SDIPRDMSI_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/schemas/ItemSyncPMMPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/SDIPRDMSI.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIPRDMSI.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIPRDMSI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIPRDMSI_DATA_SOAP.xsd"/>
+    <pd:name>PmmItemSync Processes/Sub Process/SDIPRDMSIProducts.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="body" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>102</pd:startX>
+    <pd:startY>174</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>676</pd:endX>
+    <pd:endY>178</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1449181484341</pd:targetNamespace>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>225</pd:x>
+        <pd:y>174</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx6:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/body"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>356</pd:x>
+        <pd:y>101</pd:y>
+        <pd:width>196</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>52</pd:collapsedWidth>
+        <pd:collapsedHeight>69</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Parse-XML/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:SDIPRDMSI/pfx6:RECORD</pd:over>
+            <pd:iterationElementSlot>Record_SDIPRDMSI</pd:iterationElementSlot>
+            <pd:indexSlot>I</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>SDIPRDMSIProductos</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SDIPRDMSIProductos</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="SDIPRDMSIProductos">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>457</pd:x>
+            <pd:y>176</pd:y>
+            <config>
+                <processName>/PmmItemSync Processes/Sub Process/Insert SDIPRDMSI_Product.process</processName>
+            </config>
+            <pd:inputBindings>
+                <pfx6:SDIPRDMSI>
+                    <xsl:for-each select="$Record_SDIPRDMSI/pfx6:RECORD">
+                        <pfx6:RECORD>
+                            <pfx6:BATCH_NUM>
+                                <xsl:copy-of select="pfx6:BATCH_NUM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:BATCH_NUM"/>
+                            </pfx6:BATCH_NUM>
+                            <pfx6:PRD_LVL_NUMBER>
+                                <xsl:copy-of select="pfx6:PRD_LVL_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_LVL_NUMBER"/>
+                            </pfx6:PRD_LVL_NUMBER>
+                            <pfx6:PRD_LVL_ID>
+                                <xsl:copy-of select="pfx6:PRD_LVL_ID/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_LVL_ID"/>
+                            </pfx6:PRD_LVL_ID>
+                            <pfx6:TRAN_TYPE>
+                                <xsl:copy-of select="pfx6:TRAN_TYPE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:TRAN_TYPE"/>
+                            </pfx6:TRAN_TYPE>
+                            <pfx6:PRD_LVL_PARENT>
+                                <xsl:copy-of select="pfx6:PRD_LVL_PARENT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_LVL_PARENT"/>
+                            </pfx6:PRD_LVL_PARENT>
+                            <pfx6:PRD_NAME_FULL>
+                                <xsl:copy-of select="pfx6:PRD_NAME_FULL/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_NAME_FULL"/>
+                            </pfx6:PRD_NAME_FULL>
+                            <pfx6:PRD_TARGETGM>
+                                <xsl:copy-of select="pfx6:PRD_TARGETGM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_TARGETGM"/>
+                            </pfx6:PRD_TARGETGM>
+                            <pfx6:PRD_STYLE_IND>
+                                <xsl:copy-of select="pfx6:PRD_STYLE_IND/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_STYLE_IND"/>
+                            </pfx6:PRD_STYLE_IND>
+                            <pfx6:PRD_STATUS>
+                                <xsl:copy-of select="pfx6:PRD_STATUS/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_STATUS"/>
+                            </pfx6:PRD_STATUS>
+                            <pfx6:PRD_INH_VAL>
+                                <xsl:copy-of select="pfx6:PRD_INH_VAL/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_INH_VAL"/>
+                            </pfx6:PRD_INH_VAL>
+                            <pfx6:PRD_PDH_NAME_1>
+                                <xsl:copy-of select="pfx6:PRD_PDH_NAME_1/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_PDH_NAME_1"/>
+                            </pfx6:PRD_PDH_NAME_1>
+                            <pfx6:PRD_PDD_CODE_1>
+                                <xsl:copy-of select="pfx6:PRD_PDD_CODE_1/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_PDD_CODE_1"/>
+                            </pfx6:PRD_PDD_CODE_1>
+                            <pfx6:PRD_PDH_NAME_2>
+                                <xsl:copy-of select="pfx6:PRD_PDH_NAME_2/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_PDH_NAME_2"/>
+                            </pfx6:PRD_PDH_NAME_2>
+                            <pfx6:PRD_PDD_CODE_2>
+                                <xsl:copy-of select="pfx6:PRD_PDD_CODE_2/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_PDD_CODE_2"/>
+                            </pfx6:PRD_PDD_CODE_2>
+                            <pfx6:PRD_PDH_NAME_3>
+                                <xsl:copy-of select="pfx6:PRD_PDH_NAME_3/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_PDH_NAME_3"/>
+                            </pfx6:PRD_PDH_NAME_3>
+                            <pfx6:PRD_PDD_CODE_3>
+                                <xsl:copy-of select="pfx6:PRD_PDD_CODE_3/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_PDD_CODE_3"/>
+                            </pfx6:PRD_PDD_CODE_3>
+                            <pfx6:VPC_SHP_POINT>
+                                <xsl:copy-of select="pfx6:VPC_SHP_POINT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_SHP_POINT"/>
+                            </pfx6:VPC_SHP_POINT>
+                            <pfx6:DATE_CREATED>
+                                <xsl:copy-of select="pfx6:DATE_CREATED/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:DATE_CREATED"/>
+                            </pfx6:DATE_CREATED>
+                            <pfx6:DOWNLOAD_DATE_1>
+                                <xsl:copy-of select="pfx6:DOWNLOAD_DATE_1/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:DOWNLOAD_DATE_1"/>
+                            </pfx6:DOWNLOAD_DATE_1>
+                            <pfx6:DOWNLOAD_DATE_2>
+                                <xsl:copy-of select="pfx6:DOWNLOAD_DATE_2/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:DOWNLOAD_DATE_2"/>
+                            </pfx6:DOWNLOAD_DATE_2>
+                            <pfx6:PRD_UOM_SIZE>
+                                <xsl:copy-of select="pfx6:PRD_UOM_SIZE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_UOM_SIZE"/>
+                            </pfx6:PRD_UOM_SIZE>
+                            <pfx6:PRD_SLL_UOM>
+                                <xsl:copy-of select="pfx6:PRD_SLL_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_SLL_UOM"/>
+                            </pfx6:PRD_SLL_UOM>
+                            <pfx6:PRD_COMP_UOM>
+                                <xsl:copy-of select="pfx6:PRD_COMP_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_COMP_UOM"/>
+                            </pfx6:PRD_COMP_UOM>
+                            <pfx6:PRD_CONV_QTY>
+                                <xsl:copy-of select="pfx6:PRD_CONV_QTY/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_CONV_QTY"/>
+                            </pfx6:PRD_CONV_QTY>
+                            <pfx6:ERROR_CODE>
+                                <xsl:copy-of select="pfx6:ERROR_CODE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:ERROR_CODE"/>
+                            </pfx6:ERROR_CODE>
+                            <pfx6:PRD_CROSS_DOCK>
+                                <xsl:copy-of select="pfx6:PRD_CROSS_DOCK/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_CROSS_DOCK"/>
+                            </pfx6:PRD_CROSS_DOCK>
+                            <pfx6:IMP_DSS_FLAG>
+                                <xsl:copy-of select="pfx6:IMP_DSS_FLAG/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:IMP_DSS_FLAG"/>
+                            </pfx6:IMP_DSS_FLAG>
+                            <pfx6:VENDOR_NUMBER>
+                                <xsl:copy-of select="pfx6:VENDOR_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VENDOR_NUMBER"/>
+                            </pfx6:VENDOR_NUMBER>
+                            <pfx6:ALT_SLL_UOM_1>
+                                <xsl:copy-of select="pfx6:ALT_SLL_UOM_1/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:ALT_SLL_UOM_1"/>
+                            </pfx6:ALT_SLL_UOM_1>
+                            <pfx6:ALT_SLL_UOM_2>
+                                <xsl:copy-of select="pfx6:ALT_SLL_UOM_2/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:ALT_SLL_UOM_2"/>
+                            </pfx6:ALT_SLL_UOM_2>
+                            <pfx6:VAR_WEIGHT_ITEM>
+                                <xsl:copy-of select="pfx6:VAR_WEIGHT_ITEM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VAR_WEIGHT_ITEM"/>
+                            </pfx6:VAR_WEIGHT_ITEM>
+                            <pfx6:VAR_WEIGHT_TYPE>
+                                <xsl:copy-of select="pfx6:VAR_WEIGHT_TYPE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VAR_WEIGHT_TYPE"/>
+                            </pfx6:VAR_WEIGHT_TYPE>
+                            <pfx6:PRD_SKU_TYPE>
+                                <xsl:copy-of select="pfx6:PRD_SKU_TYPE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_SKU_TYPE"/>
+                            </pfx6:PRD_SKU_TYPE>
+                            <pfx6:PRD_SHRINK_RATE>
+                                <xsl:copy-of select="pfx6:PRD_SHRINK_RATE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_SHRINK_RATE"/>
+                            </pfx6:PRD_SHRINK_RATE>
+                            <pfx6:PRD_WASTE_CODE>
+                                <xsl:copy-of select="pfx6:PRD_WASTE_CODE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_WASTE_CODE"/>
+                            </pfx6:PRD_WASTE_CODE>
+                            <pfx6:SLL_UOM_1_RATE>
+                                <xsl:copy-of select="pfx6:SLL_UOM_1_RATE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:SLL_UOM_1_RATE"/>
+                            </pfx6:SLL_UOM_1_RATE>
+                            <pfx6:SLL_UOM_2_RATE>
+                                <xsl:copy-of select="pfx6:SLL_UOM_2_RATE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:SLL_UOM_2_RATE"/>
+                            </pfx6:SLL_UOM_2_RATE>
+                            <pfx6:PRD_SIZE_UOM>
+                                <xsl:copy-of select="pfx6:PRD_SIZE_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_SIZE_UOM"/>
+                            </pfx6:PRD_SIZE_UOM>
+                            <pfx6:MANDATORY_PLU>
+                                <xsl:copy-of select="pfx6:MANDATORY_PLU/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:MANDATORY_PLU"/>
+                            </pfx6:MANDATORY_PLU>
+                            <pfx6:MANDATORY_PRD_GTIN>
+                                <xsl:copy-of select="pfx6:MANDATORY_PRD_GTIN/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:MANDATORY_PRD_GTIN"/>
+                            </pfx6:MANDATORY_PRD_GTIN>
+                            <pfx6:MANDATORY_CP_GTIN>
+                                <xsl:copy-of select="pfx6:MANDATORY_CP_GTIN/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:MANDATORY_CP_GTIN"/>
+                            </pfx6:MANDATORY_CP_GTIN>
+                            <pfx6:PRC_LINK_ID>
+                                <xsl:copy-of select="pfx6:PRC_LINK_ID/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRC_LINK_ID"/>
+                            </pfx6:PRC_LINK_ID>
+                            <pfx6:UNIT_HEIGHT>
+                                <xsl:copy-of select="pfx6:UNIT_HEIGHT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:UNIT_HEIGHT"/>
+                            </pfx6:UNIT_HEIGHT>
+                            <pfx6:UNIT_WIDTH>
+                                <xsl:copy-of select="pfx6:UNIT_WIDTH/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:UNIT_WIDTH"/>
+                            </pfx6:UNIT_WIDTH>
+                            <pfx6:UNIT_DEPTH>
+                                <xsl:copy-of select="pfx6:UNIT_DEPTH/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:UNIT_DEPTH"/>
+                            </pfx6:UNIT_DEPTH>
+                            <pfx6:FILL_COLOR>
+                                <xsl:copy-of select="pfx6:FILL_COLOR/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:FILL_COLOR"/>
+                            </pfx6:FILL_COLOR>
+                            <pfx6:PACKAGE_TYPE>
+                                <xsl:copy-of select="pfx6:PACKAGE_TYPE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PACKAGE_TYPE"/>
+                            </pfx6:PACKAGE_TYPE>
+                            <pfx6:MANUFACTURER>
+                                <xsl:copy-of select="pfx6:MANUFACTURER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:MANUFACTURER"/>
+                            </pfx6:MANUFACTURER>
+                            <pfx6:PACKAGE_SIZE>
+                                <xsl:copy-of select="pfx6:PACKAGE_SIZE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PACKAGE_SIZE"/>
+                            </pfx6:PACKAGE_SIZE>
+                            <pfx6:UNIT_OF_MEASURE>
+                                <xsl:copy-of select="pfx6:UNIT_OF_MEASURE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:UNIT_OF_MEASURE"/>
+                            </pfx6:UNIT_OF_MEASURE>
+                            <pfx6:TRAY_QUANTITY>
+                                <xsl:copy-of select="pfx6:TRAY_QUANTITY/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:TRAY_QUANTITY"/>
+                            </pfx6:TRAY_QUANTITY>
+                            <pfx6:TRAY_HEIGHT>
+                                <xsl:copy-of select="pfx6:TRAY_HEIGHT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:TRAY_HEIGHT"/>
+                            </pfx6:TRAY_HEIGHT>
+                            <pfx6:TRAY_WIDTH>
+                                <xsl:copy-of select="pfx6:TRAY_WIDTH/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:TRAY_WIDTH"/>
+                            </pfx6:TRAY_WIDTH>
+                            <pfx6:TRAY_DEPTH>
+                                <xsl:copy-of select="pfx6:TRAY_DEPTH/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:TRAY_DEPTH"/>
+                            </pfx6:TRAY_DEPTH>
+                            <pfx6:CASE_QUANTITY>
+                                <xsl:copy-of select="pfx6:CASE_QUANTITY/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CASE_QUANTITY"/>
+                            </pfx6:CASE_QUANTITY>
+                            <pfx6:CASE_HEIGHT>
+                                <xsl:copy-of select="pfx6:CASE_HEIGHT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CASE_HEIGHT"/>
+                            </pfx6:CASE_HEIGHT>
+                            <pfx6:CASE_WIDTH>
+                                <xsl:copy-of select="pfx6:CASE_WIDTH/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CASE_WIDTH"/>
+                            </pfx6:CASE_WIDTH>
+                            <pfx6:CASE_DEPTH>
+                                <xsl:copy-of select="pfx6:CASE_DEPTH/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CASE_DEPTH"/>
+                            </pfx6:CASE_DEPTH>
+                            <pfx6:FLAG>
+                                <xsl:copy-of select="pfx6:FLAG/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:FLAG"/>
+                            </pfx6:FLAG>
+                        </pfx6:RECORD>
+                    </xsl:for-each>
+                </pfx6:SDIPRDMSI>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

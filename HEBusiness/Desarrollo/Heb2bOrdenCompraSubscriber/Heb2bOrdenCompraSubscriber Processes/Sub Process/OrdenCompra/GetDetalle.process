@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/GetDetalle.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx:PURCHASE_ORDER"/>
+                    <xsd:element name="Reproceso" type="xsd:int"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>153</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:copy-of select="$OutDetalleList/AccumulatedOutput/group/DetalleList"/>
+            <xsl:copy-of select="$OutDetalleList/AccumulatedOutput/group/ReprocesoList"/>
+            <Reproceso>
+                <xsl:value-of select="number($ErrorDependencias/ErrorDependencias) + number($Start/group/Reproceso)"/>
+            </Reproceso>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="DetalleList" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="IDORDENCOMPRA" type="xsd:string"/>
+                                <xsd:element name="IDARTICULO" type="xsd:string"/>
+                                <xsd:element name="IDCASEPACK" type="xsd:string"/>
+                                <xsd:element name="SINCARGO" type="xsd:string"/>
+                                <xsd:element name="FACTOR" type="xsd:string"/>
+                                <xsd:element name="CANTIDADUNIDADESCASEPACK" type="xsd:string"/>
+                                <xsd:element name="CANTIDADUNIDADESINNERPACK" type="xsd:string"/>
+                                <xsd:element name="CANTIDADINNERPACK" type="xsd:string"/>
+                                <xsd:element name="TOTALPEDIDOUNIDADES" type="xsd:string"/>
+                                <xsd:element name="DESCUENTOARTICULO" type="xsd:string"/>
+                                <xsd:element name="COSTOPORARTICULO" type="xsd:string"/>
+                                <xsd:element name="CANTIDADORDENADA" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="ReprocesoList" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Articulo" type="xsd:string"/>
+                                <xsd:element name="Casepack" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="Reproceso" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1201</pd:endX>
+    <pd:endY>146</pd:endY>
+    <pd:errorSchemas>
+        <Error>
+            <xsd:element name="Error">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Articulo" type="xsd:string"/>
+                        <xsd:element name="CasePack" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Error>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <ErrorDependencias>
+            <xsd:element name="ErrorDependencias" type="xsd:int"/>
+        </ErrorDependencias>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1472745533238</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>743</pd:x>
+        <pd:y>7</pd:y>
+        <pd:width>368</pd:width>
+        <pd:height>268</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Products/AccumulatedOutput/pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM</pd:over>
+            <pd:iterationElementSlot>InDetalleList</pd:iterationElementSlot>
+            <pd:indexSlot>indesarray1</pd:indexSlot>
+            <pd:outSlot>OutDetalleList</pd:outSlot>
+            <pd:activityOutputName>OutOC</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>GetLLaves</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>OutOC</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ValidateErrorD</pd:from>
+            <pd:to>Reproceso = 2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$ValidateErrorD/DetalleList/IDARTICULO = 'ERROR' or $ValidateErrorD/DetalleList/IDCASEPACK = 'ERROR'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ValidateErrorD</pd:from>
+            <pd:to>OutOC</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Reproceso = 2</pd:from>
+            <pd:to>ReprocesoList</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ReprocesoList</pd:from>
+            <pd:to>OutOC</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>GetLLaves</pd:from>
+            <pd:to>ValidateErrorD</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="ValidateErrorD">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>906</pd:x>
+            <pd:y>62</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="DetalleList">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="IDORDENCOMPRA" type="xsd:string"/>
+                                <xsd:element name="IDARTICULO" type="xsd:string"/>
+                                <xsd:element name="IDCASEPACK" type="xsd:string"/>
+                                <xsd:element name="SINCARGO" type="xsd:string"/>
+                                <xsd:element name="FACTOR" type="xsd:string"/>
+                                <xsd:element name="CANTIDADUNIDADESCASEPACK" type="xsd:string"/>
+                                <xsd:element name="CANTIDADUNIDADESINNERPACK" type="xsd:string"/>
+                                <xsd:element name="CANTIDADINNERPACK" type="xsd:string"/>
+                                <xsd:element name="TOTALPEDIDOUNIDADES" type="xsd:string"/>
+                                <xsd:element name="DESCUENTOARTICULO" type="xsd:string"/>
+                                <xsd:element name="COSTOPORARTICULO" type="xsd:string"/>
+                                <xsd:element name="CANTIDADORDENADA" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <DetalleList>
+                    <IDORDENCOMPRA>
+                        <xsl:value-of select="$Start/group/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER"/>
+                    </IDORDENCOMPRA>
+                    <xsl:choose>
+                        <xsl:when test="string-length($GetLLaves/root/Articulo)>0">
+                            <IDARTICULO>
+                                <xsl:value-of select="$GetLLaves/root/Articulo"/>
+                            </IDARTICULO>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <IDARTICULO>
+                                <xsl:value-of select="'ERROR'"/>
+                            </IDARTICULO>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="string-length($GetLLaves/root/CasePack)>0">
+                            <IDCASEPACK>
+                                <xsl:value-of select="$GetLLaves/root/CasePack"/>
+                            </IDCASEPACK>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <IDCASEPACK>
+                                <xsl:value-of select="'ERROR'"/>
+                            </IDCASEPACK>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <SINCARGO>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:PMG_FREE_QTY"/>
+                    </SINCARGO>
+                    <FACTOR>
+                        <xsl:value-of select="if ($InDetalleList/pfx:ITEM/pfx:VPC_BUY_MULTIPLE > 1 )&#xA;                then $InDetalleList/pfx:ITEM/pfx:VPC_BUY_MULTIPLE*100&#xA;&#xA;else (&#xA;                                if($InDetalleList/pfx:ITEM/pfx:NUMBER_OF_INNERS=1) &#xA;                                then (if(string-length($InDetalleList/pfx:ITEM/pfx:SLL_UNITS_PER_INNER)=0)&#xA;                                then 0 &#xA;else tib:round-fraction(($InDetalleList/pfx:ITEM/pfx:SLL_UNITS_PER_INNER * 100), 0)) &#xA;else (&#xA;  if(string-length($InDetalleList/pfx:ITEM/pfx:VPC_CASE_QTY)=0) &#xA;  then 0&#xA;   else tib:round-fraction(($InDetalleList/pfx:ITEM/pfx:VPC_CASE_QTY * 100), 0))&#xA;)"/>
+                    </FACTOR>
+                    <CANTIDADUNIDADESCASEPACK>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:VPC_CASE_QTY"/>
+                    </CANTIDADUNIDADESCASEPACK>
+                    <CANTIDADUNIDADESINNERPACK>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:SLL_UNITS_PER_INNER"/>
+                    </CANTIDADUNIDADESINNERPACK>
+                    <CANTIDADINNERPACK>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:PMG_PACK_QTY"/>
+                    </CANTIDADINNERPACK>
+                    <TOTALPEDIDOUNIDADES>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:PMG_SELL_QTY"/>
+                    </TOTALPEDIDOUNIDADES>
+                    <xsl:choose>
+                        <xsl:when test="count($GetDescuentoPMM/resultSet/Record) > 0">
+                            <DESCUENTOARTICULO>
+                                <xsl:value-of select="1"/>
+                            </DESCUENTOARTICULO>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <DESCUENTOARTICULO>
+                                <xsl:value-of select="0"/>
+                            </DESCUENTOARTICULO>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <COSTOPORARTICULO>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:PMG_SELL_COST"/>
+                    </COSTOPORARTICULO>
+                    <CANTIDADORDENADA>
+                        <xsl:value-of select="if($InDetalleList/pfx:ITEM/pfx:NUMBER_OF_INNERS=1) &#xA;then round(number($InDetalleList/pfx:ITEM/pfx:PMG_TOTAL_INNERS) div number($InDetalleList/pfx:ITEM/pfx:VPC_BUY_MULTIPLE) )&#xA;else round(number($InDetalleList/pfx:ITEM/pfx:PMG_PACK_QTY) div number($InDetalleList/pfx:ITEM/pfx:VPC_BUY_MULTIPLE ) )"/>
+                    </CANTIDADORDENADA>
+                </DetalleList>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="OutOC">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>1032</pd:x>
+            <pd:y>63</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="group">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="DetalleList">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="IDORDENCOMPRA" type="xsd:string"/>
+                                            <xsd:element name="IDARTICULO" type="xsd:string"/>
+                                            <xsd:element name="IDCASEPACK" type="xsd:string"/>
+                                            <xsd:element name="SINCARGO" type="xsd:string"/>
+                                            <xsd:element name="FACTOR" type="xsd:string"/>
+                                            <xsd:element name="CANTIDADUNIDADESCASEPACK" type="xsd:string"/>
+                                            <xsd:element name="CANTIDADUNIDADESINNERPACK" type="xsd:string"/>
+                                            <xsd:element name="CANTIDADINNERPACK" type="xsd:string"/>
+                                            <xsd:element name="TOTALPEDIDOUNIDADES" type="xsd:string"/>
+                                            <xsd:element name="DESCUENTOARTICULO" type="xsd:string"/>
+                                            <xsd:element name="COSTOPORARTICULO" type="xsd:string"/>
+                                            <xsd:element name="CANTIDADORDENADA" type="xsd:string"/>
+                                        </xsd:sequence>
+                                    </xsd:complexType>
+                                </xsd:element>
+                                <xsd:element name="ReprocesoList" minOccurs="0">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="Articulo" type="xsd:string"/>
+                                            <xsd:element name="Casepack" type="xsd:string"/>
+                                        </xsd:sequence>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <xsl:copy-of select="$ValidateErrorD/DetalleList"/>
+                    <xsl:copy-of select="$ReprocesoList/ReprocesoList"/>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Reproceso = 2">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>906</pd:x>
+            <pd:y>198</pd:y>
+            <config>
+                <variableName>ErrorDependencias</variableName>
+            </config>
+            <pd:inputBindings>
+                <ErrorDependencias>
+                    <xsl:value-of select="2"/>
+                </ErrorDependencias>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ReprocesoList">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>1031</pd:x>
+            <pd:y>199</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="ReprocesoList">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Articulo" type="xsd:string"/>
+                                <xsd:element name="Casepack" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ReprocesoList>
+                    <Articulo>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:PRD_LVL_NUMBER"/>
+                    </Articulo>
+                    <Casepack>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:VPC_CASE_PACK_ID"/>
+                    </Casepack>
+                </ReprocesoList>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="GetLLaves">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>808</pd:x>
+            <pd:y>149</pd:y>
+            <config>
+                <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/GetLLaves.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <CasePack>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:VPC_CASE_PACK_ID"/>
+                    </CasePack>
+                    <Articulo>
+                        <xsl:value-of select="$InDetalleList/pfx:ITEM/pfx:PRD_LVL_NUMBER"/>
+                    </Articulo>
+                    <Proveedor>
+                        <xsl:value-of select="$JDBC-Query-PROVEEDOR/resultSet/Record[1]/IDPROVEEDOR"/>
+                    </Proveedor>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="GetDescuentoPMM">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>345</pd:x>
+        <pd:y>150</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/JDBC_PMM/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT P.VENDOR_NUMBER,P.VENDOR_NAME,D.* 
+FROM PMM.PMGALWEE D
+JOIN PMM.VPCMSTEE P ON (D.VPC_TECH_KEY = P.VPC_TECH_KEY AND VPC_SVCVPC_FLAG NOT IN ('T'))
+WHERE D.PMG_PO_NUMBER IN (?)</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>idOrden</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>VENDOR_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VENDOR_NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_PO_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_ALW_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_MAN_ALW_FLAG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ORG_LVL_CHILD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRD_LVL_CHILD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_PRD_TECH_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_DTL_TECH_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_SEQ_NUM</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_START_DATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_END_DATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_AMOUNT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_PERCENT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_EVNT_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_SEQUENCE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_MAN_SEQ</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_CB_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_CALC_LEVEL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_GROSS_NET</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_ALLOC_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_TECH_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_CHARGE_QTY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_FREE_QTY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PMG_FREE_PER_QTY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_ALW_BRK_KEY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_PROD_VEND_FLAG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_ALW_DESC</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VPC_SHP_POINT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>WEIGHT_TYPE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>WEIGHT_UOM</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ORDER_BRACKET_FLAG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <idOrden>
+                    <xsl:copy-of select="$Start/group/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/group/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER"/>
+                </idOrden>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Inicializar = 0">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>110</pd:x>
+        <pd:y>153</pd:y>
+        <config>
+            <variableName>ErrorDependencias</variableName>
+        </config>
+        <pd:inputBindings>
+            <ErrorDependencias>
+                <xsl:value-of select="0"/>
+            </ErrorDependencias>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>431</pd:x>
+        <pd:y>37</pd:y>
+        <pd:width>250</pd:width>
+        <pd:height>214</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/group/pfx:PURCHASE_ORDER/pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM</pd:over>
+            <pd:iterationElementSlot>currentItem</pd:iterationElementSlot>
+            <pd:indexSlot>item</pd:indexSlot>
+            <pd:outSlot>Products</pd:outSlot>
+            <pd:activityOutputName>MapDetailProducts</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>MapDetailProducts</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count(
+	$Products/AccumulatedOutput[
+		pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM/pfx:PRD_LVL_NUMBER=$currentItem/pfx:ITEM/pfx:PRD_LVL_NUMBER	
+	]
+)=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>MapDetailProducts</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="MapDetailProducts">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>534</pd:x>
+            <pd:y>98</pd:y>
+            <config>
+                <element ref="pfx:PURCHASE_ORDER_DETAIL"/>
+            </config>
+            <pd:inputBindings>
+                <pfx:PURCHASE_ORDER_DETAIL>
+                    <xsl:copy-of select="$currentItem/pfx:ITEM"/>
+                </pfx:PURCHASE_ORDER_DETAIL>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>535</pd:x>
+            <pd:y>197</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="JDBC Query PROVEEDOR">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>228</pd:x>
+        <pd:y>160</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT ID AS IDPROVEEDOR FROM PROVEEDOR WHERE IDPMM = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PROVEEDOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>IDPROVEEDOR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <PROVEEDOR>
+                    <xsl:copy-of select="$Start/group/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/group/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER"/>
+                </PROVEEDOR>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Inicializar = 0</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Inicializar = 0</pd:from>
+        <pd:to>JDBC Query PROVEEDOR</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetDescuentoPMM</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query PROVEEDOR</pd:from>
+        <pd:to>GetDescuentoPMM</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

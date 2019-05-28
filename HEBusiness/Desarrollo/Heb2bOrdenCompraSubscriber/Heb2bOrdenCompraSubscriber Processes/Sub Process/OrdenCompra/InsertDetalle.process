@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/InsertDetalle.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER_DETAIL"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>36</pd:startY>
+    <pd:returnBindings>
+        <IDOC>
+            <xsl:value-of select="$GetIdOC/resultSet/Record[1]/id"/>
+        </IDOC>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="IDOC" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>345</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1472762775963</pd:targetNamespace>
+    <pd:activity name="InsertDetalle-1">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>231</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO ORDENCOMPRADETALLE (IDORDENCOMPRA, IDARTICULO, IDCASEPACK, SINCARGO, FACTOR, 
+CANTIDADUNIDADESCASEPACK, CANTIDADUNIDADESINNERPACK, CANTIDADINNERPACKS, TOTALPEDIDOUNIDADES,
+DESCUENTOARTICULO, COSTOPORARTICULO, CANTIDADORDENADA)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>IdOrdenCompra</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IdArticulo</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IdCasePack</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SinCargo</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Factor</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CantidadUnidadesCasePack</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CantidadUnidadesInnerPack</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CantidadInnerPacks</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TotalPedidoUnidades</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>DescuentoArticulo</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CostoPorArticulo</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CantidadOrdenada</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <batchUpdate>true</batchUpdate>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <xsl:for-each select="$Start/pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM">
+                    <Record>
+                        <IdOrdenCompra>
+                            <xsl:choose>
+                                <xsl:when test="exists($GetIdOC/resultSet/Record[1]/id)">
+                                    <xsl:value-of select="$GetIdOC/resultSet/Record[1]/id"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdOrdenCompra>
+                        <IdArticulo>
+                            <xsl:copy-of select="pfx:IDARTICULO/@xsi:nil"/>
+                            <xsl:value-of select="pfx:IDARTICULO"/>
+                        </IdArticulo>
+                        <IdCasePack>
+                            <xsl:copy-of select="pfx:IDCASEPACK/@xsi:nil"/>
+                            <xsl:value-of select="pfx:IDCASEPACK"/>
+                        </IdCasePack>
+                        <SinCargo>
+                            <xsl:copy-of select="pfx:SINCARGO/@xsi:nil"/>
+                            <xsl:value-of select="pfx:SINCARGO"/>
+                        </SinCargo>
+                        <Factor>
+                            <xsl:copy-of select="pfx:FACTOR/@xsi:nil"/>
+                            <xsl:value-of select="pfx:FACTOR"/>
+                        </Factor>
+                        <CantidadUnidadesCasePack>
+                            <xsl:copy-of select="pfx:CANTIDADUNIDADESCASEPACK/@xsi:nil"/>
+                            <xsl:value-of select="pfx:CANTIDADUNIDADESCASEPACK"/>
+                        </CantidadUnidadesCasePack>
+                        <CantidadUnidadesInnerPack>
+                            <xsl:copy-of select="pfx:CANTIDADUNIDADESINNERPACK/@xsi:nil"/>
+                            <xsl:value-of select="pfx:CANTIDADUNIDADESINNERPACK"/>
+                        </CantidadUnidadesInnerPack>
+                        <CantidadInnerPacks>
+                            <xsl:copy-of select="pfx:CANTIDADINNERPACK/@xsi:nil"/>
+                            <xsl:value-of select="pfx:CANTIDADINNERPACK"/>
+                        </CantidadInnerPacks>
+                        <TotalPedidoUnidades>
+                            <xsl:copy-of select="pfx:TOTALPEDIDOUNIDADES/@xsi:nil"/>
+                            <xsl:value-of select="pfx:TOTALPEDIDOUNIDADES"/>
+                        </TotalPedidoUnidades>
+                        <DescuentoArticulo>
+                            <xsl:copy-of select="pfx:DESCUENTOARTICULO/@xsi:nil"/>
+                            <xsl:value-of select="pfx:DESCUENTOARTICULO"/>
+                        </DescuentoArticulo>
+                        <CostoPorArticulo>
+                            <xsl:copy-of select="pfx:COSTOPORARTICULO/@xsi:nil"/>
+                            <xsl:value-of select="pfx:COSTOPORARTICULO"/>
+                        </CostoPorArticulo>
+                        <CantidadOrdenada>
+                            <xsl:copy-of select="pfx:CANTIDADORDENADA/@xsi:nil"/>
+                            <xsl:value-of select="pfx:CANTIDADORDENADA"/>
+                        </CantidadOrdenada>
+                    </Record>
+                </xsl:for-each>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetIdOC">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>118</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/JDBC_HEBB/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <statement>select id  FROM ORDENESCOMPRA(nolock)
+WHERE NUMEROORDEN = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>numeroOrden</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>id</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <numeroOrden>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM[1]/pfx:IDORDENCOMPRA/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM[1]/pfx:IDORDENCOMPRA"/>
+                </numeroOrden>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetIdOC</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InsertDetalle-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetIdOC</pd:from>
+        <pd:to>InsertDetalle-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

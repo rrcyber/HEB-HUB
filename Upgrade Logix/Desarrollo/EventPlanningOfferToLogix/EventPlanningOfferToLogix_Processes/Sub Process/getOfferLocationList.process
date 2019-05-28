@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Discounted.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/LogixOffer.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Discounted.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Discounted.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/LogixOffer.xsd"/>
+    <pd:name>EventPlanningOfferToLogix_Processes/Sub Process/getOfferLocationList.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="OfferFolio" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>149</pd:startX>
+    <pd:startY>63</pd:startY>
+    <pd:returnBindings>
+        <resultSet>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                <xsl:if test="StoreGroupID">
+                    <StoreGroupID>
+                        <xsl:value-of select="StoreGroupID"/>
+                    </StoreGroupID>
+                </xsl:if>
+            </xsl:for-each>
+        </resultSet>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="resultSet">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="StoreGroupID" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>451</pd:endX>
+    <pd:endY>63</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1396991710468</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>290</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <timeout>%%Connections/Database/XPORTAL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/XPORTAL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/XPORTAL.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT DISTINCT
+	PAR.ValorString AS StoreGroupID
+FROM
+  CATEVENT							E				(NOLOCK)
+  JOIN CATCOMEVENTOGC			G				(NOLOCK)
+    ON G.XQASOCIACION = E.INDICE
+  JOIN CATDCOMBO					C				(NOLOCK)
+    ON C.XQASOCIACION = G.INDICE
+  JOIN CATPRECIOCLUSTER			P				(NOLOCK)
+    ON P.XQASOCIACION = C.INDICE
+  JOIN PARAMETROS					PAR			(NOLOCK)
+    ON P.XVSUCURSAL_NUMERO_DE_SUCURSAL = PAR.VALORNUMERICO
+	OR PAR.ClaveParametro LIKE '%GRUPO_TIENDA_LOGIX_TESTING%'   
+  JOIN BITACORAENVIOLOGIX		BE				(NOLOCK)
+    ON E.ID_DEL_EVENTO = BE.FOLIOREFERENCIA1
+    AND C.INDICE = BE.FOLIOREFERENCIA2
+    AND BE.ESTATUSENVIO = 0 AND BE.TIPOENVIO = 'COMBOLOCO'
+WHERE
+	BE.ID = ?</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>OFFER_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>StoreGroupID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <OFFER_ID>
+                    <xsl:value-of select="$Start/OfferFolio"/>
+                </OFFER_ID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

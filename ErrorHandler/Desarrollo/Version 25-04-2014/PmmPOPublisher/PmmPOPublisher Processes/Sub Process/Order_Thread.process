@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions">
+    <pd:name>PmmPOPublisher Processes/Sub Process/Order_Thread.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="PMG_PO_NUMBER" type="xsd:string"/>
+                    <xsd:element name="PMG_STAT_CODE_A" type="xsd:string"/>
+                    <xsd:element name="PMG_STAT_CODE" type="xsd:string"/>
+                    <xsd:element name="AUDIT_NUMBER" type="xsd:string"/>
+                    <xsd:element name="VENDOR_NUMBER" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>72</pd:startX>
+    <pd:startY>173</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>769</pd:endX>
+    <pd:endY>141</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1386136266263</pd:targetNamespace>
+    <pd:activity name="SendPO">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>352</pd:x>
+        <pd:y>71</pd:y>
+        <config>
+            <processName>/PmmPOPublisher Processes/Sub Process/SendPO.process</processName>
+            <spawn>false</spawn>
+            <customId>$header/Record/PMG_PO_NUMBER</customId>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <PMG_PO_NUMBER>
+                    <xsl:value-of select="$Start/group/PMG_PO_NUMBER"/>
+                </PMG_PO_NUMBER>
+                <AUDIT_NUMBER>
+                    <xsl:value-of select="$Start/group/AUDIT_NUMBER"/>
+                </AUDIT_NUMBER>
+                <PMG_STAT_CODE>
+                    <xsl:value-of select="if(string-length($Start/group/PMG_STAT_CODE_A)=0) then $Start/group/PMG_STAT_CODE else $Start/group/PMG_STAT_CODE_A"/>
+                </PMG_STAT_CODE>
+                <VENDOR_NUMBER>
+                    <xsl:value-of select="tib:trim($Start/group/VENDOR_NUMBER)"/>
+                </VENDOR_NUMBER>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-2">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>347</pd:x>
+        <pd:y>174</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="update_PO">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>471</pd:x>
+        <pd:y>74</pd:y>
+        <config>
+            <processName>/PmmPOPublisher Processes/Sub Process/update_PO.process</processName>
+        </config>
+        <pd:inputBindings>
+            <SDIRCVSDE_KEY>
+                <PMG_PO_NUMBER>
+                    <xsl:value-of select="$Start/group/PMG_PO_NUMBER"/>
+                </PMG_PO_NUMBER>
+                <AUDIT_NUMBER>
+                    <xsl:value-of select="$Start/group/AUDIT_NUMBER"/>
+                </AUDIT_NUMBER>
+            </SDIRCVSDE_KEY>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SendProductVar">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>449</pd:x>
+        <pd:y>225</pd:y>
+        <config>
+            <processName>/PmmPOPublisher Processes/Sub Process/SendProductVar.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <pmg_po_number>
+                    <xsl:value-of select="$Start/group/PMG_PO_NUMBER"/>
+                </pmg_po_number>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>570</pd:x>
+        <pd:y>139</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="calculateThread">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>672</pd:x>
+        <pd:y>140</pd:y>
+        <config>
+            <processName>/PmmPOPublisher Processes/Sub Process/calculateThread.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <operation>
+                    <xsl:value-of select="'SUBS'"/>
+                </operation>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="calculateThread-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>211</pd:x>
+        <pd:y>175</pd:y>
+        <config>
+            <processName>/PmmPOPublisher Processes/Sub Process/calculateThread.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <operation>
+                    <xsl:value-of select="'SUM'"/>
+                </operation>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>344</pd:x>
+        <pd:y>323</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns1:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                </messageCode>
+            </ns1:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>90</pd:x>
+        <pd:y>322</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>226</pd:x>
+        <pd:y>323</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:MSG_Container>
+                <ns12:Header>
+                    <ns12:ProjectName>
+                        <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                    </ns12:ProjectName>
+                    <ns12:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </ns12:Source_Domain>
+                    <ns12:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </ns12:Destination_Domain>
+                    <ns12:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                    </ns12:Transaction_Type>
+                    <ns12:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns12:TimeStamp>
+                </ns12:Header>
+                <ns12:Body>
+                    <ns12:ErrorManagementSchema>
+                        <ns12:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns12:inrtn_id>
+                        <ns12:inrtn_instn_nm>
+                            <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                        </ns12:inrtn_instn_nm>
+                        <ns12:inrtn_err_rtn_desc>
+                            <xsl:value-of select="concat(&#xA;'Message Code: ',$_error/ns:ErrorReport/MsgCode,&quot;&#xA;&quot;,&#xA;'Error Message: ',$_error/ns:ErrorReport/Msg,&quot;&#xA;&quot;,&#xA;'Error Class: ',$_error/ns:ErrorReport/Class,&quot;&#xA;&quot;,&#xA;tib:render-xml($_error/ns:ErrorReport/Data),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;'STACKTRACE: ',$_error/ns:ErrorReport/StackTrace,&quot;&#xA;&quot;&#xA;)"/>
+                        </ns12:inrtn_err_rtn_desc>
+                        <ns12:inrtn_msg_body>
+                            <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                        </ns12:inrtn_msg_body>
+                        <ns12:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns12:cre8_ts>
+                        <ns12:u_code>
+                            <xsl:value-of select="if (contains($_error/ns:ErrorReport/MsgCode, 'BW-JMS')) then&#xA;concat($_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_TECHNICAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else if (contains($_error/ns:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;concat($_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else &#xA;concat($_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns:ErrorReport/MsgCode)"/>
+                        </ns12:u_code>
+                        <ns12:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                        </ns12:sev_id>
+                    </ns12:ErrorManagementSchema>
+                </ns12:Body>
+            </ns12:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>SendPO</pd:to>
+        <pd:xpathDescription>PMG_STAT_CODE=4 or PMG_STAT_CODE=7</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>(string-length($Start/group/PMG_STAT_CODE_A)!=0 and ($Start/group/PMG_STAT_CODE_A=4 or $Start/group/PMG_STAT_CODE_A=7)) or (string-length($Start/group/PMG_STAT_CODE_A)=0 and ($Start/group/PMG_STAT_CODE=4 or $Start/group/PMG_STAT_CODE=7))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendPO</pd:from>
+        <pd:to>update_PO</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>SendProductVar</pd:to>
+        <pd:xpathDescription>PMG_STAT_CODE=4</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>(string-length($Start/group/PMG_STAT_CODE_A)!=0 and ($Start/group/PMG_STAT_CODE_A=4)) or (string-length($Start/group/PMG_STAT_CODE_A)=0 and ($Start/group/PMG_STAT_CODE=4))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>calculateThread-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendProductVar</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>update_PO</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>calculateThread</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>calculateThread</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>calculateThread-1</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

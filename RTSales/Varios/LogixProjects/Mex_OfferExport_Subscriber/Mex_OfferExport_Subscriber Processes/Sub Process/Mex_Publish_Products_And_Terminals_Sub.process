@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns0="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/Mex_OfferExport_Sub_Tera_Cfg" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/Mex_OfferExport_Sub_ADB_Cfg" xmlns:ns32="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>Mex_OfferExport_Subscriber Processes/Sub Process/Mex_Publish_Products_And_Terminals_Sub.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Offer"/>
+    <pd:startX>55</pd:startX>
+    <pd:startY>378</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1206</pd:endX>
+    <pd:endY>104</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1260394113750</pd:targetNamespace>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>1136</pd:x>
+        <pd:y>104</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Terminals">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>101</pd:x>
+        <pd:y>8</pd:y>
+        <pd:width>358</pd:width>
+        <pd:height>246</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/Terminal</pd:over>
+            <pd:iterationElementSlot>current_Terminal</pd:iterationElementSlot>
+            <pd:indexSlot>TerminalIndex</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Load CPE_TRMNL_TYPS</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Query CPE_OFR_TRMNLS</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Load CPE_TRMNL_TYPS</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Load CPE_OFR_TRMNLS</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Query CPE_OFR_TRMNLS</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Row Exists CPE_OFR_TRMNLS</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Query-CPE_OFR_TRMNLS/resultSet/Record/OutputColumn1 &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Query CPE_OFR_TRMNLS</pd:from>
+            <pd:to>Load CPE_OFR_TRMNLS</pd:to>
+            <pd:xpathDescription>Otherwise CPE_OFR_TRMNLS</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Load CPE_TRMNL_TYPS">
+            <pd:type>com.tibco.plugin.ae.AEPublisherActivity</pd:type>
+            <pd:resourceType>ae.aepalette.aePubActivity</pd:resourceType>
+            <pd:x>182</pd:x>
+            <pd:y>178</pd:y>
+            <config>
+                <ae.aepalette.sharedProperties.transportChoice>default</ae.aepalette.sharedProperties.transportChoice>
+                <ae.aepalette.sharedProperties.useRequestReply>false</ae.aepalette.sharedProperties.useRequestReply>
+                <ae.aepalette.sharedProperties.adapterService>/Adapter Services/Mex_OfferExport_Sub_ADB_Cfg.adb#adapterService.CpeTrmnlTyps_Sub_Svc</ae.aepalette.sharedProperties.adapterService>
+                <tpPluginEndpointName>CpeTrmnlTyps_Sub_Svc</tpPluginEndpointName>
+                <ae.aepalette.sharedProperties.transportType>jmsQueue</ae.aepalette.sharedProperties.transportType>
+                <ae.aepalette.sharedProperties.jmsQueueSessionQueue>%%Destinations/Queues/GLB_ADB_CPETRMNLTYPS_QUEUE%%</ae.aepalette.sharedProperties.jmsQueueSessionQueue>
+                <ae.aepalette.sharedProperties.deliveryMode>NONPERSISTENT</ae.aepalette.sharedProperties.deliveryMode>
+                <ae.aepalette.sharedProperties.timeToLive>%%ADBTimeToLive%%</ae.aepalette.sharedProperties.timeToLive>
+                <ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>QueueConnectionFactory</ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>
+                <ae.aepalette.sharedProperties.jmsSessionUsername>%%JmsUser%%</ae.aepalette.sharedProperties.jmsSessionUsername>
+                <ae.aepalette.sharedProperties.jmsSessionPassword>%%JmsPassword%%</ae.aepalette.sharedProperties.jmsSessionPassword>
+                <ae.aepalette.sharedProperties.jmsSessionProviderURL>%%JmsProviderUrl%%</ae.aepalette.sharedProperties.jmsSessionProviderURL>
+                <ae.aepalette.sharedProperties.autoGenClientID>true</ae.aepalette.sharedProperties.autoGenClientID>
+                <ae.aepalette.sharedProperties.outputMeta>
+                    <aeMeta>/AESchemas/ae/ADB/Mex_OfferExport_Sub_ADB_Cfg.aeschema#class.CPE_TRMNL_TYPS</aeMeta>
+                </ae.aepalette.sharedProperties.outputMeta>
+            </config>
+            <pd:inputBindings>
+                <aePubInputType>
+                    <body>
+                        <ns3:CPE__TRMNL__TYPS>
+                            <TRMNL__TYP__ID>
+                                <xsl:choose>
+                                    <xsl:when test="exists($current_Terminal/Terminal/Header/TerminalTypeID)">
+                                        <xsl:value-of select="$current_Terminal/Terminal/Header/TerminalTypeID"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </TRMNL__TYP__ID>
+                            <TRMNL__TYP__NM>
+                                <xsl:choose>
+                                    <xsl:when test="exists($current_Terminal/Terminal/Header/Name)">
+                                        <xsl:value-of select="$current_Terminal/Terminal/Header/Name"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </TRMNL__TYP__NM>
+                            <DES>
+                                <xsl:choose>
+                                    <xsl:when test="exists($current_Terminal/Terminal/Header/Description)">
+                                        <xsl:value-of select="$current_Terminal/Terminal/Header/Description"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </DES>
+                            <EXT__TRMNL__CD>
+                                <xsl:choose>
+                                    <xsl:when test="exists($current_Terminal/Terminal/Header/ExtTerminalCode)">
+                                        <xsl:value-of select="$current_Terminal/Terminal/Header/ExtTerminalCode"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </EXT__TRMNL__CD>
+                            <LST__UPDT__TS>
+                                <dateTime>
+                                    <xsl:value-of select="if (string-length($current_Terminal/Terminal/Header/LastUpdate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current_Terminal/Terminal/Header/LastUpdate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                                </dateTime>
+                            </LST__UPDT__TS>
+                            <xsl:if test="string-length($current_Terminal/Terminal/Header/LayoutID)!=0">
+                                <LAYOT__ID>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($current_Terminal/Terminal/Header/LayoutID)">
+                                            <xsl:value-of select="$current_Terminal/Terminal/Header/LayoutID"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </LAYOT__ID>
+                            </xsl:if>
+                            <xsl:if test="string-length($current_Terminal/Terminal/Header/EngineID)!=0">
+                                <ENGN__ID>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($current_Terminal/Terminal/Header/EngineID)">
+                                            <xsl:value-of select="$current_Terminal/Terminal/Header/EngineID"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </ENGN__ID>
+                            </xsl:if>
+                            <FUEL__PROCNG__SW>
+                                <xsl:choose>
+                                    <xsl:when test="exists(if(lower-case($current_Terminal/Terminal/Header/FuelProcessing)='true') then 1 else 0)">
+                                        <xsl:value-of select="if(lower-case($current_Terminal/Terminal/Header/FuelProcessing)='true') then 1 else 0"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </FUEL__PROCNG__SW>
+                            <ANY__TRMNL__SW>
+                                <xsl:value-of select="if(lower-case($current_Terminal/Terminal/Header/AnyTerminal)='true') then 1 else 0"/>
+                            </ANY__TRMNL__SW>
+                            <SPEC__PROMOS__ONLY__SW>
+                                <xsl:choose>
+                                    <xsl:when test="exists($current_Terminal/Terminal/Header/SpecificPromosOnly)">
+                                        <xsl:value-of select="$current_Terminal/Terminal/Header/SpecificPromosOnly"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </SPEC__PROMOS__ONLY__SW>
+                            <BANNER__ID>
+                                <xsl:choose>
+                                    <xsl:when test="exists(if(string-length($current_Terminal/Terminal/Header/BannerID)=0) then 0 else $current_Terminal/Terminal/Header/BannerID)">
+                                        <xsl:value-of select="if(string-length($current_Terminal/Terminal/Header/BannerID)=0) then 0 else $current_Terminal/Terminal/Header/BannerID"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </BANNER__ID>
+                            <ADB__OPCODE>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/AdapterConfig/DBSTG/GLB_ADB_OPCODE"/>
+                            </ADB__OPCODE>
+                        </ns3:CPE__TRMNL__TYPS>
+                    </body>
+                </aePubInputType>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Load CPE_OFR_TRMNLS">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>354</pd:x>
+            <pd:y>123</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT  INTO CPE_OFR_TRMNLS (INCNT_ID,TRMNL_TYP_ID)
+VALUES(?,?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>INCNT_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TRMNL_TYP_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <INCNT_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </INCNT_ID>
+                    <TRMNL_TYP_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_Terminal/Terminal/Header/TerminalTypeID)">
+                                <xsl:value-of select="$current_Terminal/Terminal/Header/TerminalTypeID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </TRMNL_TYP_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Query CPE_OFR_TRMNLS">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>198</pd:x>
+            <pd:y>66</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/DB/DBSTG/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                <statement>select count(INCNT_ID) from CPE_OFR_TRMNLS where INCNT_ID = ? and TRMNL_TYP_ID =? </statement>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>OutputColumn1</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>INCNT_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TRMNL_TYP_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <INCNT_ID>
+                        <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                    </INCNT_ID>
+                    <TRMNL_TYP_ID>
+                        <xsl:value-of select="$current_Terminal/Terminal/Header/TerminalTypeID"/>
+                    </TRMNL_TYP_ID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:group name="Customers2">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>127</pd:x>
+        <pd:y>529</pd:y>
+        <pd:width>253</pd:width>
+        <pd:height>220</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Conditions/Customer</pd:over>
+            <pd:iterationElementSlot>current_customer</pd:iterationElementSlot>
+            <pd:indexSlot>customer</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Products</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Products</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Products">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>149</pd:x>
+            <pd:y>562</pd:y>
+            <pd:width>189</pd:width>
+            <pd:height>147</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Start/Offer/Conditions/Product</pd:over>
+                <pd:iterationElementSlot>current_Product</pd:iterationElementSlot>
+                <pd:indexSlot>ProductIndex</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Load CPE_INCNT_PROD_GRP</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Load CPE_INCNT_PROD_GRP</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Load CPE_INCNT_PROD_GRP">
+                <pd:type>com.tibco.plugin.ae.AEPublisherActivity</pd:type>
+                <pd:resourceType>ae.aepalette.aePubActivity</pd:resourceType>
+                <pd:x>234</pd:x>
+                <pd:y>632</pd:y>
+                <config>
+                    <ae.aepalette.sharedProperties.transportChoice>default</ae.aepalette.sharedProperties.transportChoice>
+                    <ae.aepalette.sharedProperties.useRequestReply>false</ae.aepalette.sharedProperties.useRequestReply>
+                    <ae.aepalette.sharedProperties.adapterService>/Adapter Services/Mex_OfferExport_Sub_ADB_Cfg.adb#adapterService.CpeIncntProdGrps_Sub_Svc</ae.aepalette.sharedProperties.adapterService>
+                    <tpPluginEndpointName>CpeIncntProdGrps_Sub_Svc</tpPluginEndpointName>
+                    <ae.aepalette.sharedProperties.transportType>jmsQueue</ae.aepalette.sharedProperties.transportType>
+                    <ae.aepalette.sharedProperties.jmsQueueSessionQueue>%%Destinations/Queues/GLB_ADB_CPEINCNTPRODGRP_QUEUE%%</ae.aepalette.sharedProperties.jmsQueueSessionQueue>
+                    <ae.aepalette.sharedProperties.deliveryMode>NONPERSISTENT</ae.aepalette.sharedProperties.deliveryMode>
+                    <ae.aepalette.sharedProperties.timeToLive>%%ADBTimeToLive%%</ae.aepalette.sharedProperties.timeToLive>
+                    <ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>QueueConnectionFactory</ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>
+                    <ae.aepalette.sharedProperties.jmsSessionUsername>%%JmsUser%%</ae.aepalette.sharedProperties.jmsSessionUsername>
+                    <ae.aepalette.sharedProperties.jmsSessionPassword>%%JmsPassword%%</ae.aepalette.sharedProperties.jmsSessionPassword>
+                    <ae.aepalette.sharedProperties.jmsSessionProviderURL>%%JmsProviderUrl%%</ae.aepalette.sharedProperties.jmsSessionProviderURL>
+                    <ae.aepalette.sharedProperties.autoGenClientID>true</ae.aepalette.sharedProperties.autoGenClientID>
+                    <ae.aepalette.sharedProperties.outputMeta>
+                        <aeMeta>/AESchemas/ae/ADB/Mex_OfferExport_Sub_ADB_Cfg.aeschema#class.CPE_INCNT_PROD_GRPS</aeMeta>
+                    </ae.aepalette.sharedProperties.outputMeta>
+                </config>
+                <pd:inputBindings>
+                    <aePubInputType>
+                        <body>
+                            <ns3:CPE__INCNT__PROD__GRPS>
+                                <INCNT__PROD__GRP__ID>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($current_Product/Product/IncentiveProductGroupID)">
+                                            <xsl:value-of select="$current_Product/Product/IncentiveProductGroupID"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </INCNT__PROD__GRP__ID>
+                                <xsl:if test="string-length($current_customer/Customer/RewardOptionID)!=0">
+                                    <RWRD__OPT__ID>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($current_Product/Product/RewardOptionID)">
+                                                <xsl:value-of select="$current_Product/Product/RewardOptionID"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </RWRD__OPT__ID>
+                                </xsl:if>
+                                <xsl:if test="string-length($current_Product/Product/QtyForIncentive)!=0">
+                                    <INCNT__QTY>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($current_Product/Product/QtyForIncentive)">
+                                                <xsl:value-of select="$current_Product/Product/QtyForIncentive"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </INCNT__QTY>
+                                </xsl:if>
+                                <xsl:if test="string-length($current_Product/Product/QtyUnitType)!=0">
+                                    <QTY__UNT__TYP>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($current_Product/Product/QtyUnitType)">
+                                                <xsl:value-of select="$current_Product/Product/QtyUnitType"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </QTY__UNT__TYP>
+                                </xsl:if>
+                                <xsl:if test="string-length($current_Product/Product/AccumMin)!=0">
+                                    <ACCUM__MIN>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($current_Product/Product/AccumMin)">
+                                                <xsl:value-of select="$current_Product/Product/AccumMin"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </ACCUM__MIN>
+                                </xsl:if>
+                                <ACCUM__LIM>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($current_Product/Product/AccumLimit)">
+                                            <xsl:value-of select="$current_Product/Product/AccumLimit"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </ACCUM__LIM>
+                                <xsl:if test="string-length($current_Product/Product/AccumPeriod)!=0">
+                                    <ACCUM__PRD>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($current_Product/Product/AccumPeriod)">
+                                                <xsl:value-of select="$current_Product/Product/AccumPeriod"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </ACCUM__PRD>
+                                </xsl:if>
+                                <EXCLD__PRODS>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if(lower-case($current_Product/Product/ExcludedProducts)='true') then 1 else 0)">
+                                            <xsl:value-of select="if(lower-case($current_Product/Product/ExcludedProducts)='true') then 1 else 0"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </EXCLD__PRODS>
+                                <DELD__SW>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if(lower-case($current_Product/Product/Deleted)='true') then 1 else 0)">
+                                            <xsl:value-of select="if(lower-case($current_Product/Product/Deleted)='true') then 1 else 0"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </DELD__SW>
+                                <LST__UPDT__TS>
+                                    <dateTime>
+                                        <xsl:choose>
+                                            <xsl:when test="exists(if (string-length($current_Product/Product/LastUpdate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current_Product/Product/LastUpdate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime()))">
+                                                <xsl:value-of select="if (string-length($current_Product/Product/LastUpdate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current_Product/Product/LastUpdate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </dateTime>
+                                </LST__UPDT__TS>
+                                <COND__NBR>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($current_Product/Product/ConditionNumber)">
+                                            <xsl:value-of select="$current_Product/Product/ConditionNumber"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </COND__NBR>
+                                <REQ__FRM__TMPLT__SW>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if(lower-case($current_Product/Product/RequiredFromTemplate)='true') then 1 else 0)">
+                                            <xsl:value-of select="if(lower-case($current_Product/Product/RequiredFromTemplate)='true') then 1 else 0"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </REQ__FRM__TMPLT__SW>
+                                <DISQUALIFIER>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if(lower-case($current_Product/Product/Disqualifier)='true') then 1 else 0)">
+                                            <xsl:value-of select="if(lower-case($current_Product/Product/Disqualifier)='true') then 1 else 0"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </DISQUALIFIER>
+                                <xsl:if test="string-length($current_Product/Product/ProductGroupID)!=0">
+                                    <PROD__GRP__ID>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($current_Product/Product/ProductGroupID)">
+                                                <xsl:value-of select="$current_Product/Product/ProductGroupID"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </PROD__GRP__ID>
+                                </xsl:if>
+                                <xsl:if test="string-length($current_Product/Product/ProductComboID)!=0">
+                                    <PROD__COMBO__ID>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($current_Product/Product/ProductComboID)">
+                                                <xsl:value-of select="$current_Product/Product/ProductComboID"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </PROD__COMBO__ID>
+                                </xsl:if>
+                                <ADB__OPCODE>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/AdapterConfig/DBSTG/GLB_ADB_OPCODE"/>
+                                </ADB__OPCODE>
+                            </ns3:CPE__INCNT__PROD__GRPS>
+                        </body>
+                    </aePubInputType>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:group name="ProductGroups">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>465</pd:x>
+        <pd:y>185</pd:y>
+        <pd:width>456</pd:width>
+        <pd:height>435</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/ProductGroup</pd:over>
+            <pd:iterationElementSlot>current_ProductGroup</pd:iterationElementSlot>
+            <pd:indexSlot>ProductGroupIndex</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Products Parse Data</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Load CPE_PROD_GRP</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Load CPE_PROD_GRP</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>GroupByAndProducts</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Products Parse Data</pd:from>
+            <pd:to>JDBC Update</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Update</pd:from>
+            <pd:to>GroupByAndProducts</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Load CPE_PROD_GRP">
+            <pd:type>com.tibco.plugin.ae.AEPublisherActivity</pd:type>
+            <pd:resourceType>ae.aepalette.aePubActivity</pd:resourceType>
+            <pd:x>549</pd:x>
+            <pd:y>240</pd:y>
+            <config>
+                <ae.aepalette.sharedProperties.transportChoice>default</ae.aepalette.sharedProperties.transportChoice>
+                <ae.aepalette.sharedProperties.useRequestReply>false</ae.aepalette.sharedProperties.useRequestReply>
+                <ae.aepalette.sharedProperties.adapterService>/Adapter Services/Mex_OfferExport_Sub_ADB_Cfg.adb#adapterService.CpeProdGrp_Sub_Svc</ae.aepalette.sharedProperties.adapterService>
+                <tpPluginEndpointName>CpeProdGrp_Sub_Svc</tpPluginEndpointName>
+                <ae.aepalette.sharedProperties.transportType>jmsQueue</ae.aepalette.sharedProperties.transportType>
+                <ae.aepalette.sharedProperties.jmsQueueSessionQueue>%%Destinations/Queues/GLB_ADB_CPEPRODGRP_QUEUE%%</ae.aepalette.sharedProperties.jmsQueueSessionQueue>
+                <ae.aepalette.sharedProperties.deliveryMode>NONPERSISTENT</ae.aepalette.sharedProperties.deliveryMode>
+                <ae.aepalette.sharedProperties.timeToLive>%%ADBTimeToLive%%</ae.aepalette.sharedProperties.timeToLive>
+                <ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>QueueConnectionFactory</ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>
+                <ae.aepalette.sharedProperties.jmsSessionUsername>%%JmsUser%%</ae.aepalette.sharedProperties.jmsSessionUsername>
+                <ae.aepalette.sharedProperties.jmsSessionPassword>%%JmsPassword%%</ae.aepalette.sharedProperties.jmsSessionPassword>
+                <ae.aepalette.sharedProperties.jmsSessionProviderURL>%%JmsProviderUrl%%</ae.aepalette.sharedProperties.jmsSessionProviderURL>
+                <ae.aepalette.sharedProperties.autoGenClientID>true</ae.aepalette.sharedProperties.autoGenClientID>
+                <ae.aepalette.sharedProperties.outputMeta>
+                    <aeMeta>/AESchemas/ae/ADB/Mex_OfferExport_Sub_ADB_Cfg.aeschema#class.CPE_PROD_GRP</aeMeta>
+                </ae.aepalette.sharedProperties.outputMeta>
+            </config>
+            <pd:inputBindings>
+                <aePubInputType>
+                    <body>
+                        <ns3:CPE__PROD__GRP>
+                            <PROD__GRP__ID>
+                                <xsl:choose>
+                                    <xsl:when test="exists($current_ProductGroup/ProductGroup/Header/ProductGroupID)">
+                                        <xsl:value-of select="$current_ProductGroup/ProductGroup/Header/ProductGroupID"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </PROD__GRP__ID>
+                            <PROD__GRP__NM>
+                                <xsl:value-of select="$current_ProductGroup/ProductGroup/Header/Name"/>
+                            </PROD__GRP__NM>
+                            <ANY__PROD__SW>
+                                <xsl:value-of select="if (lower-case($current_ProductGroup/ProductGroup/Header/AnyProduct)='true') then 1 else 0"/>
+                            </ANY__PROD__SW>
+                            <ADB__OPCODE>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/AdapterConfig/DBSTG/GLB_ADB_OPCODE"/>
+                            </ADB__OPCODE>
+                        </ns3:CPE__PROD__GRP>
+                    </body>
+                </aePubInputType>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="GroupByAndProducts">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>686</pd:x>
+            <pd:y>239</pd:y>
+            <pd:width>193</pd:width>
+            <pd:height>340</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Products-Parse-Data/Output/Rows/Products</pd:over>
+                <pd:iterationElementSlot>current_GroupByAndProducts</pd:iterationElementSlot>
+                <pd:indexSlot>GroupByAndProductsIndex</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Load CPE_PROD_GRP_PRODUCT</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Load CPE_PRODUCT</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Load CPE_PRODUCT</pd:from>
+                <pd:to>end</pd:to>
+                <pd:xpathDescription>Success2</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Load CPE_PROD_GRP_PRODUCT</pd:from>
+                <pd:to>end</pd:to>
+                <pd:xpathDescription>Success1</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Load CPE_PROD_GRP_PRODUCT</pd:from>
+                <pd:to>Null</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-65536</pd:lineColor>
+                <pd:conditionType>error</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Load CPE_PRODUCT</pd:from>
+                <pd:to>Null</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-65536</pd:lineColor>
+                <pd:conditionType>error</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Load CPE_PROD_GRP_PRODUCT">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>768</pd:x>
+                <pd:y>301</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <statement>INSERT INTO CPE_PROD_GRP_PRODUCT(PROD_GRP_ID,PROD_ID)
+VALUES(?,?)</statement>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>PROD_GRP_ID</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PROD_ID</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <PROD_GRP_ID>
+                            <xsl:choose>
+                                <xsl:when test="exists($current_ProductGroup/ProductGroup/Header/ProductGroupID)">
+                                    <xsl:value-of select="$current_ProductGroup/ProductGroup/Header/ProductGroupID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </PROD_GRP_ID>
+                        <PROD_ID>
+                            <xsl:choose>
+                                <xsl:when test="exists($current_GroupByAndProducts/Products/strProduct[1])">
+                                    <xsl:value-of select="$current_GroupByAndProducts/Products/strProduct[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </PROD_ID>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Load CPE_PRODUCT">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>773</pd:x>
+                <pd:y>503</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO CPE_PRODUCT(PROD_ID)
+VALUES(?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>PROD_ID</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <PROD_ID>
+                            <xsl:choose>
+                                <xsl:when test="exists($current_GroupByAndProducts/Products/strProduct[1])">
+                                    <xsl:value-of select="$current_GroupByAndProducts/Products/strProduct[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </PROD_ID>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Null">
+                <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                <pd:resourceType>ae.activities.null</pd:resourceType>
+                <pd:x>793</pd:x>
+                <pd:y>403</pd:y>
+                <config/>
+                <pd:inputBindings/>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="Products Parse Data">
+            <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+            <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+            <pd:x>539</pd:x>
+            <pd:y>414</pd:y>
+            <config>
+                <InputType>String</InputType>
+                <Encoding>ASCII</Encoding>
+                <ParseSharedConfig>/Shared Resources/Schema Definitions/Custom/Products Data Format.sharedparse</ParseSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <Input>
+                    <text>
+                        <xsl:value-of select="$current_ProductGroup/ProductGroup/Products"/>
+                    </text>
+                    <noOfRecords>
+                        <xsl:value-of select="-1"/>
+                    </noOfRecords>
+                </Input>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Update">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>623</pd:x>
+            <pd:y>406</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                <statement>DELETE FROM [dbo].[CPE_PROD_GRP_PRODUCT]
+WHERE PROD_GRP_ID = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>PROD_GRP_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <PROD_GRP_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($current_ProductGroup/ProductGroup/Header/ProductGroupID)">
+                                <xsl:value-of select="$current_ProductGroup/ProductGroup/Header/ProductGroupID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </PROD_GRP_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Terminals</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Terminals</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Customers2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Customers2</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>ProductGroups</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ProductGroups</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

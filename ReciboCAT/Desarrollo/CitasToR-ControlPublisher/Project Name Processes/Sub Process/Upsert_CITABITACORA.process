@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/BITACORA_CITAS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/BITACORA_CITAS" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_CITAS.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/Upsert_CITABITACORA.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:CITAS"/>
+    <pd:startX>66</pd:startX>
+    <pd:startY>255</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <Valid>
+                <xsl:value-of select="$Map-Data/root/Valido"/>
+            </Valid>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Valid" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1318</pd:endX>
+    <pd:endY>293</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1513719502640</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>170</pd:x>
+        <pd:y>105</pd:y>
+        <pd:width>452</pd:width>
+        <pd:height>285</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>FECHACITA</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FECHACITA</pd:from>
+            <pd:to>FECHACITA-1</pd:to>
+            <pd:xpathDescription> </pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FECHACITA-1</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:xpathDescription> </pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FECHACITA</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:xpathDescription>update</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$FECHACITA/jdbcUpdateActivityOutput/noOfUpdates&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FECHACITA-1</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:xpathDescription>update</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$FECHACITA-1/jdbcUpdateActivityOutput/noOfUpdates&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="FECHACITA">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>250</pd:x>
+            <pd:y>170</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>update vo set vo.FECHACITA = vo.FECHA_RECEPCION
+from SC_BITACORACITAS vo
+inner join SC_CITABODEGA w on vo.PROVEEDORID = w.ProveedorId
+inner join dates d on w.DiaSemana = d.DiaSemana and vo.FECHA_RECEPCION = d.date_equivalent
+where vo.ORDEN_COMPRA = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>Orden_Compra</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <Orden_Compra>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA"/>
+                    </Orden_Compra>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="FECHACITA-1">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>373</pd:x>
+            <pd:y>172</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>update v set v.FECHACITA = d.date_equivalent
+from SC_BITACORACITAS v
+inner join SC_CITABODEGA w on v.PROVEEDORID = w.ProveedorId
+inner join dates d on w.DiaSemana = d.DiaSemana and CONVERT(datetime,convert(varchar,v.FECHA_RECEPCION)) + 1 = CONVERT(datetime,convert(varchar,d.date_equivalent))
+where w.Hora &gt;= ? and v.FECHACITA is null and v.ORDEN_COMPRA = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>HORA</parameterName>
+                        <dataType>TIME</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ORDEN_COMPRA</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <HORA>
+                        <xsl:value-of select="tib:create-time(22, 30,00)"/>
+                    </HORA>
+                    <ORDEN_COMPRA>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA"/>
+                    </ORDEN_COMPRA>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>251</pd:x>
+            <pd:y>333</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>379</pd:x>
+            <pd:y>254</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>521</pd:x>
+            <pd:y>256</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Valido" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <Valido>
+                        <xsl:value-of select="if($FECHACITA/jdbcUpdateActivityOutput/noOfUpdates>0 or $FECHACITA-1/jdbcUpdateActivityOutput/noOfUpdates>0)&#xA;then 'Valido'&#xA;else 'No Valido'"/>
+                    </Valido>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.CriticalSectionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>788</pd:x>
+        <pd:y>102</pd:y>
+        <pd:width>302</pd:width>
+        <pd:height>141</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>criticalSection</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:scope>single</pd:scope>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Select Hora,Fecha</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>UpdateHORA_DIA</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Select Hora,Fecha</pd:from>
+            <pd:to>UpdateHORA_DIA</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Select Hora,Fecha">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>871</pd:x>
+            <pd:y>174</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>select distinct w.DiaSemana,w.Hora from SC_CITABODEGA w
+inner join dates d on w.DiaSemana = d.DiaSemana
+left join OPROV P on w.ProveedorId = P.PRO_PROVEEDOR
+left join SC_BITACORACITAS vo on w.ProveedorId = vo.PROVEEDORID and d.date_equivalent = vo.FECHACITA
+where	--d.date_equivalent in (CONVERT(varchar,GETDATE()+3,112))
+          vo.orden_COMPRA =?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>ORDEN_COMPRA</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>DiaSemana</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>Hora</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>time</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <ORDEN_COMPRA>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA"/>
+                    </ORDEN_COMPRA>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="UpdateHORA_DIA">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>994</pd:x>
+            <pd:y>175</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>update SC_BITACORACITAS
+set dia = ? ,
+hora_cita = ?
+where ORDEN_COMPRA = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>DIA</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>HORA</parameterName>
+                        <dataType>TIME</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ORDEN_COMPRA</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <DIA>
+                        <xsl:choose>
+                            <xsl:when test="exists($Select-HoraFecha/resultSet/Record[1]/DiaSemana)">
+                                <xsl:value-of select="$Select-HoraFecha/resultSet/Record[1]/DiaSemana"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </DIA>
+                    <HORA>
+                        <xsl:choose>
+                            <xsl:when test="exists(tib:format-time('HH:mm:ss', substring($Select-HoraFecha/resultSet/Record[1]/Hora, 12, 8)))">
+                                <xsl:value-of select="tib:format-time('HH:mm:ss', substring($Select-HoraFecha/resultSet/Record[1]/Hora, 12, 8))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </HORA>
+                    <ORDEN_COMPRA>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA"/>
+                    </ORDEN_COMPRA>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:group name="Group (2)">
+        <pd:type>com.tibco.pe.core.CriticalSectionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>783</pd:x>
+        <pd:y>299</pd:y>
+        <pd:width>305</pd:width>
+        <pd:height>142</pd:height>
+        <pd:collapsedWidth>62</pd:collapsedWidth>
+        <pd:collapsedHeight>69</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <config>
+            <pd:groupType>criticalSection</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:scope>single</pd:scope>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>FechaEquivalente</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>UpdateFechEquiv</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FechaEquivalente</pd:from>
+            <pd:to>UpdateFechEquiv</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="FechaEquivalente">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>878</pd:x>
+            <pd:y>379</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <statement>select w.ProveedorId,d.date_equivalent --min_date_equivalent
+from SC_CITABODEGA w inner join dates d on w.DiaSemana = d.DiaSemana 
+inner join SC_BITACORACITAS b on w.tipoProveedorId = b.PROVEEDORID
+where W.tipoProveedorId = ?
+and d.date_equivalent &gt;= ?
+and b.orden_compra = ?
+and b.FECHACITA is null
+group by w.ProveedorId, d.date_equivalent
+order by d.date_equivalent asc</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>Proveedor</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Fecha_Recepcion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Orden_compra</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>ProveedorId</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>date_equivalent</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <Proveedor>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:PROVEEDORID/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:PROVEEDORID"/>
+                    </Proveedor>
+                    <Fecha_Recepcion>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:FECHA_RECEPCION/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:FECHA_RECEPCION"/>
+                    </Fecha_Recepcion>
+                    <Orden_compra>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA"/>
+                    </Orden_compra>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="UpdateFechEquiv">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>991</pd:x>
+            <pd:y>379</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+                <statement>update  SC_BITACORACITAS
+set fechacita=?
+where orden_compra=?
+and Proveedorid=?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>FechaCita</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Orden_compra</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ProveedorID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <FechaCita>
+                        <xsl:choose>
+                            <xsl:when test="exists($FechaEquivalente/resultSet/Record[1]/date_equivalent)">
+                                <xsl:value-of select="$FechaEquivalente/resultSet/Record[1]/date_equivalent"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FechaCita>
+                    <Orden_compra>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:ORDEN_COMPRA"/>
+                    </Orden_compra>
+                    <ProveedorID>
+                        <xsl:copy-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:PROVEEDORID/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx:CITAS/pfx:ITEM/pfx:PROVEEDORID"/>
+                    </ProveedorID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:xpathDescription> </pd:xpathDescription>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Map-Data/root/Valido='Valido'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Group (2)</pd:to>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (2)</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

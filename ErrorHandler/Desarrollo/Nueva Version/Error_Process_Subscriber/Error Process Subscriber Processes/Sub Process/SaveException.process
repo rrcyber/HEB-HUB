@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/TIB_LOG_EXCEPTION.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/TIB_LOG_EXCEPTION.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/ExceptionSchema.xsd">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/ExceptionSchema.xsd" schemaLocation="/SharedResources/Schemas/ExceptionSchema.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/TIB_LOG_EXCEPTION.xsd" schemaLocation="/SharedResources/Schemas/TIB_LOG_EXCEPTION.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/TIB_LOG_EXCEPTION.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/TIB_LOG_EXCEPTION.xsd"/>
+    <pd:name>Error Process Subscriber Processes/Sub Process/SaveException.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx4:Exception"/>
+    <pd:startX>81</pd:startX>
+    <pd:startY>113</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>545</pd:endX>
+    <pd:endY>115</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1431450349926</pd:targetNamespace>
+    <pd:activity name="MapException">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>220</pd:x>
+        <pd:y>114</pd:y>
+        <config>
+            <element ref="pfx3:TIB_LOG_EXCEPTION"/>
+        </config>
+        <pd:inputBindings>
+            <TIB_LOG_EXCEPTION>
+                <DOMAIN>
+                    <xsl:value-of select="$Start/Exception/Domain"/>
+                </DOMAIN>
+                <DEPLOYMENT>
+                    <xsl:value-of select="$Start/Exception/Deployment"/>
+                </DEPLOYMENT>
+                <PROJECT>
+                    <xsl:value-of select="$Start/Exception/Project"/>
+                </PROJECT>
+                <ENGINE_NAME>
+                    <xsl:value-of select="$Start/Exception/EngineName"/>
+                </ENGINE_NAME>
+                <ERROR_DATE>
+                    <xsl:value-of select="$Start/Exception/TimeStamp"/>
+                </ERROR_DATE>
+                <CODE>
+                    <xsl:value-of select="$Start/Exception/Code"/>
+                </CODE>
+                <SEVERITY>
+                    <xsl:value-of select="if (contains($Start/Exception/Code, 'BW-JDBC')) then 'HIGH'&#xA;else if (contains($Start/Exception/Code, 'BW-ENGINE'))  then 'MEDIA'&#xA;else 'LOW'"/>
+                </SEVERITY>
+                <ERROR_DESCRIPTION>
+                    <xsl:value-of select="$Start/Exception/Message"/>
+                </ERROR_DESCRIPTION>
+            </TIB_LOG_EXCEPTION>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC_InserException">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>377</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_SXD201080/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_SXD201080.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO TIB_LOG_EXCEPTION  (DOMAIN,DEPLOYMENT,PROJECT,ENGINE_NAME,ERROR_DATE,CODE,SEVERITY,ERROR_DESCRIPTION)
+VALUES (?,?,?,?,?,?,?,? )</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>DOMAIN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>DEPLOYMENT</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PROJECT</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ENGINE_NAME</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERROR_DATE</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SEVERITY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERROR_DESCRIPTION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <DOMAIN>
+                    <xsl:value-of select="substring($MapException/TIB_LOG_EXCEPTION/DOMAIN, 0, 50)"/>
+                </DOMAIN>
+                <DEPLOYMENT>
+                    <xsl:value-of select="substring($MapException/TIB_LOG_EXCEPTION/DEPLOYMENT, 0, 250)"/>
+                </DEPLOYMENT>
+                <PROJECT>
+                    <xsl:value-of select="substring($MapException/TIB_LOG_EXCEPTION/PROJECT, 0, 500)"/>
+                </PROJECT>
+                <ENGINE_NAME>
+                    <xsl:value-of select="substring($MapException/TIB_LOG_EXCEPTION/ENGINE_NAME, 0, 500)"/>
+                </ENGINE_NAME>
+                <ERROR_DATE>
+                    <xsl:value-of select="$MapException/TIB_LOG_EXCEPTION/ERROR_DATE"/>
+                </ERROR_DATE>
+                <CODE>
+                    <xsl:value-of select="if(string-length($MapException/TIB_LOG_EXCEPTION/CODE) >0)&#xA;then substring($MapException/TIB_LOG_EXCEPTION/CODE, 0,90)&#xA;else ''"/>
+                </CODE>
+                <SEVERITY>
+                    <xsl:value-of select="substring($MapException/TIB_LOG_EXCEPTION/SEVERITY, 0, 50)"/>
+                </SEVERITY>
+                <ERROR_DESCRIPTION>
+                    <xsl:value-of select="$MapException/TIB_LOG_EXCEPTION/ERROR_DESCRIPTION"/>
+                </ERROR_DESCRIPTION>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>MapException</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>MapException</pd:from>
+        <pd:to>JDBC_InserException</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_InserException</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

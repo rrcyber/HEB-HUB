@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://xmlns.heb.com/ei/error" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Compare_Offers.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>55</pd:startX>
+    <pd:startY>195</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="exists($Send_Exceptions/run_id)">
+                <run_id>
+                    <xsl:value-of select="$Send_Exceptions/run_id"/>
+                </run_id>
+            </xsl:when>
+            <xsl:otherwise>
+                <run_id>
+                    <xsl:value-of select="''"/>
+                </run_id>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="run_id" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>1643</pd:endX>
+    <pd:endY>204</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412717083123</pd:targetNamespace>
+    <pd:activity name="Inactive_RepeatedProducts">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>592</pd:x>
+        <pd:y>195</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Inactive_RepeatedProducts.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Get_RepeatedProducts/Group"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1436</pd:x>
+        <pd:y>205</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns2:AuditingSchema>
+                <ns2:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns2:inrtn_id>
+                <ns2:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                </ns2:inrtn_nm>
+                <ns2:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                </ns2:inrtn_instn_nm>
+                <ns2:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProcessId"/>
+                </ns2:inrtn_proc_id>
+                <ns2:inrtn_rec_cnt>
+                    <xsl:value-of select="count($Get_Exceptions/Group/Products)"/>
+                </ns2:inrtn_rec_cnt>
+                <ns2:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                </ns2:inrtn_cre8_ts>
+            </ns2:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Delete_OldPromos">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>196</pd:x>
+        <pd:y>195</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Delete_OldPromos.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Get_RepeatedProducts">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>454</pd:x>
+        <pd:y>196</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Get_RepeatedProducts.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Update_StatusOffers">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>317</pd:x>
+        <pd:y>197</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Update_StatusOffers.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Active_HighHierarchy">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>835</pd:x>
+        <pd:y>197</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Active_HighHierarchy.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Get_HighHierarchy/Group"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_Exceptions">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1278</pd:x>
+        <pd:y>205</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Send_Exceptions.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Get_Exceptions/Group"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_HighHierarchy">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>713</pd:x>
+        <pd:y>196</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Get_HighHierarchy.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Get_Exceptions">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1086</pd:x>
+        <pd:y>202</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Get_Exceptions.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>718</pd:x>
+        <pd:y>334</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>1170</pd:x>
+        <pd:y>340</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Validate_SkuInvalid">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>452</pd:x>
+        <pd:y>335</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Validate_SkuInvalid.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Active_SkuInvalids">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>716</pd:x>
+        <pd:y>443</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Active_SkuInvalid.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Validate_SkuInvalid/ProductsInvalid"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Cambios_sku_invalid">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>952</pd:x>
+        <pd:y>114</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Cambios_sku_invalid.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Delete_OldPromos</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Delete_OldPromos</pd:from>
+        <pd:to>Update_StatusOffers</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_RepeatedProducts</pd:from>
+        <pd:to>Inactive_RepeatedProducts</pd:to>
+        <pd:xpathDescription>records &gt; 0</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Get_RepeatedProducts/Group/Products)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_StatusOffers</pd:from>
+        <pd:to>Get_RepeatedProducts</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Inactive_RepeatedProducts</pd:from>
+        <pd:to>Get_HighHierarchy</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Active_HighHierarchy</pd:from>
+        <pd:to>Cambios_sku_invalid</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_Exceptions</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_HighHierarchy</pd:from>
+        <pd:to>Active_HighHierarchy</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Exceptions</pd:from>
+        <pd:to>Send_Exceptions</pd:to>
+        <pd:xpathDescription>excpetions</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not(empty($Get_Exceptions/Group/Products))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_RepeatedProducts</pd:from>
+        <pd:to>Validate_SkuInvalid</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Get_Exceptions</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Exceptions</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validate_SkuInvalid</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validate_SkuInvalid</pd:from>
+        <pd:to>Active_SkuInvalids</pd:to>
+        <pd:xpathDescription>Existe SkuInvalid</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Validate_SkuInvalid/ProductsInvalid/Products)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Active_SkuInvalids</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Cambios_sku_invalid</pd:from>
+        <pd:to>Get_Exceptions</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>string-length($Cambios_sku_invalid/Products)!=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Cambios_sku_invalid</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

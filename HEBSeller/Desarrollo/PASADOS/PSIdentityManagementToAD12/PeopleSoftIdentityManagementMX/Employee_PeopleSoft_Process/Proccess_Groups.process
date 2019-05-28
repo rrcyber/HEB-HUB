@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Proccess_Groups.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="StringGroups">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="String_from_BD" type="xsd:string"/>
+                    <xsd:element name="String_from_AD" type="xsd:string"/>
+                    <xsd:element name="String_To_Remove" type="xsd:string"/>
+                    <xsd:element name="String_To_Remove_Puesto" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>62</pd:startY>
+    <pd:returnBindings>
+        <String_Final_Groups>
+            <Groups_To_Add_AD>
+                <xsl:value-of select="$Get_Final_Group_Employee_LDAP/javaCodeActivityOutput/out_Final_Groups"/>
+            </Groups_To_Add_AD>
+            <Groups_To_Remove_AD>
+                <xsl:value-of select="$Start/StringGroups/String_from_AD"/>
+            </Groups_To_Remove_AD>
+        </String_Final_Groups>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="String_Final_Groups">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Groups_To_Add_AD" type="xsd:string"/>
+                    <xsd:element name="Groups_To_Remove_AD" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>395</pd:endX>
+    <pd:endY>61</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1430242417141</pd:targetNamespace>
+    <pd:activity name="Get_Final_Group_Employee_LDAP">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>196</pd:x>
+        <pd:y>60</pd:y>
+        <config>
+            <fileName>Proccess_GroupsGet_Final_Group_Employee_LDAP</fileName>
+            <packageName>PeopleSoftIdentityManagementMX.Employee_PeopleSoft_Process.Proccess_Groups</packageName>
+            <fullsource>package PeopleSoftIdentityManagementMX.Employee_PeopleSoft_Process.Proccess_Groups;
+import java.util.Hashtable;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import java.util.StringTokenizer;
+
+
+public class Proccess_GroupsGet_Final_Group_Employee_LDAP{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String in_Groups_BD = "";
+	protected String in_Groups_AD = "";
+	protected String in_Groups_To_remove = "";
+	protected String in_Groups_byCodJob = "";
+	protected String out_Final_Groups = "";
+	public String getin_Groups_BD() {
+		return in_Groups_BD;
+	}
+	public void setin_Groups_BD(String val) {
+		in_Groups_BD = val;
+	}
+	public String getin_Groups_AD() {
+		return in_Groups_AD;
+	}
+	public void setin_Groups_AD(String val) {
+		in_Groups_AD = val;
+	}
+	public String getin_Groups_To_remove() {
+		return in_Groups_To_remove;
+	}
+	public void setin_Groups_To_remove(String val) {
+		in_Groups_To_remove = val;
+	}
+	public String getin_Groups_byCodJob() {
+		return in_Groups_byCodJob;
+	}
+	public void setin_Groups_byCodJob(String val) {
+		in_Groups_byCodJob = val;
+	}
+	public String getout_Final_Groups() {
+		return out_Final_Groups;
+	}
+	public void setout_Final_Groups(String val) {
+		out_Final_Groups = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public Proccess_GroupsGet_Final_Group_Employee_LDAP() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String in_Groups_BD
+	In  : String in_Groups_AD
+	In  : String in_Groups_To_remove
+	In  : String in_Groups_byCodJob
+	Out : String out_Final_Groups
+* Available Variables: DO NOT MODIFY *****/
+
+		String in_Groups_To_Add_user_BD=in_Groups_BD;
+                String in_Groups_To_Add_user_AD=in_Groups_AD;
+                String in_Groups_To_Add_user_Remove=in_Groups_To_remove;
+        // Los nuevos Quedan Todos
+                String String_Final=in_Groups_To_Add_user_BD;
+        
+                String String_Final_1="";
+
+        StringTokenizer tokenizerGroupsbyCodJob;
+        if (in_Groups_byCodJob!=null) {
+           if (!in_Groups_byCodJob.contains("+")) {
+              in_Groups_byCodJob=in_Groups_byCodJob+"+";
+            }
+            tokenizerGroupsbyCodJob = new StringTokenizer(in_Groups_byCodJob,"+");
+            String groupNamebyCD="";
+            while (tokenizerGroupsbyCodJob.hasMoreElements()) {
+                  groupNamebyCD = tokenizerGroupsbyCodJob.nextToken();
+                  //System.out.println("Quitar :"+groupNamebyCD);
+                  in_Groups_To_Add_user_BD=in_Groups_To_Add_user_BD.replaceAll(groupNamebyCD,"");
+                  in_Groups_To_Add_user_BD=in_Groups_To_Add_user_BD.replace("++","+");
+            }
+            //System.out.println(in_Groups_To_Add_user_BD);
+            String_Final=in_Groups_To_Add_user_BD;
+            if (String_Final.length()&gt;0) {
+            }
+        }
+        //Se analizan los de AD
+               StringTokenizer tokenizerGroups = new StringTokenizer(in_Groups_To_Add_user_AD,"+");
+        
+               while (tokenizerGroups.hasMoreElements()) {
+                     String groupName;
+                     groupName = tokenizerGroups.nextToken();
+                     CharSequence chs = groupName;
+                     
+                     // Checa los que debe Quitar
+                     if (in_Groups_To_Add_user_Remove.contains(chs)) {
+                         
+                     } else {
+                         // Checa Los que ya existen de los nuevos desde BD
+                         if (!String_Final.contains(chs)) {
+                              String_Final_1=String_Final_1+"+"+groupName;
+                         }
+                     }
+                  
+               }
+        out_Final_Groups=String_Final+String_Final_1;
+	}	
+	
+}
+</fullsource>
+            <outputData>
+                <row>
+                    <fieldName>out_Final_Groups</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+            </outputData>
+            <inputData>
+                <row>
+                    <fieldName>in_Groups_BD</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>in_Groups_AD</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>required</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>in_Groups_To_remove</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>in_Groups_byCodJob</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </inputData>
+            <byteCode>
+                <class>
+                    <name>Proccess_GroupsGet_Final_Group_Employee_LDAP</name>
+                    <byteCode>yv66vgAAADIAYQkAFgA4CQAWADkJABYAOgkAFgA7CQAWADwKABcAPQgAPggAPwoAQABBBwBCCgAKAD0KAAoAQwoACgBEBwBFCgAOAEYKAA4ARwoADgBICgBAAEkIAEoKAEAASwoAQABMBwBNBwBOAQAMaW5fR3JvdXBzX0JEAQASTGphdmEvbGFuZy9TdHJpbmc7AQAMaW5fR3JvdXBzX0FEAQATaW5fR3JvdXBzX1RvX3JlbW92ZQEAEmluX0dyb3Vwc19ieUNvZEpvYgEAEG91dF9GaW5hbF9Hcm91cHMBAA9nZXRpbl9Hcm91cHNfQkQBABQoKUxqYXZhL2xhbmcvU3RyaW5nOwEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBAA9zZXRpbl9Hcm91cHNfQkQBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAA9nZXRpbl9Hcm91cHNfQUQBAA9zZXRpbl9Hcm91cHNfQUQBABZnZXRpbl9Hcm91cHNfVG9fcmVtb3ZlAQAWc2V0aW5fR3JvdXBzX1RvX3JlbW92ZQEAFWdldGluX0dyb3Vwc19ieUNvZEpvYgEAFXNldGluX0dyb3Vwc19ieUNvZEpvYgEAE2dldG91dF9GaW5hbF9Hcm91cHMBABNzZXRvdXRfRmluYWxfR3JvdXBzAQAGPGluaXQ+AQADKClWAQAGaW52b2tlAQANU3RhY2tNYXBUYWJsZQcATQcATwcARQcAUAEACkV4Y2VwdGlvbnMHAFEBAApTb3VyY2VGaWxlAQAxUHJvY2Nlc3NfR3JvdXBzR2V0X0ZpbmFsX0dyb3VwX0VtcGxveWVlX0xEQVAuamF2YQwAGAAZDAAaABkMABsAGQwAHAAZDAAdABkMACwALQEAAAEAASsHAE8MAFIAUwEAF2phdmEvbGFuZy9TdHJpbmdCdWlsZGVyDABUAFUMAFYAHwEAGWphdmEvdXRpbC9TdHJpbmdUb2tlbml6ZXIMACwAVwwAWABZDABaAB8MAFsAXAEAAisrDABdAF4MAF8AYAEAd1Blb3BsZVNvZnRJZGVudGl0eU1hbmFnZW1lbnRNWC9FbXBsb3llZV9QZW9wbGVTb2Z0X1Byb2Nlc3MvUHJvY2Nlc3NfR3JvdXBzL1Byb2NjZXNzX0dyb3Vwc0dldF9GaW5hbF9Hcm91cF9FbXBs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</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings>
+            <javaCodeActivityInput>
+                <in_Groups_BD>
+                    <xsl:value-of select="$Start/StringGroups/String_from_BD"/>
+                </in_Groups_BD>
+                <in_Groups_AD>
+                    <xsl:value-of select="$Start/StringGroups/String_from_AD"/>
+                </in_Groups_AD>
+                <in_Groups_To_remove>
+                    <xsl:value-of select="$Start/StringGroups/String_To_Remove"/>
+                </in_Groups_To_remove>
+                <in_Groups_byCodJob>
+                    <xsl:value-of select="$Start/StringGroups/String_To_Remove_Puesto"/>
+                </in_Groups_byCodJob>
+            </javaCodeActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_Final_Group_Employee_LDAP</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Final_Group_Employee_LDAP</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_Certificate.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="VALIDATOR_INPUT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ISSUE_DATE" type="xsd:dateTime" minOccurs="0"/>
+                    <xsd:element name="CERTIFICATE_NUMBER" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="RFC" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>225</pd:startX>
+    <pd:startY>166</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="($Call-Procedure/resultSet/outputSet/RETURN_VALUE=0) and (tib:compare-date(tib:format-dateTime('yyyy-MM-dd',$Start/VALIDATOR_INPUT/ISSUE_DATE), tib:format-dateTime('yyyy-MM-dd', $Call-Procedure/resultSet/Resultsets[1]/ResultSet1[1]/Record1[1]/SEL_FECINIVIG)) !=-1) and (tib:compare-date(tib:format-dateTime('yyyy-MM-dd', $Call-Procedure/resultSet/Resultsets[1]/ResultSet1[1]/Record1[1]/SEL_FECFINVIG), tib:format-dateTime('yyyy-MM-dd', $Start/VALIDATOR_INPUT/ISSUE_DATE)) >=0)">
+                <VALIDATOR_RESULT>
+                    <VALID>
+                        <xsl:value-of select="true()"/>
+                    </VALID>
+                </VALIDATOR_RESULT>
+            </xsl:when>
+            <xsl:otherwise>
+                <VALIDATOR_RESULT>
+                    <VALID>
+                        <xsl:value-of select="false()"/>
+                    </VALID>
+                    <CODE>
+                        <xsl:value-of select="$Get_Response_Message/MESSAGE/CODE"/>
+                    </CODE>
+                    <DESCRIPTION>
+                        <xsl:value-of select="$Get_Response_Message/MESSAGE/DESCRIPTION"/>
+                    </DESCRIPTION>
+                </VALIDATOR_RESULT>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="VALIDATOR_RESULT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="VALID" type="xsd:boolean"/>
+                    <xsd:element name="CODE" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>596</pd:endX>
+    <pd:endY>165</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1303416592470</pd:targetNamespace>
+    <pd:activity name="Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>357</pd:x>
+        <pd:y>165</pd:y>
+        <config>
+            <timeout>%%Connections/Database/VISORFE/GBL_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/VISORFE/GBL_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spSel_GetCertificate;1</ProcedureName>
+            <useSchema>true</useSchema>
+            <oraObjects/>
+            <oraTables/>
+            <ResultSets>
+                <ResultSet>
+                    <QueryOutputCachedSchemaColumns>SEL_IDPROV</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SEL_SELLO</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SEL_FECINIVIG</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SEL_FECFINVIG</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SEL_RFC</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SEL_EDOCERTIF</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SEL_FECACTUALIZA</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                </ResultSet>
+            </ResultSets>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@CERTIFICATE_NUMBER</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@RFC</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <CERTIFICATE_NUMBER>
+                        <xsl:value-of select="$Start/VALIDATOR_INPUT/CERTIFICATE_NUMBER"/>
+                    </CERTIFICATE_NUMBER>
+                    <RFC>
+                        <xsl:value-of select="$Start/VALIDATOR_INPUT/RFC"/>
+                    </RFC>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_Response_Message">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>478</pd:x>
+        <pd:y>168</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Get_Response_Message.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:choose>
+                <xsl:when test="string-length($Start/VALIDATOR_INPUT/RFC) > 0">
+                    <CODE>
+                        <xsl:value-of select="&quot;ERR0104&quot;"/>
+                    </CODE>
+                </xsl:when>
+                <xsl:otherwise>
+                    <CODE>
+                        <xsl:value-of select="&quot;ERR0103&quot;"/>
+                    </CODE>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>Get_Response_Message</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Response_Message</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

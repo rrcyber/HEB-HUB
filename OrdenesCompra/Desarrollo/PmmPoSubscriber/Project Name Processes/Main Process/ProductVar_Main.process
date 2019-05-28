@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PMM_DETAIL_SOAP.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PMM_DETAIL_DATA.xsd" xmlns:pfx="http://xmlns.heb.com/ei/PMM_DETAIL_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_DETAIL_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_DETAIL_DATA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PMM_DETAIL_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_DETAIL_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Main Process/ProductVar_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PMM_DETAIL"/>
+    <pd:startX>88</pd:startX>
+    <pd:startY>88</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>516</pd:endX>
+    <pd:endY>94</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371226939184</pd:targetNamespace>
+    <pd:activity name="SetPMM.pmgvqtee">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>217</pd:x>
+        <pd:y>314</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/SetPMM.pmgvqtee.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$Start/pfx:PMM_DETAIL/pfx:ITEM">
+                    <group>
+                        <ORG_LVL_NUMBER>
+                            <xsl:value-of select="pfx:ORG_LVL_NUMBER"/>
+                        </ORG_LVL_NUMBER>
+                        <PMG_PO_NUMBER>
+                            <xsl:value-of select="pfx:PMG_PO_NUMBER"/>
+                        </PMG_PO_NUMBER>
+                        <PRD_LVL_NUMBER_1>
+                            <xsl:value-of select="pfx:PRD_LVL_NUMBER_1"/>
+                        </PRD_LVL_NUMBER_1>
+                        <PRD_LVL_NUMBER_2>
+                            <xsl:value-of select="pfx:PRD_LVL_NUMBER_2"/>
+                        </PRD_LVL_NUMBER_2>
+                        <PMG_SELL_QTY>
+                            <xsl:value-of select="pfx:PMG_SELL_QTY"/>
+                        </PMG_SELL_QTY>
+                    </group>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>213</pd:x>
+        <pd:y>87</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>373</pd:x>
+        <pd:y>232</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getOarorVar">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>215</pd:x>
+        <pd:y>213</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/getOarorVar.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:if test="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:PMG_PO_NUMBER">
+                    <orden>
+                        <xsl:value-of select="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                    </orden>
+                </xsl:if>
+                <xsl:if test="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER">
+                    <sucursal>
+                        <xsl:value-of select="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER"/>
+                    </sucursal>
+                </xsl:if>
+                <xsl:if test="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:PRD_LVL_NUMBER_2">
+                    <variacion>
+                        <xsl:value-of select="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:PRD_LVL_NUMBER_2"/>
+                    </variacion>
+                </xsl:if>
+                <xsl:if test="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:PRD_LVL_NUMBER_1">
+                    <preempaque>
+                        <xsl:value-of select="$Start/pfx:PMM_DETAIL/pfx:ITEM[1]/pfx:PRD_LVL_NUMBER_1"/>
+                    </preempaque>
+                </xsl:if>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>SetPMM.pmgvqtee</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>getOarorVar</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Start/pfx:PMM_DETAIL/pfx:ITEM)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetPMM.pmgvqtee</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getOarorVar</pd:from>
+        <pd:to>SetPMM.pmgvqtee</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getOarorVar</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($getOarorVar/group/param)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getOarorVar</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

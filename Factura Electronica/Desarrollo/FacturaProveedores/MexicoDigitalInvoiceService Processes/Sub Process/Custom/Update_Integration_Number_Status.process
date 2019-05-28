@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INTEGRATION_NUMBER.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/RECEIPT_NUMBER.xsd">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/RECEIPT_NUMBER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/RECEIPT_NUMBER.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INTEGRATION_NUMBER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/INTEGRATION_NUMBER.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Custom/Update_Integration_Number_Status.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:OUTPUT"/>
+    <pd:startX>318</pd:startX>
+    <pd:startY>132</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>577</pd:endX>
+    <pd:endY>132</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1304440364473</pd:targetNamespace>
+    <pd:activity name="Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>451</pd:x>
+        <pd:y>131</pd:y>
+        <config>
+            <timeout>%%Connections/Database/VISORFE/GBL_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/VISORFE/GBL_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spUpd_SetIntegrationNumberStatus;1</ProcedureName>
+            <useSchema>true</useSchema>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@XML</colName>
+                    <colType>1</colType>
+                    <dataType>-1</dataType>
+                    <typeName>xml</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <XML>
+                        <xsl:value-of select="tib:render-xml($Start/OUTPUT, true())"/>
+                    </XML>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

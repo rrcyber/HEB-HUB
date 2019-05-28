@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>Project Name Processes/Main Process/LOG_main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ITEM">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ID" type="xsd:string"/>
+                                <xsd:element name="TYPE" type="xsd:string"/>
+                                <xsd:element name="TRAN_TYPE" type="xsd:string"/>
+                                <xsd:element name="DESCRIPTION" type="xsd:string"/>
+                                <xsd:element name="ID_2" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="UNIT_SHIP_CASE" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="operation" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>136</pd:startX>
+    <pd:startY>137</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <log_status>
+                <xsl:value-of select="if(($Start/group/operation='QUERY' and count($getLOG_ERROR/group/ITEM)>0) or &#xA;($Start/group/operation='QUERY' and count($getLOG_ERROR/group/ITEM)=0 &#xA;and not($Start/group/ITEM/TYPE='ORDER' or $Start/group/ITEM/TYPE='PO'))) &#xA;then 'ERROR' else ''"/>
+            </log_status>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="log_status" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>758</pd:endX>
+    <pd:endY>136</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1375916642293</pd:targetNamespace>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>373</pd:x>
+        <pd:y>227</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-2">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>375</pd:x>
+        <pd:y>136</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-3">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>502</pd:x>
+        <pd:y>136</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-4">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>509</pd:x>
+        <pd:y>234</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="getLOG_ERROR">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>264</pd:x>
+        <pd:y>137</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/getLOG_ERROR.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <ID>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT'  or $Start/group/ITEM/TYPE='ORDER'  or $Start/group/ITEM/TYPE='PO') then concat($Start/group/ITEM/ID, $Start/group/ITEM/UNIT_SHIP_CASE) else $Start/group/ITEM/ID"/>
+                </ID>
+                <TYPE>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='ORDER') then 'PRODUCT' else $Start/group/ITEM/TYPE"/>
+                </TYPE>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="LOG_Error_delete">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>652</pd:x>
+        <pd:y>136</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/LOG_Error_delete.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <ID>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT') then concat($Start/group/ITEM/ID, $Start/group/ITEM/UNIT_SHIP_CASE) else (&#xA;if($Start/group/ITEM/TYPE='PO') then $Start/group/ITEM/ID_2 else $Start/group/ITEM/ID)"/>
+                </ID>
+                <TYPE>
+                    <xsl:value-of select="$Start/group/ITEM/TYPE"/>
+                </TYPE>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="LOG_Error_Historic_insert">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>512</pd:x>
+        <pd:y>325</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/LOG_Error_Historic_insert.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <ID>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT') then concat($Start/group/ITEM/ID, $Start/group/ITEM/UNIT_SHIP_CASE) else (&#xA;if($Start/group/ITEM/TYPE='PO') then $Start/group/ITEM/ID_2 else $Start/group/ITEM/ID)"/>
+                </ID>
+                <TYPE>
+                    <xsl:value-of select="$Start/group/ITEM/TYPE"/>
+                </TYPE>
+                <TRAN_TYPE>
+                    <xsl:value-of select="$Start/group/ITEM/TRAN_TYPE"/>
+                </TRAN_TYPE>
+                <DESCRIPTION>
+                    <xsl:value-of select="$Start/group/ITEM/DESCRIPTION"/>
+                </DESCRIPTION>
+                <ATTR1>
+                    <xsl:value-of select="$Start/group/ITEM/ID"/>
+                </ATTR1>
+                <ATTR2>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT' or $Start/group/ITEM/TYPE='PO') then $Start/group/ITEM/UNIT_SHIP_CASE else ''"/>
+                </ATTR2>
+                <ATTR3>
+                    <xsl:value-of select="''"/>
+                </ATTR3>
+                <ATTR4>
+                    <xsl:value-of select="''"/>
+                </ATTR4>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="LOG_Error_update">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>655</pd:x>
+        <pd:y>230</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/LOG_Error_update.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <DESCRIPTION>
+                    <xsl:value-of select="$Start/group/ITEM/DESCRIPTION"/>
+                </DESCRIPTION>
+                <ATTR1>
+                    <xsl:value-of select="$Start/group/ITEM/ID"/>
+                </ATTR1>
+                <ATTR2>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT' or $Start/group/ITEM/TYPE='PO') then $Start/group/ITEM/UNIT_SHIP_CASE else ''"/>
+                </ATTR2>
+                <ATTR3>
+                    <xsl:value-of select="''"/>
+                </ATTR3>
+                <ATTR4>
+                    <xsl:value-of select="''"/>
+                </ATTR4>
+                <ID>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT') then concat($Start/group/ITEM/ID, $Start/group/ITEM/UNIT_SHIP_CASE) else (&#xA;if($Start/group/ITEM/TYPE='PO') then $Start/group/ITEM/ID_2 else $Start/group/ITEM/ID)"/>
+                </ID>
+                <TYPE>
+                    <xsl:value-of select="$Start/group/ITEM/TYPE"/>
+                </TYPE>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="LOG_Error_insert">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>375</pd:x>
+        <pd:y>325</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/LOG_Error_insert.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <ID>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT') then concat($Start/group/ITEM/ID, $Start/group/ITEM/UNIT_SHIP_CASE) else (&#xA;if($Start/group/ITEM/TYPE='PO') then $Start/group/ITEM/ID_2 else $Start/group/ITEM/ID)"/>
+                </ID>
+                <TYPE>
+                    <xsl:value-of select="$Start/group/ITEM/TYPE"/>
+                </TYPE>
+                <TRAN_TYPE>
+                    <xsl:value-of select="$Start/group/ITEM/TRAN_TYPE"/>
+                </TRAN_TYPE>
+                <DESCRIPTION>
+                    <xsl:value-of select="$Start/group/ITEM/DESCRIPTION"/>
+                </DESCRIPTION>
+                <ATTR1>
+                    <xsl:value-of select="$Start/group/ITEM/ID"/>
+                </ATTR1>
+                <ATTR2>
+                    <xsl:value-of select="if($Start/group/ITEM/TYPE='PRODUCT' or $Start/group/ITEM/TYPE='PO') then $Start/group/ITEM/UNIT_SHIP_CASE else ''"/>
+                </ATTR2>
+                <ATTR3>
+                    <xsl:value-of select="''"/>
+                </ATTR3>
+                <ATTR4>
+                    <xsl:value-of select="''"/>
+                </ATTR4>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>617</pd:x>
+        <pd:y>49</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>26</pd:x>
+        <pd:y>393</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>158</pd:x>
+        <pd:y>392</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns1:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns1:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>getLOG_ERROR</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:xpathDescription>count&gt;0</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($getLOG_ERROR/group/ITEM)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>LOG_Error_delete</pd:to>
+        <pd:xpathDescription>operation=SOLVED</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($getLOG_ERROR/group/ITEM)&gt;0 and $Start/group/operation='SOLVED'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>Null-4</pd:to>
+        <pd:xpathDescription>operation=QUERY</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/group/operation='QUERY'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-4</pd:from>
+        <pd:to>LOG_Error_update</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:xpathDescription>COUNT=0</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getLOG_ERROR</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LOG_Error_delete</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>LOG_Error_insert</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LOG_Error_update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LOG_Error_Historic_insert</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LOG_Error_insert</pd:from>
+        <pd:to>LOG_Error_Historic_insert</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-4</pd:from>
+        <pd:to>LOG_Error_Historic_insert</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>COUNT=0</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($getLOG_ERROR/group/ITEM)=0 and $Start/group/operation='SOLVED'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>LOG_Error_Historic_insert</pd:to>
+        <pd:xpathDescription>TYPE=ORDER</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/group/ITEM/TYPE='ORDER' and not($Start/group/operation='SOLVED')</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:xpathDescription>operation=SOLVED</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/group/operation='SOLVED'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>COUNT=0 and TYPE=PO</pd:xpathDescription>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($getLOG_ERROR/group/ITEM)=0 and ($Start/group/ITEM/TYPE='PO' or $Start/group/ITEM/TYPE='PO_DEMAND')</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

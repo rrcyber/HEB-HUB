@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/Marcajes_KRONOS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Marcajes_KRONOS" schemaLocation="/Shared Resources/Schema Definitions/Custom/Marcajes_KRONOS.xsd"/>
+    <pd:name>Project Name Processes/Main Process/Update_Estado_Marcajes_Tienda.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Marcajes_KRONOS"/>
+    <pd:startX>64</pd:startX>
+    <pd:startY>132</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>542</pd:endX>
+    <pd:endY>133</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1423276371908</pd:targetNamespace>
+    <pd:activity name="DynamicConnectionUpdate">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>353</pd:x>
+        <pd:y>131</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/DynamicConnectionUpdate.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <DB_URL>
+                    <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$_processContext/ns:ProcessContext/CustomId]/URL"/>
+                </DB_URL>
+                <USER>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                </USER>
+                <MAX_ROWS>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                </MAX_ROWS>
+                <xsl:for-each select="$Start/pfx:Marcajes_KRONOS/pfx:ITEM">
+                    <QUERY>
+                        <xsl:value-of select="concat(&quot;UPDATE DBWCK..PS_PUNCHS SET&quot;,&#xA;&quot; ESTATUS = '1'&quot;,&#xA;&quot; WHERE NUMERO = &quot;,pfx:NUMERO,&#xA;&quot; AND PS_PUNCHSID = &quot;,pfx:PS_PUNCHSID)"/>
+                    </QUERY>
+                </xsl:for-each>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetVariable">
+        <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+        <pd:x>205</pd:x>
+        <pd:y>131</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>DynamicConnectionUpdate</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>DynamicConnectionUpdate</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

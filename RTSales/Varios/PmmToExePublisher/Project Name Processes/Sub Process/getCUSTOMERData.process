@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType">
+    <pd:name>Project Name Processes/Sub Process/getCUSTOMERData.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>148</pd:startX>
+    <pd:startY>71</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                <arrayData>
+                    <RECORD_ID>
+                        <xsl:value-of select="RECORDID"/>
+                    </RECORD_ID>
+                    <ROW_STAT>
+                        <xsl:value-of select="ACTIONCODE"/>
+                    </ROW_STAT>
+                    <CUST_ID>
+                        <xsl:value-of select="CUSTOMERNUMBER"/>
+                    </CUST_ID>
+                    <CUST_NAME>
+                        <xsl:value-of select="CUSTOMERNAME"/>
+                    </CUST_NAME>
+                    <xsl:if test="CONTACTNAME">
+                        <CONTACT_NAME>
+                            <xsl:value-of select="CONTACTNAME"/>
+                        </CONTACT_NAME>
+                    </xsl:if>
+                    <xsl:if test="ADDRESSLINE1">
+                        <ADDR_LINE1>
+                            <xsl:value-of select="ADDRESSLINE1"/>
+                        </ADDR_LINE1>
+                    </xsl:if>
+                    <xsl:if test="ADDRESSLINE2">
+                        <ADDR_LINE2>
+                            <xsl:value-of select="ADDRESSLINE2"/>
+                        </ADDR_LINE2>
+                    </xsl:if>
+                    <CITY>
+                        <xsl:value-of select="CITY"/>
+                    </CITY>
+                    <STATE>
+                        <xsl:value-of select="STATE"/>
+                    </STATE>
+                    <xsl:if test="PHONENUMBER">
+                        <PHONE_NO>
+                            <xsl:value-of select="PHONENUMBER"/>
+                        </PHONE_NO>
+                    </xsl:if>
+                    <TRAN_TYPE>
+                        <xsl:value-of select="TRAN_TYPE"/>
+                    </TRAN_TYPE>
+                    <AUDIT_NUMBER>
+                        <xsl:value-of select="AUDIT_NUMBER"/>
+                    </AUDIT_NUMBER>
+                </arrayData>
+            </xsl:for-each>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="arrayData" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="RECORD_ID" type="xsd:string"/>
+                                <xsd:element name="ROW_STAT" type="xsd:string"/>
+                                <xsd:element name="CUST_ID" type="xsd:string"/>
+                                <xsd:element name="CUST_NAME" type="xsd:string"/>
+                                <xsd:element name="CONTACT_NAME" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="ADDR_LINE1" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="ADDR_LINE2" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="CITY" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="STATE" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="PHONE_NO" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="TRAN_TYPE" type="xsd:string"/>
+                                <xsd:element name="AUDIT_NUMBER" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>444</pd:endX>
+    <pd:endY>70</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1372111306484</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>297</pd:x>
+        <pd:y>72</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC PMM_Connection.sharedjdbc</jdbcSharedConfig>
+            <statement> select TRAN_TYPE, AUDIT_NUMBER, 'CUSTOMER' RecordID
+          ,case when tran_type='C' then 'M' 
+               else tran_type
+          end ActionCode
+         ,trim(org_lvl_number_s) CustomerNumber
+         ,trim(org_name_full) CustomerName
+         ,trim(substr(org_name_full,5,5)) ContactName
+         ,substr(trim(bas_addr_1) || trim(substr(bas_addr_2,1,7)),1,30) AddressLine1
+         ,trim(substr(bas_addr_2,8,20)) AddressLine2
+         ,trim(bas_city) City
+         ,trim(substr(bas_state,1,2)) State
+         ,trim(bas_isd) || '-' || trim(bas_area) || '-' || trim(bas_phone_numb) PhoneNumber
+  from pmm.sdiorgmst org
+  where org_is_store='T'
+and date_created &gt;= trunc(sysdate-?)
+ and download_date_2 is null
+</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>DIAS_ATRAS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>TRAN_TYPE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AUDIT_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>RECORDID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ACTIONCODE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CUSTOMERNUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CUSTOMERNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CONTACTNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ADDRESSLINE1</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ADDRESSLINE2</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>STATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PHONENUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <DIAS_ATRAS>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/TIMER_CONF/DIAS_ATRAS"/>
+                </DIAS_ATRAS>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

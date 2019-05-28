@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <pd:name>Processes/Starter Process/FaceBook_Starter_Java_Code.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>73</pd:startX>
+    <pd:startY>91</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>319</pd:endX>
+    <pd:endY>92</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1421255905824</pd:targetNamespace>
+    <pd:activity name="Java Code">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>198</pd:x>
+        <pd:y>91</pd:y>
+        <config>
+            <javaArchive>/Utility Services/Library/AliasLibrary.aliaslib</javaArchive>
+            <fileName>FaceBook_Starter_Java_CodeJavaCode</fileName>
+            <packageName>Processes.StarterProcess.FaceBook_Starter_Java_Code</packageName>
+            <fullsource>package Processes.StarterProcess.FaceBook_Starter_Java_Code;
+import java.util.*;
+import java.io.*;
+
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.Post;
+import facebook4j.ResponseList;
+import facebook4j.conf.Configuration;
+import facebook4j.conf.ConfigurationBuilder;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import net.sf.json.JsonConfig;
+import net.sf.json.JSONObject;
+
+public class FaceBook_Starter_Java_CodeJavaCode{
+
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+public FaceBook_Starter_Java_CodeJavaCode() throws FacebookException{
+
+// Create conf builder and set authorization and access keys 
+       ConfigurationBuilder configurationBuilder = new ConfigurationBuilder(); 
+       configurationBuilder.setDebugEnabled(true); 
+       configurationBuilder.setOAuthAppId("837819606274821"); 
+       configurationBuilder.setOAuthAppSecret("8da91b60603be2580437192a365a077a"); 
+       configurationBuilder.setOAuthAccessToken("837819606274821|r06oAsfGWysuipnRSCO7tT-TFyQ"); 
+       configurationBuilder .setOAuthPermissions("email, publish_stream, id, name, first_name, last_name, read_stream , generic"); 
+       configurationBuilder.setUseSSL(true); 
+       configurationBuilder.setJSONStoreEnabled(true);       
+     
+       // Create configuration and get Facebook instance 
+       Configuration configuration = configurationBuilder.build(); 
+       FacebookFactory ff = new FacebookFactory(configuration); 
+       Facebook Facebook = ff.getInstance(); 
+       
+       try { 
+                      
+          // ResponseList&lt;Post&gt; results = Facebook.getPosts("Macdonalds"); 
+           
+           // Set search string and get results 
+           String searchPost = "HEB"; 
+           Date date = new Date(); 
+           SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "dd_MM_yyyy_hh_mm"); 
+           String fileName = "D:\\FacebookConfigFolder\\File\\" + searchPost + "_" + simpleDateFormat.format(date) + ".txt"; 
+           String results = getFacebookPostes(Facebook, searchPost); 
+           File file = new File(fileName); 
+           if (!file.exists()) { file.createNewFile(); 
+           FileWriter fw = new FileWriter(file.getAbsoluteFile()); 
+           BufferedWriter bw = new BufferedWriter(fw); 
+           bw.write(results); 
+           bw.close(); 
+           System.out.println("Completed"); } } 
+       catch (IOException e) 
+            { e.printStackTrace();
+           }
+}
+
+ // This method is used to get Facebook posts based on the search string set 
+   
+   public static String getFacebookPostes(Facebook Facebook, String searchPost) 
+           throws FacebookException { 
+       String searchResult = "Item : " + searchPost + "\n"; 
+       StringBuffer searchMessage = new StringBuffer(); 
+       ResponseList&lt;Post&gt; results = Facebook.getPosts(searchPost); 
+       for (Post post : results) {
+                System.out.println(post.getMessage()); 
+                searchMessage.append(post.getMessage() + "\n"); 
+                for (int j = 0; j &lt; post.getComments().size(); j++){ 
+                    searchMessage.append(post.getComments().get(j).getFrom() .getName() + ", "); 
+                    searchMessage.append(post.getComments().get(j).getMessage() + ", "); 
+                    searchMessage.append(post.getComments().get(j).getCreatedTime() + ", "); 
+                    searchMessage.append(post.getComments().get(j).getLikeCount() + "\n"); } 
+       } 
+       String feedString = getFacebookFeed(Facebook, searchPost);
+       searchResult = searchResult + searchMessage.toString();
+       searchResult = searchResult + feedString; return searchResult;
+   }
+   
+   // This method is used to get Facebook feeds based on the search string set 
+   public static String getFacebookFeed(Facebook Facebook, String searchPost) 
+           throws FacebookException { 
+       String searchResult = ""; 
+       StringBuffer searchMessage = new StringBuffer(); 
+       ResponseList&lt;Post&gt; results = Facebook.getFeed(searchPost); 
+       for (Post post : results) { 
+           System.out.println(post.getMessage()); 
+           searchMessage.append(post.getFrom().getName() + ", "); 
+           searchMessage.append(post.getMessage() + ", "); 
+           searchMessage.append(post.getCreatedTime() + "\n"); } 
+       searchResult = searchResult + searchMessage.toString(); 
+       return searchResult; 
+   } 
+   
+   // This method is used to create JSON object from data string 
+   public static String stringToJson(String data) { 
+       JsonConfig cfg = new JsonConfig(); 
+       try { JSONObject jsonObject = JSONObject.fromObject(data, cfg); 
+       System.out.println("JSON = " + jsonObject.toString()); } 
+       catch (Exception e) { e.printStackTrace(); } 
+       return "JSON Created"; 
+   } 
+
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+* Available Variables: DO NOT MODIFY *****/
+
+}
+}
+</fullsource>
+            <byteCode>
+                <class>
+                    <name>FaceBook_Starter_Java_CodeJavaCode</name>
+                    <byteCode>yv66vgAAADIBDgoAVwB0BwB1CgACAHQKAAIAdggAdwoAAgB4CAB5CgACAHoIAHsKAAIAfAgAfQoAAgB+CgACAH8KAAIAgAoAAgCBBwCCCgAQAIMKABAAhAgAhQcAhgoAFAB0BwCHCACICgAWAIkHAIoKABkAdAgAiwoAGQCMCACNCgAWAI4IAI8KABkAkAoAVgCRBwCSCgAiAIkKACIAkwoAIgCUBwCVCgAiAJYKACYAlwcAmAoAKQCZCgApAJoKACkAmwkAnACdCACeCgCfAKAHAKEKADAAoggAowgApAcApQoANAB0CwCmAKcLAKgAqQsAqgCrCwCqAKwHAK0LADoArgoANACvCwA6ALALALEAsgsAsQCzBwC0CwBAALULALYAtwgAuAsAQACuCwBAALkKABkAugsAQAC7CgBWALwKADQAkAgAvQsApgC+CwA6ALULADoAuQcAvwoATgB0CgDAAMEIAMIKAMAAkAcAwwoAUwCiCADEBwDFBwDGAQAGPGluaXQ+AQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADVN0YWNrTWFwVGFibGUHAMUHAHUHAMcHAIIHAMgHAKEBAApFeGNlcHRpb25zBwDJAQARZ2V0RmFjZWJvb2tQb3N0ZXMBADsoTGZhY2Vib29rNGovRmFjZWJvb2s7TGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvU3RyaW5nOwcAygcApQcAywcAzAcArQEAD2dldEZhY2Vib29rRmVlZAEADHN0cmluZ1RvSnNvbgEAJihMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9TdHJpbmc7BwC/BwDDAQAGaW52b2tlAQAKU291cmNlRmlsZQEAJ0ZhY2VCb29rX1N0YXJ0ZXJfSmF2YV9Db2RlSmF2YUNvZGUuamF2YQwAWABZAQAkZmFjZWJvb2s0ai9jb25mL0NvbmZpZ3VyYXRpb25CdWlsZGVyDADNAM4BAA84Mzc4MTk2MDYyNzQ4MjEMAM8A0AEAIDhkYTkxYjYwNjAzYmUyNTgwNDM3MTkyYTM2NWEwNzdhDADRANABACs4Mzc4MTk2MDYyNzQ4MjF8cjA2b0FzZkdXeXN1aXBuUlNDTzd0VC1URnlRDADSANABAE1lbWFpbCwgcHVibGlzaF9zdHJlYW0sIGlkLCBuYW1lLCBmaXJzdF9uYW1lLCBsYXN0X25hbWUsIHJlYWRfc3RyZWFtICwgZ2VuZXJpYwwA0wDQDADUAM4MANUAzgwA1gDXAQAaZmFjZWJvb2s0ai9GYWNlYm9va0ZhY3RvcnkMAFgA2AwA2QDaAQADSEVCAQAOamF2YS91dGlsL0RhdGUBABpqYXZhL3RleHQvU2ltcGxlRGF0ZUZvcm1hdAEAEGRkX01NX3l5eXlfaGhfbW0MAFgA2wEAF2phdmEvbGFuZy9TdHJpbmdCdWlsZGVyAQAdRDpcRmFjZWJvb2tDb25maWdGb2xkZXJcRmlsZVwMANwA3QEAAV8MAN4A3wEABC50eHQMAOAA4QwAZQBmAQAMamF2YS9pby9GaWxlDADiAOMMAOQA4wEAEmphdmEvaW8vRmlsZVdyaXRlcgwA5QDmDABYAOcBABZqYXZhL2lvL0J1ZmZlcmVkV3JpdGVyDABYAOgMAOkA2wwA6gBZBwDrDADsAO0BAAlDb21wbGV0ZWQHAO4MAO8A2wEAE2phdmEvaW8vSU9FeGNlcHRpb24MAPAAWQEAB0l0ZW0gOiABAAEKAQAWamF2YS9sYW5nL1N0cmluZ0J1ZmZlcgcAyAwA8QDyBwDLDADzAPQHAMwMAPUA4wwA9gD3AQAPZmFjZWJvb2s0ai9Qb3N0DAD4AOEMANwA+QwA+gD7BwD8DAD9AP4MAP8BAAEAEmZhY2Vib29rNGovQ29tbWVudAwBAQECBwEDDAEEAOEBAAIsIAwBBQEGDADcAQcMAQgBCQwAbABmAQAADAEKAPIBABZuZXQvc2YvanNvbi9Kc29uQ29uZmlnBwELDAEMAQ0BAAdKU09OID0gAQATamF2YS9sYW5nL0V4Y2VwdGlvbgEADEpTT04gQ3JlYXRlZAEAVlByb2Nlc3Nlcy9TdGFydGVyUHJvY2Vzcy9GYWNlQm9va19TdGFydGVyX0phdmFfQ29kZS9GYWNlQm9va19TdGFydGVyX0phdmFfQ29kZUphdmFDb2RlAQAQamF2YS9sYW5nL09iamVjdAEAHWZhY2Vib29rNGovY29uZi9Db25maWd1cmF0aW9uAQATZmFjZWJvb2s0ai9GYWNlYm9vawEAHGZhY2Vib29rNGovRmFjZWJvb2tFeGNlcHRpb24BABBqYXZhL2xhbmcvU3RyaW5nAQAXZmFjZWJvb2s0ai9SZXNwb25zZUxpc3QBABJqYXZhL3V0aWwvSXRlcmF0b3IBAA9zZXREZWJ1Z0VuYWJsZWQBACkoWilMZmFjZWJvb2s0ai9jb25mL0NvbmZpZ3VyYXRpb25CdWlsZGVyOwEADXNldE9BdXRoQXBwSWQBADooTGphdmEvbGFuZy9TdHJpbmc7KUxmYWNlYm9vazRqL2NvbmYvQ29uZmlndXJhdGlvbkJ1aWxkZXI7AQARc2V0T0F1dGhBcHBTZWNyZXQBABNzZXRPQXV0aEFjY2Vzc1Rva2VuAQATc2V0T0F1dGhQZXJtaXNzaW9ucwEACXNldFVzZVNTTAEAE3NldEpTT05TdG9yZUVuYWJsZWQBAAVidWlsZAEAISgpTGZhY2Vib29rNGovY29uZi9Db25maWd1cmF0aW9uOwEAIihMZmFjZWJvb2s0ai9jb25mL0NvbmZpZ3VyYXRpb247KVYBAAtnZXRJbnN0YW5jZQEAFygpTGZhY2Vib29rNGovRmFjZWJvb2s7AQAVKExqYXZhL2xhbmcvU3RyaW5nOylWAQAGYXBwZW5kAQAtKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1N0cmluZ0J1aWxkZXI7AQAGZm9ybWF0AQAkKExqYXZhL3V0aWwvRGF0ZTspTGphdmEvbGFuZy9TdHJpbmc7AQAIdG9TdHJpbmcBABQoKUxqYXZhL2xhbmcvU3RyaW5nOwEABmV4aXN0cwEAAygpWgEADWNyZWF0ZU5ld0ZpbGUBAA9nZXRBYnNvbHV0ZUZpbGUBABAoKUxqYXZhL2lvL0ZpbGU7AQARKExqYXZhL2lvL0ZpbGU7KVYBABMoTGphdmEvaW8vV3JpdGVyOylWAQAFd3JpdGUBAAVjbG9zZQEAEGphdmEvbGFuZy9TeXN0ZW0BAANvdXQBABVMamF2YS9pby9QcmludFN0cmVhbTsBABNqYXZhL2lvL1ByaW50U3RyZWFtAQAHcHJpbnRsbgEAD3ByaW50U3RhY2tUcmFjZQEACGdldFBvc3RzAQAtKExqYXZhL2xhbmcvU3RyaW5nOylMZmFjZWJvb2s0ai9SZXNwb25zZUxpc3Q7AQAIaXRlcmF0b3IBABYoKUxqYXZhL3V0aWwvSXRlcmF0b3I7AQAHaGFzTmV4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</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Java Code</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Java Code</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

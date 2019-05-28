@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="www.tibco.com/plugin/Sleep" xmlns:ns13="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType">
+    <pd:name>Project Name Processes/Sub_Process/Get_Monto_Original.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="TRANSACCION_ID" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>28</pd:startX>
+    <pd:startY>256</pd:startY>
+    <pd:returnBindings>
+        <xsl:for-each select="$Query_SXD201013_CONCILIACION_ECOMMERCE/resultSet">
+            <resultSet>
+                <xsl:for-each select="Record">
+                    <Record>
+                        <Monto>
+                            <xsl:value-of select="Monto"/>
+                        </Monto>
+                    </Record>
+                </xsl:for-each>
+            </resultSet>
+        </xsl:for-each>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="resultSet">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Record" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Monto" type="xsd:double"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>791</pd:endX>
+    <pd:endY>262</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1438352779617</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>192</pd:x>
+        <pd:y>33</pd:y>
+        <pd:width>451</pd:width>
+        <pd:height>434</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/pfx:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Query_SXD201013_CONCILIACION_ECOMMERCE</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Query_SXD201013_CONCILIACION_ECOMMERCE</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Error Process</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Query_SXD201013_CONCILIACION_ECOMMERCE</pd:from>
+            <pd:to>Java Code</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>Error Process</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Error Process</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/pfx:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Query_SXD201013_CONCILIACION_ECOMMERCE">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>412</pd:x>
+            <pd:y>88</pd:y>
+            <config>
+                <timeout>%%Connections/Database/SXD202013_HEBCARD/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/SXD202013_HEBCARD/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/Connection_SXD202013_HEBCARD.sharedjdbc</jdbcSharedConfig>
+                <statement>select Monto from CONCILIACION_ECOMMERCE
+where TRANSACCION_ID = ?
+</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>TRANSACCION_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>Monto</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>money</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <TRANSACCION_ID>
+                        <xsl:value-of select="$Start/TRANSACCION_ID"/>
+                    </TRANSACCION_ID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Java Code">
+            <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+            <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+            <pd:x>415</pd:x>
+            <pd:y>246</pd:y>
+            <config>
+                <fileName>Get_Monto_OriginalJavaCode</fileName>
+                <packageName>ProjectNameProcesses.Sub_Process.Get_Monto_Original</packageName>
+                <fullsource>package ProjectNameProcesses.Sub_Process.Get_Monto_Original;
+import java.util.*;
+import java.io.*;
+public class Get_Monto_OriginalJavaCode{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String ERROR_CODE = "";
+	protected String ERRORS = "";
+	protected String TYPE_ERROR = "";
+	public String getERROR_CODE() {
+		return ERROR_CODE;
+	}
+	public void setERROR_CODE(String val) {
+		ERROR_CODE = val;
+	}
+	public String getERRORS() {
+		return ERRORS;
+	}
+	public void setERRORS(String val) {
+		ERRORS = val;
+	}
+	public String getTYPE_ERROR() {
+		return TYPE_ERROR;
+	}
+	public void setTYPE_ERROR(String val) {
+		TYPE_ERROR = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public Get_Monto_OriginalJavaCode() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String ERROR_CODE
+	In  : String ERRORS
+	Out : String TYPE_ERROR
+* Available Variables: DO NOT MODIFY *****/
+
+  TYPE_ERROR="false";
+           String [] ErrorArray  = ERRORS.split(",");
+
+     for (int i = 0; i &lt; ErrorArray.length; i++) {
+	if ((ErrorArray[i]).equals(ERROR_CODE))
+	{
+         TYPE_ERROR="true" ;
+         break;
+         }
+ 
+	
+ }   }
+}
+</fullsource>
+                <inputData>
+                    <row>
+                        <fieldName>ERROR_CODE</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                    <row>
+                        <fieldName>ERRORS</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </inputData>
+                <outputData>
+                    <row>
+                        <fieldName>TYPE_ERROR</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </outputData>
+                <byteCode>
+                    <class>
+                        <name>Get_Monto_OriginalJavaCode</name>
+                        <byteCode>yv66vgAAADEANQkACwAiCQALACMJAAsAJAoADAAlCAAmCAAnCAAoCgApACoKACkAKwgALAcALQcALgEACkVSUk9SX0NPREUBABJMamF2YS9sYW5nL1N0cmluZzsBAAZFUlJPUlMBAApUWVBFX0VSUk9SAQANZ2V0RVJST1JfQ09ERQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADXNldEVSUk9SX0NPREUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAAlnZXRFUlJPUlMBAAlzZXRFUlJPUlMBAA1nZXRUWVBFX0VSUk9SAQANc2V0VFlQRV9FUlJPUgEABjxpbml0PgEAAygpVgEABmludm9rZQEACkV4Y2VwdGlvbnMHAC8BAApTb3VyY2VGaWxlAQAfR2V0X01vbnRvX09yaWdpbmFsSmF2YUNvZGUuamF2YQwADQAODAAPAA4MABAADgwAGwAcAQAAAQAFZmFsc2UBAAEsBwAwDAAxADIMADMANAEABHRydWUBAE5Qcm9qZWN0TmFtZVByb2Nlc3Nlcy9TdWJfUHJvY2Vzcy9HZXRfTW9udG9fT3JpZ2luYWwvR2V0X01vbnRvX09yaWdpbmFsSmF2YUNvZGUBABBqYXZhL2xhbmcvT2JqZWN0AQATamF2YS9sYW5nL0V4Y2VwdGlvbgEAEGphdmEvbGFuZy9TdHJpbmcBAAVzcGxpdAEAJyhMamF2YS9sYW5nL1N0cmluZzspW0xqYXZhL2xhbmcvU3RyaW5nOwEABmVxdWFscwEAFShMamF2YS9sYW5nL09iamVjdDspWgAhAAsADAAAAAMABAANAA4AAAAEAA8ADgAAAAQAEAAOAAAACAABABEAEgABABMAAAAdAAEAAQAAAAUqtAABsAAAAAEAFAAAAAYAAQAAAAoAAQAVABYAAQATAAAAIgACAAIAAAAGKiu1AAGxAAAAAQAUAAAACgACAAAADQAFAA4AAQAXABIAAQATAAAAHQABAAEAAAAFKrQAArAAAAABABQAAAAGAAEAAAAQAAEAGAAWAAEAEwAAACIAAgACAAAABiortQACsQAAAAEAFAAAAAoAAgAAABMABQAUAAEAGQASAAEAEwAAAB0AAQABAAAABSq0AAOwAAAAAQAUAAAABgABAAAAFgABABoAFgABABMAAAAiAAIAAgAAAAYqK7UAA7EAAAABABQAAAAKAAIAAAAZAAUAGgABABsAHAABABMAAAA/AAIAAQAAABcqtwAEKhIFtQABKhIFtQACKhIFtQADsQAAAAEAFAAAABYABQAAABwABAAGAAoABwAQAAgAFgAdAAEAHQAcAAIAEwAAAGkAAgADAAAANSoSBrUAAyq0AAISB7YACEwDPRwrvqIAHyscMiq0AAG2AAmZAAwqEgq1AAOnAAmEAgGn/+GxAAAAAQAUAAAAIgAIAAAAJQAGACYAEAAoABgAKQAlACsAKwAsAC4AKAA0ADAAHgAAAAQAAQAfAAEAIAAAAAIAIQ==</byteCode>
+                    </class>
+                </byteCode>
+            </config>
+            <pd:inputBindings>
+                <javaCodeActivityInput>
+                    <ERROR_CODE>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </ERROR_CODE>
+                    <ERRORS>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ConditionForSuspend"/>
+                    </ERRORS>
+                </javaCodeActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>246</pd:x>
+            <pd:y>413</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns1:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns1:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>417</pd:x>
+            <pd:y>413</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns12:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns12:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Error Process">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>588</pd:x>
+            <pd:y>413</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns13:MSG_Container>
+                    <ns13:Header>
+                        <ns13:ProjectName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </ns13:ProjectName>
+                        <ns13:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </ns13:Source_Domain>
+                        <ns13:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </ns13:Destination_Domain>
+                        <ns13:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ProjectConfig/TransactionType"/>
+                        </ns13:Transaction_Type>
+                        <ns13:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns13:TimeStamp>
+                    </ns13:Header>
+                    <ns13:Body>
+                        <ns13:ErrorManagementSchema>
+                            <ns13:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </ns13:inrtn_id>
+                            <ns13:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                            </ns13:inrtn_instn_nm>
+                            <ns13:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                            </ns13:inrtn_err_rtn_desc>
+                            <ns13:inrtn_msg_body>
+                                <xsl:value-of select="concat(&#xA;'Message Code: ',$_error/ns:ErrorReport/MsgCode,&quot;&#xA;&quot;,&#xA;'Error Message: ',$_error/ns:ErrorReport/Msg,&quot;&#xA;&quot;,&#xA;'Error Class: ',$_error/ns:ErrorReport/Class,&quot;&#xA;&quot;,&#xA;tib:render-xml($_error/ns:ErrorReport/Data),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;'STACKTRACE: ',$_error/ns:ErrorReport/StackTrace,&quot;&#xA;&quot;&#xA;)"/>
+                            </ns13:inrtn_msg_body>
+                            <ns13:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                            </ns13:cre8_ts>
+                            <ns13:u_code>
+                                <xsl:value-of select="if ($Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true') then&#xA;concat($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_TECHNICAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else if (contains($_error/ns:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;concat($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else &#xA;concat($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns:ErrorReport/MsgCode)"/>
+                            </ns13:u_code>
+                            <ns13:sev_id>
+                                <xsl:value-of select="if ($Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true') then&#xA;($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH) &#xA;else if (contains($_error/ns:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED) &#xA;else &#xA;($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_LOW)"/>
+                            </ns13:sev_id>
+                        </ns13:ErrorManagementSchema>
+                    </ns13:Body>
+                </ns13:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

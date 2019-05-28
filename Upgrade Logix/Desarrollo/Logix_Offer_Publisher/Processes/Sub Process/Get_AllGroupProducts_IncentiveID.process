@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCNTS.xsd" xmlns:pfx3="http://xmlns.heb.com/ei/OFFER_LIST_RESPONSE" xmlns:pfx2="http://xmlns.tibco.com/bw/activity/xml/render/bytesEnvelope/2003/05">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/OFFER_LIST_RESPONSE" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER_LIST_RESPONSE.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCNTS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/INCNTS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Sub Process/Get_AllGroupProducts_IncentiveID.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="FECHA_INICIAL" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>219</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:for-each select="$JDBC-GROUP_PRODUCTS/resultSet/Record">
+                <param>
+                    <IncentiveId>
+                        <xsl:value-of select="IncentiveID"/>
+                    </IncentiveId>
+                </param>
+            </xsl:for-each>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="param" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="IncentiveId" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>610</pd:endX>
+    <pd:endY>248</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1403107857851</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>122</pd:x>
+        <pd:y>40</pd:y>
+        <pd:width>410</pd:width>
+        <pd:height>425</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC GROUP_PRODUCTS</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC GROUP_PRODUCTS</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Is Error Data</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Validate-Error/ErrorCode='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Retry</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>ErrorProcess (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch</pd:from>
+            <pd:to>Validate Error</pd:to>
+            <pd:xpathDescription>Is Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC GROUP_PRODUCTS">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>342</pd:x>
+            <pd:y>181</pd:y>
+            <config>
+                <timeout>%%Connections/Database/LOGIX/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/LOGIX/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT 
+RO.IncentiveID
+FROM ProductGroups PG
+INNER JOIN CPE_Discounts DSC ON DSC.DiscountedProductGroupID = PG.ProductGroupID
+INNER JOIN CPE_Deliverables D ON  DSC.DiscountID = D.OutputID
+INNER JOIN CPE_RewardOptions RO ON D.RewardOptionID = RO.RewardOptionID
+INNER JOIN [BannerOffers] B on  RO.IncentiveID = B.OfferID
+WHERE (PG.LastUpdate &gt; convert(datetime,?,120) OR
+  PG.LastLoaded &gt; convert(datetime,?,120)) AND 
+  PG.UpdateLevel &gt;= 1 AND
+  B.BannerID = 2
+  UNION
+SELECT
+RO.IncentiveID 
+FROM ProductGroups PG
+INNER JOIN CPE_IncentiveProductGroups IPG ON  PG.ProductGroupID = IPG.ProductGroupID
+INNER JOIN CPE_RewardOptions RO ON IPG.RewardOptionID = RO.RewardOptionID
+INNER JOIN [BannerOffers] B on  RO.IncentiveID = B.OfferID
+WHERE (PG.LastUpdate &gt; convert(datetime,?,120) OR
+PG.LastLoaded &gt; convert(datetime,?,120)) AND 
+PG.UpdateLevel &gt;= 1 AND
+B.BannerID = 2
+GROUP BY 	
+RO.IncentiveID
+ORDER BY RO.IncentiveID ASC</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/LOGIX.sharedjdbc</jdbcSharedConfig>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>LAST_UPDATE_DISC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LAST_LOADED_DISC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LAST_UPDATE_REW</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LAST_UPDATE_REW</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>IncentiveID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>bigint</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <LAST_UPDATE_DISC>
+                        <xsl:value-of select="$Start/root/FECHA_INICIAL"/>
+                    </LAST_UPDATE_DISC>
+                    <LAST_LOADED_DISC>
+                        <xsl:value-of select="$Start/root/FECHA_INICIAL"/>
+                    </LAST_LOADED_DISC>
+                    <LAST_UPDATE_REW>
+                        <xsl:value-of select="$Start/root/FECHA_INICIAL"/>
+                    </LAST_UPDATE_REW>
+                    <LAST_UPDATE_REW>
+                        <xsl:value-of select="$Start/root/FECHA_INICIAL"/>
+                    </LAST_UPDATE_REW>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>330</pd:x>
+            <pd:y>392</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GLB_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Retry">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>181</pd:x>
+            <pd:y>388</pd:y>
+            <config>
+                <faultName>Exception</faultName>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                    <data>
+                        <Exception>
+                            <Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                            </Domain>
+                            <Deployment>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                            </Deployment>
+                            <Project>
+                                <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                            </Project>
+                            <EngineName>
+                                <xsl:value-of select="$_processContext/ns2:ProcessContext/EngineName"/>
+                            </EngineName>
+                            <TimeStamp>
+                                <xsl:value-of select="current-dateTime()"/>
+                            </TimeStamp>
+                            <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                                <Code>
+                                    <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                                </Code>
+                            </xsl:if>
+                            <Message>
+                                <xsl:value-of select="tib:render-xml($_error/ns2:ErrorReport, 0,0)"/>
+                            </Message>
+                        </Exception>
+                    </data>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Error">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>330</pd:x>
+            <pd:y>300</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="ErrorCode" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ErrorCode>
+                    <xsl:value-of select="contains($_globalVariables/ns:GlobalVariables/ExceptionHandling/GBL_CONDITION_FOR_SUSPEND, $_error/ns2:ErrorReport/MsgCode)"/>
+                </ErrorCode>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>179</pd:x>
+            <pd:y>285</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="ErrorProcess (1)">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>466</pd:x>
+            <pd:y>388</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess (1).process</processName>
+            </config>
+            <pd:inputBindings>
+                <Exception>
+                    <Domain>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                    </Domain>
+                    <Deployment>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                    </Deployment>
+                    <Project>
+                        <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                    </Project>
+                    <EngineName>
+                        <xsl:value-of select="$_processContext/ns2:ProcessContext/EngineName"/>
+                    </EngineName>
+                    <TimeStamp>
+                        <xsl:value-of select="current-dateTime()"/>
+                    </TimeStamp>
+                    <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                        <Code>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </Code>
+                    </xsl:if>
+                    <Message>
+                        <xsl:value-of select="tib:render-xml($_error/ns2:ErrorReport, 0,0)"/>
+                    </Message>
+                </Exception>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

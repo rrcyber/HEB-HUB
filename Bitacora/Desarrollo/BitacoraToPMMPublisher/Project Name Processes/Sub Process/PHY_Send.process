@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/SDIPHYDTI_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/SDIPHYDTI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIPHYDTI_DATA_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/PHY_Send.process</pd:name>
+    <pd:description>Mandamos la información de toma fisica de la tienda</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>60</pd:startX>
+    <pd:startY>155</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>920</pd:endX>
+    <pd:endY>260</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1380227959281</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:description>Dividimos en envio de Información por CONTROL_NUMBER</pd:description>
+        <pd:x>217</pd:x>
+        <pd:y>22</pd:y>
+        <pd:width>549</pd:width>
+        <pd:height>333</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>rows</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>count($getSDIPHYDTIDetail/pfx:SDIPHYDTI/pfx:ITEM)=0</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>getSDIPHYDTIDetail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getSDIPHYDTIDetail</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PHY_SDIFlag_update</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getSDIPHYDTIDetail</pd:from>
+            <pd:to>JMS Queue Sender</pd:to>
+            <pd:xpathDescription/>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($getSDIPHYDTIDetail/pfx:SDIPHYDTI/pfx:ITEM)&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JMS Queue Sender</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getSDIPHYDTIDetail</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JMS Queue Sender</pd:from>
+            <pd:to>PHY_SDIFlag_update</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="getSDIPHYDTIDetail">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:description>Obtenemos los registros a mandar a PMM enviados por CONTRL_NUMBER</pd:description>
+            <pd:x>346</pd:x>
+            <pd:y>134</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/getSDIPHYDTIDetail.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <CONTROL_NUMBER>
+                        <xsl:value-of select="$control_array/record/CONTROL_N-UMBER"/>
+                    </CONTROL_NUMBER>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JMS Queue Sender">
+            <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+            <pd:description>Mandamos un mensaje al QUEUE de Toma fisica</pd:description>
+            <pd:x>484</pd:x>
+            <pd:y>289</pd:y>
+            <config>
+                <PermittedMessageType>XML Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Queues/GLB_PHYSICAL_PMM_QUEUE%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+                <InDataxsdString ref="pfx:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <ns2:ActivityInput>
+                    <JMSCorrelationID>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/SUCURSAL"/>
+                    </JMSCorrelationID>
+                    <JMSType>
+                        <xsl:value-of select="'PHY'"/>
+                    </JMSType>
+                    <Body>
+                        <pfx:MSG_CONTAINER>
+                            <pfx:Header>
+                                <pfx:ProjectName>
+                                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                                </pfx:ProjectName>
+                                <pfx:Source_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectNameVariables/GLB_SOURCE_DOMAIN"/>
+                                </pfx:Source_Domain>
+                                <pfx:Destination_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectNameVariables/GLB_DESTINATION_DOMAIN"/>
+                                </pfx:Destination_Domain>
+                                <pfx:Transaction_Type>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectNameVariables/GLB_TRANSACTION_TYPE"/>
+                                </pfx:Transaction_Type>
+                                <pfx:TimeStamp>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </pfx:TimeStamp>
+                            </pfx:Header>
+                            <pfx:Body>
+                                <pfx:SDIPHYDTI>
+                                    <xsl:for-each select="$getSDIPHYDTIDetail/pfx:SDIPHYDTI/pfx:ITEM">
+                                        <pfx:ITEM>
+                                            <pfx:CONTROL_NUMBER>
+                                                <xsl:copy-of select="pfx:CONTROL_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:CONTROL_NUMBER"/>
+                                            </pfx:CONTROL_NUMBER>
+                                            <pfx:ORG_LVL_NUMBER>
+                                                <xsl:copy-of select="pfx:ORG_LVL_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:ORG_LVL_NUMBER"/>
+                                            </pfx:ORG_LVL_NUMBER>
+                                            <pfx:BATCH_NUMBER>
+                                                <xsl:copy-of select="pfx:BATCH_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:BATCH_NUMBER"/>
+                                            </pfx:BATCH_NUMBER>
+                                            <pfx:SEQUENCE_NUMBER>
+                                                <xsl:copy-of select="pfx:SEQUENCE_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:SEQUENCE_NUMBER"/>
+                                            </pfx:SEQUENCE_NUMBER>
+                                            <pfx:PRD_LVL_NUMBER>
+                                                <xsl:copy-of select="pfx:PRD_LVL_NUMBER/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PRD_LVL_NUMBER"/>
+                                            </pfx:PRD_LVL_NUMBER>
+                                            <pfx:PRD_UPC>
+                                                <xsl:copy-of select="pfx:PRD_UPC/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PRD_UPC"/>
+                                            </pfx:PRD_UPC>
+                                            <pfx:INV_TYPE_CODE>
+                                                <xsl:copy-of select="pfx:INV_TYPE_CODE/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:INV_TYPE_CODE"/>
+                                            </pfx:INV_TYPE_CODE>
+                                            <pfx:ACTUAL_COUNT>
+                                                <xsl:copy-of select="pfx:ACTUAL_COUNT/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:ACTUAL_COUNT"/>
+                                            </pfx:ACTUAL_COUNT>
+                                            <pfx:USER_ID>
+                                                <xsl:copy-of select="pfx:USER_ID/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:USER_ID"/>
+                                            </pfx:USER_ID>
+                                            <pfx:COUNT_DATE>
+                                                <xsl:copy-of select="pfx:COUNT_DATE/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:COUNT_DATE"/>
+                                            </pfx:COUNT_DATE>
+                                            <pfx:COUNT_TIME>
+                                                <xsl:copy-of select="pfx:COUNT_TIME/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:COUNT_TIME"/>
+                                            </pfx:COUNT_TIME>
+                                            <pfx:USER_FLD_1>
+                                                <xsl:copy-of select="pfx:USER_FLD_1/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:USER_FLD_1"/>
+                                            </pfx:USER_FLD_1>
+                                            <pfx:USER_FLD_2>
+                                                <xsl:copy-of select="pfx:USER_FLD_2/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:USER_FLD_2"/>
+                                            </pfx:USER_FLD_2>
+                                            <pfx:USER_FLD_3>
+                                                <xsl:copy-of select="pfx:USER_FLD_3/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:USER_FLD_3"/>
+                                            </pfx:USER_FLD_3>
+                                            <pfx:DOWNLOAD_DATE_1>
+                                                <xsl:copy-of select="pfx:DOWNLOAD_DATE_1/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:DOWNLOAD_DATE_1"/>
+                                            </pfx:DOWNLOAD_DATE_1>
+                                            <pfx:NOTES>
+                                                <xsl:copy-of select="pfx:NOTES/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:NOTES"/>
+                                            </pfx:NOTES>
+                                            <pfx:INNER_PACK_ID>
+                                                <xsl:copy-of select="pfx:INNER_PACK_ID/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:INNER_PACK_ID"/>
+                                            </pfx:INNER_PACK_ID>
+                                            <pfx:PHYS_INNERS>
+                                                <xsl:copy-of select="pfx:PHYS_INNERS/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PHYS_INNERS"/>
+                                            </pfx:PHYS_INNERS>
+                                            <pfx:PHYS_SELL_UNITS>
+                                                <xsl:copy-of select="pfx:PHYS_SELL_UNITS/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PHYS_SELL_UNITS"/>
+                                            </pfx:PHYS_SELL_UNITS>
+                                            <pfx:PHYS_WEIGHT>
+                                                <xsl:copy-of select="pfx:PHYS_WEIGHT/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PHYS_WEIGHT"/>
+                                            </pfx:PHYS_WEIGHT>
+                                            <pfx:PHYS_WEIGHT_UOM>
+                                                <xsl:copy-of select="pfx:PHYS_WEIGHT_UOM/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PHYS_WEIGHT_UOM"/>
+                                            </pfx:PHYS_WEIGHT_UOM>
+                                            <pfx:PHYS_SELL_UOM>
+                                                <xsl:copy-of select="pfx:PHYS_SELL_UOM/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PHYS_SELL_UOM"/>
+                                            </pfx:PHYS_SELL_UOM>
+                                            <pfx:PHYS_CASES>
+                                                <xsl:copy-of select="pfx:PHYS_CASES/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:PHYS_CASES"/>
+                                            </pfx:PHYS_CASES>
+                                            <pfx:SDIFLAG>
+                                                <xsl:copy-of select="pfx:SDIFLAG/@xsi:nil"/>
+                                                <xsl:value-of select="pfx:SDIFLAG"/>
+                                            </pfx:SDIFLAG>
+                                        </pfx:ITEM>
+                                    </xsl:for-each>
+                                </pfx:SDIPHYDTI>
+                            </pfx:Body>
+                        </pfx:MSG_CONTAINER>
+                    </Body>
+                </ns2:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>312</pd:x>
+            <pd:y>294</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <pfx2:ActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="PHY_SDIFlag_update">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:description>Marcamos en 1 la información que ya se haya enviado al EMS</pd:description>
+            <pd:x>619</pd:x>
+            <pd:y>270</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/PHY_SDIFlag_update.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:for-each xmlns:xsl="http://www.w3.org/1999/XSL/Transform" select="$getSDIPHYDTIDetail/pfx:SDIPHYDTI/pfx:ITEM">
+                        <ITEM>
+                            <FOLIO>
+                                <xsl:value-of select="pfx:CONTROL_NUMBER"/>
+                            </FOLIO>
+                            <SUCURSAL>
+                                <xsl:value-of select="pfx:ORG_LVL_NUMBER"/>
+                            </SUCURSAL>
+                            <PRD>
+                                <xsl:value-of select="pfx:PRD_LVL_NUMBER"/>
+                            </PRD>
+                        </ITEM>
+                    </xsl:for-each>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

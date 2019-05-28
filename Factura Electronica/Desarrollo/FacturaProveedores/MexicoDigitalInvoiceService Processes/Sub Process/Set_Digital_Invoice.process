@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://www.sat.gob.mx/cfd/3" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.sat.gob.mx/cfd/2" xmlns:pfx2="http://xmlns.heb.com/ei/DIGITAL_INVOICE_RESPONSE" xmlns:pfx="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST">
+    <xsd:import namespace="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" schemaLocation="/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_REQUEST.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/DIGITAL_INVOICE_RESPONSE" schemaLocation="/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_RESPONSE.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Set_Digital_Invoice.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:SET_DIGITAL_INVOICE_REQUEST"/>
+    <pd:startX>66</pd:startX>
+    <pd:startY>124</pd:startY>
+    <pd:returnBindings>
+        <pfx2:SET_DIGITAL_INVOICE_RESPONSE>
+            <xsl:copy-of select="$Variable1/pfx2:SET_DIGITAL_INVOICE_RESPONSE/pfx2:AckErrorApplication"/>
+            <xsl:copy-of select="$Variable1/pfx2:SET_DIGITAL_INVOICE_RESPONSE/MESSAGE"/>
+            <xsl:for-each select="$Variable0/MESSAGE">
+                <MESSAGE>
+                    <pfx2:CODE>
+                        <xsl:value-of select="CODE"/>
+                    </pfx2:CODE>
+                    <pfx2:DESCRIPTION>
+                        <xsl:value-of select="DESCRIPTION"/>
+                    </pfx2:DESCRIPTION>
+                </MESSAGE>
+            </xsl:for-each>
+        </pfx2:SET_DIGITAL_INVOICE_RESPONSE>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx2:SET_DIGITAL_INVOICE_RESPONSE"/>
+    <pd:endX>930</pd:endX>
+    <pd:endY>120</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Variable1 ref="pfx2:SET_DIGITAL_INVOICE_RESPONSE"/>
+        <Variable0>
+            <xsd:element name="MESSAGE">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="CODE" type="xsd:string"/>
+                        <xsd:element name="DESCRIPTION" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Variable0>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1303767568019</pd:targetNamespace>
+    <pd:activity name="Get_Vendor_Status">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>291</pd:x>
+        <pd:y>125</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Get_Vendor_Status.process</processName>
+        </config>
+        <pd:inputBindings>
+            <INPUT>
+                <VENDOR_NUMBER>
+                    <xsl:value-of select="$Get_LoggedUser_Data/VENDOR_ID"/>
+                </VENDOR_NUMBER>
+                <ISBUREAU>
+                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU"/>
+                </ISBUREAU>
+            </INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Process_CDF_Type">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>612</pd:x>
+        <pd:y>62</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Process_CDF_Type.process</processName>
+        </config>
+        <pd:inputBindings>
+            <PARAM_INPUT>
+                <ISSUER_TYPE>
+                    <xsl:value-of select="$Get_Vendor_Status/RESULT/TYPE"/>
+                </ISSUER_TYPE>
+                <ID_PRO_BRO>
+                    <xsl:value-of select="$Get_LoggedUser_Data/VENDOR_ID"/>
+                </ID_PRO_BRO>
+                <Afiliado>
+                    <xsl:value-of select="$Get_Response_Message/MESSAGE/CODE"/>
+                </Afiliado>
+                <xsl:copy-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST"/>
+            </PARAM_INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Process_CDFI_Type">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>598</pd:x>
+        <pd:y>202</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Process_CDFI_Type.process</processName>
+        </config>
+        <pd:inputBindings>
+            <PARAM_INPUT>
+                <ISSUER_TYPE>
+                    <xsl:value-of select="$Get_Vendor_Status/RESULT/TYPE"/>
+                </ISSUER_TYPE>
+                <ID_PRO_BRO>
+                    <xsl:value-of select="$Get_LoggedUser_Data/VENDOR_ID"/>
+                </ID_PRO_BRO>
+                <Afiliacion>
+                    <xsl:value-of select="$Get_Response_Message/MESSAGE/CODE"/>
+                </Afiliacion>
+                <xsl:copy-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST"/>
+            </PARAM_INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_Response_Message">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>294</pd:x>
+        <pd:y>261</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Get_Response_Message.process</processName>
+        </config>
+        <pd:inputBindings>
+            <CODE>
+                <xsl:value-of select="$Get_Vendor_Status/RESULT/CODE"/>
+            </CODE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>429</pd:x>
+        <pd:y>260</pd:y>
+        <config>
+            <variableName>Variable0</variableName>
+        </config>
+        <pd:inputBindings>
+            <MESSAGE>
+                <CODE>
+                    <xsl:value-of select="$Get_Response_Message/MESSAGE/CODE"/>
+                </CODE>
+                <DESCRIPTION>
+                    <xsl:value-of select="$Get_Response_Message/MESSAGE/DESCRIPTION"/>
+                </DESCRIPTION>
+            </MESSAGE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>714</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <variableName>Variable1</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Process_CDF_Type/pfx2:SET_DIGITAL_INVOICE_RESPONSE"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-2">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>723</pd:x>
+        <pd:y>202</pd:y>
+        <config>
+            <variableName>Variable1</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Process_CDFI_Type/pfx2:SET_DIGITAL_INVOICE_RESPONSE"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_LoggedUser_Data">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>165</pd:x>
+        <pd:y>124</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Get_LoggedUser_Data.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Loger Error">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>822</pd:x>
+        <pd:y>123</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Loger Error.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$Variable0/MESSAGE">
+                    <ERROR>
+                        <ID_ERROR>
+                            <xsl:value-of select="CODE"/>
+                        </ID_ERROR>
+                        <MENSAJE>
+                            <xsl:value-of select="DESCRIPTION"/>
+                        </MENSAJE>
+                        <ID_PROVEDOR>
+                            <xsl:value-of select="$Get_LoggedUser_Data/VENDOR_ID"/>
+                        </ID_PROVEDOR>
+                        <xsl:choose>
+                            <xsl:when test="string-length($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@rfc)> 0">
+                                <RFC_PROVEDOR>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@rfc"/>
+                                </RFC_PROVEDOR>
+                            </xsl:when>
+                            <xsl:when test="string-length($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@rfc)> 0">
+                                <RFC_PROVEDOR>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@rfc"/>
+                                </RFC_PROVEDOR>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <RFC_PROVEDOR>
+                                    <xsl:value-of select="''"/>
+                                </RFC_PROVEDOR>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <ID_FACTURA>
+                            <xsl:value-of select="''"/>
+                        </ID_FACTURA>
+                        <TIPO_PROVEDOR>
+                            <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU"/>
+                        </TIPO_PROVEDOR>
+                        <FECHA>
+                            <xsl:value-of select="tib:format-dateTime('dd/MM/yyyy HH:mm:ss', current-dateTime())"/>
+                        </FECHA>
+                    </ERROR>
+                </xsl:for-each>
+                <xsl:for-each select="$Variable1/pfx2:SET_DIGITAL_INVOICE_RESPONSE/pfx2:AckErrorApplication">
+                    <xsl:for-each select="pfx2:messageError">
+                        <ERROR>
+                            <ID_ERROR>
+                                <xsl:value-of select="pfx2:errorCode"/>
+                            </ID_ERROR>
+                            <MENSAJE>
+                                <xsl:value-of select="pfx2:errorDescription/pfx2:text"/>
+                            </MENSAJE>
+                            <ID_PROVEDOR>
+                                <xsl:value-of select="$Get_LoggedUser_Data/VENDOR_ID"/>
+                            </ID_PROVEDOR>
+                            <xsl:choose>
+                                <xsl:when test="string-length($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@rfc)> 0">
+                                    <RFC_PROVEDOR>
+                                        <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@rfc"/>
+                                    </RFC_PROVEDOR>
+                                </xsl:when>
+                                <xsl:when test="string-length($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@rfc)> 0">
+                                    <RFC_PROVEDOR>
+                                        <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@rfc"/>
+                                    </RFC_PROVEDOR>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <RFC_PROVEDOR>
+                                        <xsl:value-of select="''"/>
+                                    </RFC_PROVEDOR>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <ID_FACTURA>
+                                <xsl:value-of select="../pfx2:ReferenceNumber/pfx2:referenceIdentification"/>
+                            </ID_FACTURA>
+                            <TIPO_PROVEDOR>
+                                <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU"/>
+                            </TIPO_PROVEDOR>
+                            <FECHA>
+                                <xsl:value-of select="tib:format-dateTime('dd/MM/yyyy HH:mm:ss', current-dateTime())"/>
+                            </FECHA>
+                        </ERROR>
+                    </xsl:for-each>
+                </xsl:for-each>
+                <xsl:for-each select="$Variable1/pfx2:SET_DIGITAL_INVOICE_RESPONSE/MESSAGE">
+                    <ERROR>
+                        <ID_ERROR>
+                            <xsl:value-of select="pfx2:CODE"/>
+                        </ID_ERROR>
+                        <MENSAJE>
+                            <xsl:value-of select="pfx2:DESCRIPTION"/>
+                        </MENSAJE>
+                        <ID_PROVEDOR>
+                            <xsl:value-of select="$Get_LoggedUser_Data/VENDOR_ID"/>
+                        </ID_PROVEDOR>
+                        <xsl:choose>
+                            <xsl:when test="string-length($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@rfc)> 0">
+                                <RFC_PROVEDOR>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@rfc"/>
+                                </RFC_PROVEDOR>
+                            </xsl:when>
+                            <xsl:when test="string-length($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@rfc)> 0">
+                                <RFC_PROVEDOR>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@rfc"/>
+                                </RFC_PROVEDOR>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <RFC_PROVEDOR>
+                                    <xsl:value-of select="''"/>
+                                </RFC_PROVEDOR>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <ID_FACTURA>
+                            <xsl:value-of select="../pfx2:AckErrorApplication[1]/pfx2:ReferenceNumber/pfx2:referenceIdentification"/>
+                        </ID_FACTURA>
+                        <TIPO_PROVEDOR>
+                            <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU"/>
+                        </TIPO_PROVEDOR>
+                        <FECHA>
+                            <xsl:value-of select="tib:format-dateTime('dd/MM/yyyy HH:mm:ss', current-dateTime())"/>
+                        </FECHA>
+                    </ERROR>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validate_RFC_Lote">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>429</pd:x>
+        <pd:y>125</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_RFC_Lote.process</processName>
+        </config>
+        <pd:inputBindings>
+            <PARAM_INPUT>
+                <xsl:copy-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST"/>
+            </PARAM_INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-1-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>660</pd:x>
+        <pd:y>121</pd:y>
+        <config>
+            <variableName>Variable1</variableName>
+        </config>
+        <pd:inputBindings>
+            <pfx2:SET_DIGITAL_INVOICE_RESPONSE>
+                <pfx2:AckErrorApplication>
+                    <pfx2:ackErrorApplicationIdentification>
+                        <pfx2:entityType>
+                            <xsl:value-of select="'305'"/>
+                        </pfx2:entityType>
+                        <pfx2:uniqueCreatorIdentification>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProcessId"/>
+                        </pfx2:uniqueCreatorIdentification>
+                    </pfx2:ackErrorApplicationIdentification>
+                    <pfx2:ApplicationInformation>
+                        <pfx2:deliveryDatePresent>
+                            <xsl:value-of select="current-date()"/>
+                        </pfx2:deliveryDatePresent>
+                    </pfx2:ApplicationInformation>
+                    <pfx2:ReferenceNumber>
+                        <xsl:attribute name="type">
+                            <xsl:value-of select="'IV'"/>
+                        </xsl:attribute>
+                        <pfx2:referenceIdentification>
+                            <xsl:value-of select="'RFC DIFERENTES'"/>
+                        </pfx2:referenceIdentification>
+                        <pfx2:referenceDate>
+                            <xsl:value-of select="tib:format-date('yyyyMMdd', current-date())"/>
+                        </pfx2:referenceDate>
+                    </pfx2:ReferenceNumber>
+                    <xsl:choose>
+                        <xsl:when test="count($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante) > 0">
+                            <pfx2:Buyer>
+                                <pfx2:gln>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Receptor/@rfc"/>
+                                </pfx2:gln>
+                                <pfx2:nameAndAddress>
+                                    <pfx2:name>
+                                        <xsl:value-of select="substring($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Receptor/@nombre,1,35)"/>
+                                    </pfx2:name>
+                                </pfx2:nameAndAddress>
+                            </pfx2:Buyer>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <pfx2:Buyer>
+                                <pfx2:gln>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Receptor/@rfc"/>
+                                </pfx2:gln>
+                                <pfx2:nameAndAddress>
+                                    <pfx2:name>
+                                        <xsl:value-of select="substring($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Receptor/@nombre,1,35)"/>
+                                    </pfx2:name>
+                                </pfx2:nameAndAddress>
+                            </pfx2:Buyer>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="count($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante) > 0">
+                            <pfx2:Seller>
+                                <pfx2:gln>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@rfc"/>
+                                </pfx2:gln>
+                                <pfx2:nameAndAddress>
+                                    <pfx2:name>
+                                        <xsl:value-of select="substring($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante[1]/pfx3:Emisor/@nombre,1,35)"/>
+                                    </pfx2:name>
+                                </pfx2:nameAndAddress>
+                            </pfx2:Seller>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <pfx2:Seller>
+                                <pfx2:gln>
+                                    <xsl:value-of select="$Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@rfc"/>
+                                </pfx2:gln>
+                                <pfx2:nameAndAddress>
+                                    <pfx2:name>
+                                        <xsl:value-of select="substring($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante[1]/pfx4:Emisor/@nombre,1,35)"/>
+                                    </pfx2:name>
+                                </pfx2:nameAndAddress>
+                            </pfx2:Seller>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <pfx2:messageError>
+                        <pfx2:errorCode>
+                            <xsl:value-of select="$Validate_RFC_Lote/MESSAGE/CODE"/>
+                        </pfx2:errorCode>
+                        <pfx2:errorDescription>
+                            <pfx2:text>
+                                <xsl:value-of select="$Validate_RFC_Lote/MESSAGE/DESCRIPTION"/>
+                            </pfx2:text>
+                        </pfx2:errorDescription>
+                    </pfx2:messageError>
+                </pfx2:AckErrorApplication>
+            </pfx2:SET_DIGITAL_INVOICE_RESPONSE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Get_Vendor_Status</pd:from>
+        <pd:to>Get_Response_Message</pd:to>
+        <pd:xpathDescription>Not Authorized</pd:xpathDescription>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Response_Message</pd:from>
+        <pd:to>Assign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Process_CDF_Type</pd:from>
+        <pd:to>Assign-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Process_CDFI_Type</pd:from>
+        <pd:to>Assign-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1</pd:from>
+        <pd:to>Loger Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-2</pd:from>
+        <pd:to>Loger Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_LoggedUser_Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_LoggedUser_Data</pd:from>
+        <pd:to>Get_Vendor_Status</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>Validate_RFC_Lote</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Vendor_Status</pd:from>
+        <pd:to>Validate_RFC_Lote</pd:to>
+        <pd:xpathDescription>Authorized</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Get_Vendor_Status/RESULT/STATUS=1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Loger Error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validate_RFC_Lote</pd:from>
+        <pd:to>Assign-1-1</pd:to>
+        <pd:xpathDescription>error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>string-length($Validate_RFC_Lote/MESSAGE/CODE) &gt; 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validate_RFC_Lote</pd:from>
+        <pd:to>Process_CDFI_Type</pd:to>
+        <pd:xpathDescription>CFDI</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx4:Comprobante) &gt; 0 and string-length($Validate_RFC_Lote/MESSAGE/CODE) = 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validate_RFC_Lote</pd:from>
+        <pd:to>Process_CDF_Type</pd:to>
+        <pd:xpathDescription>CFD</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Start/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx3:Comprobante) &gt; 0 and string-length($Validate_RFC_Lote/MESSAGE/CODE) = 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1-1</pd:from>
+        <pd:to>Loger Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

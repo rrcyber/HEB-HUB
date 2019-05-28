@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://xmlns.heb.com/ei/PRCTYPEE_INFORMATION" xmlns:pfx="http://xmlns.heb.com/ei/PRDPCDEE_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>MexicoPMMSpecialProcessesPublisher Processes/Starter Process/Updater_InventoryDate_JMS_Starter.process</pd:name>
+    <pd:startName>JMS Topic Subscriber</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Topic Subscriber">
+        <pd:type>com.tibco.plugin.jms.JMSTopicEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicEventSource</pd:resourceType>
+        <pd:x>178</pd:x>
+        <pd:y>116</pd:y>
+        <config>
+            <PermittedMessageType>Simple</PermittedMessageType>
+            <SessionAttributes>%%Destinations/Topics/MIG_CATALOG_TOPIC%%1JMSCorrelationID='HEB_DESCTONODEVOLUCION' or JMSCorrelationID='ALL'<acknowledgeMode>1</acknowledgeMode>
+                <destination>%%Destinations/Topics/MIG_CATALOG_TOPIC%%</destination>
+                <selector>JMSCorrelationID='HEB_PHYPOPEE' or JMSCorrelationID='ALL'</selector>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>594</pd:endX>
+    <pd:endY>122</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1272029667152</pd:targetNamespace>
+    <pd:group name="Critical Section">
+        <pd:type>com.tibco.pe.core.CriticalSectionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>281</pd:x>
+        <pd:y>37</pd:y>
+        <pd:width>236</pd:width>
+        <pd:height>154</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>criticalSection</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:scope>single</pd:scope>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_InventoryDate_Main</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_InventoryDate_Main</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Get_InventoryDate_Main">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>403</pd:x>
+            <pd:y>122</pd:y>
+            <config>
+                <processName>/MexicoPMMSpecialProcessesPublisher Processes/Main Process/InventoryDate/Get_InventoryDate_Main.process</processName>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>400</pd:x>
+        <pd:y>271</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx3:MSG_Container>
+                <pfx3:Header>
+                    <pfx3:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </pfx3:ProjectName>
+                    <pfx3:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </pfx3:Source_Domain>
+                    <pfx3:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </pfx3:Destination_Domain>
+                    <pfx3:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                    </pfx3:Transaction_Type>
+                    <pfx3:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                    </pfx3:TimeStamp>
+                </pfx3:Header>
+                <pfx3:Body>
+                    <pfx3:ErrorManagementSchema>
+                        <pfx3:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </pfx3:inrtn_id>
+                        <pfx3:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </pfx3:inrtn_instn_nm>
+                        <pfx3:inrtn_err_rtn_desc>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                        </pfx3:inrtn_err_rtn_desc>
+                        <pfx3:inrtn_msg_body>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/ProcessStack"/>
+                        </pfx3:inrtn_msg_body>
+                        <pfx3:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </pfx3:cre8_ts>
+                        <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                            <pfx3:u_code>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                            </pfx3:u_code>
+                        </xsl:if>
+                        <pfx3:sev_id>
+                            <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                        </pfx3:sev_id>
+                    </pfx3:ErrorManagementSchema>
+                </pfx3:Body>
+            </pfx3:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Critical Section</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Critical Section</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Topic Subscriber</pd:from>
+        <pd:to>Critical Section</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Topic Subscriber</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

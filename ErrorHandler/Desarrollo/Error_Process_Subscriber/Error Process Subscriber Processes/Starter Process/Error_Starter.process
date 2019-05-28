@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx3="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns21="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:ns6="http://xmlns.tibco.com/body" xmlns:ns7="com/tibco/pe/commands" xmlns:ns12="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns8="www.tibco.com/plugin/Sleep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://schemas.tibco.com/bw/plugins/file/5.0/fileExceptions">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <pd:name>Error Process Subscriber Processes/Starter Process/Error_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>115</pd:x>
+        <pd:y>95</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Properties/GLB_MAX_SESSIONS%%</maxSessions>
+                <destination>%%Destinations/Queues/DESTINATION_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <OutDataxsdString ref="pfx:MSG_Container"/>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>820</pd:endX>
+    <pd:endY>103</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1390584059488</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>57</pd:x>
+        <pd:y>278</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>494</pd:x>
+        <pd:y>102</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>207</pd:x>
+        <pd:y>277</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$Catch/exceptiondata/*"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="&quot;GENERAL ERROR&quot;"/>
+                </messageCode>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>241</pd:x>
+        <pd:y>98</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>true</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term ref="pfx:MSG_Container"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/pfx:MSG_Container" copy-namespaces="yes"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_Error_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>347</pd:x>
+        <pd:y>100</pd:y>
+        <config>
+            <processName>/Error Process Subscriber Processes/Main Process/Error_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <XmlString>
+                    <xsl:value-of select="$Render-XML/xmlString"/>
+                </XmlString>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Report Error">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>680</pd:x>
+        <pd:y>343</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>%%ExceptionHandling/GLB_ERR_EMAIL_HOST%%</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:coercions>
+            <pd:coercion xpath="" type=""/>
+        </pd:coercions>
+        <pd:inputBindings>
+            <ns3:mailActivityInput>
+                <from>
+                    <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ExceptionHandling/GLB_ERR_EMAIL_FROM"/>
+                </from>
+                <to>
+                    <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ExceptionHandling/GLB_ERR_EMAIL_TO"/>
+                </to>
+                <subject>
+                    <xsl:value-of select="concat($_processContext/ns1:ProcessContext/ProjectName,&quot; Failure Logged To File&quot;)"/>
+                </subject>
+                <ns6:bodyElement>
+                    <bodyText xsi:type="xsd:string">
+                        <xsl:value-of select="concat(&quot;An error has been written to the TIBCO error file directory.&quot;,&#xA;&quot;&#xA;&quot;,&quot;&#xA;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;&quot;THE ERROR INFORMATION FOLLOWS:&quot;,&#xA;&quot;&#xA;&quot;,&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;&quot;MESSAGE ID :  &quot;, string($JMS-Queue-Receiver/ns:ActivityOutput/JMSHeaders/ns:JMSMessageID),&#xA;&quot;&#xA;&#xA;&quot;,&#xA;&quot;ERROR CODE :  &quot;, string($_error/ns1:ErrorReport/MsgCode),&#xA;&quot;&#xA;&#xA;&quot;,&#xA;&quot;MESSAGE ERROR :  &quot;, string($_error/ns1:ErrorReport/Msg),&#xA;&quot;&#xA;&#xA;&quot;,&#xA;&quot;STACK TRACE :  &quot;, string($_error/ns1:ErrorReport/StackTrace),&#xA;&quot;&#xA;&#xA;&quot;,&#xA;&quot;FULL CLASS :  &quot;, string($_error/ns1:ErrorReport/FullClass),&#xA;&quot;&#xA;&#xA;&quot;,&#xA;&quot;CLASS :  &quot;, string($_error/ns1:ErrorReport/Class),&#xA;&quot;&#xA;&#xA;&quot;,&#xA;&quot;PROCESS STACK :  &quot;, string($_error/ns1:ErrorReport/ProcessStack))"/>
+                    </bodyText>
+                </ns6:bodyElement>
+            </ns3:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error File">
+        <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+        <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+        <pd:x>351</pd:x>
+        <pd:y>348</pd:y>
+        <config>
+            <encoding>text</encoding>
+            <compressFile>None</compressFile>
+            <append>true</append>
+            <createMissingDirectories>true</createMissingDirectories>
+        </config>
+        <pd:inputBindings>
+            <ns21:WriteActivityInputTextClass>
+                <fileName>
+                    <xsl:value-of select="concat($_globalVariables/pfx3:GlobalVariables/ExceptionHandling/GLB_ERR_FILE, tib:format-date('MMddyyyy',current-date()), &quot;.txt&quot;)"/>
+                </fileName>
+                <textContent>
+                    <xsl:value-of select="concat(current-dateTime(), &quot;‡&quot; ,normalize-space($Render-XML-Error/xmlString),&quot;‡&quot;)"/>
+                </textContent>
+                <addLineSeparator>
+                    <xsl:value-of select="1"/>
+                </addLineSeparator>
+            </ns21:WriteActivityInputTextClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render-XML-Error">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>349</pd:x>
+        <pd:y>215</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <term>
+                <xsd:element name="group">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="StackTrace" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Msg" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="FullClass" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Class" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="ProcessStack" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="MsgCode" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Data" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <StackTrace>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                </StackTrace>
+                <Msg>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </Msg>
+                <FullClass>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/FullClass"/>
+                </FullClass>
+                <Class>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Class"/>
+                </Class>
+                <ProcessStack>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/ProcessStack"/>
+                </ProcessStack>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <MsgCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </MsgCode>
+                </xsl:if>
+                <xsl:if test="$_error/ns1:ErrorReport/Data/*">
+                    <Data>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Data/*"/>
+                    </Data>
+                </xsl:if>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Infrastructure Check">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>680</pd:x>
+        <pd:y>113</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ShutDown Engine">
+        <pd:type>com.tibco.pe.core.EngineCommandActivity</pd:type>
+        <pd:resourceType>ae.activities.enginecommand</pd:resourceType>
+        <pd:x>814</pd:x>
+        <pd:y>298</pd:y>
+        <config>
+            <command>Shutdown</command>
+        </config>
+        <pd:inputBindings>
+            <ns7:input>
+                <MaxDelayInSeconds>
+                    <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ExceptionHandling/GLB_ERR_MAX_DELAY"/>
+                </MaxDelayInSeconds>
+            </ns7:input>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Stob Job">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>813</pd:x>
+        <pd:y>204</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <xsl:if test="$_error/ns1:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send-File-Error">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>508</pd:x>
+        <pd:y>216</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>%%ExceptionHandling/GLB_ERR_EMAIL_HOST%%</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns3:mailActivityInput>
+                <from>
+                    <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ExceptionHandling/GLB_ERR_EMAIL_FROM"/>
+                </from>
+                <to>
+                    <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ExceptionHandling/GLB_ERR_EMAIL_TO"/>
+                </to>
+                <subject>
+                    <xsl:value-of select="concat($_processContext/ns1:ProcessContext/ProjectName,&quot; Message Not Processed&quot;)"/>
+                </subject>
+                <ns6:bodyElement>
+                    <bodyText>
+                        <xsl:value-of select="concat(&quot;An error was unable to be written to the TIBCO error file directory.&quot;,&quot;&#xA;&quot;,&quot;&#xA;&quot;,&quot;The error information follows:&quot;,&quot;&#xA;&quot;,&quot;&#xA;&quot;,&quot;Error Code:  &quot;, string( $_error/ns1:ErrorReport/MsgCode),&quot;&#xA;&quot;,&quot;Message Error:  &quot;, string($_error/ns1:ErrorReport/Msg),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&quot;Here is the complete message for replay, if necessary:&quot;,&quot;&#xA;&quot;,&quot;&#xA;&quot;,$_error,&quot;&#xA;&quot;,&quot;&#xA;&quot;, &quot;The error information from the Error Call Process is as follows: &quot;,&quot;&#xA;&quot;, $_error_Generate-Error-File/ActivityErrors/ns4:FileNotFoundException/fileName)"/>
+                    </bodyText>
+                </ns6:bodyElement>
+            </ns3:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="No Mail">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>623</pd:x>
+        <pd:y>218</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Generate Error File</pd:from>
+        <pd:to>Report Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render-XML-Error</pd:from>
+        <pd:to>Generate Error File</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>Get_Error_Main</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Error_Main</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Error_Main</pd:from>
+        <pd:to>Render-XML-Error</pd:to>
+        <pd:xpathDescription>JDBC-Error</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>Infrastructure Check</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Infrastructure Check</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Report Error</pd:from>
+        <pd:to>Infrastructure Check</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Infrastructure Check</pd:from>
+        <pd:to>ShutDown Engine</pd:to>
+        <pd:xpathDescription>error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>exists($_error/ns1:ErrorReport)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ShutDown Engine</pd:from>
+        <pd:to>Stob Job</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Render-XML-Error</pd:to>
+        <pd:xpathDescription>EMS-Error</pd:xpathDescription>
+        <pd:lineType>Curved</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Generate Error File</pd:from>
+        <pd:to>Send-File-Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render-XML-Error</pd:from>
+        <pd:to>Send-File-Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send-File-Error</pd:from>
+        <pd:to>No Mail</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Report Error</pd:from>
+        <pd:to>No Mail</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>No Mail</pd:from>
+        <pd:to>Infrastructure Check</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send-File-Error</pd:from>
+        <pd:to>Infrastructure Check</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

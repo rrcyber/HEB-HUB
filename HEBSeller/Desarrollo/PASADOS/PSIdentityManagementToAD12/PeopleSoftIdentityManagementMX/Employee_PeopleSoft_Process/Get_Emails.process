@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="www.tibco.com/plugin/Timer" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx="http://xmlns.heb.com/ei/PARTNER_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PARTNER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PARTNER_INFORMATION_SOAP.xsd"/>
+    <pd:name>PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Get_Emails.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Filtro">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Operacion" type="xsd:string"/>
+                    <xsd:element name="Dept" type="xsd:string"/>
+                    <xsd:element name="Location" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>213</pd:startY>
+    <pd:returnBindings>
+        <StringEmails>
+            <emails>
+                <xsl:value-of select="tib:substring-before-last($Variable2/var2, &quot;;&quot;)"/>
+            </emails>
+        </StringEmails>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="StringEmails">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="emails" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>770</pd:endX>
+    <pd:endY>205</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Variable2>
+            <xsd:element name="var2" type="xsd:string"/>
+        </Variable2>
+        <varProcess>
+            <xsd:element name="bProcessed" type="xsd:string"/>
+        </varProcess>
+        <varCurrentEmpl>
+            <xsd:element name="strEmpl" type="xsd:string"/>
+        </varCurrentEmpl>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1268939340178</pd:targetNamespace>
+    <pd:activity name="Get Filter Location Depts">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>307</pd:x>
+        <pd:y>324</pd:y>
+        <config>
+            <timeout>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>Select EMAIL_ADDR
+ from EmailGroups_AD_MX where 
+LOCATION_ID=? and DEPT_ID=? and Operacion_AD=? union all
+Select EMAIL_ADDR
+ from EmailGroups_AD_MX where 
+LOCATION_ID=? and DEPT_ID=? and Operacion_AD=?</statement>
+            <wizardData>#Wed Apr 01 16:46:41 CST 2015&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=Select SURNAME,GIVENAME,DISPLAY_NAME,EMPL_ID,PHONE,PRIMARY_NID,EMAIL_ADDR,EFF_DT,EFF_SEQ,DEP_DESCR,JOBCODE_DESCR,DEPT_ID,JOB_CD,EMPL_STAT,EMPLOYEE_TYPE,\n\t        NAME,NATIONAL_ID,COMPANY,LOCATION_ID,LOCATION_DESCR,LAST_UPDATE_DT from PS_EMPL_DATA_DETAIL_MX where STATUS_AD\='L'&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>EMAIL_ADDR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>location</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>dept</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>operation</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>location_2</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>depto_2</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>operation_2</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <location>
+                    <xsl:value-of select="$Start/Filtro/Location"/>
+                </location>
+                <dept>
+                    <xsl:value-of select="$Start/Filtro/Dept"/>
+                </dept>
+                <operation>
+                    <xsl:value-of select="$Start/Filtro/Operacion"/>
+                </operation>
+                <location_2>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/DefaultLocation"/>
+                </location_2>
+                <depto_2>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/DefaultDepto"/>
+                </depto_2>
+                <operation_2>
+                    <xsl:value-of select="$Start/Filtro/Operacion"/>
+                </operation_2>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group Emails">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>408</pd:x>
+        <pd:y>240</pd:y>
+        <pd:width>316</pd:width>
+        <pd:height>142</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get-Filter-Location-Depts/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>current_Member_Mails_1</pd:iterationElementSlot>
+            <pd:indexSlot>imail</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Assign-Emails-String</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign-Email</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign-Emails-String</pd:from>
+            <pd:to>Assign-Email</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Assign-Emails-String">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>492</pd:x>
+            <pd:y>302</pd:y>
+            <config>
+                <variableName>varProcess</variableName>
+            </config>
+            <pd:inputBindings>
+                <bProcessed>
+                    <xsl:value-of select="concat($Variable2/var2,$current_Member_Mails_1/Record/EMAIL_ADDR ,';')"/>
+                </bProcessed>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Assign-Email">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>617</pd:x>
+            <pd:y>306</pd:y>
+            <config>
+                <variableName>Variable2</variableName>
+            </config>
+            <pd:inputBindings>
+                <var2>
+                    <xsl:value-of select="$varProcess/bProcessed"/>
+                </var2>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Assign GetEmails">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>177</pd:x>
+        <pd:y>216</pd:y>
+        <config>
+            <variableName>varProcess</variableName>
+        </config>
+        <pd:inputBindings>
+            <bProcessed>
+                <xsl:value-of select="''"/>
+            </bProcessed>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-GetEmails-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>180</pd:x>
+        <pd:y>314</pd:y>
+        <config>
+            <variableName>Variable2</variableName>
+        </config>
+        <pd:inputBindings>
+            <var2>
+                <xsl:value-of select="''"/>
+            </var2>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group Emails (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>399</pd:x>
+        <pd:y>23</pd:y>
+        <pd:width>292</pd:width>
+        <pd:height>144</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get-Filter-Location-Depts-1/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>current_Member_Mails</pd:iterationElementSlot>
+            <pd:indexSlot>imail2</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Assign-Emails-String-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign-Email-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign-Emails-String-1</pd:from>
+            <pd:to>Assign-Email-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Assign-Emails-String-1">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>476</pd:x>
+            <pd:y>87</pd:y>
+            <config>
+                <variableName>varProcess</variableName>
+            </config>
+            <pd:inputBindings>
+                <bProcessed>
+                    <xsl:value-of select="concat($Variable2/var2,$current_Member_Mails/Record/EMAIL_ADDR ,';')"/>
+                </bProcessed>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Assign-Email-1">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>601</pd:x>
+            <pd:y>91</pd:y>
+            <config>
+                <variableName>Variable2</variableName>
+            </config>
+            <pd:inputBindings>
+                <var2>
+                    <xsl:value-of select="$varProcess/bProcessed"/>
+                </var2>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Get-Filter-Location-Depts-1">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>305</pd:x>
+        <pd:y>97</pd:y>
+        <config>
+            <timeout>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>Select EMAIL_ADDR
+ from EmailGroups_AD_MX where 
+LOCATION_ID=? and DEPT_ID=? and Operacion_AD=?
+</statement>
+            <wizardData>#Wed Apr 01 16:46:41 CST 2015&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=Select SURNAME,GIVENAME,DISPLAY_NAME,EMPL_ID,PHONE,PRIMARY_NID,EMAIL_ADDR,EFF_DT,EFF_SEQ,DEP_DESCR,JOBCODE_DESCR,DEPT_ID,JOB_CD,EMPL_STAT,EMPLOYEE_TYPE,\n\t        NAME,NATIONAL_ID,COMPANY,LOCATION_ID,LOCATION_DESCR,LAST_UPDATE_DT from PS_EMPL_DATA_DETAIL_MX where STATUS_AD\='L'&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>location</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>dept</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>operation</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>EMAIL_ADDR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <location>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/DefaultLocation"/>
+                </location>
+                <dept>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/DefaultDepto"/>
+                </dept>
+                <operation>
+                    <xsl:value-of select="$Start/Filtro/Operacion"/>
+                </operation>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Assign GetEmails</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Emails</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign GetEmails</pd:from>
+        <pd:to>Assign-GetEmails-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-GetEmails-1</pd:from>
+        <pd:to>Get Filter Location Depts</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get Filter Location Depts</pd:from>
+        <pd:to>Group Emails</pd:to>
+        <pd:xpathDescription>Existen mails</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Get-Filter-Location-Depts/resultSet/Record)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get Filter Location Depts</pd:from>
+        <pd:to>Get-Filter-Location-Depts-1</pd:to>
+        <pd:xpathDescription>No existen Mails</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get-Filter-Location-Depts-1</pd:from>
+        <pd:to>Group Emails (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Emails (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

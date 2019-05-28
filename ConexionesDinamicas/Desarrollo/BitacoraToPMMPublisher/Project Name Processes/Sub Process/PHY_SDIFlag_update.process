@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <pd:name>Project Name Processes/Sub Process/PHY_SDIFlag_update.process</pd:name>
+    <pd:description>Marcamos en 1 los registros que ya se enviaron al queue</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="FOLIO" type="xsd:string"/>
+                                <xsd:element name="SUCURSAL" type="xsd:string"/>
+                                <xsd:element name="PRD" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="URL" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>148</pd:startX>
+    <pd:startY>144</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>715</pd:endX>
+    <pd:endY>147</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1365099223381</pd:targetNamespace>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>257</pd:x>
+        <pd:y>57</pd:y>
+        <pd:width>414</pd:width>
+        <pd:height>483</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>397</pd:x>
+            <pd:y>485</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>590</pd:x>
+            <pd:y>485</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Group">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>296</pd:x>
+            <pd:y>95</pd:y>
+            <pd:width>323</pd:width>
+            <pd:height>337</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>simpleGroup</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Update SDIPHYDTI</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Update SDIPHYDTI</pd:from>
+                <pd:to>end</pd:to>
+                <pd:xpathDescription>OK</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$Update-SDIPHYDTI/group/result='SUCCESS'</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Update SDIPHYDTI</pd:from>
+                <pd:to>Generate-Error-1</pd:to>
+                <pd:xpathDescription>ERROR</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Update SDIPHYDTI">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>456</pd:x>
+                <pd:y>269</pd:y>
+                <config>
+                    <processName>/Project Name Processes/Sub Process/DynamicConnectionUpdate.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <group>
+                        <DB_URL>
+                            <xsl:value-of select="$Start/root/URL"/>
+                        </DB_URL>
+                        <USER>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                        </USER>
+                        <MAX_ROWS>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                        </MAX_ROWS>
+                        <xsl:for-each select="$Start/root/ITEM">
+                            <QUERY>
+                                <xsl:value-of select="concat(&quot;UPDATE BDINV..sdiphydti SET SDIFLAG = 1 where SDIFLAG = 0 AND CONTROL_NUMBER = &quot;,FOLIO,&#xA;&quot; AND ORG_LVL_NUMBER = &quot;, SUCURSAL,&quot; and PRD_LVL_NUMBER = &quot;, PRD)"/>
+                            </QUERY>
+                        </xsl:for-each>
+                    </group>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Generate-Error-1">
+                <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+                <pd:resourceType>ae.activities.throw</pd:resourceType>
+                <pd:x>397</pd:x>
+                <pd:y>376</pd:y>
+                <config>
+                    <faultName/>
+                </config>
+                <pd:inputBindings>
+                    <ns12:ActivityInput>
+                        <xsl:if test="$Update-SDIPHYDTI/group/error_msg">
+                            <message>
+                                <xsl:value-of select="$Update-SDIPHYDTI/group/error_msg"/>
+                            </message>
+                        </xsl:if>
+                        <xsl:if test="$Update-SDIPHYDTI/group/sqlState">
+                            <messageCode>
+                                <xsl:value-of select="$Update-SDIPHYDTI/group/sqlState"/>
+                            </messageCode>
+                        </xsl:if>
+                    </ns12:ActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

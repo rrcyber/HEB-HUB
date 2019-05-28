@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/ReplicaHuellas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ReplicaHuellas" schemaLocation="/Shared Resources/Schema Definitions/Custom/ReplicaHuellas.xsd"/>
+    <pd:name>Project Name Processes/Main Process/ReplicaHuellas.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>79</pd:startX>
+    <pd:startY>197</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>776</pd:endX>
+    <pd:endY>200</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1456234251419</pd:targetNamespace>
+    <pd:activity name="Map ReplicaHuellasALTA">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>457</pd:x>
+        <pd:y>92</pd:y>
+        <config>
+            <element ref="pfx:ReplicaHuellas"/>
+        </config>
+        <pd:inputBindings>
+            <pfx:ReplicaHuellas>
+                <xsl:for-each select="$Parse-Data/Output/Rows/FINGER_TEMPLATE">
+                    <xsl:for-each select="ITEM">
+                        <pfx:ITEM>
+                            <xsl:if test="REGID">
+                                <pfx:REGID>
+                                    <xsl:value-of select="REGID"/>
+                                </pfx:REGID>
+                            </xsl:if>
+                            <xsl:if test="SCAN_SOCIOID">
+                                <pfx:SCAN_SOCIOID>
+                                    <xsl:value-of select="SCAN_SOCIOID"/>
+                                </pfx:SCAN_SOCIOID>
+                            </xsl:if>
+                            <xsl:if test="SCAN_DEDOTIPO">
+                                <pfx:SCAN_DEDOTIPO>
+                                    <xsl:value-of select="SCAN_DEDOTIPO"/>
+                                </pfx:SCAN_DEDOTIPO>
+                            </xsl:if>
+                            <xsl:if test="SCAN_TEMPLATEDEDO">
+                                <pfx:SCAN_TEMPLATEDEDO>
+                                    <xsl:value-of select="SCAN_TEMPLATEDEDO"/>
+                                </pfx:SCAN_TEMPLATEDEDO>
+                            </xsl:if>
+                            <pfx:SCAN_FECHAREG>
+                                <xsl:value-of select="tib:parse-dateTime('yyyy-MM-dd HH:mm:ss.SSS',SCAN_FECHAREG)"/>
+                            </pfx:SCAN_FECHAREG>
+                            <xsl:if test="SCAN_USUARIOREG">
+                                <pfx:SCAN_USUARIOREG>
+                                    <xsl:value-of select="SCAN_USUARIOREG"/>
+                                </pfx:SCAN_USUARIOREG>
+                            </xsl:if>
+                            <pfx:SCAN_FECHAMOD>
+                                <xsl:value-of select="tib:parse-dateTime('yyyy-MM-dd HH:mm:ss.SSS',SCAN_FECHAMOD)"/>
+                            </pfx:SCAN_FECHAMOD>
+                            <xsl:if test="SCAN_USUARIOMOD">
+                                <pfx:SCAN_USUARIOMOD>
+                                    <xsl:value-of select="SCAN_USUARIOMOD"/>
+                                </pfx:SCAN_USUARIOMOD>
+                            </xsl:if>
+                        </pfx:ITEM>
+                    </xsl:for-each>
+                </xsl:for-each>
+            </pfx:ReplicaHuellas>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Topic Publisher ALTA">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>632</pd:x>
+        <pd:y>102</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Topics/GLB.STORE.REPLICA.HUELLAS.TOPIC%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx:ReplicaHuellas"/>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <Body>
+                    <pfx:ReplicaHuellas>
+                        <xsl:copy-of select="$Map-ReplicaHuellasALTA/pfx:ReplicaHuellas/pfx:ITEM"/>
+                    </pfx:ReplicaHuellas>
+                </Body>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>488</pd:x>
+        <pd:y>197</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="DynamicConnectionQuery">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>224</pd:x>
+        <pd:y>198</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/DynamicConnectionQuery.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <DB_URL>
+                    <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$_processContext/ns2:ProcessContext/CustomId]/URL"/>
+                </DB_URL>
+                <USER>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                </USER>
+                <QUERY>
+                    <xsl:value-of select="concat(&quot;SELECT REGID,SCAN_SOCIOID,SCAN_DEDOTIPO,SCAN_TEMPLATEDEDO,ISNULL(SCAN_FECHAREG, NULL) AS 'SCAN_FECHAREG',&quot;,&#xA;&quot;'TIBCO' AS 'SCAN_USUARIOREG',GETDATE() AS 'SCAN_FECHAMOD','TIBCO' AS 'SCAN_USUARIOMOD' FROM DBWCK..FINGER_TEMPLATE  (nolock)&quot;,&#xA;&quot; WHERE SCAN_FECHAREG >= DATEADD(HOUR, -1, GETDATE())&quot;,&#xA;&quot; OR SCAN_FECHAMOD >= DATEADD(HOUR, -1, GETDATE())&quot;,&#xA;&quot; ORDER BY SCAN_FECHAREG DESC&quot;)"/>
+                </QUERY>
+                <MAX_ROWS>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                </MAX_ROWS>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse Data">
+        <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+        <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+        <pd:x>325</pd:x>
+        <pd:y>198</pd:y>
+        <config>
+            <InputType>String</InputType>
+            <Encoding>ASCII</Encoding>
+            <ParseSharedConfig>/Shared Resources/Schema Definitions/Data Format/FINGER_TEMPLATE.sharedparse</ParseSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <Input>
+                <text>
+                    <xsl:value-of select="$DynamicConnectionQuery/group/result"/>
+                </text>
+                <noOfRecords>
+                    <xsl:value-of select="count(tib:tokenize($DynamicConnectionQuery/group/result, &quot;&#xA;&quot;))"/>
+                </noOfRecords>
+            </Input>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetVariable">
+        <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+        <pd:x>167</pd:x>
+        <pd:y>110</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error GetVariable">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>162</pd:x>
+        <pd:y>293</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetVariable</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Topic Publisher ALTA</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map ReplicaHuellasALTA</pd:from>
+        <pd:to>JMS Topic Publisher ALTA</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>DynamicConnectionQuery</pd:from>
+        <pd:to>Parse Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Data</pd:from>
+        <pd:to>Map ReplicaHuellasALTA</pd:to>
+        <pd:xpathDescription>Con datos</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Parse-Data/Output/Rows/FINGER_TEMPLATE)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Data</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>DynamicConnectionQuery</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>Error GetVariable</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error GetVariable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

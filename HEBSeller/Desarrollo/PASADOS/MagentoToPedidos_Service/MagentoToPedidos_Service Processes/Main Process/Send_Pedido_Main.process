@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns22="http://xmlns.heb.com/ei/OutVenta" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/Supertarjeta" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:pfx5="http://xmlns.heb.com/ei/PedidoRequest" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam" xmlns:pfx2="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:pfx8="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Pedido.xsd" xmlns:pfx7="http://xmlns.heb.com/ei/Pedido" xmlns:pfx6="http://xmlns.heb.com/ei/PedidoResponse">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Supertarjeta" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaIn.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SupertarjetaOut" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoRequest" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoRequest.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoResponse" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoResponse.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Pedido" schemaLocation="/Shared Resources/Schema Definitions/Custom/Pedido.xsd"/>
+    <pd:name>MagentoToPedidos_Service Processes/Main Process/Send_Pedido_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Pedido" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>124</pd:startY>
+    <pd:returnBindings>
+        <pfx6:PedidoResponse>
+            <pfx6:Codigo>
+                <xsl:value-of select="$Send_Pedido/pfx6:PedidoResponse/pfx6:Codigo"/>
+            </pfx6:Codigo>
+            <pfx6:Descripcion>
+                <xsl:value-of select="$Send_Pedido/pfx6:PedidoResponse/pfx6:Descripcion"/>
+            </pfx6:Descripcion>
+        </pfx6:PedidoResponse>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx6:PedidoResponse"/>
+    <pd:endX>775</pd:endX>
+    <pd:endY>123</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx6:PedidoResponse"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <Error>
+            <xsd:element name="error" type="xsd:string"/>
+        </Error>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1412351440454</pd:targetNamespace>
+    <pd:activity name="AuditProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>656</pd:x>
+        <pd:y>123</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:AuditingSchema>
+                <ns12:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns12:inrtn_id>
+                <ns12:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns12:inrtn_nm>
+                <ns12:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns12:inrtn_instn_nm>
+                <ns12:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns12:inrtn_proc_id>
+                <ns12:inrtn_rec_cnt>
+                    <xsl:value-of select="$Map-Data/pfx7:Pedido/pfx7:Encabezado/pfx7:IdPedido"/>
+                </ns12:inrtn_rec_cnt>
+                <ns12:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                </ns12:inrtn_cre8_ts>
+            </ns12:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>354</pd:x>
+        <pd:y>39</pd:y>
+        <pd:width>209</pd:width>
+        <pd:height>152</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Send_Pedido</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Send_Pedido</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Send_Pedido">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>455</pd:x>
+            <pd:y>125</pd:y>
+            <config>
+                <processName>/MagentoToPedidos_Service Processes/Sub Process/Send_Pedido.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:for-each select="$Map-Data/pfx7:Pedido">
+                    <pfx7:Pedido>
+                        <xsl:for-each select="pfx7:Encabezado">
+                            <pfx7:Encabezado>
+                                <pfx7:IdPedido>
+                                    <xsl:value-of select="pfx7:IdPedido"/>
+                                </pfx7:IdPedido>
+                                <pfx7:IdWebsite>
+                                    <xsl:value-of select="pfx7:IdWebsite"/>
+                                </pfx7:IdWebsite>
+                                <pfx7:IdCliente>
+                                    <xsl:value-of select="pfx7:IdCliente"/>
+                                </pfx7:IdCliente>
+                                <pfx7:Email>
+                                    <xsl:value-of select="pfx7:Email"/>
+                                </pfx7:Email>
+                                <pfx7:NombreCliente>
+                                    <xsl:value-of select="pfx7:NombreCliente"/>
+                                </pfx7:NombreCliente>
+                                <pfx7:FechaEntrega>
+                                    <xsl:value-of select="pfx7:FechaEntrega"/>
+                                </pfx7:FechaEntrega>
+                                <pfx7:HorarioEntrega>
+                                    <xsl:value-of select="pfx7:HorarioEntrega"/>
+                                </pfx7:HorarioEntrega>
+                                <pfx7:TipoServicio>
+                                    <xsl:value-of select="pfx7:TipoServicio"/>
+                                </pfx7:TipoServicio>
+                                <pfx7:TipoEntrega>
+                                    <xsl:value-of select="pfx7:TipoEntrega"/>
+                                </pfx7:TipoEntrega>
+                                <pfx7:CostoEntrega>
+                                    <xsl:value-of select="pfx7:CostoEntrega"/>
+                                </pfx7:CostoEntrega>
+                                <pfx7:TotalPiezas>
+                                    <xsl:value-of select="pfx7:TotalPiezas"/>
+                                </pfx7:TotalPiezas>
+                                <pfx7:MontoTotalOriginal>
+                                    <xsl:value-of select="pfx7:MontoTotalOriginal"/>
+                                </pfx7:MontoTotalOriginal>
+                                <pfx7:MontoTotalFinal>
+                                    <xsl:value-of select="pfx7:MontoTotalFinal"/>
+                                </pfx7:MontoTotalFinal>
+                                <pfx7:Estatus>
+                                    <xsl:value-of select="pfx7:Estatus"/>
+                                </pfx7:Estatus>
+                                <pfx7:Plataforma>
+                                    <xsl:value-of select="pfx7:Plataforma"/>
+                                </pfx7:Plataforma>
+                                <pfx7:DireccionEnvio>
+                                    <xsl:value-of select="pfx7:DireccionEnvio"/>
+                                </pfx7:DireccionEnvio>
+                                <pfx7:PersonaRecibe>
+                                    <xsl:value-of select="pfx7:PersonaRecibe"/>
+                                </pfx7:PersonaRecibe>
+                                <pfx7:IdColonia>
+                                    <xsl:value-of select="pfx7:IdColonia"/>
+                                </pfx7:IdColonia>
+                                <pfx7:CodigoPostal>
+                                    <xsl:value-of select="pfx7:CodigoPostal"/>
+                                </pfx7:CodigoPostal>
+                                <pfx7:Comentarios>
+                                    <xsl:value-of select="pfx7:Comentarios"/>
+                                </pfx7:Comentarios>
+                                <xsl:for-each select="pfx7:Promociones">
+                                    <pfx7:Promociones>
+                                        <pfx7:IdPromo>
+                                            <xsl:value-of select="pfx7:IdPromo"/>
+                                        </pfx7:IdPromo>
+                                        <pfx7:MontoDescuento>
+                                            <xsl:value-of select="pfx7:MontoDescuento"/>
+                                        </pfx7:MontoDescuento>
+                                        <pfx7:Chargeback_Department>
+                                            <xsl:value-of select="pfx7:Chargeback_Department"/>
+                                        </pfx7:Chargeback_Department>
+                                    </pfx7:Promociones>
+                                </xsl:for-each>
+                                <pfx7:IdCupon>
+                                    <xsl:value-of select="pfx7:IdCupon"/>
+                                </pfx7:IdCupon>
+                                <pfx7:IdGrupoCliente>
+                                    <xsl:value-of select="pfx7:IdGrupoCliente"/>
+                                </pfx7:IdGrupoCliente>
+                            </pfx7:Encabezado>
+                        </xsl:for-each>
+                        <xsl:for-each select="pfx7:Detalle">
+                            <pfx7:Detalle>
+                                <pfx7:IdItem>
+                                    <xsl:value-of select="pfx7:IdItem"/>
+                                </pfx7:IdItem>
+                                <pfx7:Sku>
+                                    <xsl:value-of select="pfx7:Sku"/>
+                                </pfx7:Sku>
+                                <pfx7:NombreProducto>
+                                    <xsl:value-of select="pfx7:NombreProducto"/>
+                                </pfx7:NombreProducto>
+                                <pfx7:Upc>
+                                    <xsl:value-of select="pfx7:Upc"/>
+                                </pfx7:Upc>
+                                <pfx7:CantidadOrdenada>
+                                    <xsl:value-of select="pfx7:CantidadOrdenada"/>
+                                </pfx7:CantidadOrdenada>
+                                <pfx7:UnidadMedidaOrdenado>
+                                    <xsl:value-of select="pfx7:UnidadMedidaOrdenado"/>
+                                </pfx7:UnidadMedidaOrdenado>
+                                <pfx7:CantidadCalculada>
+                                    <xsl:value-of select="pfx7:CantidadCalculada"/>
+                                </pfx7:CantidadCalculada>
+                                <pfx7:UnidadMedidaProducto>
+                                    <xsl:value-of select="pfx7:UnidadMedidaProducto"/>
+                                </pfx7:UnidadMedidaProducto>
+                                <pfx7:PrecioUnitario>
+                                    <xsl:value-of select="pfx7:PrecioUnitario"/>
+                                </pfx7:PrecioUnitario>
+                                <pfx7:MontoTotalOriginal>
+                                    <xsl:value-of select="pfx7:MontoTotalOriginal"/>
+                                </pfx7:MontoTotalOriginal>
+                                <pfx7:CantidadEntregada>
+                                    <xsl:value-of select="pfx7:CantidadEntregada"/>
+                                </pfx7:CantidadEntregada>
+                                <pfx7:MontoTotalEntrega>
+                                    <xsl:value-of select="pfx7:MontoTotalEntrega"/>
+                                </pfx7:MontoTotalEntrega>
+                                <pfx7:TipoProducto>
+                                    <xsl:value-of select="pfx7:TipoProducto"/>
+                                </pfx7:TipoProducto>
+                                <pfx7:Estatus>
+                                    <xsl:value-of select="pfx7:Estatus"/>
+                                </pfx7:Estatus>
+                                <pfx7:Ticket>
+                                    <xsl:value-of select="pfx7:Ticket"/>
+                                </pfx7:Ticket>
+                                <pfx7:FechaTicket>
+                                    <xsl:value-of select="pfx7:FechaTicket"/>
+                                </pfx7:FechaTicket>
+                                <pfx7:GiftCard>
+                                    <xsl:value-of select="pfx7:GiftCard"/>
+                                </pfx7:GiftCard>
+                                <xsl:for-each select="pfx7:Promociones">
+                                    <pfx7:Promociones>
+                                        <pfx7:IdPromo>
+                                            <xsl:value-of select="pfx7:IdPromo"/>
+                                        </pfx7:IdPromo>
+                                        <pfx7:MontoDescuento>
+                                            <xsl:value-of select="pfx7:MontoDescuento"/>
+                                        </pfx7:MontoDescuento>
+                                        <pfx7:Chargeback_Department>
+                                            <xsl:value-of select="pfx7:Chargeback_Department"/>
+                                        </pfx7:Chargeback_Department>
+                                    </pfx7:Promociones>
+                                </xsl:for-each>
+                            </pfx7:Detalle>
+                        </xsl:for-each>
+                        <xsl:for-each select="pfx7:Pago">
+                            <pfx7:Pago>
+                                <pfx7:IdFormaPago>
+                                    <xsl:value-of select="pfx7:IdFormaPago"/>
+                                </pfx7:IdFormaPago>
+                                <pfx7:NombreFormaPago>
+                                    <xsl:value-of select="pfx7:NombreFormaPago"/>
+                                </pfx7:NombreFormaPago>
+                                <pfx7:NumeroReferencia>
+                                    <xsl:value-of select="pfx7:NumeroReferencia"/>
+                                </pfx7:NumeroReferencia>
+                                <pfx7:MontoAutorizado>
+                                    <xsl:value-of select="pfx7:MontoAutorizado"/>
+                                </pfx7:MontoAutorizado>
+                                <pfx7:MontoFinalAplicado>
+                                    <xsl:value-of select="pfx7:MontoFinalAplicado"/>
+                                </pfx7:MontoFinalAplicado>
+                                <pfx7:NumeroAprobacion>
+                                    <xsl:value-of select="pfx7:NumeroAprobacion"/>
+                                </pfx7:NumeroAprobacion>
+                                <pfx7:FechaAprobacion>
+                                    <xsl:value-of select="pfx7:FechaAprobacion"/>
+                                </pfx7:FechaAprobacion>
+                                <pfx7:NumeroTarjeta>
+                                    <xsl:value-of select="pfx7:NumeroTarjeta"/>
+                                </pfx7:NumeroTarjeta>
+                                <pfx7:NombrePropietarioTarjeta>
+                                    <xsl:value-of select="pfx7:NombrePropietarioTarjeta"/>
+                                </pfx7:NombrePropietarioTarjeta>
+                                <pfx7:BancoTarjeta>
+                                    <xsl:value-of select="pfx7:BancoTarjeta"/>
+                                </pfx7:BancoTarjeta>
+                                <pfx7:TipoTarjeta>
+                                    <xsl:value-of select="pfx7:TipoTarjeta"/>
+                                </pfx7:TipoTarjeta>
+                                <pfx7:EstatusPago>
+                                    <xsl:value-of select="pfx7:EstatusPago"/>
+                                </pfx7:EstatusPago>
+                            </pfx7:Pago>
+                        </xsl:for-each>
+                        <xsl:for-each select="pfx7:BitacoraEstatus">
+                            <pfx7:BitacoraEstatus>
+                                <pfx7:IdEstatus>
+                                    <xsl:value-of select="pfx7:IdEstatus"/>
+                                </pfx7:IdEstatus>
+                                <pfx7:FechaModificacion>
+                                    <xsl:value-of select="pfx7:FechaModificacion"/>
+                                </pfx7:FechaModificacion>
+                                <pfx7:Comentario>
+                                    <xsl:value-of select="pfx7:Comentario"/>
+                                </pfx7:Comentario>
+                                <pfx7:Usuario>
+                                    <xsl:value-of select="pfx7:Usuario"/>
+                                </pfx7:Usuario>
+                            </pfx7:BitacoraEstatus>
+                        </xsl:for-each>
+                    </pfx7:Pedido>
+                </xsl:for-each>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>266</pd:x>
+        <pd:y>125</pd:y>
+        <config>
+            <element ref="pfx7:Pedido"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$Parse-XML/pfx7:Pedido">
+                <pfx7:Pedido>
+                    <xsl:for-each select="pfx7:Encabezado">
+                        <pfx7:Encabezado>
+                            <pfx7:IdPedido>
+                                <xsl:value-of select="pfx7:IdPedido"/>
+                            </pfx7:IdPedido>
+                            <pfx7:IdWebsite>
+                                <xsl:value-of select="pfx7:IdWebsite"/>
+                            </pfx7:IdWebsite>
+                            <pfx7:IdCliente>
+                                <xsl:value-of select="pfx7:IdCliente"/>
+                            </pfx7:IdCliente>
+                            <pfx7:Email>
+                                <xsl:value-of select="pfx7:Email"/>
+                            </pfx7:Email>
+                            <pfx7:NombreCliente>
+                                <xsl:value-of select="pfx7:NombreCliente"/>
+                            </pfx7:NombreCliente>
+                            <pfx7:FechaEntrega>
+                                <xsl:value-of select="pfx7:FechaEntrega"/>
+                            </pfx7:FechaEntrega>
+                            <pfx7:HorarioEntrega>
+                                <xsl:value-of select="pfx7:HorarioEntrega"/>
+                            </pfx7:HorarioEntrega>
+                            <pfx7:TipoServicio>
+                                <xsl:value-of select="pfx7:TipoServicio"/>
+                            </pfx7:TipoServicio>
+                            <pfx7:TipoEntrega>
+                                <xsl:value-of select="pfx7:TipoEntrega"/>
+                            </pfx7:TipoEntrega>
+                            <pfx7:CostoEntrega>
+                                <xsl:value-of select="pfx7:CostoEntrega"/>
+                            </pfx7:CostoEntrega>
+                            <pfx7:TotalPiezas>
+                                <xsl:value-of select="pfx7:TotalPiezas"/>
+                            </pfx7:TotalPiezas>
+                            <pfx7:MontoTotalOriginal>
+                                <xsl:value-of select="pfx7:MontoTotalOriginal"/>
+                            </pfx7:MontoTotalOriginal>
+                            <pfx7:MontoTotalFinal>
+                                <xsl:value-of select="pfx7:MontoTotalFinal"/>
+                            </pfx7:MontoTotalFinal>
+                            <pfx7:Estatus>
+                                <xsl:value-of select="pfx7:Estatus"/>
+                            </pfx7:Estatus>
+                            <pfx7:Plataforma>
+                                <xsl:value-of select="pfx7:Plataforma"/>
+                            </pfx7:Plataforma>
+                            <pfx7:DireccionEnvio>
+                                <xsl:value-of select="pfx7:DireccionEnvio"/>
+                            </pfx7:DireccionEnvio>
+                            <pfx7:PersonaRecibe>
+                                <xsl:value-of select="pfx7:PersonaRecibe"/>
+                            </pfx7:PersonaRecibe>
+                            <pfx7:IdColonia>
+                                <xsl:value-of select="pfx7:IdColonia"/>
+                            </pfx7:IdColonia>
+                            <pfx7:CodigoPostal>
+                                <xsl:value-of select="pfx7:CodigoPostal"/>
+                            </pfx7:CodigoPostal>
+                            <pfx7:Comentarios>
+                                <xsl:value-of select="pfx7:Comentarios"/>
+                            </pfx7:Comentarios>
+                            <xsl:for-each select="pfx7:Promociones">
+                                <pfx7:Promociones>
+                                    <pfx7:IdPromo>
+                                        <xsl:value-of select="pfx7:IdPromo"/>
+                                    </pfx7:IdPromo>
+                                    <pfx7:MontoDescuento>
+                                        <xsl:value-of select="pfx7:MontoDescuento"/>
+                                    </pfx7:MontoDescuento>
+                                    <pfx7:Chargeback_Department>
+                                        <xsl:value-of select="pfx7:Chargeback_Department"/>
+                                    </pfx7:Chargeback_Department>
+                                </pfx7:Promociones>
+                            </xsl:for-each>
+                            <pfx7:IdCupon>
+                                <xsl:value-of select="pfx7:IdCupon"/>
+                            </pfx7:IdCupon>
+                            <pfx7:IdGrupoCliente>
+                                <xsl:value-of select="pfx7:IdGrupoCliente"/>
+                            </pfx7:IdGrupoCliente>
+                        </pfx7:Encabezado>
+                    </xsl:for-each>
+                    <xsl:for-each select="pfx7:Detalle">
+                        <pfx7:Detalle>
+                            <pfx7:IdItem>
+                                <xsl:value-of select="pfx7:IdItem"/>
+                            </pfx7:IdItem>
+                            <pfx7:Sku>
+                                <xsl:value-of select="pfx7:Sku"/>
+                            </pfx7:Sku>
+                            <pfx7:NombreProducto>
+                                <xsl:value-of select="pfx7:NombreProducto"/>
+                            </pfx7:NombreProducto>
+                            <pfx7:Upc>
+                                <xsl:value-of select="pfx7:Upc"/>
+                            </pfx7:Upc>
+                            <pfx7:CantidadOrdenada>
+                                <xsl:value-of select="pfx7:CantidadOrdenada"/>
+                            </pfx7:CantidadOrdenada>
+                            <pfx7:UnidadMedidaOrdenado>
+                                <xsl:value-of select="pfx7:UnidadMedidaOrdenado"/>
+                            </pfx7:UnidadMedidaOrdenado>
+                            <pfx7:CantidadCalculada>
+                                <xsl:value-of select="pfx7:CantidadCalculada"/>
+                            </pfx7:CantidadCalculada>
+                            <pfx7:UnidadMedidaProducto>
+                                <xsl:value-of select="pfx7:UnidadMedidaProducto"/>
+                            </pfx7:UnidadMedidaProducto>
+                            <pfx7:PrecioUnitario>
+                                <xsl:value-of select="pfx7:PrecioUnitario"/>
+                            </pfx7:PrecioUnitario>
+                            <pfx7:MontoTotalOriginal>
+                                <xsl:value-of select="pfx7:MontoTotalOriginal"/>
+                            </pfx7:MontoTotalOriginal>
+                            <pfx7:CantidadEntregada>
+                                <xsl:value-of select="pfx7:CantidadEntregada"/>
+                            </pfx7:CantidadEntregada>
+                            <pfx7:MontoTotalEntrega>
+                                <xsl:value-of select="pfx7:MontoTotalEntrega"/>
+                            </pfx7:MontoTotalEntrega>
+                            <pfx7:TipoProducto>
+                                <xsl:value-of select="pfx7:TipoProducto"/>
+                            </pfx7:TipoProducto>
+                            <pfx7:Estatus>
+                                <xsl:value-of select="pfx7:Estatus"/>
+                            </pfx7:Estatus>
+                            <pfx7:Ticket>
+                                <xsl:value-of select="pfx7:Ticket"/>
+                            </pfx7:Ticket>
+                            <pfx7:FechaTicket>
+                                <xsl:value-of select="pfx7:FechaTicket"/>
+                            </pfx7:FechaTicket>
+                            <pfx7:GiftCard>
+                                <xsl:value-of select="pfx7:GiftCard"/>
+                            </pfx7:GiftCard>
+                            <xsl:for-each select="pfx7:Promociones">
+                                <pfx7:Promociones>
+                                    <pfx7:IdPromo>
+                                        <xsl:value-of select="pfx7:IdPromo"/>
+                                    </pfx7:IdPromo>
+                                    <pfx7:MontoDescuento>
+                                        <xsl:value-of select="pfx7:MontoDescuento"/>
+                                    </pfx7:MontoDescuento>
+                                    <pfx7:Chargeback_Department>
+                                        <xsl:value-of select="pfx7:Chargeback_Department"/>
+                                    </pfx7:Chargeback_Department>
+                                </pfx7:Promociones>
+                            </xsl:for-each>
+                        </pfx7:Detalle>
+                    </xsl:for-each>
+                    <xsl:for-each select="pfx7:Pago">
+                        <pfx7:Pago>
+                            <pfx7:IdFormaPago>
+                                <xsl:value-of select="pfx7:IdFormaPago"/>
+                            </pfx7:IdFormaPago>
+                            <pfx7:NombreFormaPago>
+                                <xsl:value-of select="pfx7:NombreFormaPago"/>
+                            </pfx7:NombreFormaPago>
+                            <pfx7:NumeroReferencia>
+                                <xsl:value-of select="pfx7:NumeroReferencia"/>
+                            </pfx7:NumeroReferencia>
+                            <pfx7:MontoAutorizado>
+                                <xsl:value-of select="pfx7:MontoAutorizado"/>
+                            </pfx7:MontoAutorizado>
+                            <pfx7:MontoFinalAplicado>
+                                <xsl:value-of select="pfx7:MontoFinalAplicado"/>
+                            </pfx7:MontoFinalAplicado>
+                            <pfx7:NumeroAprobacion>
+                                <xsl:value-of select="pfx7:NumeroAprobacion"/>
+                            </pfx7:NumeroAprobacion>
+                            <pfx7:FechaAprobacion>
+                                <xsl:value-of select="pfx7:FechaAprobacion"/>
+                            </pfx7:FechaAprobacion>
+                            <pfx7:NumeroTarjeta>
+                                <xsl:value-of select="pfx7:NumeroTarjeta"/>
+                            </pfx7:NumeroTarjeta>
+                            <pfx7:NombrePropietarioTarjeta>
+                                <xsl:value-of select="pfx7:NombrePropietarioTarjeta"/>
+                            </pfx7:NombrePropietarioTarjeta>
+                            <pfx7:BancoTarjeta>
+                                <xsl:value-of select="pfx7:BancoTarjeta"/>
+                            </pfx7:BancoTarjeta>
+                            <pfx7:TipoTarjeta>
+                                <xsl:value-of select="pfx7:TipoTarjeta"/>
+                            </pfx7:TipoTarjeta>
+                            <pfx7:EstatusPago>
+                                <xsl:value-of select="pfx7:EstatusPago"/>
+                            </pfx7:EstatusPago>
+                        </pfx7:Pago>
+                    </xsl:for-each>
+                    <xsl:for-each select="pfx7:BitacoraEstatus">
+                        <pfx7:BitacoraEstatus>
+                            <pfx7:IdEstatus>
+                                <xsl:value-of select="pfx7:IdEstatus"/>
+                            </pfx7:IdEstatus>
+                            <pfx7:FechaModificacion>
+                                <xsl:value-of select="pfx7:FechaModificacion"/>
+                            </pfx7:FechaModificacion>
+                            <pfx7:Comentario>
+                                <xsl:value-of select="pfx7:Comentario"/>
+                            </pfx7:Comentario>
+                            <pfx7:Usuario>
+                                <xsl:value-of select="pfx7:Usuario"/>
+                            </pfx7:Usuario>
+                        </pfx7:BitacoraEstatus>
+                    </xsl:for-each>
+                </pfx7:Pedido>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1006</pd:x>
+        <pd:y>217</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>654</pd:x>
+        <pd:y>218</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>148</pd:x>
+        <pd:y>125</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx7:Pedido"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="translate(translate($Start/Pedido, '&amp;ÑñáéíóúÁÉÍÓÚ#±´?','yNnaeiouAEIOU n  '),'%','')"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>827</pd:x>
+        <pd:y>321</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>829</pd:x>
+        <pd:y>216</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <Code>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </Code>
+                </xsl:if>
+                <Message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "Fault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

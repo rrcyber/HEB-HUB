@@ -1,0 +1,1901 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:cfdi="http://www.sat.gob.mx/cfd/3"
+	 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital"
+	 xmlns:ns0="http://www.sat.gob.mx/TimbreFiscalDigital"
+	 xmlns:detallista="http://www.sat.gob.mx/detallista"
+	 xmlns:ns1="http://www.sat.gob.mx/Addenda"
+	 xmlns:pago10="http://www.sat.gob.mx/Pagos"
+	 xmlns:ns2="http://www.sat.gob.mx/Pagos"
+	 xmlns:terceros="http://www.sat.gob.mx/terceros"
+	 xmlns:catCFDI="http://www.sat.gob.mx/sitio_internet/cfd/catalogos"
+	 xmlns:tdCFDI="http://www.sat.gob.mx/sitio_internet/cfd/tipoDatos/tdCFDI"
+	 targetNamespace="http://www.sat.gob.mx/cfd/3"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.sat.gob.mx/sitio_internet/cfd/catalogos" schemaLocation="../Common/catCFDI.xsd"/>
+	<xs:import namespace="http://www.sat.gob.mx/Pagos" schemaLocation="../Common/Pagos10.xsd"/>
+	<xs:import namespace="http://www.sat.gob.mx/TimbreFiscalDigital" schemaLocation="../Common/TimbreFiscalDigitalv11.xsd"/>
+	<xs:import namespace="http://www.sat.gob.mx/sitio_internet/cfd/tipoDatos/tdCFDI" schemaLocation="../Common/tdCFDI.xsd"/>
+	<xs:import namespace="http://www.sat.gob.mx/terceros" schemaLocation="terceros11.xsd"/>
+	<xs:import namespace="http://www.sat.gob.mx/detallista" schemaLocation="detallista.xsd"/>
+	<xs:import schemaLocation="SIHProveedor.xsd"/>
+	<xs:element name="Comprobante">
+		<xs:annotation>
+			<xs:documentation>Estándar de Comprobante Fiscal Digital por Internet.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="CfdiRelacionados" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Nodo opcional para precisar la información de los comprobantes relacionados.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CfdiRelacionado" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Nodo requerido para precisar la información de los comprobantes relacionados.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="UUID" use="required">
+										<xs:annotation>
+											<xs:documentation>Atributo requerido para registrar el folio fiscal (UUID) de un CFDI relacionado con el presente comprobante, por ejemplo: Si el CFDI relacionado es un comprobante de traslado que sirve para registrar el movimiento de la mercancía. Si este comprobante se usa como nota de crédito o nota de débito del comprobante relacionado. Si este comprobante es una devolución sobre el comprobante relacionado. Si éste sustituye a una factura cancelada.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:length value="36"/>
+												<xs:whiteSpace value="collapse"/>
+												<xs:pattern value="[a-f0-9A-F]{8}-[a-f0-9A-F]{4}-[a-f0-9A-F]{4}-[a-f0-9A-F]{4}-[a-f0-9A-F]{12}"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="TipoRelacion" type="catCFDI:c_TipoRelacion" use="required">
+							<xs:annotation>
+								<xs:documentation>Atributo requerido para indicar la clave de la relación que existe entre éste que se esta generando y el o los CFDI previos.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Emisor">
+					<xs:annotation>
+						<xs:documentation>Nodo requerido para expresar la información del contribuyente emisor del comprobante.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="Rfc" type="tdCFDI:t_RFC" use="required">
+							<xs:annotation>
+								<xs:documentation>Atributo requerido para registrar la Clave del Registro Federal de Contribuyentes correspondiente al contribuyente emisor del comprobante.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="Nombre">
+							<xs:annotation>
+								<xs:documentation>Atributo opcional para registrar el nombre, denominación o razón social del contribuyente emisor del comprobante.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="254"/>
+									<xs:whiteSpace value="collapse"/>
+									<xs:pattern value="[^|]{1,254}"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="RegimenFiscal" type="catCFDI:c_RegimenFiscal" use="required">
+							<xs:annotation>
+								<xs:documentation>Atributo requerido para incorporar la clave del régimen del contribuyente emisor al que aplicará el efecto fiscal de este comprobante.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Receptor">
+					<xs:annotation>
+						<xs:documentation>Nodo requerido para precisar la información del contribuyente receptor del comprobante.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="Rfc" type="tdCFDI:t_RFC" use="required">
+							<xs:annotation>
+								<xs:documentation>Atributo requerido para precisar la Clave del Registro Federal de Contribuyentes correspondiente al contribuyente receptor del comprobante.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="Nombre">
+							<xs:annotation>
+								<xs:documentation>Atributo opcional para precisar el nombre, denominación o razón social del contribuyente receptor del comprobante.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="254"/>
+									<xs:whiteSpace value="collapse"/>
+									<xs:pattern value="[^|]{1,254}"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="ResidenciaFiscal" type="catCFDI:c_Pais">
+							<xs:annotation>
+								<xs:documentation>Atributo condicional para registrar la clave del país de residencia para efectos fiscales del receptor del comprobante, cuando se trate de un extranjero, y que es conforme con la especificación ISO 3166-1 alpha-3. Es requerido cuando se incluya el complemento de comercio exterior o se registre el atributo NumRegIdTrib.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="NumRegIdTrib">
+							<xs:annotation>
+								<xs:documentation>Atributo condicional para expresar el número de registro de identidad fiscal del receptor cuando sea residente en el  extranjero. Es requerido cuando se incluya el complemento de comercio exterior.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="40"/>
+									<xs:whiteSpace value="collapse"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="UsoCFDI" type="catCFDI:c_UsoCFDI" use="required">
+							<xs:annotation>
+								<xs:documentation>Atributo requerido para expresar la clave del uso que dará a esta factura el receptor del CFDI.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Conceptos">
+					<xs:annotation>
+						<xs:documentation>Nodo requerido para listar los conceptos cubiertos por el comprobante.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Concepto" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Nodo requerido para registrar la información detallada de un bien o servicio amparado en el comprobante.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Impuestos" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Nodo opcional para capturar los impuestos aplicables al presente concepto. Cuando un concepto no registra un impuesto, implica que no es objeto del mismo.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Traslados" minOccurs="0">
+														<xs:annotation>
+															<xs:documentation>Nodo opcional para asentar los impuestos trasladados aplicables al presente concepto.</xs:documentation>
+														</xs:annotation>
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="Traslado" maxOccurs="unbounded">
+																	<xs:annotation>
+																		<xs:documentation>Nodo requerido para asentar la información detallada de un traslado de impuestos aplicable al presente concepto.</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:attribute name="Base" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar la base para el cálculo del impuesto, la determinación de la base se realiza de acuerdo con las disposiciones fiscales vigentes. No se permiten valores negativos.</xs:documentation>
+																			</xs:annotation>
+																			<xs:simpleType>
+																				<xs:restriction base="xs:decimal">
+																					<xs:fractionDigits value="6"/>
+																					<xs:minInclusive value="0.000001"/>
+																					<xs:whiteSpace value="collapse"/>
+																				</xs:restriction>
+																			</xs:simpleType>
+																		</xs:attribute>
+																		<xs:attribute name="Impuesto" type="catCFDI:c_Impuesto" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar la clave del tipo de impuesto trasladado aplicable al concepto.</xs:documentation>
+																			</xs:annotation>
+																		</xs:attribute>
+																		<xs:attribute name="TipoFactor" type="catCFDI:c_TipoFactor" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar la clave del tipo de factor que se aplica a la base del impuesto.</xs:documentation>
+																			</xs:annotation>
+																		</xs:attribute>
+																		<xs:attribute name="TasaOCuota">
+																			<xs:annotation>
+																				<xs:documentation>Atributo condicional para señalar el valor de la tasa o cuota del impuesto que se traslada para el presente concepto. Es requerido cuando el atributo TipoFactor tenga una clave que corresponda a Tasa o Cuota.</xs:documentation>
+																			</xs:annotation>
+																			<xs:simpleType>
+																				<xs:restriction base="xs:decimal">
+																					<xs:fractionDigits value="6"/>
+																					<xs:minInclusive value="0.000000"/>
+																					<xs:whiteSpace value="collapse"/>
+																				</xs:restriction>
+																			</xs:simpleType>
+																		</xs:attribute>
+																		<xs:attribute name="Importe" type="tdCFDI:t_Importe">
+																			<xs:annotation>
+																				<xs:documentation>Atributo condicional para señalar el importe del impuesto trasladado que aplica al concepto. No se permiten valores negativos. Es requerido cuando TipoFactor sea Tasa o Cuota</xs:documentation>
+																			</xs:annotation>
+																		</xs:attribute>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="Retenciones" minOccurs="0">
+														<xs:annotation>
+															<xs:documentation>Nodo opcional para asentar los impuestos retenidos aplicables al presente concepto.</xs:documentation>
+														</xs:annotation>
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="Retencion" maxOccurs="unbounded">
+																	<xs:annotation>
+																		<xs:documentation>Nodo requerido para asentar la información detallada de una retención de impuestos aplicable al presente concepto.</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:attribute name="Base" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar la base para el cálculo de la retención, la determinación de la base se realiza de acuerdo con las disposiciones fiscales vigentes. No se permiten valores negativos.</xs:documentation>
+																			</xs:annotation>
+																			<xs:simpleType>
+																				<xs:restriction base="xs:decimal">
+																					<xs:fractionDigits value="6"/>
+																					<xs:minInclusive value="0.000001"/>
+																					<xs:whiteSpace value="collapse"/>
+																				</xs:restriction>
+																			</xs:simpleType>
+																		</xs:attribute>
+																		<xs:attribute name="Impuesto" type="catCFDI:c_Impuesto" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar la clave del tipo de impuesto retenido aplicable al concepto.</xs:documentation>
+																			</xs:annotation>
+																		</xs:attribute>
+																		<xs:attribute name="TipoFactor" type="catCFDI:c_TipoFactor" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar la clave del tipo de factor que se aplica a la base del impuesto.</xs:documentation>
+																			</xs:annotation>
+																		</xs:attribute>
+																		<xs:attribute name="TasaOCuota" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar la tasa o cuota del impuesto que se retiene para el presente concepto.</xs:documentation>
+																			</xs:annotation>
+																			<xs:simpleType>
+																				<xs:restriction base="xs:decimal">
+																					<xs:whiteSpace value="collapse"/>
+																					<xs:minInclusive value="0.000000"/>
+																					<xs:fractionDigits value="6"/>
+																				</xs:restriction>
+																			</xs:simpleType>
+																		</xs:attribute>
+																		<xs:attribute name="Importe" type="tdCFDI:t_Importe" use="required">
+																			<xs:annotation>
+																				<xs:documentation>Atributo requerido para señalar el importe del impuesto retenido que aplica al concepto. No se permiten valores negativos.</xs:documentation>
+																			</xs:annotation>
+																		</xs:attribute>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="InformacionAduanera" minOccurs="0" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Nodo opcional para introducir la información aduanera aplicable cuando se trate de ventas de primera mano de mercancías importadas o se trate de operaciones de comercio exterior con bienes o servicios.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:attribute name="NumeroPedimento" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para expresar el número del pedimento que ampara la importación del bien que se expresa en el siguiente formato: últimos 2 dígitos del año de validación seguidos por dos espacios, 2 dígitos de la aduana de despacho seguidos por dos espacios, 4 dígitos del número de la patente seguidos por dos espacios, 1 dígito que corresponde al último dígito del año en curso, salvo que se trate de un pedimento consolidado iniciado en el año inmediato anterior o del pedimento original de una rectificación, seguido de 6 dígitos de la numeración progresiva por aduana.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:length value="21"/>
+															<xs:pattern value="[0-9]{2}  [0-9]{2}  [0-9]{4}  [0-9]{7}"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="CuentaPredial" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Nodo opcional para asentar el número de cuenta predial con el que fue registrado el inmueble, en el sistema catastral de la entidad federativa de que trate, o bien para incorporar los datos de identificación del certificado de participación inmobiliaria no amortizable.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:attribute name="Numero" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para precisar el número de la cuenta predial del inmueble cubierto por el presente concepto, o bien para incorporar los datos de identificación del certificado de participación inmobiliaria no amortizable, tratándose de arrendamiento.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="150"/>
+															<xs:whiteSpace value="collapse"/>
+															<xs:pattern value="[0-9]{1,150}"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="ComplementoConcepto" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Nodo opcional donde se incluyen los nodos complementarios de extensión al concepto definidos por el SAT, de acuerdo con las disposiciones particulares para un sector o actividad específica.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:any namespace="##any" processContents="strict" maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Parte" minOccurs="0" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Nodo opcional para expresar las partes o componentes que integran la totalidad del concepto expresado en el comprobante fiscal digital por Internet.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="InformacionAduanera" minOccurs="0" maxOccurs="unbounded">
+														<xs:annotation>
+															<xs:documentation>Nodo opcional para introducir la información aduanera aplicable cuando se trate de ventas de primera mano de mercancías importadas o se trate de operaciones de comercio exterior con bienes o servicios.</xs:documentation>
+														</xs:annotation>
+														<xs:complexType>
+															<xs:attribute name="NumeroPedimento" use="required">
+																<xs:annotation>
+																	<xs:documentation>Atributo requerido para expresar el número del pedimento que ampara la importación del bien que se expresa en el siguiente formato: últimos 2 dígitos del año de validación seguidos por dos espacios, 2 dígitos de la aduana de despacho seguidos por dos espacios, 4 dígitos del número de la patente seguidos por dos espacios, 1 dígito que corresponde al último dígito del año en curso, salvo que se trate de un pedimento consolidado iniciado en el año inmediato anterior o del pedimento original de una rectificación, seguido de 6 dígitos de la numeración progresiva por aduana.</xs:documentation>
+																</xs:annotation>
+																<xs:simpleType>
+																	<xs:restriction base="xs:string">
+																		<xs:length value="21"/>
+																		<xs:pattern value="[0-9]{2}  [0-9]{2}  [0-9]{4}  [0-9]{7}"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="ClaveProdServ" type="catCFDI:c_ClaveProdServ" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para expresar la clave del producto o del servicio amparado por la presente parte. Es requerido y deben utilizar las claves del catálogo de productos y servicios, cuando los conceptos que registren por sus actividades correspondan con dichos conceptos.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="NoIdentificacion">
+													<xs:annotation>
+														<xs:documentation>Atributo opcional para expresar el número de serie, número de parte del bien o identificador del producto o del servicio amparado por la presente parte. Opcionalmente se puede utilizar claves del estándar GTIN.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="100"/>
+															<xs:whiteSpace value="collapse"/>
+															<xs:pattern value="[^|]{1,100}"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="Cantidad" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para precisar la cantidad de bienes o servicios del tipo particular definido por la presente parte.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:decimal">
+															<xs:fractionDigits value="6"/>
+															<xs:minInclusive value="0.000001"/>
+															<xs:whiteSpace value="collapse"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="Unidad">
+													<xs:annotation>
+														<xs:documentation>Atributo opcional para precisar la unidad de medida propia de la operación del emisor, aplicable para la cantidad expresada en la parte. La unidad debe corresponder con la descripción de la parte. </xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="20"/>
+															<xs:whiteSpace value="collapse"/>
+															<xs:pattern value="[^|]{1,20}"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="Descripcion" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para precisar la descripción del bien o servicio cubierto por la presente parte.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="1000"/>
+															<xs:whiteSpace value="collapse"/>
+															<xs:pattern value="[^|]{1,1000}"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="ValorUnitario" type="tdCFDI:t_Importe">
+													<xs:annotation>
+														<xs:documentation>Atributo opcional para precisar el valor o precio unitario del bien o servicio cubierto por la presente parte. No se permiten valores negativos.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="Importe" type="tdCFDI:t_Importe">
+													<xs:annotation>
+														<xs:documentation>Atributo opcional para precisar el importe total de los bienes o servicios de la presente parte. Debe ser equivalente al resultado de multiplicar la cantidad por el valor unitario expresado en la parte. No se permiten valores negativos.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="ClaveProdServ" type="catCFDI:c_ClaveProdServ" use="required">
+										<xs:annotation>
+											<xs:documentation>Atributo requerido para expresar la clave del producto o del servicio amparado por el presente concepto. Es requerido y deben utilizar las claves del catálogo de productos y servicios, cuando los conceptos que registren por sus actividades correspondan con dichos conceptos.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="NoIdentificacion">
+										<xs:annotation>
+											<xs:documentation>Atributo opcional para expresar el número de parte, identificador del producto o del servicio, la clave de producto o servicio, SKU o equivalente, propia de la operación del emisor, amparado por el presente concepto. Opcionalmente se puede utilizar claves del estándar GTIN.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:whiteSpace value="collapse"/>
+												<xs:minLength value="1"/>
+												<xs:maxLength value="100"/>
+												<xs:pattern value="[^|]{1,100}"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+									<xs:attribute name="Cantidad" use="required">
+										<xs:annotation>
+											<xs:documentation>Atributo requerido para precisar la cantidad de bienes o servicios del tipo particular definido por el presente concepto.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:decimal">
+												<xs:fractionDigits value="6"/>
+												<xs:minInclusive value="0.000001"/>
+												<xs:whiteSpace value="collapse"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+									<xs:attribute name="ClaveUnidad" type="catCFDI:c_ClaveUnidad" use="required">
+										<xs:annotation>
+											<xs:documentation>Atributo requerido para precisar la clave de unidad de medida estandarizada aplicable para la cantidad expresada en el concepto. La unidad debe corresponder con la descripción del concepto.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="Unidad">
+										<xs:annotation>
+											<xs:documentation>Atributo opcional para precisar la unidad de medida propia de la operación del emisor, aplicable para la cantidad expresada en el concepto. La unidad debe corresponder con la descripción del concepto.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:minLength value="1"/>
+												<xs:maxLength value="20"/>
+												<xs:whiteSpace value="collapse"/>
+												<xs:pattern value="[^|]{1,20}"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+									<xs:attribute name="Descripcion" use="required">
+										<xs:annotation>
+											<xs:documentation>Atributo requerido para precisar la descripción del bien o servicio cubierto por el presente concepto.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:minLength value="1"/>
+												<xs:maxLength value="1000"/>
+												<xs:whiteSpace value="collapse"/>
+												<xs:pattern value="[^|]{1,1000}"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+									<xs:attribute name="ValorUnitario" type="tdCFDI:t_Importe" use="required">
+										<xs:annotation>
+											<xs:documentation>Atributo requerido para precisar el valor o precio unitario del bien o servicio cubierto por el presente concepto.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="Importe" type="tdCFDI:t_Importe" use="required">
+										<xs:annotation>
+											<xs:documentation>Atributo requerido para precisar el importe total de los bienes o servicios del presente concepto. Debe ser equivalente al resultado de multiplicar la cantidad por el valor unitario expresado en el concepto. No se permiten valores negativos. </xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="Descuento" type="tdCFDI:t_Importe">
+										<xs:annotation>
+											<xs:documentation>Atributo opcional para representar el importe de los descuentos aplicables al concepto. No se permiten valores negativos.</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Impuestos" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Nodo condicional para expresar el resumen de los impuestos aplicables.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Retenciones" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Nodo condicional para capturar los impuestos retenidos aplicables. Es requerido cuando en los conceptos se registre algún impuesto retenido.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Retencion" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Nodo requerido para la información detallada de una retención de impuesto específico.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:attribute name="Impuesto" type="catCFDI:c_Impuesto" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para señalar la clave del tipo de impuesto retenido</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="Importe" type="tdCFDI:t_Importe" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para señalar el monto del impuesto retenido. No se permiten valores negativos.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Traslados" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Nodo condicional para capturar los impuestos trasladados aplicables. Es requerido cuando en los conceptos se registre un impuesto trasladado.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Traslado" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Nodo requerido para la información detallada de un traslado de impuesto específico.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:attribute name="Impuesto" type="catCFDI:c_Impuesto" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para señalar la clave del tipo de impuesto trasladado.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="TipoFactor" type="catCFDI:c_TipoFactor" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para señalar la clave del tipo de factor que se aplica a la base del impuesto.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="TasaOCuota" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para señalar el valor de la tasa o cuota del impuesto que se traslada por los conceptos amparados en el comprobante.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:decimal">
+															<xs:whiteSpace value="collapse"/>
+															<xs:minInclusive value="0.000000"/>
+															<xs:fractionDigits value="6"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="Importe" type="tdCFDI:t_Importe" use="required">
+													<xs:annotation>
+														<xs:documentation>Atributo requerido para señalar la suma del importe del impuesto trasladado, agrupado por impuesto, TipoFactor y TasaOCuota. No se permiten valores negativos.</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="TotalImpuestosRetenidos" type="tdCFDI:t_Importe">
+							<xs:annotation>
+								<xs:documentation>Atributo condicional para expresar el total de los impuestos retenidos que se desprenden de los conceptos expresados en el comprobante fiscal digital por Internet. No se permiten valores negativos. Es requerido cuando en los conceptos se registren impuestos retenidos</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="TotalImpuestosTrasladados" type="tdCFDI:t_Importe">
+							<xs:annotation>
+								<xs:documentation>Atributo condicional para expresar el total de los impuestos trasladados que se desprenden de los conceptos expresados en el comprobante fiscal digital por Internet. No se permiten valores negativos. Es requerido cuando en los conceptos se registren impuestos trasladados.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Complemento" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Nodo opcional donde se incluye el complemento Timbre Fiscal Digital de manera obligatoria y los nodos complementarios determinados por el SAT, de acuerdo con las disposiciones particulares para un sector o actividad específica.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:all>
+							<xs:element ref="ns0:TimbreFiscalDigital"/>
+							<xs:element ref="ns2:Pagos" minOccurs="0"/>
+							<xs:element ref="detallista:detallista" minOccurs="0"/>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Addenda">
+					<xs:annotation>
+						<xs:documentation>Nodo opcional para recibir las extensiones al presente formato que sean de utilidad al contribuyente. Para las reglas de uso del mismo, referirse al formato origen.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:all>
+							<xs:element ref="SIH_Proveedor" minOccurs="0"/>
+							<xs:element name="requestForPayment" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="requestForPaymentIdentification">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="entityType">
+														<xs:simpleType>
+															<xs:restriction base="xs:NMTOKEN">
+																<xs:enumeration value="INVOICE"/>
+																<xs:enumeration value="DEBIT_NOTE"/>
+																<xs:enumeration value="CREDIT_NOTE"/>
+																<xs:enumeration value="LEASE_RECEIPT"/>
+																<xs:enumeration value="HONORARY_RECEIPT"/>
+																<xs:enumeration value="PARTIAL_INVOICE"/>
+																<xs:enumeration value="TRANSPORT_DOCUMENT"/>
+																<xs:enumeration value="AUTO_INVOICE"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="uniqueCreatorIdentification">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="17"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="specialInstruction" minOccurs="0" maxOccurs="4">
+											<xs:complexType mixed="true">
+												<xs:sequence>
+													<xs:element name="text" maxOccurs="15">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="255"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="code" use="required">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:maxLength value="3"/>
+															<xs:minLength value="1"/>
+															<xs:enumeration value="AAB"/>
+															<xs:enumeration value="DUT"/>
+															<xs:enumeration value="PUR"/>
+															<xs:enumeration value="ZZZ"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="orderIdentification">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="referenceIdentification" maxOccurs="30">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="type" fixed="ON" use="required">
+																		<xs:annotation>
+																			<xs:appinfo source="ON"/>
+																		</xs:annotation>
+																		<xs:simpleType>
+																			<xs:restriction base="xs:NMTOKEN">
+																				<xs:enumeration value="ON"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="ReferenceDate" type="xs:date" minOccurs="0"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="AdditionalInformation">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="referenceIdentification" maxOccurs="99">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="type" use="required">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:NMTOKEN">
+																				<xs:enumeration value="AAE"/>
+																				<xs:enumeration value="CK"/>
+																				<xs:enumeration value="ACE"/>
+																				<xs:enumeration value="ATZ"/>
+																				<xs:enumeration value="DQ"/>
+																				<xs:enumeration value="IV"/>
+																				<xs:enumeration value="ON"/>
+																				<xs:enumeration value="AWR"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="DeliveryNote" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="referenceIdentification" maxOccurs="30">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="35"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="ReferenceDate" type="xs:date" minOccurs="0"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="buyer">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="gln">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="13"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="contactInformation" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="personOrDepartmentName">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="text">
+																				<xs:simpleType>
+																					<xs:restriction base="xs:string">
+																						<xs:minLength value="1"/>
+																						<xs:maxLength value="35"/>
+																					</xs:restriction>
+																				</xs:simpleType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="seller" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="gln">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="13"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="alternatePartyIdentification">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="type" use="required">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:NMTOKEN">
+																				<xs:minLength value="1"/>
+																				<xs:maxLength value="40"/>
+																				<xs:enumeration value="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY"/>
+																				<xs:enumeration value="IEPS_REFERENCE"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="shipTo" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="gln" minOccurs="0">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="13"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="nameAndAddress" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence maxOccurs="unbounded">
+																<xs:element name="name" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="streetAddressOne" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="city" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="postalCode" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="9"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="InvoiceCreator" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="gln" minOccurs="0">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="13"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="alternatePartyIdentification" minOccurs="0">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="type" use="required">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:NMTOKEN">
+																				<xs:length value="2"/>
+																				<xs:enumeration value="VA"/>
+																				<xs:enumeration value="IA"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="nameAndAddress" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="name" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="streetAddressOne" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="city" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="postalCode" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="9"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Customs" minOccurs="0" maxOccurs="999999">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="gln" minOccurs="0">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="13"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="alternatePartyIdentification">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="type" use="required">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:NMTOKEN">
+																				<xs:length value="2"/>
+																				<xs:enumeration value="TN"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="ReferenceDate" type="xs:date"/>
+													<xs:element name="nameAndAddress" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="name">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="city">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="currency" minOccurs="0" maxOccurs="3">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="currencyFunction" maxOccurs="3">
+														<xs:simpleType>
+															<xs:restriction base="xs:NMTOKEN">
+																<xs:maxLength value="16"/>
+																<xs:minLength value="1"/>
+																<xs:enumeration value="BILLING_CURRENCY"/>
+																<xs:enumeration value="PRICE_CURRENCY"/>
+																<xs:enumeration value="PAYMENT_CURRENCY"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="rateOfChange" type="xs:decimal" minOccurs="0"/>
+												</xs:sequence>
+												<xs:attribute name="currencyISOCode" use="required">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:length value="3"/>
+															<xs:enumeration value="MXN"/>
+															<xs:enumeration value="XEU"/>
+															<xs:enumeration value="USD"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="paymentTerms" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="netPayment" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence minOccurs="0">
+																<xs:element name="paymentTimePeriod" minOccurs="0">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="timePeriodDue">
+																				<xs:complexType>
+																					<xs:sequence>
+																						<xs:element name="value">
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:minLength value="1"/>
+																									<xs:maxLength value="5"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																					</xs:sequence>
+																					<xs:attribute name="timePeriod" use="required">
+																						<xs:simpleType>
+																							<xs:restriction base="xs:NMTOKEN">
+																								<xs:minLength value="1"/>
+																								<xs:maxLength value="6"/>
+																								<xs:enumeration value="DAYS"/>
+																							</xs:restriction>
+																						</xs:simpleType>
+																					</xs:attribute>
+																				</xs:complexType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+															<xs:attribute name="netPaymentTermsType" use="required">
+																<xs:simpleType>
+																	<xs:restriction base="xs:NMTOKEN">
+																		<xs:maxLength value="22"/>
+																		<xs:minLength value="1"/>
+																		<xs:enumeration value="BASIC_NET"/>
+																		<xs:enumeration value="END_OF_MONTH"/>
+																		<xs:enumeration value="BASIC_DISCOUNT_OFFERED"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="discountPayment" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="percentage">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="5"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:sequence>
+															<xs:attribute name="discountType" use="required">
+																<xs:simpleType>
+																	<xs:restriction base="xs:NMTOKEN">
+																		<xs:maxLength value="28"/>
+																		<xs:minLength value="1"/>
+																		<xs:enumeration value="ALLOWANCE_BY_PAYMENT_ON_TIME"/>
+																		<xs:enumeration value="SANCTION"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="paymentTermsEvent">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:maxLength value="15"/>
+															<xs:minLength value="1"/>
+															<xs:enumeration value="DATE_OF_INVOICE"/>
+															<xs:enumeration value="EFFECTIVE_DATE"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="PaymentTermsRelationTime">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="15"/>
+															<xs:enumeration value="REFERENCE_AFTER"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="shipmentDetail" minOccurs="0"/>
+										<xs:element name="allowanceCharge" minOccurs="0" maxOccurs="99">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="specialServicesType" minOccurs="0">
+														<xs:simpleType>
+															<xs:restriction base="xs:NMTOKEN">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="3"/>
+																<xs:enumeration value="AA"/>
+																<xs:enumeration value="AJ"/>
+																<xs:enumeration value="ADO"/>
+																<xs:enumeration value="ADT"/>
+																<xs:enumeration value="ADS"/>
+																<xs:enumeration value="ABZ"/>
+																<xs:enumeration value="DA"/>
+																<xs:enumeration value="EAA"/>
+																<xs:enumeration value="EAB"/>
+																<xs:enumeration value="PI"/>
+																<xs:enumeration value="TAE"/>
+																<xs:enumeration value="SAB"/>
+																<xs:enumeration value="RAA"/>
+																<xs:enumeration value="PAD"/>
+																<xs:enumeration value="FG"/>
+																<xs:enumeration value="FA"/>
+																<xs:enumeration value="TD"/>
+																<xs:enumeration value="TS"/>
+																<xs:enumeration value="TX"/>
+																<xs:enumeration value="TZ"/>
+																<xs:enumeration value="ZZZ"/>
+																<xs:enumeration value="VAB"/>
+																<xs:enumeration value="UM"/>
+																<xs:enumeration value="DI"/>
+																<xs:enumeration value="CAC"/>
+																<xs:enumeration value="COD"/>
+																<xs:enumeration value="EAB"/>
+																<xs:enumeration value="FC"/>
+																<xs:enumeration value="FI"/>
+																<xs:enumeration value="HD"/>
+																<xs:enumeration value="QD"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="monetaryAmountOrPercentage" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="rate" minOccurs="0">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="percentage" type="xs:decimal"/>
+																		</xs:sequence>
+																		<xs:attribute name="base" use="required">
+																			<xs:simpleType>
+																				<xs:restriction base="xs:NMTOKEN">
+																					<xs:length value="13"/>
+																					<xs:enumeration value="INVOICE_VALUE"/>
+																				</xs:restriction>
+																			</xs:simpleType>
+																		</xs:attribute>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="allowanceChargeType" use="required">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="16"/>
+															<xs:enumeration value="ALLOWANCE_GLOBAL"/>
+															<xs:enumeration value="CHARGE_GLOBAL"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="settlementType" use="required">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="11"/>
+															<xs:enumeration value="BILL_BACK"/>
+															<xs:enumeration value="OFF_INVOICE"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="sequenceNumber">
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="15"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="lineItem" minOccurs="0" maxOccurs="9999999">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="tradeItemIdentification">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="gtin">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="14"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="alternateTradeItemIdentification" minOccurs="0" maxOccurs="999999">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="type" use="required">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:NMTOKEN">
+																				<xs:minLength value="1"/>
+																				<xs:maxLength value="35"/>
+																				<xs:enumeration value="BUYER_ASSIGNED"/>
+																				<xs:enumeration value="SUPPLIER_ASSIGNED"/>
+																				<xs:enumeration value="SERIAL_NUMBER"/>
+																				<xs:enumeration value="GLOBAL_TRADE_ITEM_IDENTIFICATION"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="tradeItemDescriptionInformation" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="longText">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="35"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:sequence>
+															<xs:attribute name="language">
+																<xs:simpleType>
+																	<xs:restriction base="xs:NMTOKEN">
+																		<xs:length value="2"/>
+																		<xs:enumeration value="ES"/>
+																		<xs:enumeration value="EN"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="invoicedQuantity">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:decimal">
+																	<xs:attribute name="unitOfMeasure" type="xs:NMTOKEN" use="required"/>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="aditionalQuantity" minOccurs="0" maxOccurs="9999">
+														<xs:complexType>
+															<xs:simpleContent>
+																<xs:extension base="xs:decimal">
+																	<xs:attribute name="QuantityType" use="required">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:NMTOKEN">
+																				<xs:minLength value="1"/>
+																				<xs:maxLength value="18"/>
+																				<xs:enumeration value="NUM_CONSUMER_UNITS"/>
+																				<xs:enumeration value="FREE_GOODS"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="grossPrice" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="Amount" type="xs:decimal"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="netPrice" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="Amount" type="xs:decimal"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="AdditionalInformation" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="referenceIdentification" minOccurs="0">
+																	<xs:complexType>
+																		<xs:simpleContent>
+																			<xs:extension base="xs:string">
+																				<xs:attribute name="type" use="required">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:NMTOKEN">
+																							<xs:length value="2"/>
+																							<xs:enumeration value="ON"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:attribute>
+																			</xs:extension>
+																		</xs:simpleContent>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="Customs" minOccurs="0" maxOccurs="999999">
+														<xs:complexType>
+															<xs:all>
+																<xs:element name="gln" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:length value="14"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="alternatePartyIdentification">
+																	<xs:complexType>
+																		<xs:simpleContent>
+																			<xs:extension base="xs:string">
+																				<xs:attribute name="type" use="required">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:NMTOKEN">
+																							<xs:length value="2"/>
+																							<xs:enumeration value="TN"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:attribute>
+																			</xs:extension>
+																		</xs:simpleContent>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="ReferenceDate" type="xs:date"/>
+																<xs:element name="nameAndAddress">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="name">
+																				<xs:simpleType>
+																					<xs:restriction base="xs:string">
+																						<xs:minLength value="1"/>
+																						<xs:maxLength value="35"/>
+																					</xs:restriction>
+																				</xs:simpleType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="LogisticUnits" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="serialShippingContainerCode">
+																	<xs:complexType>
+																		<xs:simpleContent>
+																			<xs:extension base="xs:string">
+																				<xs:attribute name="type" use="required">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:NMTOKEN">
+																							<xs:minLength value="1"/>
+																							<xs:maxLength value="3"/>
+																							<xs:enumeration value="BJ"/>
+																							<xs:enumeration value="SRV"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:attribute>
+																			</xs:extension>
+																		</xs:simpleContent>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="palletInformation" minOccurs="0">
+														<xs:complexType>
+															<xs:all>
+																<xs:element name="palletQuantity">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="15"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="description">
+																	<xs:complexType>
+																		<xs:simpleContent>
+																			<xs:extension base="xs:string">
+																				<xs:attribute name="type" use="required">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:NMTOKEN">
+																							<xs:maxLength value="35"/>
+																							<xs:minLength value="1"/>
+																							<xs:enumeration value="EXCHANGE_PALLETS"/>
+																							<xs:enumeration value="RETURN_PALLETS"/>
+																							<xs:enumeration value="PALLET_80x100"/>
+																							<xs:enumeration value="CASE"/>
+																							<xs:enumeration value="BOX"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:attribute>
+																			</xs:extension>
+																		</xs:simpleContent>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="transport">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="methodOfPayment">
+																				<xs:simpleType>
+																					<xs:restriction base="xs:NMTOKEN">
+																						<xs:maxLength value="17"/>
+																						<xs:minLength value="1"/>
+																						<xs:enumeration value="PREPAID_BY_SELLER"/>
+																						<xs:enumeration value="PAID_BY_BUYER"/>
+																					</xs:restriction>
+																				</xs:simpleType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="extendedAttributes" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="lotNumber" maxOccurs="10">
+																	<xs:complexType>
+																		<xs:simpleContent>
+																			<xs:extension base="xs:string">
+																				<xs:attribute name="productionDate" type="xs:date"/>
+																			</xs:extension>
+																		</xs:simpleContent>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="allowanceCharge" minOccurs="0" maxOccurs="99">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="specialServicesType" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:NMTOKEN">
+																			<xs:maxLength value="3"/>
+																			<xs:minLength value="1"/>
+																			<xs:enumeration value="AA"/>
+																			<xs:enumeration value="ADS"/>
+																			<xs:enumeration value="ADO"/>
+																			<xs:enumeration value="ABZ"/>
+																			<xs:enumeration value="DA"/>
+																			<xs:enumeration value="EAA"/>
+																			<xs:enumeration value="PI"/>
+																			<xs:enumeration value="TAE"/>
+																			<xs:enumeration value="SAB"/>
+																			<xs:enumeration value="RAA"/>
+																			<xs:enumeration value="PAD"/>
+																			<xs:enumeration value="FG"/>
+																			<xs:enumeration value="FA"/>
+																			<xs:enumeration value="TD"/>
+																			<xs:enumeration value="TS"/>
+																			<xs:enumeration value="TX"/>
+																			<xs:enumeration value="TZ"/>
+																			<xs:enumeration value="ZZZ"/>
+																			<xs:enumeration value="VAB"/>
+																			<xs:enumeration value="UM"/>
+																			<xs:enumeration value="DI"/>
+																			<xs:enumeration value="ADT"/>
+																			<xs:enumeration value="AJ"/>
+																			<xs:enumeration value="CAC"/>
+																			<xs:enumeration value="COD"/>
+																			<xs:enumeration value="EAB"/>
+																			<xs:enumeration value="FC"/>
+																			<xs:enumeration value="FI"/>
+																			<xs:enumeration value="HD"/>
+																			<xs:enumeration value="QD"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="monetaryAmountOrPercentage">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="percentagePerUnit">
+																				<xs:simpleType>
+																					<xs:restriction base="xs:string">
+																						<xs:minLength value="1"/>
+																						<xs:maxLength value="5"/>
+																					</xs:restriction>
+																				</xs:simpleType>
+																			</xs:element>
+																			<xs:element name="ratePerUnit" minOccurs="0">
+																				<xs:complexType>
+																					<xs:sequence>
+																						<xs:element name="amountPerUnit">
+																							<xs:simpleType>
+																								<xs:restriction base="xs:string">
+																									<xs:minLength value="1"/>
+																									<xs:maxLength value="35"/>
+																								</xs:restriction>
+																							</xs:simpleType>
+																						</xs:element>
+																					</xs:sequence>
+																				</xs:complexType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+															<xs:attribute name="allowanceChargeType" use="required">
+																<xs:simpleType>
+																	<xs:restriction base="xs:NMTOKEN">
+																		<xs:minLength value="1"/>
+																		<xs:maxLength value="16"/>
+																		<xs:enumeration value="ALLOWANCE_GLOBAL"/>
+																		<xs:enumeration value="CHARGE_GLOBAL"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:attribute>
+															<xs:attribute name="settlementType">
+																<xs:simpleType>
+																	<xs:restriction base="xs:NMTOKEN">
+																		<xs:minLength value="1"/>
+																		<xs:maxLength value="29"/>
+																		<xs:enumeration value="OFF_INVOICE"/>
+																		<xs:enumeration value="CHARGE_TO_BE_PAID_BY_VENDOR"/>
+																		<xs:enumeration value="CHARGE_TO_BE_PAID_BY_CUSTOMER"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:attribute>
+															<xs:attribute name="sequenceNumber">
+																<xs:simpleType>
+																	<xs:restriction base="xs:string">
+																		<xs:minLength value="1"/>
+																		<xs:maxLength value="15"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="tradeItemTaxInformation" minOccurs="0" maxOccurs="99">
+														<xs:complexType>
+															<xs:all>
+																<xs:element name="taxTypeDescription">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:NMTOKEN">
+																			<xs:length value="3"/>
+																			<xs:enumeration value="GST"/>
+																			<xs:enumeration value="VAT"/>
+																			<xs:enumeration value="LAC"/>
+																			<xs:enumeration value="AAA"/>
+																			<xs:enumeration value="ADD"/>
+																			<xs:enumeration value="FRE"/>
+																			<xs:enumeration value="LOC"/>
+																			<xs:enumeration value="STT"/>
+																			<xs:enumeration value="OTH"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="referenceNumber" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:minLength value="1"/>
+																			<xs:maxLength value="20"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="tradeItemTaxAmount" minOccurs="0">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="taxPercentage" type="xs:decimal"/>
+																			<xs:element name="taxAmount" type="xs:decimal"/>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="taxCategory" minOccurs="0">
+																	<xs:simpleType>
+																		<xs:restriction base="xs:NMTOKEN">
+																			<xs:minLength value="0"/>
+																			<xs:maxLength value="11"/>
+																			<xs:enumeration value="TRANSFERIDO"/>
+																			<xs:enumeration value="RETENIDO"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="totalLineAmount">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="grossAmount" minOccurs="0">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="Amount" type="xs:decimal"/>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="netAmount">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element name="Amount" type="xs:decimal"/>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="type" default="SimpleInvoiceLineItemType">
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="32"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="number">
+													<xs:simpleType>
+														<xs:restriction base="xs:integer">
+															<xs:totalDigits value="5"/>
+															<xs:fractionDigits value="0"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="totalAmount" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Amount" type="xs:decimal"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="TotalAllowanceCharge" minOccurs="0" maxOccurs="999999">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="specialServicesType" minOccurs="0">
+														<xs:simpleType>
+															<xs:restriction base="xs:NMTOKEN">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="3"/>
+																<xs:enumeration value="AA"/>
+																<xs:enumeration value="ADS"/>
+																<xs:enumeration value="ADO"/>
+																<xs:enumeration value="ABZ"/>
+																<xs:enumeration value="DA"/>
+																<xs:enumeration value="EAA"/>
+																<xs:enumeration value="PI"/>
+																<xs:enumeration value="TAE"/>
+																<xs:enumeration value="SAB"/>
+																<xs:enumeration value="RAA"/>
+																<xs:enumeration value="PAD"/>
+																<xs:enumeration value="FG"/>
+																<xs:enumeration value="FA"/>
+																<xs:enumeration value="TD"/>
+																<xs:enumeration value="TS"/>
+																<xs:enumeration value="TX"/>
+																<xs:enumeration value="TZ"/>
+																<xs:enumeration value="ZZZ"/>
+																<xs:enumeration value="VAB"/>
+																<xs:enumeration value="UM"/>
+																<xs:enumeration value="DI"/>
+																<xs:enumeration value="ADT"/>
+																<xs:enumeration value="AJ"/>
+																<xs:enumeration value="CAC"/>
+																<xs:enumeration value="COD"/>
+																<xs:enumeration value="EAB"/>
+																<xs:enumeration value="FC"/>
+																<xs:enumeration value="FI"/>
+																<xs:enumeration value="HD"/>
+																<xs:enumeration value="QD"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="Amount" type="xs:decimal" minOccurs="0"/>
+												</xs:sequence>
+												<xs:attribute name="allowanceOrChargeType" use="required">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:minLength value="1"/>
+															<xs:maxLength value="9"/>
+															<xs:enumeration value="ALLOWANCE"/>
+															<xs:enumeration value="CHARGE"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="baseAmount" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Amount" type="xs:decimal"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="tax" minOccurs="0" maxOccurs="99">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="taxPercentage" type="xs:decimal" minOccurs="0"/>
+													<xs:element name="taxAmount" type="xs:decimal" minOccurs="0"/>
+													<xs:element name="taxCategory" minOccurs="0">
+														<xs:simpleType>
+															<xs:restriction base="xs:NMTOKEN">
+																<xs:minLength value="0"/>
+																<xs:maxLength value="11"/>
+																<xs:enumeration value="TRANSFERIDO"/>
+																<xs:enumeration value="RETENIDO"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="type">
+													<xs:simpleType>
+														<xs:restriction base="xs:NMTOKEN">
+															<xs:length value="3"/>
+															<xs:enumeration value="GST"/>
+															<xs:enumeration value="VAT"/>
+															<xs:enumeration value="LAC"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="payableAmount" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Amount" type="xs:decimal"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="type" type="xs:string" default="SimpleInvoiceType"/>
+									<xs:attribute name="contentVersion" type="xs:string" default="1.3.1"/>
+									<xs:attribute name="documentStructureVersion" type="xs:string" use="required"/>
+									<xs:attribute name="documentStatus" use="required">
+										<xs:simpleType>
+											<xs:restriction base="xs:NMTOKEN">
+												<xs:enumeration value="ORIGINAL"/>
+												<xs:enumeration value="COPY"/>
+												<xs:enumeration value="REEMPLAZA"/>
+												<xs:enumeration value="DELETE"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+									<xs:attribute name="DeliveryDate" type="xs:date"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="Version" fixed="3.3" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido con valor prefijado a 3.3 que indica la versión del estándar bajo el que se encuentra expresado el comprobante.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Serie">
+				<xs:annotation>
+					<xs:documentation>Atributo opcional para precisar la serie para control interno del contribuyente. Este atributo acepta una cadena de caracteres.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="25"/>
+						<xs:whiteSpace value="collapse"/>
+						<xs:pattern value="[^|]{1,25}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Folio">
+				<xs:annotation>
+					<xs:documentation>Atributo opcional para control interno del contribuyente que expresa el folio del comprobante, acepta una cadena de caracteres.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="40"/>
+						<xs:whiteSpace value="collapse"/>
+						<xs:pattern value="[^|]{1,40}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Fecha" type="tdCFDI:t_FechaH" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para la expresión de la fecha y hora de expedición del Comprobante Fiscal Digital por Internet. Se expresa en la forma AAAA-MM-DDThh:mm:ss y debe corresponder con la hora local donde se expide el comprobante.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Sello" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para contener el sello digital del comprobante fiscal, al que hacen referencia las reglas de resolución miscelánea vigente. El sello debe ser expresado como una cadena de texto en formato Base 64.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="FormaPago" type="catCFDI:c_FormaPago">
+				<xs:annotation>
+					<xs:documentation>Atributo condicional para expresar la clave de la forma de pago de los bienes o servicios amparados por el comprobante. Si no se conoce la forma de pago este atributo se debe omitir.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="NoCertificado" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para expresar el número de serie del certificado de sello digital que ampara al comprobante, de acuerdo con el acuse correspondiente a 20 posiciones otorgado por el sistema del SAT.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="20"/>
+						<xs:whiteSpace value="collapse"/>
+						<xs:pattern value="[0-9]{20}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Certificado" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido que sirve para incorporar el certificado de sello digital que ampara al comprobante, como texto en formato base 64.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="CondicionesDePago">
+				<xs:annotation>
+					<xs:documentation>Atributo condicional para expresar las condiciones comerciales aplicables para el pago del comprobante fiscal digital por Internet. Este atributo puede ser condicionado mediante atributos o complementos.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+						<xs:minLength value="1"/>
+						<xs:maxLength value="1000"/>
+						<xs:pattern value="[^|]{1,1000}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="SubTotal" type="tdCFDI:t_Importe" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para representar la suma de los importes de los conceptos antes de descuentos e impuesto. No se permiten valores negativos.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Descuento" type="tdCFDI:t_Importe">
+				<xs:annotation>
+					<xs:documentation>Atributo condicional para representar el importe total de los descuentos aplicables antes de impuestos. No se permiten valores negativos. Se debe registrar cuando existan conceptos con descuento.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Moneda" type="catCFDI:c_Moneda" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para identificar la clave de la moneda utilizada para expresar los montos, cuando se usa moneda nacional se registra MXN. Conforme con la especificación ISO 4217.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="TipoCambio">
+				<xs:annotation>
+					<xs:documentation>Atributo condicional para representar el tipo de cambio conforme con la moneda usada. Es requerido cuando la clave de moneda es distinta de MXN y de XXX. El valor debe reflejar el número de pesos mexicanos que equivalen a una unidad de la divisa señalada en el atributo moneda. Si el valor está fuera del porcentaje aplicable a la moneda tomado del catálogo c_Moneda, el emisor debe obtener del PAC que vaya a timbrar el CFDI, de manera no automática, una clave de confirmación para ratificar que el valor es correcto e integrar dicha clave en el atributo Confirmacion.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:fractionDigits value="6"/>
+						<xs:minInclusive value="0.000001"/>
+						<xs:whiteSpace value="collapse"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Total" type="tdCFDI:t_Importe" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para representar la suma del subtotal, menos los descuentos aplicables, más las contribuciones recibidas (impuestos trasladados - federales o locales, derechos, productos, aprovechamientos, aportaciones de seguridad social, contribuciones de mejoras) menos los impuestos retenidos. Si el valor es superior al límite que establezca el SAT en la Resolución Miscelánea Fiscal vigente, el emisor debe obtener del PAC que vaya a timbrar el CFDI, de manera no automática, una clave de confirmación para ratificar que el valor es correcto e integrar dicha clave en el atributo Confirmacion. No se permiten valores negativos.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="TipoDeComprobante" type="catCFDI:c_TipoDeComprobante" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para expresar la clave del efecto del comprobante fiscal para el contribuyente emisor.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="MetodoPago" type="catCFDI:c_MetodoPago">
+				<xs:annotation>
+					<xs:documentation>Atributo condicional para precisar la clave del método de pago que aplica para este comprobante fiscal digital por Internet, conforme al Artículo 29-A fracción VII incisos a y b del CFF.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="LugarExpedicion" type="catCFDI:c_CodigoPostal" use="required">
+				<xs:annotation>
+					<xs:documentation>Atributo requerido para incorporar el código postal del lugar de expedición del comprobante (domicilio de la matriz o de la sucursal).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Confirmacion">
+				<xs:annotation>
+					<xs:documentation>Atributo condicional para registrar la clave de confirmación que entregue el PAC para expedir el comprobante con importes grandes, con un tipo de cambio fuera del rango establecido o con ambos  casos. Es requerido cuando se registra un tipo de cambio o un total fuera del rango establecido.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:whiteSpace value="collapse"/>
+						<xs:length value="5"/>
+						<xs:pattern value="[0-9a-zA-Z]{5}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

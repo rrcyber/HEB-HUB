@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/WebClock4Kronos/CheckFingerPrintTemplate" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:pfx2="http://xmlns.heb.com.mx/1369930841350" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx3="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:ns3="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://xmlns.heb.com/ei/WebClock4Kronos/CheckFingerPrintTemplate" schemaLocation="/Shared Resources/Schema Definitions/Custom/CheckFingerPrintTemplate.xsd"/>
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Sub Process/CheckFingerPrint.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:CheckFingerPrintTemplate"/>
+    <pd:startX>215</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <result>
+            <ValidationResult>
+                <xsl:value-of select="$ValidateFingerprint_left/javaCodeActivityOutput/performVerification =1&#xA;or&#xA;$ValidateFingerprint_left/javaCodeActivityOutput/performVerification='true'"/>
+            </ValidationResult>
+            <AssotiateId>
+                <xsl:value-of select="$Start/pfx:CheckFingerPrintTemplate/pfx:AssotiateId"/>
+            </AssotiateId>
+        </result>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="result">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ValidationResult" type="xsd:boolean"/>
+                    <xsd:element name="AssotiateId" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>522</pd:endX>
+    <pd:endY>65</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx2:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371574946062</pd:targetNamespace>
+    <pd:activity name="ValidateFingerprint_left">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>370</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <fileName>CheckFingerPrintValidateFingerprint_left</fileName>
+            <packageName>Process.SubProcess.CheckFingerPrint</packageName>
+            <fullsource>package Process.SubProcess.CheckFingerPrint;
+import java.util.*;
+import java.io.*;
+import com.digitalpersona.onetouch.DPFPFeatureSet;
+import com.digitalpersona.onetouch.DPFPFeatureSetFactory;
+import com.digitalpersona.onetouch.DPFPGlobal;
+import com.digitalpersona.onetouch.DPFPTemplate;
+import com.digitalpersona.onetouch.DPFPTemplateFactory;
+import com.digitalpersona.onetouch.verification.DPFPVerification;
+import com.digitalpersona.onetouch.verification.DPFPVerificationResult;
+public class CheckFingerPrintValidateFingerprint_left{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected byte[] fingerScanFeatures = null;
+	protected byte[] fingerScanTemplate = null;
+	protected boolean performVerification = false;
+	public byte[] getfingerScanFeatures() {
+		return fingerScanFeatures;
+	}
+	public void setfingerScanFeatures(byte[] val) {
+		fingerScanFeatures = val;
+	}
+	public byte[] getfingerScanTemplate() {
+		return fingerScanTemplate;
+	}
+	public void setfingerScanTemplate(byte[] val) {
+		fingerScanTemplate = val;
+	}
+	public boolean getperformVerification() {
+		return performVerification;
+	}
+	public void setperformVerification(boolean val) {
+		performVerification = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public CheckFingerPrintValidateFingerprint_left() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : byte[] fingerScanFeatures
+	In  : byte[] fingerScanTemplate
+	Out : boolean performVerification
+* Available Variables: DO NOT MODIFY *****/
+	boolean result;
+	result = performVerification(fingerScanTemplate, fingerScanFeatures);
+	setperformVerification(result);}
+			  
+		public boolean performVerification(byte[] fingerScanTemplate, byte[] sampleFeatures) {
+			DPFPTemplateFactory templateFactory 		= DPFPGlobal.getTemplateFactory();
+			DPFPFeatureSetFactory featureSetFactory 	= DPFPGlobal.getFeatureSetFactory();
+	        DPFPVerification      verifier  						= DPFPGlobal.getVerificationFactory().createVerification();
+	        
+	        // Deserialize template &amp; sampleFeature
+	        DPFPTemplate deserializedTemplate = templateFactory.createTemplate(fingerScanTemplate);
+	        DPFPFeatureSet features = featureSetFactory.createFeatureSet(sampleFeatures);
+	          
+            //Compare the feature set with the template, based on which finger was captured
+	        DPFPVerificationResult result = null;
+	        result = verifier.verify(features, deserializedTemplate);
+	          
+	        return result != null &amp;&amp; result.isVerified();
+	     }
+}
+</fullsource>
+            <inputData>
+                <row>
+                    <fieldName>fingerScanFeatures</fieldName>
+                    <fieldType>byte</fieldType>
+                    <fieldRequired>repeating</fieldRequired>
+                </row>
+                <row>
+                    <fieldName>fingerScanTemplate</fieldName>
+                    <fieldType>byte</fieldType>
+                    <fieldRequired>repeating</fieldRequired>
+                </row>
+            </inputData>
+            <outputData>
+                <row>
+                    <fieldName>performVerification</fieldName>
+                    <fieldType>boolean</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </outputData>
+            <javaArchive>/Shared Resources/AliasLibrary.aliaslib</javaArchive>
+            <byteCode>
+                <class>
+                    <name>CheckFingerPrintValidateFingerprint_left</name>
+                    <byteCode>yv66vgAAADEAVgkADwAqCQAPACsJAA8ALAoAEAAtCgAPAC4KAA8ALwoAMAAxCgAwADIKADAAMwsANAA1CwA2ADcLADgAOQsAOgA7CwA8AD0HAD4HAD8BABJmaW5nZXJTY2FuRmVhdHVyZXMBAAJbQgEAEmZpbmdlclNjYW5UZW1wbGF0ZQEAE3BlcmZvcm1WZXJpZmljYXRpb24BAAFaAQAVZ2V0ZmluZ2VyU2NhbkZlYXR1cmVzAQAEKClbQgEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABVzZXRmaW5nZXJTY2FuRmVhdHVyZXMBAAUoW0IpVgEAFWdldGZpbmdlclNjYW5UZW1wbGF0ZQEAFXNldGZpbmdlclNjYW5UZW1wbGF0ZQEAFmdldHBlcmZvcm1WZXJpZmljYXRpb24BAAMoKVoBABZzZXRwZXJmb3JtVmVyaWZpY2F0aW9uAQAEKFopVgEABjxpbml0PgEAAygpVgEABmludm9rZQEACkV4Y2VwdGlvbnMHAEABAAcoW0JbQilaAQAKU291cmNlRmlsZQEALUNoZWNrRmluZ2VyUHJpbnRWYWxpZGF0ZUZpbmdlcnByaW50X2xlZnQuamF2YQwAEQASDAATABIMABQAFQwAIgAjDAAUACcMACAAIQcAQQwAQgBDDABEAEUMAEYARwcASAwASQBKBwBLDABMAE0HAE4MAE8AUAcAUQwAUgBTBwBUDABVAB8BAExQcm9jZXNzL1N1YlByb2Nlc3MvQ2hlY2tGaW5nZXJQcmludC9DaGVja0ZpbmdlclByaW50VmFsaWRhdGVGaW5nZXJwcmludF9sZWZ0AQAQamF2YS9sYW5nL09iamVjdAEAE2phdmEvbGFuZy9FeGNlcHRpb24BACZjb20vZGlnaXRhbHBlcnNvbmEvb25ldG91Y2gvRFBGUEdsb2JhbAEAEmdldFRlbXBsYXRlRmFjdG9yeQEAMygpTGNvbS9kaWdpdGFscGVyc29uYS9vbmV0b3VjaC9EUEZQVGVtcGxhdGVGYWN0b3J5OwEAFGdldEZlYXR1cmVTZXRGYWN0b3J5AQA1KClMY29tL2RpZ2l0YWxwZXJzb25hL29uZXRvdWNoL0RQRlBGZWF0dXJlU2V0RmFjdG9yeTsBABZnZXRWZXJpZmljYXRpb25GYWN0b3J5AQBEKClMY29tL2RpZ2l0YWxwZXJzb25hL29uZXRvdWNoL3ZlcmlmaWNhdGlvbi9EUEZQVmVyaWZpY2F0aW9uRmFjdG9yeTsBAEBjb20vZGlnaXRhbHBlcnNvbmEvb25ldG91Y2gvdmVyaWZpY2F0aW9uL0RQRlBWZXJpZmljYXRpb25GYWN0b3J5AQASY3JlYXRlVmVyaWZpY2F0aW9uAQA9KClMY29tL2RpZ2l0YWxwZXJzb25hL29uZXRvdWNoL3ZlcmlmaWNhdGlvbi9EUEZQVmVyaWZpY2F0aW9uOwEAL2NvbS9kaWdpdGFscGVyc29uYS9vbmV0b3VjaC9EUEZQVGVtcGxhdGVGYWN0b3J5AQAOY3JlYXRlVGVtcGxhdGUBAC4oW0IpTGNvbS9kaWdpdGFscGVyc29uYS9vbmV0b3VjaC9EUEZQVGVtcGxhdGU7AQAxY29tL2RpZ2l0YWxwZXJzb25hL29uZXRvdWNoL0RQRlBGZWF0dXJlU2V0RmFjdG9yeQEAEGNyZWF0ZUZlYXR1cmVTZXQBADAoW0IpTGNvbS9kaWdpdGFscGVyc29uYS9vbmV0b3VjaC9EUEZQRmVhdHVyZVNldDsBADljb20vZGlnaXRhbHBlcnNvbmEvb25ldG91Y2gvdmVyaWZpY2F0aW9uL0RQRlBWZXJpZmljYXRpb24BAAZ2ZXJpZnkBAJkoTGNvbS9kaWdpdGFscGVyc29uYS9vbmV0b3VjaC9EUEZQRmVhdHVyZVNldDtMY29tL2RpZ2l0YWxwZXJzb25hL29uZXRvdWNoL0RQRlBUZW1wbGF0ZTspTGNvbS9kaWdpdGFscGVyc29uYS9vbmV0b3VjaC92ZXJpZmljYXRpb24vRFBGUFZlcmlmaWNhdGlvblJlc3VsdDsBAD9jb20vZGlnaXRhbHBlcnNvbmEvb25ldG91Y2gvdmVyaWZpY2F0aW9uL0RQRlBWZXJpZmljYXRpb25SZXN1bHQBAAppc1ZlcmlmaWVkACEADwAQAAAAAwAEABEAEgAAAAQAEwASAAAABAAUABUAAAAJAAEAFgAXAAEAGAAAAB0AAQABAAAABSq0AAGwAAAAAQAZAAAABgABAAAAEQABABoAGwABABgAAAAiAAIAAgAAAAYqK7UAAbEAAAABABkAAAAKAAIAAAAUAAUAFQABABwAFwABABgAAAAdAAEAAQAAAAUqtAACsAAAAAEAGQAAAAYAAQAAABcAAQAdABsAAQAYAAAAIgACAAIAAAAGKiu1AAKxAAAAAQAZAAAACgACAAAAGgAFABsAAQAeAB8AAQAYAAAAHQABAAEAAAAFKrQAA6wAAAABABkAAAAGAAEAAAAdAAEAIAAhAAEAGAAAACIAAgACAAAABiobtQADsQAAAAEAGQAAAAoAAgAAACAABQAhAAEAIgAjAAEAGAAAADwAAgABAAAAFCq3AAQqAbUAASoBtQACKgO1AAOxAAAAAQAZAAAAFgAFAAAAIwAEAA0ACQAOAA4ADwATACQAAQAkACMAAgAYAAAALwADAAIAAAATKiq0AAIqtAABtgAFPCobtgAGsQAAAAEAGQAAAAoAAgAAACwADQAtACUAAAAEAAEAJgABABQAJwABABgAAAB/AAMACQAAAEu4AAdOuAAIOgS4AAm5AAoBADoFLSu5AAsCADoGGQQsuQAMAgA6BwE6CBkFGQcZBrkADQMAOggZCMYAERkIuQAOAQCZAAcEpwAEA6wAAAABABkAAAAiAAgAAAAwAAQAMQAJADIAEwA1ABwANgAmADkAKQA6ADYAPAABACgAAAACACk=</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings>
+            <javaCodeActivityInput>
+                <xsl:if test="$Start/pfx:CheckFingerPrintTemplate/pfx:FingerprintFeatures">
+                    <fingerScanFeatures>
+                        <xsl:value-of select="$Start/pfx:CheckFingerPrintTemplate/pfx:FingerprintFeatures"/>
+                    </fingerScanFeatures>
+                </xsl:if>
+                <fingerScanTemplate>
+                    <xsl:value-of select="$Start/pfx:CheckFingerPrintTemplate/pfx:FingerprintTemplateBLB"/>
+                </fingerScanTemplate>
+            </javaCodeActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 27">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>373</pd:x>
+        <pd:y>199</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <data>
+                    <pfx2:Fault>
+                        <Fault>
+                            <pfx3:ProviderSOAPFault>
+                                <pfx3:FaultCode>
+                                    <xsl:value-of select="27"/>
+                                </pfx3:FaultCode>
+                                <pfx3:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/Mensajes/Fault_27"/>
+                                </pfx3:FaultString>
+                                <pfx3:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </pfx3:FaultActor>
+                                <pfx3:ProviderSOAPErrorMsg>
+                                    <pfx3:Message>
+                                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                    </pfx3:Message>
+                                    <xsl:if test="$Start/pfx:CheckFingerPrintTemplate/pfx:FingerprintFeatures">
+                                        <pfx3:MessageId>
+                                            <xsl:value-of select="$Start/pfx:CheckFingerPrintTemplate/pfx:FingerprintFeatures"/>
+                                        </pfx3:MessageId>
+                                    </xsl:if>
+                                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                        <pfx3:ErrorCode>
+                                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                        </pfx3:ErrorCode>
+                                    </xsl:if>
+                                </pfx3:ProviderSOAPErrorMsg>
+                            </pfx3:ProviderSOAPFault>
+                        </Fault>
+                    </pfx2:Fault>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>ValidateFingerprint_left</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ValidateFingerprint_left</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ValidateFingerprint_left</pd:from>
+        <pd:to>Fault 27</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

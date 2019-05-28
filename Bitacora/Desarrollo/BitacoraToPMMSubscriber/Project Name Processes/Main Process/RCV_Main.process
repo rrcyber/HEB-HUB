@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/SDIRCVHDI_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIRCVHDI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIRCVHDI_DATA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIRCVHDI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIRCVHDI_DATA_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Main Process/RCV_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="xmlString" type="xsd:string"/>
+                    <xsd:element name="sucursal" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>209</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <folio>
+                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:RCV_SESSION_ID"/>
+            </folio>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="folio" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1244</pd:endX>
+    <pd:endY>213</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Variable0>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="valid_rcv" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Variable0>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1364857422865</pd:targetNamespace>
+    <pd:activity name="PROCESA_RCV_CONCURRENTE_Import">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1242</pd:x>
+        <pd:y>467</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/PROCESA_RCV_CONCURRENTE_Import.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <RCV_SESSION>
+                    <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:RCV_SESSION_ID"/>
+                </RCV_SESSION>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>674</pd:x>
+        <pd:y>67</pd:y>
+        <pd:width>519</pd:width>
+        <pd:height>288</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>getBatchNumber-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Group (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SDIRCVHDI_Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SDIRCVDTI_Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getBatchNumber-1</pd:from>
+            <pd:to>SDIRCVHDI_Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (1)</pd:from>
+            <pd:to>SDIRCVDTI_Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="SDIRCVDTI_Insert">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>1093</pd:x>
+            <pd:y>242</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/SDIRCVDTI_Insert.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <xsl:for-each select="$DetailList/AccumulatedOutput/pfx:SDIRCVDTI_DATA">
+                        <ITEM>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:TECH_KEY/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:TECH_KEY/@xsi:nil=(&quot;1&quot;)))">
+                                <TECH_KEY>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:TECH_KEY"/>
+                                </TECH_KEY>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:TRAN_TYPE/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:TRAN_TYPE/@xsi:nil=(&quot;1&quot;)))">
+                                <TRAN_TYPE>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:TRAN_TYPE"/>
+                                </TRAN_TYPE>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_SESSION_ID/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_SESSION_ID/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_SESSION_ID>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_SESSION_ID"/>
+                                </RCV_SESSION_ID>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_DOC_NUMBER/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_DOC_NUMBER/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_DOC_NUMBER>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_DOC_NUMBER"/>
+                                </RCV_DOC_NUMBER>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:BAS_USER_NAME/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:BAS_USER_NAME/@xsi:nil=(&quot;1&quot;)))">
+                                <BAS_USER_NAME>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:BAS_USER_NAME"/>
+                                </BAS_USER_NAME>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:PMG_PO_NUMBER/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:PMG_PO_NUMBER/@xsi:nil=(&quot;1&quot;)))">
+                                <PMG_PO_NUMBER>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                                </PMG_PO_NUMBER>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:PMG_DTL_TECH_KEY/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:PMG_DTL_TECH_KEY/@xsi:nil=(&quot;1&quot;)))">
+                                <PMG_DTL_TECH_KEY>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:PMG_DTL_TECH_KEY"/>
+                                </PMG_DTL_TECH_KEY>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:PMG_SEQ_NUM/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:PMG_SEQ_NUM/@xsi:nil=(&quot;1&quot;)))">
+                                <PMG_SEQ_NUM>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:PMG_SEQ_NUM"/>
+                                </PMG_SEQ_NUM>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:VPC_CASE_PACK_ID/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:VPC_CASE_PACK_ID/@xsi:nil=(&quot;1&quot;)))">
+                                <VPC_CASE_PACK_ID>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:VPC_CASE_PACK_ID"/>
+                                </VPC_CASE_PACK_ID>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:PRD_LVL_NUMBER/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:PRD_LVL_NUMBER/@xsi:nil=(&quot;1&quot;)))">
+                                <PRD_LVL_NUMBER>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:PRD_LVL_NUMBER"/>
+                                </PRD_LVL_NUMBER>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_SUB_PRD_FLG/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_SUB_PRD_FLG/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_SUB_PRD_FLG>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_SUB_PRD_FLG"/>
+                                </RCV_SUB_PRD_FLG>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_SELL_QTY/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_SELL_QTY/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_SELL_QTY>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_SELL_QTY"/>
+                                </RCV_SELL_QTY>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_CASE_QTY/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_CASE_QTY/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_CASE_QTY>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_CASE_QTY"/>
+                                </RCV_CASE_QTY>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_DATE/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_DATE/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_DATE>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_DATE"/>
+                                </RCV_DATE>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:DATE_CREATED/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:DATE_CREATED/@xsi:nil=(&quot;1&quot;)))">
+                                <DATE_CREATED>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:DATE_CREATED"/>
+                                </DATE_CREATED>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:VENDOR_NUMBER/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:VENDOR_NUMBER/@xsi:nil=(&quot;1&quot;)))">
+                                <VENDOR_NUMBER>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:VENDOR_NUMBER"/>
+                                </VENDOR_NUMBER>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_WEIGHT/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_WEIGHT/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_WEIGHT>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_WEIGHT"/>
+                                </RCV_WEIGHT>
+                            </xsl:if>
+                            <xsl:if test="not((pfx:ITEM[1]/pfx:RCV_WEIGHT_UOM/@xsi:nil=(&quot;true&quot;)) or (pfx:ITEM[1]/pfx:RCV_WEIGHT_UOM/@xsi:nil=(&quot;1&quot;)))">
+                                <RCV_WEIGHT_UOM>
+                                    <xsl:value-of select="pfx:ITEM[1]/pfx:RCV_WEIGHT_UOM"/>
+                                </RCV_WEIGHT_UOM>
+                            </xsl:if>
+                        </ITEM>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="SDIRCVHDI_Insert">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>1011</pd:x>
+            <pd:y>137</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/SDIRCVHDI_Insert.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:for-each select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]">
+                    <gorup>
+                        <xsl:if test="$getBatchNumber-1/result/batch_number">
+                            <TECH_KEY>
+                                <xsl:value-of select="$getBatchNumber-1/result/batch_number"/>
+                            </TECH_KEY>
+                        </xsl:if>
+                        <RCV_SESSION_ID>
+                            <xsl:value-of select="pfx:RCV_SESSION_ID"/>
+                        </RCV_SESSION_ID>
+                        <TRAN_TYPE>
+                            <xsl:value-of select="pfx:TRAN_TYPE"/>
+                        </TRAN_TYPE>
+                        <ORG_LVL_NUMBER>
+                            <xsl:value-of select="pfx:ORG_LVL_NUMBER"/>
+                        </ORG_LVL_NUMBER>
+                        <RCV_DATE_SES_OPN>
+                            <xsl:value-of select="pfx:RCV_DATE_SES_OPN"/>
+                        </RCV_DATE_SES_OPN>
+                        <RCV_SESSION_STS>
+                            <xsl:value-of select="pfx:RCV_SESSION_STS"/>
+                        </RCV_SESSION_STS>
+                    </gorup>
+                </xsl:for-each>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Group (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>758</pd:x>
+            <pd:y>175</pd:y>
+            <pd:width>272</pd:width>
+            <pd:height>140</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI/pfx:SDIRCVDTI_DATA/pfx:ITEM</pd:over>
+                <pd:iterationElementSlot>Detailarray</pd:iterationElementSlot>
+                <pd:indexSlot>tech-index</pd:indexSlot>
+                <pd:outSlot>DetailList</pd:outSlot>
+                <pd:activityOutputName>Map Data</pd:activityOutputName>
+                <pd:accumulateOutput>true</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>getBatchNumber</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Map Data</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>getBatchNumber</pd:from>
+                <pd:to>Map Data</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Map Data">
+                <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+                <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+                <pd:x>956</pd:x>
+                <pd:y>238</pd:y>
+                <config>
+                    <element ref="pfx:SDIRCVDTI_DATA"/>
+                </config>
+                <pd:inputBindings>
+                    <pfx:SDIRCVDTI_DATA>
+                        <pfx:ITEM>
+                            <pfx:TECH_KEY>
+                                <xsl:choose>
+                                    <xsl:when test="exists($getBatchNumber/result/batch_number)">
+                                        <xsl:value-of select="$getBatchNumber/result/batch_number"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </pfx:TECH_KEY>
+                            <pfx:TRAN_TYPE>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:TRAN_TYPE/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:TRAN_TYPE"/>
+                            </pfx:TRAN_TYPE>
+                            <pfx:RCV_SESSION_ID>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_SESSION_ID/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_SESSION_ID"/>
+                            </pfx:RCV_SESSION_ID>
+                            <pfx:RCV_DOC_NUMBER>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_DOC_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_DOC_NUMBER"/>
+                            </pfx:RCV_DOC_NUMBER>
+                            <pfx:BAS_USER_NAME>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:BAS_USER_NAME/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:BAS_USER_NAME"/>
+                            </pfx:BAS_USER_NAME>
+                            <pfx:PMG_PO_NUMBER>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:PMG_PO_NUMBER"/>
+                            </pfx:PMG_PO_NUMBER>
+                            <xsl:variable name="var" select="$Detailarray/pfx:ITEM/pfx:PRD_LVL_NUMBER"/>
+                            <pfx:PMG_DTL_TECH_KEY>
+                                <xsl:choose>
+                                    <xsl:when test="exists(if($Valida_ropa/group/ITEM/PMG_STYLE_IND='F') then &#xA;(for $current-dt in $getTechkey/group/ITEM[tib:trim(PRD_LVL_NUMBER)=$var] return $current-dt/PMG_DTL_TECH_KEY)&#xA;else (for $current-dt-ropa in $getTechkey_ropa/group/ITEM[tib:trim(PRD_LVL_NUMBER)=$var] return $current-dt-ropa/PMG_DTL_TECH_KEY))">
+                                        <xsl:value-of select="if($Valida_ropa/group/ITEM/PMG_STYLE_IND='F') then &#xA;(for $current-dt in $getTechkey/group/ITEM[tib:trim(PRD_LVL_NUMBER)=$var] return $current-dt/PMG_DTL_TECH_KEY)&#xA;else (for $current-dt-ropa in $getTechkey_ropa/group/ITEM[tib:trim(PRD_LVL_NUMBER)=$var] return $current-dt-ropa/PMG_DTL_TECH_KEY)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </pfx:PMG_DTL_TECH_KEY>
+                            <pfx:PMG_SEQ_NUM>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:PMG_SEQ_NUM/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:PMG_SEQ_NUM"/>
+                            </pfx:PMG_SEQ_NUM>
+                            <pfx:VPC_CASE_PACK_ID>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:VPC_CASE_PACK_ID/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:VPC_CASE_PACK_ID"/>
+                            </pfx:VPC_CASE_PACK_ID>
+                            <pfx:PRD_LVL_NUMBER>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:PRD_LVL_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:PRD_LVL_NUMBER"/>
+                            </pfx:PRD_LVL_NUMBER>
+                            <pfx:RCV_SUB_PRD_FLG>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_SUB_PRD_FLG/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_SUB_PRD_FLG"/>
+                            </pfx:RCV_SUB_PRD_FLG>
+                            <pfx:RCV_SELL_QTY>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_SELL_QTY/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_SELL_QTY"/>
+                            </pfx:RCV_SELL_QTY>
+                            <pfx:RCV_CASE_QTY>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_CASE_QTY/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_CASE_QTY"/>
+                            </pfx:RCV_CASE_QTY>
+                            <pfx:RCV_DATE>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_DATE/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_DATE"/>
+                            </pfx:RCV_DATE>
+                            <pfx:DATE_CREATED>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:DATE_CREATED/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:DATE_CREATED"/>
+                            </pfx:DATE_CREATED>
+                            <pfx:VENDOR_NUMBER>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:VENDOR_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:VENDOR_NUMBER"/>
+                            </pfx:VENDOR_NUMBER>
+                            <pfx:RCV_WEIGHT>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_WEIGHT/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_WEIGHT"/>
+                            </pfx:RCV_WEIGHT>
+                            <pfx:RCV_WEIGHT_UOM>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_WEIGHT_UOM/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:RCV_WEIGHT_UOM"/>
+                            </pfx:RCV_WEIGHT_UOM>
+                            <pfx:SDIFLAG>
+                                <xsl:copy-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:SDIFLAG/@xsi:nil"/>
+                                <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[$tech-index]/pfx:SDIFLAG"/>
+                            </pfx:SDIFLAG>
+                        </pfx:ITEM>
+                    </pfx:SDIRCVDTI_DATA>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="getBatchNumber">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>831</pd:x>
+                <pd:y>239</pd:y>
+                <config>
+                    <processName>/Project Name Processes/Sub Process/getBatchNumber.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <counter_name>
+                            <xsl:value-of select="'TECH_KEY'"/>
+                        </counter_name>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="getBatchNumber-1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>789</pd:x>
+            <pd:y>138</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/getBatchNumber.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <counter_name>
+                        <xsl:value-of select="'TECH_KEY'"/>
+                    </counter_name>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>710</pd:x>
+        <pd:y>472</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getTechkey">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>296</pd:x>
+        <pd:y>255</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/getTechkey.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <PMG_PO_NUMBER>
+                    <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                </PMG_PO_NUMBER>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Queue Sender">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>704</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_BITACORA_STEP_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <InDataxsdString>
+                <xsd:element name="group">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="folio" type="xsd:string"/>
+                            <xsd:element name="sucursal" type="xsd:string"/>
+                            <xsd:element name="toma_fisica_estado" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InDataxsdString>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <xsl:if test="not(($Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:ORG_LVL_NUMBER/@xsi:nil=(&quot;true&quot;)) or ($Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:ORG_LVL_NUMBER/@xsi:nil=(&quot;1&quot;)))">
+                    <JMSCorrelationID>
+                        <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:ORG_LVL_NUMBER"/>
+                    </JMSCorrelationID>
+                </xsl:if>
+                <JMSType>
+                    <xsl:value-of select="'RCV'"/>
+                </JMSType>
+                <Body>
+                    <group>
+                        <folio>
+                            <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:RCV_SESSION_ID"/>
+                        </folio>
+                        <sucursal>
+                            <xsl:value-of select="$Start/root/sucursal"/>
+                        </sucursal>
+                    </group>
+                </Body>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse-XML-1">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>179</pd:x>
+        <pd:y>214</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/root/xmlString"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group (2)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>403</pd:x>
+        <pd:y>94</pd:y>
+        <pd:width>183</pd:width>
+        <pd:height>242</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM</pd:over>
+            <pd:iterationElementSlot>TECHelem</pd:iterationElementSlot>
+            <pd:indexSlot>TECHindex</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Assign</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Variable0/root/valid_rcv=0</pd:xpath>
+        </pd:transition>
+        <pd:activity name="Assign">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:description>Check if all rows of the detail has PMG_DTL_TECH_KEY</pd:description>
+            <pd:x>485</pd:x>
+            <pd:y>257</pd:y>
+            <config>
+                <variableName>Variable0</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:variable name="var" select="$TECHelem/pfx:ITEM/pfx:PRD_LVL_NUMBER"/>
+                    <valid_rcv>
+                        <xsl:value-of select="if($Valida_ropa/group/ITEM/PMG_STYLE_IND='F') then&#xA;(if(string-length(for $current-dt in $getTechkey/group/ITEM[tib:trim(PRD_LVL_NUMBER)=$var] return $current-dt/PMG_DTL_TECH_KEY)=0) then 1 else 0)&#xA;else (if(string-length(for $current-dt in $getTechkey_ropa/group/ITEM[PRD_LVL_NUMBER=$var] return $current-dt/PMG_DTL_TECH_KEY)=0) then 1 else 0)"/>
+                    </valid_rcv>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>481</pd:x>
+            <pd:y>155</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Assign-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>96</pd:x>
+        <pd:y>215</pd:y>
+        <config>
+            <variableName>Variable0</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <valid_rcv>
+                    <xsl:value-of select="0"/>
+                </valid_rcv>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Valida_ropa">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>174</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/Valida_ropa.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <PMG_PO_NUMBER>
+                    <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                </PMG_PO_NUMBER>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getTechkey_ropa">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>320</pd:x>
+        <pd:y>96</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/getTechkey_ropa.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <PMG_PO_NUMBER>
+                    <xsl:value-of select="$Parse-XML-1/pfx:MSG_CONTAINER/pfx:Body/pfx:SDIRCVHDI[1]/pfx:SDIRCVDTI_DATA/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                </PMG_PO_NUMBER>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>PROCESA_RCV_CONCURRENTE_Import</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PROCESA_RCV_CONCURRENTE_Import</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PROCESA_RCV_CONCURRENTE_Import</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Assign-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getTechkey</pd:from>
+        <pd:to>Group (2)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (2)</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (2)</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (2)</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>if($Valida_ropa/group/ITEM/PMG_STYLE_IND='F') then
+(count($getTechkey/group/ITEM)=0 or ($Variable0/root/valid_rcv=1))
+else (count($getTechkey_ropa/group/ITEM)=0 or ($Variable0/root/valid_rcv=1))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1</pd:from>
+        <pd:to>Parse-XML-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse-XML-1</pd:from>
+        <pd:to>Valida_ropa</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida_ropa</pd:from>
+        <pd:to>getTechkey</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Valida_ropa/group/ITEM/PMG_STYLE_IND='F'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida_ropa</pd:from>
+        <pd:to>getTechkey_ropa</pd:to>
+        <pd:xpathDescription>OC Ropa</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Valida_ropa/group/ITEM/PMG_STYLE_IND='T'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getTechkey_ropa</pd:from>
+        <pd:to>Group (2)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida_ropa</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

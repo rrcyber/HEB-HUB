@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Project Name Processes/Sub Process/getBitacoraOperations.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="sucursal" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="URL" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>150</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:for-each select="$Parse-Data/Output/Rows/Merc_Bitacora_Eventos">
+                <xsl:for-each select="ITEM">
+                    <ITEM>
+                        <secuencia>
+                            <xsl:value-of select="secuencia"/>
+                        </secuencia>
+                        <sdi>
+                            <xsl:value-of select="sdi"/>
+                        </sdi>
+                        <folio>
+                            <xsl:value-of select="folio"/>
+                        </folio>
+                    </ITEM>
+                </xsl:for-each>
+            </xsl:for-each>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="secuencia" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="sdi" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="folio" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>526</pd:endX>
+    <pd:endY>65</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1363048007401</pd:targetNamespace>
+    <pd:activity name="getDynamicConnection">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>303</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/DynamicConnectionQuery.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <DB_URL>
+                    <xsl:value-of select="$Start/root/URL"/>
+                </DB_URL>
+                <USER>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                </USER>
+                <QUERY>
+                    <xsl:value-of select="concat(&quot;SELECT secuencia, sdi, folio&quot;,&#xA;&quot; FROM BDCMP..MERC_BitacoraEventos&quot;,&#xA;&quot; WHERE CONVERT(VARCHAR(8),fecha, 112)  >= CONVERT(VARCHAR(8), GETDATE()-&quot;,$_globalVariables/ns:GlobalVariables/BITACORA_FECHA/DIAS_ATRAS,&quot;,112)&quot;,&#xA;&quot; AND sdi_flag = 0&quot;,&#xA;&quot; AND sucursal = &quot;,$Start/root/sucursal,&#xA;&quot; ORDER BY fecha ASC&quot;)"/>
+                </QUERY>
+                <MAX_ROWS>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                </MAX_ROWS>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse Data">
+        <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+        <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+        <pd:x>423</pd:x>
+        <pd:y>62</pd:y>
+        <config>
+            <InputType>String</InputType>
+            <Encoding>ASCII</Encoding>
+            <ParseSharedConfig>/Shared Resources/Schema Definitions/Data Format/Merc_Bitacora_Eventos.sharedparse</ParseSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <Input>
+                <text>
+                    <xsl:value-of select="$getDynamicConnection/group/result"/>
+                </text>
+                <noOfRecords>
+                    <xsl:value-of select="count(tib:tokenize($getDynamicConnection/group/result, &quot;&#xA;&quot;))"/>
+                </noOfRecords>
+            </Input>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>420</pd:x>
+        <pd:y>185</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>getDynamicConnection</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getDynamicConnection</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Data</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Parse Data</pd:to>
+        <pd:xpathDescription>NOT NULL</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>string-length($getDynamicConnection/group/result)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

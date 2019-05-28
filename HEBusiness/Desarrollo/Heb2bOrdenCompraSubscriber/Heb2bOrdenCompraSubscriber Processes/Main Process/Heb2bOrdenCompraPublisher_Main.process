@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Main Process/Heb2bOrdenCompraPublisher_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx:MSG_CONTAINER"/>
+                    <xsd:element name="Intentos" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>71</pd:startX>
+    <pd:startY>65</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>687</pd:endX>
+    <pd:endY>65</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389377586983</pd:targetNamespace>
+    <pd:activity name="GetEncabezado">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>185</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/GetEncabezado.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/group/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetDetalle">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>310</pd:x>
+        <pd:y>65</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/GetDetalle.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Start/group/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER"/>
+                <Reproceso>
+                    <xsl:value-of select="$GetEncabezado/group/Reproceso"/>
+                </Reproceso>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="PublicQueue">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>584</pd:x>
+        <pd:y>65</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/PublicQueue.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$GetEncabezado/group/ns2:PURCHASE_ORDER">
+                <ns2:PURCHASE_ORDER>
+                    <ns2:NUMEROORDEN>
+                        <xsl:copy-of select="ns2:NUMEROORDEN/@xsi:nil"/>
+                        <xsl:value-of select="ns2:NUMEROORDEN"/>
+                    </ns2:NUMEROORDEN>
+                    <ns2:IDPROVEEDOR>
+                        <xsl:copy-of select="ns2:IDPROVEEDOR/@xsi:nil"/>
+                        <xsl:value-of select="ns2:IDPROVEEDOR"/>
+                    </ns2:IDPROVEEDOR>
+                    <ns2:IDSUCURSAL>
+                        <xsl:copy-of select="ns2:IDSUCURSAL/@xsi:nil"/>
+                        <xsl:value-of select="ns2:IDSUCURSAL"/>
+                    </ns2:IDSUCURSAL>
+                    <ns2:IDESTATUS>
+                        <xsl:copy-of select="ns2:IDESTATUS/@xsi:nil"/>
+                        <xsl:value-of select="ns2:IDESTATUS"/>
+                    </ns2:IDESTATUS>
+                    <ns2:IDMETODODISTRIBUCION>
+                        <xsl:copy-of select="ns2:IDMETODODISTRIBUCION/@xsi:nil"/>
+                        <xsl:value-of select="ns2:IDMETODODISTRIBUCION"/>
+                    </ns2:IDMETODODISTRIBUCION>
+                    <ns2:FECHAORDEN>
+                        <xsl:copy-of select="ns2:FECHAORDEN/@xsi:nil"/>
+                        <xsl:value-of select="ns2:FECHAORDEN"/>
+                    </ns2:FECHAORDEN>
+                    <ns2:FECHAENTREGA>
+                        <xsl:copy-of select="ns2:FECHAENTREGA/@xsi:nil"/>
+                        <xsl:value-of select="ns2:FECHAENTREGA"/>
+                    </ns2:FECHAENTREGA>
+                    <ns2:FECHACANCELACION>
+                        <xsl:copy-of select="ns2:FECHACANCELACION/@xsi:nil"/>
+                        <xsl:value-of select="ns2:FECHACANCELACION"/>
+                    </ns2:FECHACANCELACION>
+                    <ns2:COMENTARIOS>
+                        <xsl:copy-of select="ns2:COMENTARIOS/@xsi:nil"/>
+                        <xsl:value-of select="ns2:COMENTARIOS"/>
+                    </ns2:COMENTARIOS>
+                    <ns2:COMPRADOR>
+                        <xsl:copy-of select="ns2:COMPRADOR/@xsi:nil"/>
+                        <xsl:value-of select="ns2:COMPRADOR"/>
+                    </ns2:COMPRADOR>
+                    <ns2:PURCHASE_ORDER_DETAIL>
+                        <xsl:for-each select="$GetDetalle/group/DetalleList">
+                            <ns2:ITEM>
+                                <ns2:IDORDENCOMPRA>
+                                    <xsl:value-of select="IDORDENCOMPRA"/>
+                                </ns2:IDORDENCOMPRA>
+                                <ns2:IDARTICULO>
+                                    <xsl:value-of select="IDARTICULO"/>
+                                </ns2:IDARTICULO>
+                                <ns2:IDCASEPACK>
+                                    <xsl:value-of select="IDCASEPACK"/>
+                                </ns2:IDCASEPACK>
+                                <ns2:SINCARGO>
+                                    <xsl:value-of select="SINCARGO"/>
+                                </ns2:SINCARGO>
+                                <ns2:FACTOR>
+                                    <xsl:value-of select="FACTOR"/>
+                                </ns2:FACTOR>
+                                <ns2:CANTIDADUNIDADESCASEPACK>
+                                    <xsl:value-of select="CANTIDADUNIDADESCASEPACK"/>
+                                </ns2:CANTIDADUNIDADESCASEPACK>
+                                <ns2:CANTIDADUNIDADESINNERPACK>
+                                    <xsl:value-of select="CANTIDADUNIDADESINNERPACK"/>
+                                </ns2:CANTIDADUNIDADESINNERPACK>
+                                <ns2:CANTIDADINNERPACK>
+                                    <xsl:value-of select="CANTIDADINNERPACK"/>
+                                </ns2:CANTIDADINNERPACK>
+                                <ns2:TOTALPEDIDOUNIDADES>
+                                    <xsl:value-of select="TOTALPEDIDOUNIDADES"/>
+                                </ns2:TOTALPEDIDOUNIDADES>
+                                <ns2:DESCUENTOARTICULO>
+                                    <xsl:value-of select="DESCUENTOARTICULO"/>
+                                </ns2:DESCUENTOARTICULO>
+                                <ns2:COSTOPORARTICULO>
+                                    <xsl:value-of select="COSTOPORARTICULO"/>
+                                </ns2:COSTOPORARTICULO>
+                                <ns2:CANTIDADORDENADA>
+                                    <xsl:value-of select="CANTIDADORDENADA"/>
+                                </ns2:CANTIDADORDENADA>
+                            </ns2:ITEM>
+                        </xsl:for-each>
+                    </ns2:PURCHASE_ORDER_DETAIL>
+                    <ns2:PURCHASE_ORDER_DISTRIBUTION>
+                        <xsl:for-each select="$GetListaDistribucion/DistribucionList/List">
+                            <ns2:ITEM>
+                                <ns2:ID_ORDEN_COMPRA>
+                                    <xsl:value-of select="ID_ORDEN_COMPRA"/>
+                                </ns2:ID_ORDEN_COMPRA>
+                                <ns2:ID_ARTICULO>
+                                    <xsl:value-of select="ID_ARTICULO"/>
+                                </ns2:ID_ARTICULO>
+                                <ns2:ID_SUCURSAL>
+                                    <xsl:value-of select="ID_SUCURSAL"/>
+                                </ns2:ID_SUCURSAL>
+                                <ns2:FECHA_PEDIDO_CAT>
+                                    <xsl:value-of select="FECHA_PEDIDO_CAT"/>
+                                </ns2:FECHA_PEDIDO_CAT>
+                                <ns2:CANTIDAD>
+                                    <xsl:value-of select="CANTIDAD"/>
+                                </ns2:CANTIDAD>
+                            </ns2:ITEM>
+                        </xsl:for-each>
+                    </ns2:PURCHASE_ORDER_DISTRIBUTION>
+                </ns2:PURCHASE_ORDER>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ReprocesarOCQueuePublisherOC">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>311</pd:x>
+        <pd:y>170</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/Reproceso/SendReprocesoOC.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Intentos>
+                    <xsl:value-of select="$Start/group/Intentos"/>
+                </Intentos>
+                <Nivel>
+                    <xsl:value-of select="$GetDetalle/group/Reproceso"/>
+                </Nivel>
+                <group>
+                    <xsl:for-each select="$GetDetalle/group/ReprocesoList">
+                        <Detalle>
+                            <Articulo>
+                                <xsl:value-of select="Articulo"/>
+                            </Articulo>
+                            <Casepack>
+                                <xsl:value-of select="Casepack"/>
+                            </Casepack>
+                        </Detalle>
+                    </xsl:for-each>
+                </group>
+                <Encabezado>
+                    <Sucursal>
+                        <xsl:value-of select="$GetEncabezado/group/IDSUCURSAL"/>
+                    </Sucursal>
+                    <Proveedor>
+                        <xsl:value-of select="$GetEncabezado/group/IDPROVEEDOR"/>
+                    </Proveedor>
+                    <EstatusOrdenCompra>
+                        <xsl:value-of select="$GetEncabezado/group/IDESTATUS"/>
+                    </EstatusOrdenCompra>
+                    <MetodoDistribucion>
+                        <xsl:value-of select="$GetEncabezado/group/IDMETODODISTRIBUCION"/>
+                    </MetodoDistribucion>
+                </Encabezado>
+                <xsl:copy-of select="$Start/group/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER"/>
+                <NumeroOC>
+                    <xsl:value-of select="$Start/group/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER[1]/pfx:PMG_PO_NUMBER"/>
+                </NumeroOC>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetListaDistribucion">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>442</pd:x>
+        <pd:y>65</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraSubscriber Processes/Sub Process/ListaDistribucion/GetListaDistribucion.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx:PURCHASE_ORDER_DISTRIBUTION>
+                <xsl:copy-of select="$Start/group/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM"/>
+            </pfx:PURCHASE_ORDER_DISTRIBUTION>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>657</pd:x>
+        <pd:y>265</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns0:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE: Incident at Heb2bOrdenCompraSubscriber',&quot;&amp;If;&quot;,&#xA;') Unexpected Unexpected :' , tib:render-xml($_error/ns:ErrorReport ,0, 0))"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns0:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>497</pd:x>
+        <pd:y>265</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetEncabezado</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetEncabezado</pd:from>
+        <pd:to>GetDetalle</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetDetalle</pd:from>
+        <pd:to>GetListaDistribucion</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PublicQueue</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetDetalle</pd:from>
+        <pd:to>ReprocesarOCQueuePublisherOC</pd:to>
+        <pd:xpathDescription>Error campos Requeridos</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$GetDetalle/group/Reproceso &gt; 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ReprocesarOCQueuePublisherOC</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetListaDistribucion</pd:from>
+        <pd:to>PublicQueue</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

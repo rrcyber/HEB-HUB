@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx3="http://xmlns.heb.com/ei/Products" xmlns:pfx2="http://xmlns.heb.com/ei/Bitacora" xmlns:pfx="http://xmlns.heb.com/ei/PriceInventory">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO_PRICEINVENTORY.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO.xsd"/>
+    <pd:name>Processes/Sub Process/Get_IDPropuesta.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>101</pd:startX>
+    <pd:startY>95</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Map-Propuestas/Propuestas"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Propuestas">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx3:BitacoraPropuestaArticulo" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>473</pd:endX>
+    <pd:endY>97</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1518634750295</pd:targetNamespace>
+    <pd:activity name="JDBC GetPropuestas">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>232</pd:x>
+        <pd:y>97</pd:y>
+        <config>
+            <timeout>%%Connections/Database/dbHEB2B/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/dbHEB2B/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/dbHEB2B.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT BPA.IdPropuestaArticulo, BPA.IdEstatus, BPA.FechaCaptura, BPA.UsuarioCaptura, BPA.FechaModificacion, BPA.UsuarioModificacion 
+FROM BitacoraPropuestaArticulo BPA 
+JOIN PropuestaArticulo PA ON BPA.IdPropuestaArticulo = PA.Id
+JOIN Proveedor P ON P.Id = PA.IdProveedor
+JOIN ProveedorSetId PSI ON PSI.Id = P.IdEsquemaServicio
+WHERE PA.IdEstatusPropuesta = 9 AND BPA.IdEstatus = 9
+AND PSI.SetID = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SetId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>IdPropuestaArticulo</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>IdEstatus</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FechaCaptura</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>UsuarioCaptura</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FechaModificacion</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>UsuarioModificacion</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <SetId>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ConfigurationHEBSeller/SetId"/>
+                </SetId>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Propuestas">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>359</pd:x>
+        <pd:y>98</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Propuestas">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="pfx3:BitacoraPropuestaArticulo" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Propuestas>
+                <xsl:for-each select="$JDBC-GetPropuestas/resultSet/Record">
+                    <pfx3:BitacoraPropuestaArticulo>
+                        <IdPropuestaArticulo>
+                            <xsl:value-of select="IdPropuestaArticulo"/>
+                        </IdPropuestaArticulo>
+                        <IdEstatus>
+                            <xsl:value-of select="IdEstatus"/>
+                        </IdEstatus>
+                        <FechaCaptura>
+                            <xsl:value-of select="FechaCaptura"/>
+                        </FechaCaptura>
+                        <UsuarioCaptura>
+                            <xsl:value-of select="UsuarioCaptura"/>
+                        </UsuarioCaptura>
+                        <xsl:if test="FechaModificacion">
+                            <FechaModificacion>
+                                <xsl:value-of select="FechaModificacion"/>
+                            </FechaModificacion>
+                        </xsl:if>
+                        <xsl:if test="UsuarioModificacion">
+                            <UsuarioModificacion>
+                                <xsl:value-of select="UsuarioModificacion"/>
+                            </UsuarioModificacion>
+                        </xsl:if>
+                    </pfx3:BitacoraPropuestaArticulo>
+                </xsl:for-each>
+            </Propuestas>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC GetPropuestas</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC GetPropuestas</pd:from>
+        <pd:to>Map Propuestas</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Propuestas</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

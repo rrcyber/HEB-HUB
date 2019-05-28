@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/Marcajes_KRONOS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Marcajes_KRONOS" schemaLocation="/Shared Resources/Schema Definitions/Custom/Marcajes_KRONOS.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/Update_Estado_Marcajes_Tienda.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Marcajes_KRONOS"/>
+    <pd:startX>64</pd:startX>
+    <pd:startY>132</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>542</pd:endX>
+    <pd:endY>133</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1423276371908</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>215</pd:x>
+        <pd:y>55</pd:y>
+        <pd:width>193</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx:Marcajes_KRONOS/pfx:ITEM</pd:over>
+            <pd:iterationElementSlot>Update1</pd:iterationElementSlot>
+            <pd:indexSlot>Update</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Update_PSPUNCHS_TDA</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Update_PSPUNCHS_TDA</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Update_PSPUNCHS_TDA">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>301</pd:x>
+            <pd:y>118</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>UPDATE PS_PUNCHS SET
+ESTATUS = '1'
+WHERE NUMERO = ?
+AND PS_PUNCHSID = ?</statement>
+                <batchUpdate>true</batchUpdate>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-Connection-WFCDB.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>NUMERO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>PS_PUNCHSID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <Record>
+                        <NUMERO>
+                            <xsl:copy-of select="$Update1/pfx:ITEM/pfx:NUMERO/@xsi:nil"/>
+                            <xsl:value-of select="$Update1/pfx:ITEM/pfx:NUMERO"/>
+                        </NUMERO>
+                        <PS_PUNCHSID>
+                            <xsl:copy-of select="$Update1/pfx:ITEM/pfx:PS_PUNCHSID/@xsi:nil"/>
+                            <xsl:value-of select="$Update1/pfx:ITEM/pfx:PS_PUNCHSID"/>
+                        </PS_PUNCHSID>
+                    </Record>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

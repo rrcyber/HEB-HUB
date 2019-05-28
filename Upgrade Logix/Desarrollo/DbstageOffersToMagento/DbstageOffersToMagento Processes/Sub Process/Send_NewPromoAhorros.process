@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Send_NewPromoAhorros.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>79</pd:startX>
+    <pd:startY>103</pd:startY>
+    <pd:returnBindings>
+        <runId>
+            <xsl:value-of select="$Send_PromoAhorro/group/run_id"/>
+        </runId>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="runId" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>879</pd:endX>
+    <pd:endY>101</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1417471591572</pd:targetNamespace>
+    <pd:activity name="Send_PromoAhorro">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>201</pd:x>
+        <pd:y>105</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Send_PromoAhorro.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Offer/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_PromoAhorroLocations">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>384</pd:x>
+        <pd:y>108</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Send_PromoAhorroLocations.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <last_complete_promo>
+                    <xsl:value-of select="$Send_PromoAhorro/group/last_completed_promo"/>
+                </last_complete_promo>
+                <run_id>
+                    <xsl:value-of select="$Send_PromoAhorro/group/run_id"/>
+                </run_id>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update_SendPromoAhorroDate">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>565</pd:x>
+        <pd:y>105</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Update_SendPromoAhorroDate.process</processName>
+        </config>
+        <pd:inputBindings>
+            <last_complete_promo>
+                <xsl:value-of select="$Send_PromoAhorro/group/last_completed_promo"/>
+            </last_complete_promo>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>284</pd:x>
+        <pd:y>202</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>738</pd:x>
+        <pd:y>102</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Send_PromoAhorro</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_PromoAhorro</pd:from>
+        <pd:to>Send_PromoAhorroLocations</pd:to>
+        <pd:xpathDescription>records</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Send_PromoAhorro/group/last_completed_promo !=''</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_PromoAhorroLocations</pd:from>
+        <pd:to>Update_SendPromoAhorroDate</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_PromoAhorro</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_SendPromoAhorroDate</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 xmlns:ns0="http://www.heb.com/web_order"
+	 targetNamespace="http://www.heb.com/web_order"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:element name="order" type="ns0:OrderType"/>
+	<xs:complexType name="OrderType">
+		<xs:sequence>
+			<xs:element name="header" type="ns0:HeaderType"/>
+			<xs:element name="payments" type="ns0:PaymentType" maxOccurs="unbounded"/>
+			<xs:element name="basket_discounts" type="ns0:basketDiscountType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="detail" type="ns0:LineItemType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="HeaderType">
+		<xs:sequence>
+			<xs:element name="store_id" type="ns0:StoreIdType"/>
+			<xs:element name="order_total" type="ns0:NonNegativeDouble"/>
+			<xs:element name="tax_exempt" type="ns0:BooleanInt"/>
+			<xs:element name="tax_total" type="ns0:NonNegativeDouble"/>
+			<xs:element name="web_order_id" type="ns0:AtgIdType"/>
+			<xs:element name="atg_profile_id" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PaymentType">
+		<xs:sequence>
+			<xs:element name="payment" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="payment_method" type="ns0:PaymentMethodType"/>
+						<xs:element name="media_id" type="xs:string"/>
+						<xs:element name="amount" type="xs:string"/>
+						<xs:element name="name" type="xs:string" minOccurs="0"/>
+						<xs:element name="ReferenceNumber" type="xs:string" minOccurs="0"/>
+						<xs:element name="MaskedCardNumber" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="PaymentMethodType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AtgIdType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StoreIdType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]{5}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="basketDiscountType">
+		<xs:sequence>
+			<xs:element name="discount" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="discount_amount" type="ns0:NonNegativeDouble"/>
+						<xs:element name="offer_type" type="xs:string"/>
+						<xs:element name="offer_id" type="xs:string"/>
+						<xs:element name="chargeback_acct" type="ns0:CbaType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LineItemType">
+		<xs:sequence>
+			<xs:element name="sku" type="ns0:UpcType"/>
+			<xs:element name="pss_department" type="ns0:NonNegativeLong" minOccurs="0"/>
+			<xs:element name="price" type="ns0:NonNegativeDouble"/>
+			<xs:element name="quantity" type="ns0:NonNegativeDouble"/>
+			<xs:element name="item_discounts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="item_discount" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="discount_amount" type="ns0:NonNegativeDouble"/>
+									<xs:element name="offer_type" type="xs:string"/>
+									<xs:element name="offer_id" type="xs:string"/>
+									<xs:element name="chargeback_acct" type="ns0:CbaType"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="uom" type="ns0:UomType"/>
+			<xs:element name="tax_flag" type="ns0:BooleanInt"/>
+			<xs:element name="tax" type="ns0:TaxingInfo" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxingInfo">
+		<xs:sequence>
+			<xs:element name="tax_amount" type="ns0:NonNegativeDouble" minOccurs="0"/>
+			<xs:element name="tax_rate" type="ns0:NonNegativeDouble" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="UpcType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]{1,14}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UomType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="each"/>
+			<xs:enumeration value="weight"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NonNegativeDouble">
+		<xs:restriction base="xs:double">
+			<xs:minInclusive value="0.00"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NonNegativeLong">
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BooleanInt">
+		<xs:restriction base="xs:int">
+			<xs:pattern value="[0-1]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CbaType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

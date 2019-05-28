@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="www.tibco.com/plugin/Sleep">
+    <pd:name>Project Name Processes/Sub Process/getPMMCASEPACKDetail.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="group" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="tran_type" type="xsd:string"/>
+                                <xsd:element name="prd_lvl_child" type="xsd:string"/>
+                                <xsd:element name="vpc_case_pack_id" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>62</pd:startX>
+    <pd:startY>157</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xsl:for-each select="$getDetail/resultSet/Record">
+                <ITEM>
+                    <vpc_pallet_hi>
+                        <xsl:value-of select="VPC_PALLET_HI"/>
+                    </vpc_pallet_hi>
+                    <vpc_pallet_tier>
+                        <xsl:value-of select="VPC_PALLET_TIER"/>
+                    </vpc_pallet_tier>
+                    <factorempaque>
+                        <xsl:value-of select="FACTOREMPAQUE"/>
+                    </factorempaque>
+                    <prd_lvl_number>
+                        <xsl:value-of select="PRD_LVL_NUMBER"/>
+                    </prd_lvl_number>
+                    <Detail>
+                        <xsl:value-of select="DETAIL"/>
+                    </Detail>
+                </ITEM>
+            </xsl:for-each>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="vpc_pallet_hi" type="xsd:string"/>
+                                <xsd:element name="vpc_pallet_tier" type="xsd:string"/>
+                                <xsd:element name="factorempaque" type="xsd:string"/>
+                                <xsd:element name="prd_lvl_number" type="xsd:string"/>
+                                <xsd:element name="Detail" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>513</pd:endX>
+    <pd:endY>158</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1374254579286</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>179</pd:x>
+        <pd:y>25</pd:y>
+        <pd:width>227</pd:width>
+        <pd:height>246</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns2:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>getDetail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getDetail</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getDetail</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>225</pd:x>
+            <pd:y>194</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns12:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns12:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>316</pd:x>
+            <pd:y>195</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns1:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns1:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="getDetail">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>229</pd:x>
+            <pd:y>91</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DatabaseName/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>select vpc.vpc_pallet_tier,
+vpc.vpc_pallet_hi, trim(nvl(S.prd_lvl_number, Prd.prd_lvl_number))  prd_lvl_number, case when vpc.number_of_inners &gt; 1 then trim(vpc.inv_units_per_inner) else trim(vpc.vpc_case_qty) end as FactorEmpaque,
+'DETAIL|' || ? || '|'  ||
+      case when hee.prd_aph_code='9101' then '91     '
+                       when hee.prd_aph_code='9071'then '90     ' 
+                  end || '|' || 
+                  case when hee.prd_aph_code='9071' then '71'
+             when hee.prd_aph_code='9101' then '01' 
+        end || '|' || 
+            rpad(trim(nvl(S.prd_lvl_number, Prd.prd_lvl_number)),18,' ')
+        || '|' || '0|              |' ||
+        rpad(substr(to_char(prd.prd_uom_size) || ' ' || substr(prd.prd_size_uom,1,2),1,6),10) || '|' ||
+        case when vpc.vpc_case_width is null then '00000000'                   
+              else replace(lpad(to_char(vpc.vpc_case_width),8),' ',0)
+        end || '|' || 
+        case when vpc.vpc_case_wgt is null then '0000000000'
+                 else replace(lpad(to_char(vpc.vpc_case_wgt),10),' ','0')
+        end || '|' || 
+                replace(round(to_number(lpad(vpc.vpc_case_qty ,4))),' ',0)
+        || '|' || 
+        case when vpc.vpc_case_len is null then '00000000'                   
+                  else replace(lpad(to_char(vpc.vpc_case_len),8),' ','0')
+        end || '|' ||
+        case when vpc.vpc_case_height is null then '00000000'
+                  else replace(lpad(to_char(vpc.vpc_case_height),8),' ','0')                               
+        end || '|' || 
+        case when vpc.vpc_pallet_hi  is null then '000'
+                  else replace(lpad(to_char(vpc.vpc_pallet_hi),3),' ','0')                               
+        end || '|' ||
+        case when vpc.vpc_pallet_tier  is null then '000'
+                  else replace(lpad(to_char(vpc.vpc_pallet_tier),3),' ','0')                               
+        end || '|' || 
+        case when inn.vpc_case_width is null then '00000000'
+                  else replace(lpad(to_char(inn.vpc_case_width),8),' ','0')
+        end || '|' || 
+        case when inn.net_weight is null then '0000000000'
+                  else replace(lpad(to_char(inn.net_weight),10),' ','0')
+        end || '|' || 
+        case when vpc.number_of_inners &gt; 1 then replace(round(to_number(lpad(vpc.inv_units_per_inner,4))),' ',0)
+                  else replace(round(to_number(lpad(vpc.vpc_case_qty ,4))),' ',0)
+        end || '|' ||
+       case when inn.vpc_case_len is null then '00000000'
+                  else replace(lpad(to_char(inn.vpc_case_len),8),' ','0')
+        end || '|' || 
+        case when inn.vpc_case_height is null then '00000000'
+                  else replace(lpad(to_char(inn.vpc_case_height),8),' ','0')
+        end || '|' ||
+        case when inn.vpc_case_width is null then '00000000'
+                  else replace(lpad(to_char(inn.vpc_case_width),8),' ','0')
+        end || '|' || 
+        case when inn.net_weight is null then '0000000000'
+                  else replace(lpad(to_char(inn.net_weight),10),' ','0')
+        end || '|'  ||
+          case when inn.vpc_case_len is null then '00000000'
+                  else replace(lpad(to_char(inn.vpc_case_len),8),' ','0')
+        end || '|'  || 
+        case when inn.vpc_case_height is null then '00000000'
+                  else replace(lpad(to_char(inn.vpc_case_height),8),' ','0')
+        end || '|' || 
+        case when vpc.vpc_pallet_hi  is null then '000'
+                  else replace(lpad(to_char(vpc.vpc_pallet_hi),3),' ','0')                               
+        end || '|' ||
+        case when vpc.vpc_pallet_tier  is null then '000'
+                  else replace(lpad(to_char(vpc.vpc_pallet_tier),3),' ','0')                               
+        end || '|' || trim(prv.vendor_number) || '|00|0000000.00|' || 
+        case when vpc.number_of_inners &gt; 1 then replace(round(to_number(lpad(vpc.inv_units_per_inner,4))),' ',0)
+                  else replace(round(to_number(lpad(vpc.vpc_case_qty ,4))),' ',0)
+        end || '|' || 
+        case when to_char(vpc.vpc_case_cube) is null then '000000.000'
+              when to_char((vpc.vpc_case_cube/100000)) &gt; '9999.999'  then '9999.999'
+              else replace(lpad(to_char((vpc.vpc_case_cube/100000)),10),' ',0)
+         end || '|' || 
+         case when trim(nvl(deeo.atr_code, 'X')) = 'SOTBPCO' then '0001|0120|0040'
+              else '0015|0122|0102'
+         end || '|0000' || '|' ||
+         case when to_char(vpc.vpc_case_cube) is null then '000000.000'
+              when to_char((vpc.vpc_case_cube/100000)) &gt; '9999.999'  then '9999.999'
+              else replace(lpad(to_char((vpc.vpc_case_cube/100000)),10),' ',0)
+         end || '|' ||
+         case when to_char(vpc.vpc_case_cube) is null then '000000.000'
+              when to_char((vpc.vpc_case_cube/100000)) &gt; '9999.999'  then '9999.999'
+              else replace(lpad(to_char((vpc.vpc_case_cube/100000)),10),' ',0)
+         end || '|0000|000000.0|0000|0000|P|000000.0|000000.0|B|' DETAIL
+from pmm.vpcprdee vpc left outer join pmm.prdmstee prd  on vpc.prd_lvl_child = decode(prd.prd_lvl_id, 0, prd.prd_lvl_parent, prd.prd_lvl_child)  
+                       left join pmm.prdmstee S on prd.prd_lvl_child = S.SPP_SET_PRD_CHILD
+                      left outer join pmm.PRDAPDEE SUC on suc.prd_lvl_child = decode(prd.prd_lvl_id, 0, prd.prd_lvl_parent, prd.prd_lvl_child) 
+                inner join pmm.PRDAPHEE  HEE on suc.prd_aph_key = hee.prd_aph_key
+                      left outer join pmm.BASATPEE pee1 on pee1.prd_lvl_child = decode(prd.prd_lvl_id, 0, prd.prd_lvl_parent, prd.prd_lvl_child) 
+                                                  and pee1.atr_hdr_tech_key = 77
+                                                  and pee1.ATR_TYP_TECH_KEY = 66
+                       left outer join pmm.BASACDEE dee1 on pee1.atr_hdr_tech_key = dee1.atr_hdr_tech_key
+                                                    and pee1.atr_cod_tech_key = dee1.atr_cod_tech_key
+                      left outer join pmm.BASATPEE peeo on peeo.prd_lvl_child = decode(prd.prd_lvl_id, 0, prd.prd_lvl_parent, prd.prd_lvl_child) 
+                                                  and peeo.atr_hdr_tech_key = 76
+                                                  and peeo.ATR_TYP_TECH_KEY = 66
+                       left outer join pmm.BASACDEE deeo on peeo.atr_hdr_tech_key = deeo.atr_hdr_tech_key
+                                                    and peeo.atr_cod_tech_key = deeo.atr_cod_tech_key
+                       left outer join pmm.BASVALEE val on val.tech_key1 = decode(prd.prd_lvl_id, 0, prd.prd_lvl_parent, prd.prd_lvl_child)
+                                                    and val.field_code = 'SP' and val.ENTITY_NAME = 'PRDMSTEE'
+                          left outer join pmm.BASATPEE pee on pee.prd_lvl_child = decode(prd.prd_lvl_id, 0, prd.prd_lvl_parent, prd.prd_lvl_child)
+                                              and pee.prd_lvl_id = prd.prd_lvl_id
+                                              and pee.atr_cod_tech_key in (128, 
+                                                                           129) 
+                                              and pee.prd_lvl_id in (0,1)
+                    left outer join pmm.vpcmstee prv on prv.vpc_Tech_Key = prd.Prd_Vpc_Tech_Key
+                    left outer join pmm.PRDPCDEE inn on vpc.prd_lvl_child = inn.prd_lvl_child and loose_pack_flag = 'F' and vpc.inv_units_per_inner = inn.inv_units_per_inner
+where hee.prd_aph_code in ('9101','9071')  and prd.prd_lvl_child =? and trim(vpc.VPC_CASE_PACK_ID)=?
+and prd.prd_status in (1,3,4,7,99)
+order by vpc.vpc_primary_flag asc</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC PMM_Connection.sharedjdbc</jdbcSharedConfig>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>TRAN_TYPE</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>prd_lvl_child</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>vpc_case_pack_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>VPC_PALLET_TIER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>VPC_PALLET_HI</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>FACTOREMPAQUE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>DETAIL</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <TRAN_TYPE>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/root/group[1]/tran_type)">
+                                <xsl:value-of select="$Start/root/group[1]/tran_type"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </TRAN_TYPE>
+                    <prd_lvl_child>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/root/group[1]/prd_lvl_child)">
+                                <xsl:value-of select="$Start/root/group[1]/prd_lvl_child"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </prd_lvl_child>
+                    <vpc_case_pack_id>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/root/group[1]/vpc_case_pack_id)">
+                                <xsl:value-of select="$Start/root/group[1]/vpc_case_pack_id"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </vpc_case_pack_id>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

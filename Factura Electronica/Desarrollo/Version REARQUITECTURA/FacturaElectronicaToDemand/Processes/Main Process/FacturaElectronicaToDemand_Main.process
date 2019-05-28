@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns13="http://www.tibco.com/pe/WriteToLogActivitySchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <pd:name>Processes/Main Process/FacturaElectronicaToDemand_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>101</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>804</pd:endX>
+    <pd:endY>67</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx2:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1414597575727</pd:targetNamespace>
+    <pd:activity name="GetFactura">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>346</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/GetFacturaHeader.process</processName>
+        </config>
+        <pd:inputBindings>
+            <INITIAL_DATE>
+                <xsl:value-of select="$Get_DateInitial/INITIAL_DATE"/>
+            </INITIAL_DATE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_DateInitial">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>218</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Get_DateInitial.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="PROCESS">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>349</pd:x>
+        <pd:y>182</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Set_DateInitial">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>463</pd:x>
+        <pd:y>65</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Set_DateInitial.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="var" select="count($GetFactura/resultSet/Record)"/>
+            <DATE>
+                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss.SSS ',$GetFactura/resultSet/Record[$var]/EIF_FECHAALTA)"/>
+            </DATE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetFactura">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>582</pd:x>
+        <pd:y>66</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/SetFacturaToDemand.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$GetFactura/resultSet"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="RollBack Date">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>245</pd:x>
+        <pd:y>269</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Set_DateInitial.process</processName>
+        </config>
+        <pd:inputBindings>
+            <DATE>
+                <xsl:value-of select="$Get_DateInitial/INITIAL_DATE"/>
+            </DATE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>115</pd:x>
+        <pd:y>270</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=MSG_Container namespace=http://xmlns.heb.com/ei/ErrorManagementSchema</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>489</pd:x>
+        <pd:y>271</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns0:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <xsl:copy-of select="$Catch/pfx2:MSG_Container"/>
+                </data>
+            </ns0:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log FechaInicial">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>690</pd:x>
+        <pd:y>67</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat('Inicia flujo factura >>>>  ',   $Get_DateInitial/INITIAL_DATE)"/>
+                </message>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Fecha RollBack">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>359</pd:x>
+        <pd:y>269</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat('RollBack flujo factura &lt;&lt;&lt;&lt;   ', $Get_DateInitial/INITIAL_DATE)"/>
+                </message>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_DateInitial</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetFactura</pd:from>
+        <pd:to>PROCESS</pd:to>
+        <pd:xpathDescription>No Factura</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>empty($GetFactura/resultSet/Record/EIF_FOLIO)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_DateInitial</pd:from>
+        <pd:to>GetFactura</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetFactura</pd:from>
+        <pd:to>Set_DateInitial</pd:to>
+        <pd:xpathDescription>Factura</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Set_DateInitial</pd:from>
+        <pd:to>SetFactura</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PROCESS</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetFactura</pd:from>
+        <pd:to>Log FechaInicial</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RollBack Date</pd:from>
+        <pd:to>Log Fecha RollBack</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>RollBack Date</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log FechaInicial</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Fecha RollBack</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

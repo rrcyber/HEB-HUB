@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://xmlns.heb.com/ei/PO_NOTIFY" xmlns:ns2="www.tibco.com/plugin/Sleep" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx5="http://xmlns.heb.com/ei/CatalogoPlanner" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3" xmlns:pfx6="http://xmlns.heb.com/ei/CatalogoPlannerList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Common/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Custom/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/CatalogoPlanner" schemaLocation="/Shared Resources/Schema Definitions/Custom/CATALOGO_PLANNER_INFORMATION_DATA_SOAP.xsd"/>
+    <pd:name>Heb2bOrdenCompraReciboSubscriber/Main Process/GetReciboOrdenCompra_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>69</pd:startX>
+    <pd:startY>206</pd:startY>
+    <pd:returnBindings>
+        <Cont>
+            <xsl:value-of select="$i"/>
+        </Cont>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Cont" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>1087</pd:endX>
+    <pd:endY>210</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <Global>
+            <xsd:element name="Flag" type="xsd:string"/>
+        </Global>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1406154803290</pd:targetNamespace>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>852</pd:x>
+        <pd:y>351</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE: Incident at Planner : ', tib:render-xml($_error/ns:ErrorReport ,0, 0))"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>852</pd:x>
+        <pd:y>463</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Get_Recibo_PMM">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>269</pd:x>
+        <pd:y>207</pd:y>
+        <config>
+            <processName>/Heb2bOrdenCompraReciboSubscriber/Sub Process/Get_PurchaseOrder.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group Iterate PurchaseOrder">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>339</pd:x>
+        <pd:y>37</pd:y>
+        <pd:width>411</pd:width>
+        <pd:height>321</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get_Recibo_PMM/resultSet/Record/PMG_PO_NUMBER</pd:over>
+            <pd:iterationElementSlot>PO</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Thread PurchaseOrder</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Thread PurchaseOrder</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Thread PurchaseOrder">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>388</pd:x>
+            <pd:y>69</pd:y>
+            <pd:width>326</pd:width>
+            <pd:height>261</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>repeat</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:indexSlot>IndexLoop</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:repeatCondition>$Global/Flag=1</pd:repeatCondition>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Assign</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Assign-1</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Sleep</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Assign</pd:from>
+                <pd:to>Calculate_Thread</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Calculate_Thread</pd:from>
+                <pd:to>Distribution_Thread</pd:to>
+                <pd:xpathDescription>New Thread</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$Calculate_Thread/group/value &lt;=  $_globalVariables/ns1:GlobalVariables/Threads/num</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Distribution_Thread</pd:from>
+                <pd:to>Assign-1</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Calculate_Thread</pd:from>
+                <pd:to>Sleep</pd:to>
+                <pd:xpathDescription>Wait</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Distribution_Thread">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>524</pd:x>
+                <pd:y>266</pd:y>
+                <config>
+                    <processName>/Heb2bOrdenCompraReciboSubscriber/Sub Process/Distribution_Thread_Main.process</processName>
+                    <spawn>true</spawn>
+                    <customId>$PO/PMG_PO_NUMBER</customId>
+                </config>
+                <pd:inputBindings>
+                    <Input>
+                        <PurchaseOrder>
+                            <xsl:value-of select="$PO/PMG_PO_NUMBER"/>
+                        </PurchaseOrder>
+                    </Input>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Assign">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:x>439</pd:x>
+                <pd:y>140</pd:y>
+                <config>
+                    <variableName>Global</variableName>
+                </config>
+                <pd:inputBindings>
+                    <Flag>
+                        <xsl:value-of select="0"/>
+                    </Flag>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Assign-1">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:x>624</pd:x>
+                <pd:y>266</pd:y>
+                <config>
+                    <variableName>Global</variableName>
+                </config>
+                <pd:inputBindings>
+                    <Flag>
+                        <xsl:value-of select="1"/>
+                    </Flag>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Sleep">
+                <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+                <pd:resourceType>ae.activities.sleep</pd:resourceType>
+                <pd:x>624</pd:x>
+                <pd:y>140</pd:y>
+                <config/>
+                <pd:inputBindings>
+                    <ns2:SleepInputSchema>
+                        <IntervalInMillisec>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TimerConfig/Thread_Wait"/>
+                        </IntervalInMillisec>
+                    </ns2:SleepInputSchema>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Calculate_Thread">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>524</pd:x>
+                <pd:y>139</pd:y>
+                <config>
+                    <processName>/Heb2bOrdenCompraReciboSubscriber/Sub Process/CalculateThread.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <group>
+                        <operation>
+                            <xsl:value-of select="'QUERY'"/>
+                        </operation>
+                    </group>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>787</pd:x>
+        <pd:y>129</pd:y>
+        <pd:width>233</pd:width>
+        <pd:height>141</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>IndexEnd</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>$Calculate_Thread_End/group/value = 0</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Calculate_Thread_End</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Calculate_Thread_End</pd:from>
+            <pd:to>Sleep-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Calculate_Thread_End">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>861</pd:x>
+            <pd:y>207</pd:y>
+            <config>
+                <processName>/Heb2bOrdenCompraReciboSubscriber/Sub Process/CalculateThread.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <operation>
+                        <xsl:value-of select="'QUERY'"/>
+                    </operation>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep-1">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>948</pd:x>
+            <pd:y>207</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns2:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TimerConfig/Thread_Wait"/>
+                    </IntervalInMillisec>
+                </ns2:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Assign-2">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>165</pd:x>
+        <pd:y>207</pd:y>
+        <config>
+            <variableName>Global</variableName>
+        </config>
+        <pd:inputBindings>
+            <Flag>
+                <xsl:value-of select="0"/>
+            </Flag>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Assign-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Iterate PurchaseOrder</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-2</pd:from>
+        <pd:to>Get_Recibo_PMM</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Recibo_PMM</pd:from>
+        <pd:to>Group Iterate PurchaseOrder</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

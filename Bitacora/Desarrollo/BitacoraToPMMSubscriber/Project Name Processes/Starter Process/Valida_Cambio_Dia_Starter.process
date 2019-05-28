@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:ns02="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <pd:name>Project Name Processes/Starter Process/Valida_Cambio_Dia_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>107</pd:x>
+        <pd:y>195</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>23</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Properties/GLB_MAX_SESSIONS%%</maxSessions>
+                <destination>%%Destinations/Queues/GLB_BITACORA_CDIA_QUEUE%%</destination>
+                <selector/>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <_sequenceKey>ns:ActivityOutput/JMSHeaders/ns:JMSCorrelationID</_sequenceKey>
+            <_customId>ns:ActivityOutput/JMSHeaders/ns:JMSCorrelationID</_customId>
+            <OutDataxsdString>
+                <xsd:element name="group">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="CALDAT" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </OutDataxsdString>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>813</pd:endX>
+    <pd:endY>131</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1369060482197</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>258</pd:x>
+        <pd:y>65</pd:y>
+        <pd:width>281</pd:width>
+        <pd:height>243</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/pfx:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>false</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Reply to JMS Message</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-52429</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query</pd:from>
+            <pd:to>Reply to JMS Message</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Reply to JMS Message</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Query">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>343</pd:x>
+            <pd:y>133</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>0</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>select CALDAT from pmm.caldayee</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType/>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>CALDAT</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>291</pd:x>
+            <pd:y>253</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="5"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>413</pd:x>
+            <pd:y>253</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns02:ActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Reply to JMS Message">
+            <pd:type>com.tibco.plugin.jms.JMSReplyActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSReplyActivity</pd:resourceType>
+            <pd:x>451</pd:x>
+            <pd:y>143</pd:y>
+            <config>
+                <PermittedMessageType>XML Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                    <EventSource>JMS Queue Receiver</EventSource>
+                </ConfigurableHeaders>
+                <InDataxsdString>
+                    <xsd:element name="group">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="CALDAT" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </InDataxsdString>
+            </config>
+            <pd:inputBindings>
+                <ns:ActivityInput>
+                    <JMSType>
+                        <xsl:value-of select="'REPLY'"/>
+                    </JMSType>
+                    <Body>
+                        <group>
+                            <CALDAT>
+                                <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/CALDAT"/>
+                            </CALDAT>
+                        </group>
+                    </Body>
+                </ns:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>641</pd:x>
+        <pd:y>196</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JMS-Queue-Receiver/ns:ActivityOutput/JMSHeaders/ns:JMSType='DIA'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:xpathDescription>Any</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

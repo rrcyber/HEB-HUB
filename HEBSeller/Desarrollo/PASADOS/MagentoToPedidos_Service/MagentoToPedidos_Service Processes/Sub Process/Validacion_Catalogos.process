@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/Pedido" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Pedido" schemaLocation="/Shared Resources/Schema Definitions/Custom/Pedido.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>MagentoToPedidos_Service Processes/Sub Process/Validacion_Catalogos.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Pedido"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>296</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <TipoServicio>
+                <xsl:value-of select="$Validacion_TipoServicio/resultSet/Record[1]/TipoServicio"/>
+            </TipoServicio>
+            <TipoEntrega>
+                <xsl:value-of select="$Validacion_TipoEntrega/resultSet/Record[1 ]/TipoEntrega"/>
+            </TipoEntrega>
+            <Estatus>
+                <xsl:value-of select="$Validacion_Estatus/resultSet/Record[1]/Estatus"/>
+            </Estatus>
+            <Plataforma>
+                <xsl:value-of select="$Validacion_Plataforma/resultSet/Record[1]/Plataforma"/>
+            </Plataforma>
+            <GrupoCliente>
+                <xsl:value-of select="$Validacion_GrupoCliente/resultSet/Record[1]/GrupoCliente"/>
+            </GrupoCliente>
+            <IdEstatus>
+                <xsl:value-of select="$Validacion_IdEstatus/resultSet/Record[1]/IdEstatus"/>
+            </IdEstatus>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="TipoServicio" type="xsd:string"/>
+                    <xsd:element name="TipoEntrega" type="xsd:string"/>
+                    <xsd:element name="Estatus" type="xsd:string"/>
+                    <xsd:element name="Plataforma" type="xsd:string"/>
+                    <xsd:element name="GrupoCliente" type="xsd:string"/>
+                    <xsd:element name="IdEstatus" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>704</pd:endX>
+    <pd:endY>290</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns12:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1430949546591</pd:targetNamespace>
+    <pd:activity name="Validacion_TipoServicio">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>356</pd:x>
+        <pd:y>60</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>select
+(select top 1 ClaveExterna as tipoServicio from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1 )as TipoServicio
+</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CatalagoMaestroId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TipoServicio</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>TipoServicio</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <CatalagoMaestroId>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroIdTipoServicio"/>
+                </CatalagoMaestroId>
+                <TipoServicio>
+                    <xsl:value-of select="$Start/pfx:Pedido/pfx:Encabezado/pfx:TipoServicio"/>
+                </TipoServicio>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion_TipoEntrega">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>361</pd:x>
+        <pd:y>146</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_MAX_CONNECTIONS%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>Select
+(select top 1 ClaveExterna as tipoEntrega from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1)as TipoEntrega
+</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CatalogoMaestroId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TipoEntrega</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>TipoEntrega</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <CatalogoMaestroId>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroidTipoEntrega"/>
+                </CatalogoMaestroId>
+                <TipoEntrega>
+                    <xsl:value-of select="$Start/pfx:Pedido/pfx:Encabezado/pfx:TipoEntrega"/>
+                </TipoEntrega>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion_Estatus">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>364</pd:x>
+        <pd:y>215</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_MAX_CONNECTIONS%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>Select
+(select top 1 ClaveExterna as estatus from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1 )as Estatus
+</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CatalogoMaestroId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Estatus</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>Estatus</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <CatalogoMaestroId>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroIdEstatus"/>
+                </CatalogoMaestroId>
+                <Estatus>
+                    <xsl:value-of select="$Start/pfx:Pedido/pfx:Encabezado/pfx:Estatus"/>
+                </Estatus>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion_Plataforma">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>362</pd:x>
+        <pd:y>301</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_MAX_CONNECTIONS%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>Select
+(select top 1 ClaveExterna as plataforma from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1) as Plataforma</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CatalogoMaestroId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Plataforma</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>Plataforma</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <CatalogoMaestroId>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroIdPlataforma"/>
+                </CatalogoMaestroId>
+                <Plataforma>
+                    <xsl:value-of select="$Start/pfx:Pedido/pfx:Encabezado/pfx:Plataforma"/>
+                </Plataforma>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion_GrupoCliente">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>367</pd:x>
+        <pd:y>379</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_MAX_CONNECTIONS%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>Select
+(select top 1 ClaveExterna as grupoCliente from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1) as GrupoCliente
+</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CatalogoMaestroId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>GrupoCliente</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>GrupoCliente</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <CatalogoMaestroId>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroIdGrupoCliente"/>
+                </CatalogoMaestroId>
+                <GrupoCliente>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx:Pedido/pfx:Encabezado/pfx:IdGrupoCliente)">
+                            <xsl:value-of select="$Start/pfx:Pedido/pfx:Encabezado/pfx:IdGrupoCliente"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </GrupoCliente>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion_IdEstatus">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>363</pd:x>
+        <pd:y>471</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_MAX_CONNECTIONS%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>Select
+(select top 1 ClaveExterna as idEstatus from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1) as IdEstatus
+</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CatalogoMaestroId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IdEstatus</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>IdEstatus</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <CatalogoMaestroId>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroIdIDEstatus"/>
+                </CatalogoMaestroId>
+                <IdEstatus>
+                    <xsl:value-of select="$Start/pfx:Pedido/pfx:BitacoraEstatus/pfx:IdEstatus"/>
+                </IdEstatus>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault15">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>27</pd:x>
+        <pd:y>60</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <ns12:Fault>
+                        <ns12:Code>
+                            <xsl:value-of select="'Fault15'"/>
+                        </ns12:Code>
+                        <ns12:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/Mensajes/Fault_15"/>
+                        </ns12:Reason>
+                    </ns12:Fault>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>704</pd:x>
+        <pd:y>717</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1144</pd:x>
+        <pd:y>719</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns1:ErrorReport/StackTrace">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                    </message>
+                </xsl:if>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                </messageCode>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>856</pd:x>
+        <pd:y>822</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>958</pd:x>
+        <pd:y>717</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <Code>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </Code>
+                </xsl:if>
+                <Message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Validacion_TipoServicio</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_TipoServicio</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Validacion_TipoEntrega</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_TipoEntrega</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Validacion_Estatus</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_Estatus</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Validacion_Plataforma</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_Plataforma</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Validacion_GrupoCliente</pd:to>
+        <pd:xpathDescription>Validacion</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx:Pedido/pfx:Encabezado/pfx:IdGrupoCliente !='null'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_GrupoCliente</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Validacion_IdEstatus</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_IdEstatus</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_TipoEntrega</pd:from>
+        <pd:to>Fault15</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_Estatus</pd:from>
+        <pd:to>Fault15</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_Plataforma</pd:from>
+        <pd:to>Fault15</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_GrupoCliente</pd:from>
+        <pd:to>Fault15</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_IdEstatus</pd:from>
+        <pd:to>Fault15</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "Fault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion_TipoServicio</pd:from>
+        <pd:to>Fault15</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:xpathDescription>Error Desconocido</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/Products">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS_SOAP.xsd"/>
+    <pd:name>Processes/Sub Process/Send_ArticuloPropuesta.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Body"/>
+    <pd:startX>115</pd:startX>
+    <pd:startY>230</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>634</pd:endX>
+    <pd:endY>229</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1519150346049</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>214</pd:x>
+        <pd:y>64</pd:y>
+        <pd:width>327</pd:width>
+        <pd:height>321</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx:Body/pfx:mag_import_products</pd:over>
+            <pd:iterationElementSlot>Propuesta</pd:iterationElementSlot>
+            <pd:indexSlot>I</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JMS Topic Publisher</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Render XML</pd:from>
+            <pd:to>JMS Topic Publisher</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>Render XML</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JMS Topic Publisher">
+            <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+            <pd:x>447</pd:x>
+            <pd:y>237</pd:y>
+            <config>
+                <PermittedMessageType>Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Topic/GLB_ARTICULO_PROPUESTA_TOPIC%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/JMS Mexico.sharedjmscon</ConnectionReference>
+            </config>
+            <pd:inputBindings>
+                <ns:ActivityInput>
+                    <Body>
+                        <xsl:value-of select="$Render-XML/xmlString"/>
+                    </Body>
+                </ns:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Render XML">
+            <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+            <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+            <pd:x>365</pd:x>
+            <pd:y>319</pd:y>
+            <config>
+                <renderAsText>text</renderAsText>
+                <validateInput>true</validateInput>
+                <term ref="pfx:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data/pfx:MSG_CONTAINER"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>309</pd:x>
+            <pd:y>231</pd:y>
+            <config>
+                <element ref="pfx:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <pfx:MSG_CONTAINER>
+                    <pfx:Header>
+                        <pfx:ProjectName>
+                            <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                        </pfx:ProjectName>
+                        <pfx:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </pfx:Source_Domain>
+                        <pfx:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </pfx:Destination_Domain>
+                        <pfx:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/TransactionType"/>
+                        </pfx:Transaction_Type>
+                        <pfx:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;,   current-dateTime())"/>
+                        </pfx:TimeStamp>
+                    </pfx:Header>
+                    <pfx:Body>
+                        <xsl:copy-of select="$Propuesta/pfx:mag_import_products"/>
+                        <xsl:copy-of select="$Start/pfx:Body/pfx:BitacoraPropuestaArticulo"/>
+                    </pfx:Body>
+                </pfx:MSG_CONTAINER>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

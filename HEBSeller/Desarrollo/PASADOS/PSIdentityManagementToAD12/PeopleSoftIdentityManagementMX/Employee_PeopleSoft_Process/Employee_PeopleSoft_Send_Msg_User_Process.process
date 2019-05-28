@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="www.tibco.com/plugin/Timer" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/PARTNER_INFORMATION" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://xmlns.tibco.com/body" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PARTNER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PARTNER_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_PeopleSoft_Send_Msg_User_Process.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Frecuencia" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>154</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>978</pd:endX>
+    <pd:endY>186</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <OutBody>
+            <xsd:element name="outBody" type="xsd:string"/>
+        </OutBody>
+        <varCurrentEmpl>
+            <xsd:element name="strEmpl" type="xsd:string"/>
+        </varCurrentEmpl>
+        <Days>
+            <xsd:element name="days" type="xsd:int"/>
+        </Days>
+        <varProcess>
+            <xsd:element name="bProcessed" type="xsd:string"/>
+        </varProcess>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1268939340178</pd:targetNamespace>
+    <pd:group name="Group Procesa Envio de Notificaciones de LDAP">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>253</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>654</pd:width>
+        <pd:height>366</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get-Filter-Location-Depts/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>Current_Filter_Locations_Depts</pd:iterationElementSlot>
+            <pd:indexSlot>ifilter</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_Emails</pd:to>
+            <pd:xpathDescription>Record N</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Emails</pd:from>
+            <pd:to>Assign-2-1-1-1</pd:to>
+            <pd:xpathDescription>Dario</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/root/Frecuencia='D' or $_globalVariables/ns1:GlobalVariables/ProjectConfig/UnDia_2Test=1</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Emails</pd:from>
+            <pd:to>Assign-2-1-1-1-1</pd:to>
+            <pd:xpathDescription>Semana</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Msgs_EmployeesSemana</pd:from>
+            <pd:to>Assign-2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>($Get_Msgs_EmployeesSemana/StringEmails/emailsMsgs!='' and $ifilter=1 and $Get_Msgs_EmployeesSemana/StringEmails/records&gt;0) or ($_globalVariables/ns1:GlobalVariables/ProjectConfig/UnDia_2Test=0 and $Get_Msgs_EmployeesSemana/StringEmails/records&lt;=0)</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign-2</pd:from>
+            <pd:to>Send Mail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Send Mail</pd:from>
+            <pd:to>updateNextDate</pd:to>
+            <pd:xpathDescription>Upd NextDate</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$_globalVariables/ns1:GlobalVariables/ProjectConfig/UnDia_2Test=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign-2-1-1-1-1</pd:from>
+            <pd:to>Get_Msgs_EmployeesSemana</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign-2-1-1-1</pd:from>
+            <pd:to>Get_Msgs_EmployeesSemana</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Msgs_EmployeesSemana</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>updateNextDate</pd:to>
+            <pd:xpathDescription>Updt NextDate2</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$_globalVariables/ns1:GlobalVariables/ProjectConfig/UnDia_2Test=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>updateNextDate</pd:from>
+            <pd:to>Null-1-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Send Mail</pd:from>
+            <pd:to>Null-1-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Null-1-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Send Mail">
+            <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+            <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+            <pd:x>684</pd:x>
+            <pd:y>57</pd:y>
+            <config>
+                <newMimeSupport>true</newMimeSupport>
+                <inputOutputVersion>5.2.0</inputOutputVersion>
+                <host>%%ExceptionHandling/GLB_ERR_EMAIL_HOST%%</host>
+                <InputHeaders>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </InputHeaders>
+            </config>
+            <pd:inputBindings>
+                <ns3:mailActivityInput>
+                    <from>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/fromEmail"/>
+                    </from>
+                    <to>
+                        <xsl:value-of select="$Get_Emails/StringEmails/emails"/>
+                    </to>
+                    <subject>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/subjectMsg"/>
+                    </subject>
+                    <ns4:bodyElement>
+                        <bodyText>
+                            <xsl:value-of select="$OutBody/outBody"/>
+                        </bodyText>
+                    </ns4:bodyElement>
+                    <Headers>
+                        <Content-Type>
+                            <xsl:value-of select="&quot;text/html&quot;"/>
+                        </Content-Type>
+                    </Headers>
+                </ns3:mailActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_Emails">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>324</pd:x>
+            <pd:y>166</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Get_Emails.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Filtro>
+                    <Operacion>
+                        <xsl:value-of select="'A'"/>
+                    </Operacion>
+                    <Dept>
+                        <xsl:value-of select="'T'"/>
+                    </Dept>
+                    <Location>
+                        <xsl:value-of select="'T'"/>
+                    </Location>
+                </Filtro>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_Msgs_EmployeesSemana">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>435</pd:x>
+            <pd:y>57</pd:y>
+            <config>
+                <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Get_Msgs_EmployeesSemana.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Filtro>
+                    <Operacion>
+                        <xsl:value-of select="'T'"/>
+                    </Operacion>
+                    <Dept>
+                        <xsl:value-of select="'T'"/>
+                    </Dept>
+                    <Location>
+                        <xsl:value-of select="'T'"/>
+                    </Location>
+                    <Frecuencia>
+                        <xsl:value-of select="$Start/root/Frecuencia"/>
+                    </Frecuencia>
+                    <xsl:choose>
+                        <xsl:when test="$_globalVariables/ns1:GlobalVariables/ProjectConfig/UnDia_2Test=1">
+                            <nextDate>
+                                <xsl:value-of select="tib:add-to-date(current-date(), 0,0,1)"/>
+                            </nextDate>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <nextDate>
+                                <xsl:value-of select="$Get-Filter-Location-Depts/resultSet/Record[1]/nextdate"/>
+                            </nextDate>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <days1>
+                        <xsl:value-of select="$Days/days"/>
+                    </days1>
+                    <days2>
+                        <xsl:value-of select="$Days/days"/>
+                    </days2>
+                </Filtro>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Assign-2">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>586</pd:x>
+            <pd:y>56</pd:y>
+            <config>
+                <variableName>OutBody</variableName>
+            </config>
+            <pd:inputBindings>
+                <outBody>
+                    <xsl:value-of select="$Get_Msgs_EmployeesSemana/StringEmails/emailsMsgs"/>
+                </outBody>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="updateNextDate">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>690</pd:x>
+            <pd:y>190</pd:y>
+            <config>
+                <timeout>60</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>update  [MDM_MX].[dbo].[Control_PS_AD_DATE_MX]   set nextdate=DATEADD(day,(?),CONVERT (date, ?) )
+ where ID_REPORTE=?
+</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>days</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>nextdate</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>tiporeporte</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <days>
+                        <xsl:value-of select="$Days/days"/>
+                    </days>
+                    <nextdate>
+                        <xsl:choose>
+                            <xsl:when test="exists(substring($Current_Filter_Locations_Depts/Record/nextdate, 1,10))">
+                                <xsl:value-of select="substring($Current_Filter_Locations_Depts/Record/nextdate, 1,10)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </nextdate>
+                    <tiporeporte>
+                        <xsl:value-of select="$Start/root/Frecuencia"/>
+                    </tiporeporte>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Assign-2-1-1-1">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>326</pd:x>
+            <pd:y>56</pd:y>
+            <config>
+                <variableName>Days</variableName>
+            </config>
+            <pd:inputBindings>
+                <days>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/UnDia_1"/>
+                </days>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Assign-2-1-1-1-1">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>323</pd:x>
+            <pd:y>299</pd:y>
+            <config>
+                <variableName>Days</variableName>
+            </config>
+            <pd:inputBindings>
+                <days>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/SieteDia_1"/>
+                </days>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>690</pd:x>
+            <pd:y>304</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Null-1-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>816</pd:x>
+            <pd:y>193</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Get Filter Location Depts">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>101</pd:x>
+        <pd:y>190</pd:y>
+        <config>
+            <timeout>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/DB/DBINTEGRACIONES/MSSQL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Connections/Database/Mssql/DBSTG JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>Select CONVERT (date,NEXTDATE) as nextdate FROM [MDM_MX].[dbo].[Control_PS_AD_DATE_MX] 
+ where ID_REPORTE=?
+</statement>
+            <wizardData>#Wed Apr 01 16:46:41 CST 2015&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=Select SURNAME,GIVENAME,DISPLAY_NAME,EMPL_ID,PHONE,PRIMARY_NID,EMAIL_ADDR,EFF_DT,EFF_SEQ,DEP_DESCR,JOBCODE_DESCR,DEPT_ID,JOB_CD,EMPL_STAT,EMPLOYEE_TYPE,\n\t        NAME,NATIONAL_ID,COMPANY,LOCATION_ID,LOCATION_DESCR,LAST_UPDATE_DT from PS_EMPL_DATA_DETAIL_MX where STATUS_AD\='L'&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>nextdate</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>TipoReporte</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <TipoReporte>
+                    <xsl:value-of select="$Start/root/Frecuencia"/>
+                </TipoReporte>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>37</pd:x>
+        <pd:y>405</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="GenerateError">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>149</pd:x>
+        <pd:y>405</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns2:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="tib:render-xml($_error/ns2:ErrorReport, 0,0)"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>98</pd:x>
+        <pd:y>53</pd:y>
+        <config>
+            <variableName>OutBody</variableName>
+        </config>
+        <pd:inputBindings>
+            <outBody>
+                <xsl:value-of select="''"/>
+            </outBody>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>209</pd:x>
+        <pd:y>379</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Group Procesa Envio de Notificaciones de LDAP</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Assign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>GenerateError</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>Get Filter Location Depts</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get Filter Location Depts</pd:from>
+        <pd:to>Group Procesa Envio de Notificaciones de LDAP</pd:to>
+        <pd:xpathDescription>Only NextDate</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>tib:compare-date(current-date(),substring($Get-Filter-Location-Depts/resultSet/Record[1]/nextdate, 1,10))=1 or tib:compare-date(current-date(),substring($Get-Filter-Location-Depts/resultSet/Record[1]/nextdate, 1,10))=0 or $_globalVariables/ns1:GlobalVariables/ProjectConfig/UnDia_2Test=1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get Filter Location Depts</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

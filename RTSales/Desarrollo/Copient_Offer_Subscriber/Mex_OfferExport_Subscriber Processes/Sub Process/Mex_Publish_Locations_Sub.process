@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns0="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/Mex_OfferExport_Sub_Tera_Cfg" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/Mex_OfferExport_Sub_ADB_Cfg" xmlns:ns32="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>Mex_OfferExport_Subscriber Processes/Sub Process/Mex_Publish_Locations_Sub.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Offer"/>
+    <pd:startX>48</pd:startX>
+    <pd:startY>304</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1161</pd:endX>
+    <pd:endY>299</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1260393619609</pd:targetNamespace>
+    <pd:group name="LocationGroups">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>812</pd:x>
+        <pd:y>6</pd:y>
+        <pd:width>321</pd:width>
+        <pd:height>237</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/LocationGroup</pd:over>
+            <pd:iterationElementSlot>current_LocationGroup</pd:iterationElementSlot>
+            <pd:indexSlot>LocationGroupIndex</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Load CPE_LOC_GRP</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Query CPE_OFR_LOCS</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Load CPE_LOC_GRP</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Query CPE_OFR_LOCS</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Row Exists CPE_OFR_LOCS</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Query-CPE_OFR_LOCS/resultSet/Record/OutputColumn1 &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Load CPE_OFR_LOCS</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Query CPE_OFR_LOCS</pd:from>
+            <pd:to>Load CPE_OFR_LOCS</pd:to>
+            <pd:xpathDescription>Otherwise insert CPE_OFR_LOCS</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Load CPE_LOC_GRP">
+            <pd:type>com.tibco.plugin.ae.AEPublisherActivity</pd:type>
+            <pd:resourceType>ae.aepalette.aePubActivity</pd:resourceType>
+            <pd:x>942</pd:x>
+            <pd:y>52</pd:y>
+            <config>
+                <ae.aepalette.sharedProperties.transportChoice>default</ae.aepalette.sharedProperties.transportChoice>
+                <ae.aepalette.sharedProperties.useRequestReply>false</ae.aepalette.sharedProperties.useRequestReply>
+                <ae.aepalette.sharedProperties.adapterService>/Adapter Services/Mex_OfferExport_Sub_ADB_Cfg.adb#adapterService.CpeLocGrp_Sub_Svc</ae.aepalette.sharedProperties.adapterService>
+                <tpPluginEndpointName>CpeLocGrp_Sub_Svc</tpPluginEndpointName>
+                <ae.aepalette.sharedProperties.transportType>jmsQueue</ae.aepalette.sharedProperties.transportType>
+                <ae.aepalette.sharedProperties.jmsQueueSessionQueue>%%Destinations/Queues/GLB_ADB_CPELOCGRP_QUEUE%%</ae.aepalette.sharedProperties.jmsQueueSessionQueue>
+                <ae.aepalette.sharedProperties.deliveryMode>NONPERSISTENT</ae.aepalette.sharedProperties.deliveryMode>
+                <ae.aepalette.sharedProperties.timeToLive>%%ADBTimeToLive%%</ae.aepalette.sharedProperties.timeToLive>
+                <ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>QueueConnectionFactory</ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>
+                <ae.aepalette.sharedProperties.jmsSessionUsername>%%JmsUser%%</ae.aepalette.sharedProperties.jmsSessionUsername>
+                <ae.aepalette.sharedProperties.jmsSessionPassword>%%JmsPassword%%</ae.aepalette.sharedProperties.jmsSessionPassword>
+                <ae.aepalette.sharedProperties.jmsSessionProviderURL>%%JmsProviderUrl%%</ae.aepalette.sharedProperties.jmsSessionProviderURL>
+                <ae.aepalette.sharedProperties.autoGenClientID>true</ae.aepalette.sharedProperties.autoGenClientID>
+                <ae.aepalette.sharedProperties.outputMeta>
+                    <aeMeta>/AESchemas/ae/ADB/Mex_OfferExport_Sub_ADB_Cfg.aeschema#class.CPE_LOC_GRP</aeMeta>
+                </ae.aepalette.sharedProperties.outputMeta>
+            </config>
+            <pd:inputBindings>
+                <aePubInputType>
+                    <body>
+                        <ns3:CPE__LOC__GRP>
+                            <LOC__GRP__ID>
+                                <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/LocationGroupID"/>
+                            </LOC__GRP__ID>
+                            <LOC__GRP__NM>
+                                <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/Name"/>
+                            </LOC__GRP__NM>
+                            <DES>
+                                <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/Description"/>
+                            </DES>
+                            <CRE8D__DT>
+                                <dateTime>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if (string-length($current_LocationGroup/LocationGroup/Header/CreatedDate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current_LocationGroup/LocationGroup/Header/CreatedDate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime()))">
+                                            <xsl:value-of select="if (string-length($current_LocationGroup/LocationGroup/Header/CreatedDate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current_LocationGroup/LocationGroup/Header/CreatedDate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </dateTime>
+                            </CRE8D__DT>
+                            <EXT__GRP__ID>
+                                <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/ExtGroupID"/>
+                            </EXT__GRP__ID>
+                            <EXT__SEQ__NBR>
+                                <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/ExtSeqNum"/>
+                            </EXT__SEQ__NBR>
+                            <EXT__EXCLD>
+                                <xsl:choose>
+                                    <xsl:when test="exists(if(lower-case($current_LocationGroup/LocationGroup/Header/ExtExcluded)='true') then 1 else 0)">
+                                        <xsl:value-of select="if(lower-case($current_LocationGroup/LocationGroup/Header/ExtExcluded)='true') then 1 else 0"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </EXT__EXCLD>
+                            <ALL__LOCS__SW>
+                                <xsl:choose>
+                                    <xsl:when test="exists(if(lower-case($current_LocationGroup/LocationGroup/Header/AllLocations)='true') then 1 else 0)">
+                                        <xsl:value-of select="if(lower-case($current_LocationGroup/LocationGroup/Header/AllLocations)='true') then 1 else 0"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </ALL__LOCS__SW>
+                            <LST__UPDT__TS>
+                                <dateTime>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if (string-length($current_LocationGroup/LocationGroup/Header/LastUpdate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current_LocationGroup/LocationGroup/Header/LastUpdate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime()))">
+                                            <xsl:value-of select="if (string-length($current_LocationGroup/LocationGroup/Header/LastUpdate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current_LocationGroup/LocationGroup/Header/LastUpdate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </dateTime>
+                            </LST__UPDT__TS>
+                            <xsl:if test="string-length($current_LocationGroup/LocationGroup/Header/StatusFlag)!=0">
+                                <STAT__FLAG>
+                                    <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/StatusFlag"/>
+                                </STAT__FLAG>
+                            </xsl:if>
+                            <TCRMA__STAT__FLAG>
+                                <xsl:value-of select="if(string-length($current_LocationGroup/LocationGroup/Header/TCRMAStatusFlag)=0) then 0 else $current_LocationGroup/LocationGroup/Header/TCRMAStatusFlag"/>
+                            </TCRMA__STAT__FLAG>
+                            <xsl:if test="string-length($current_LocationGroup/LocationGroup/Header/EngineID)!=0">
+                                <ENGN__ID>
+                                    <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/EngineID"/>
+                                </ENGN__ID>
+                            </xsl:if>
+                            <xsl:if test="string-length($current_LocationGroup/LocationGroup/Header/BannerID)!=0">
+                                <BANNER__ID>
+                                    <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/BannerID"/>
+                                </BANNER__ID>
+                            </xsl:if>
+                            <ADB__OPCODE>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/AdapterConfig/DBSTG/GLB_ADB_OPCODE"/>
+                            </ADB__OPCODE>
+                        </ns3:CPE__LOC__GRP>
+                    </body>
+                </aePubInputType>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Load CPE_OFR_LOCS">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>1045</pd:x>
+            <pd:y>181</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                <statement>insert into CPE_OFR_LOCS(INCNT_ID,LOC_GRP_ID) values(?,?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>INCNT_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOC_GRP_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <INCNT_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </INCNT_ID>
+                    <LOC_GRP_ID>
+                        <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/LocationGroupID"/>
+                    </LOC_GRP_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Query CPE_OFR_LOCS">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>902</pd:x>
+            <pd:y>123</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/DB/DBSTG/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                <statement>select count(INCNT_ID) from CPE_OFR_LOCS where INCNT_ID=? and LOC_GRP_ID=?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>INCNT_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>LOC_GRP_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>OutputColumn1</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <INCNT_ID>
+                        <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                    </INCNT_ID>
+                    <LOC_GRP_ID>
+                        <xsl:value-of select="$current_LocationGroup/LocationGroup/Header/LocationGroupID"/>
+                    </LOC_GRP_ID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:group name="LocationGroups2">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>211</pd:x>
+        <pd:y>111</pd:y>
+        <pd:width>478</pd:width>
+        <pd:height>365</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/LocationGroup</pd:over>
+            <pd:iterationElementSlot>currentLocationGroup</pd:iterationElementSlot>
+            <pd:indexSlot>LocationGroup_Index</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Unload CPE_LOC_GRP_ITM</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Unload CPE_LOC_GRP_ITM</pd:from>
+            <pd:to>Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Group">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>365</pd:x>
+            <pd:y>167</pd:y>
+            <pd:width>284</pd:width>
+            <pd:height>254</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$currentLocationGroup/LocationGroup/Locations/Location</pd:over>
+                <pd:iterationElementSlot>current_Location</pd:iterationElementSlot>
+                <pd:indexSlot>LoactionIndex</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Query CPE_LOC_GRP_ITM</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Query CPE_LOC_GRP_ITM</pd:from>
+                <pd:to>end</pd:to>
+                <pd:xpathDescription>Exists?</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$Query-CPE_LOC_GRP_ITM/resultSet/Record/OutputColumn1 &gt; 0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Load CPE_LOC_GRP_ITM</pd:from>
+                <pd:to>end</pd:to>
+                <pd:xpathDescription/>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Query CPE_LOC_GRP_ITM</pd:from>
+                <pd:to>Load CPE_LOC_GRP_ITM</pd:to>
+                <pd:xpathDescription>Load CPE_LOC_GRP_ITM</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Load CPE_LOC_GRP_ITM">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>465</pd:x>
+                <pd:y>351</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <statement>INSERT  into CPE_LOC_GRP_ITM(LOC_GRP_ID,LOC_ID)  values(?,?)</statement>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>LOC_GRP_ID</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>LOC_ID</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <LOC_GRP_ID>
+                            <xsl:value-of select="$currentLocationGroup/LocationGroup/Header/LocationGroupID"/>
+                        </LOC_GRP_ID>
+                        <LOC_ID>
+                            <xsl:choose>
+                                <xsl:when test="exists($current_Location/Location/Header/LocationID)">
+                                    <xsl:value-of select="$current_Location/Location/Header/LocationID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </LOC_ID>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Query CPE_LOC_GRP_ITM">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>465</pd:x>
+                <pd:y>222</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/DB/DBSTG/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                    <statement>select count(*) from CPE_LOC_GRP_ITM where LOC_GRP_ID = ? and LOC_ID = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>LOC_GRP_ID</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>LOC_ID</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>OutputColumn1</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <LOC_GRP_ID>
+                            <xsl:value-of select="$currentLocationGroup/LocationGroup/Header/LocationGroupID"/>
+                        </LOC_GRP_ID>
+                        <LOC_ID>
+                            <xsl:value-of select="$current_Location/Location/Header/LocationID"/>
+                        </LOC_ID>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="Unload CPE_LOC_GRP_ITM">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>295</pd:x>
+            <pd:y>310</pd:y>
+            <config>
+                <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+                <statement>DELETE FROM [dbo].[CPE_LOC_GRP_ITM]
+WHERE LOC_GRP_ID = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>LOC_GRP_ID</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <LOC_GRP_ID>
+                        <xsl:value-of select="$currentLocationGroup/LocationGroup/Header/LocationGroupID"/>
+                    </LOC_GRP_ID>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:group name="Locations">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>81</pd:x>
+        <pd:y>478</pd:y>
+        <pd:width>172</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/LocationGroup/Locations/Location</pd:over>
+            <pd:iterationElementSlot>current</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Load CPE_LOC</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Load CPE_LOC</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Load CPE_LOC">
+            <pd:type>com.tibco.plugin.ae.AEPublisherActivity</pd:type>
+            <pd:resourceType>ae.aepalette.aePubActivity</pd:resourceType>
+            <pd:x>161</pd:x>
+            <pd:y>555</pd:y>
+            <config>
+                <ae.aepalette.sharedProperties.transportChoice>default</ae.aepalette.sharedProperties.transportChoice>
+                <ae.aepalette.sharedProperties.useRequestReply>false</ae.aepalette.sharedProperties.useRequestReply>
+                <ae.aepalette.sharedProperties.adapterService>/Adapter Services/Mex_OfferExport_Sub_ADB_Cfg.adb#adapterService.CpeLoc_Sub_Svc</ae.aepalette.sharedProperties.adapterService>
+                <tpPluginEndpointName>CpeLoc_Sub_Svc</tpPluginEndpointName>
+                <ae.aepalette.sharedProperties.transportType>jmsQueue</ae.aepalette.sharedProperties.transportType>
+                <ae.aepalette.sharedProperties.jmsQueueSessionQueue>%%Destinations/Queues/GLB_ADB_CPELOC_QUEUE%%</ae.aepalette.sharedProperties.jmsQueueSessionQueue>
+                <ae.aepalette.sharedProperties.deliveryMode>NONPERSISTENT</ae.aepalette.sharedProperties.deliveryMode>
+                <ae.aepalette.sharedProperties.timeToLive>%%ADBTimeToLive%%</ae.aepalette.sharedProperties.timeToLive>
+                <ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>QueueConnectionFactory</ae.aepalette.sharedProperties.jmsQueueSessionConnectionFactory>
+                <ae.aepalette.sharedProperties.jmsSessionUsername>%%JmsUser%%</ae.aepalette.sharedProperties.jmsSessionUsername>
+                <ae.aepalette.sharedProperties.jmsSessionPassword>%%JmsPassword%%</ae.aepalette.sharedProperties.jmsSessionPassword>
+                <ae.aepalette.sharedProperties.jmsSessionProviderURL>%%JmsProviderUrl%%</ae.aepalette.sharedProperties.jmsSessionProviderURL>
+                <ae.aepalette.sharedProperties.autoGenClientID>true</ae.aepalette.sharedProperties.autoGenClientID>
+                <ae.aepalette.sharedProperties.outputMeta>
+                    <aeMeta>/AESchemas/ae/ADB/Mex_OfferExport_Sub_ADB_Cfg.aeschema#class.CPE_LOC</aeMeta>
+                </ae.aepalette.sharedProperties.outputMeta>
+            </config>
+            <pd:inputBindings>
+                <aePubInputType>
+                    <body>
+                        <ns3:CPE__LOC>
+                            <LOC__ID>
+                                <xsl:value-of select="$current/Location/Header/LocationID"/>
+                            </LOC__ID>
+                            <EXT__LOC__CD>
+                                <xsl:value-of select="$current/Location/Header/ExtLocationCode"/>
+                            </EXT__LOC__CD>
+                            <LOC__NM>
+                                <xsl:value-of select="$current/Location/Header/LocationName"/>
+                            </LOC__NM>
+                            <ADR__1>
+                                <xsl:choose>
+                                    <xsl:when test="exists(string($current/Location/Header/Address1))">
+                                        <xsl:value-of select="string($current/Location/Header/Address1)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </ADR__1>
+                            <ADR__2>
+                                <xsl:choose>
+                                    <xsl:when test="exists(string($current/Location/Header/Address2))">
+                                        <xsl:value-of select="string($current/Location/Header/Address2)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </ADR__2>
+                            <CTY>
+                                <xsl:choose>
+                                    <xsl:when test="exists(string($current/Location/Header/City))">
+                                        <xsl:value-of select="string($current/Location/Header/City)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </CTY>
+                            <ST>
+                                <xsl:choose>
+                                    <xsl:when test="exists(string($current/Location/Header/State))">
+                                        <xsl:value-of select="string($current/Location/Header/State)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </ST>
+                            <ZIP>
+                                <xsl:choose>
+                                    <xsl:when test="exists(string($current/Location/Header/Zip))">
+                                        <xsl:value-of select="string($current/Location/Header/Zip)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </ZIP>
+                            <TSTING__LOC>
+                                <xsl:value-of select="if(lower-case($current/Location/Header/TestingLocation)='true') then 1 else 0"/>
+                            </TSTING__LOC>
+                            <LST__UPDT__TS>
+                                <dateTime>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if (string-length($current/Location/Header/LastUpdate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current/Location/Header/LastUpdate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime()))">
+                                            <xsl:value-of select="if (string-length($current/Location/Header/LastUpdate)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current/Location/Header/LastUpdate)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </dateTime>
+                            </LST__UPDT__TS>
+                            <xsl:if test="string-length($current/Location/Header/StatusFlag)!=0">
+                                <STAT__FLAG>
+                                    <xsl:value-of select="$current/Location/Header/StatusFlag"/>
+                                </STAT__FLAG>
+                            </xsl:if>
+                            <CNTRY__ID>
+                                <xsl:value-of select="if(string-length($current/Location/Header/CountryID)=0) then 0 else $current/Location/Header/CountryID"/>
+                            </CNTRY__ID>
+                            <CONTC__NM>
+                                <xsl:choose>
+                                    <xsl:when test="exists(string($current/Location/Header/ContactName))">
+                                        <xsl:value-of select="string($current/Location/Header/ContactName)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </CONTC__NM>
+                            <PHN__NBR>
+                                <xsl:choose>
+                                    <xsl:when test="exists(string($current/Location/Header/PhoneNumber))">
+                                        <xsl:value-of select="string($current/Location/Header/PhoneNumber)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </PHN__NBR>
+                            <GEN__IPL>
+                                <xsl:value-of select="if (lower-case($current/Location/Header/GenIPL)='true')then 1 else 0"/>
+                            </GEN__IPL>
+                            <LST__IPL>
+                                <dateTime>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(if (string-length($current/Location/Header/LastIPL)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current/Location/Header/LastIPL)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime()))">
+                                            <xsl:value-of select="if (string-length($current/Location/Header/LastIPL)) then tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, tib:parse-dateTime(&quot;MM/dd/yy hh:mm:ss a&quot;, $current/Location/Header/LastIPL)) else tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </dateTime>
+                            </LST__IPL>
+                            <xsl:if test="string-length($current/Location/Header/CMOADeployStatus)!=0">
+                                <CMOA__DPLY__STAT>
+                                    <xsl:value-of select="$current/Location/Header/CMOADeployStatus"/>
+                                </CMOA__DPLY__STAT>
+                            </xsl:if>
+                            <xsl:if test="string-length($current/Location/Header/EngineID)!=0">
+                                <ENGN__ID>
+                                    <xsl:value-of select="$current/Location/Header/EngineID"/>
+                                </ENGN__ID>
+                            </xsl:if>
+                            <xsl:if test="string-length($current/Location/Header/BannerID)!=0">
+                                <BANNER__ID>
+                                    <xsl:value-of select="$current/Location/Header/BannerID"/>
+                                </BANNER__ID>
+                            </xsl:if>
+                            <ADB__OPCODE>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/AdapterConfig/DBSTG/GLB_ADB_OPCODE"/>
+                            </ADB__OPCODE>
+                        </ns3:CPE__LOC>
+                    </body>
+                </aePubInputType>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Unload CPE_OFR_LOCS">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>159</pd:x>
+        <pd:y>88</pd:y>
+        <config>
+            <timeout>%%Connections/DB/DBSTG/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/DBSTG.sharedjdbc</jdbcSharedConfig>
+            <statement>DELETE FROM [dbo].[CPE_OFR_LOCS]
+WHERE INCNT_ID = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>INCNT_ID</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <INCNT_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                            <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </INCNT_ID>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>LocationGroups2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LocationGroups2</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Unload CPE_OFR_LOCS</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LocationGroups</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Locations</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Locations</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Unload CPE_OFR_LOCS</pd:from>
+        <pd:to>LocationGroups</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns4="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>PmmArticulosPublisher/Starter Process/ProcessArticulosScheduler_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>112</pd:x>
+        <pd:y>238</pd:y>
+        <config>
+            <StartTime>1387579620000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%PmmArticulosProjectPublisherVariables/GLB_TIMEINTERVAL%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>424</pd:endX>
+    <pd:endY>240</pd:endY>
+    <pd:errorSchemas>
+        <error ref="ns3:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1387582276931</pd:targetNamespace>
+    <pd:activity name="Catch-1">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>123</pd:x>
+        <pd:y>331</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>282</pd:x>
+        <pd:y>333</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns3:MSG_Container>
+                <ns3:Header>
+                    <ns3:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </ns3:ProjectName>
+                    <ns3:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </ns3:Source_Domain>
+                    <ns3:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </ns3:Destination_Domain>
+                    <ns3:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                    </ns3:Transaction_Type>
+                    <ns3:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                    </ns3:TimeStamp>
+                </ns3:Header>
+                <ns3:Body>
+                    <ns3:ErrorManagementSchema>
+                        <ns3:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns3:inrtn_id>
+                        <ns3:inrtn_instn_nm>
+                            <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                        </ns3:inrtn_instn_nm>
+                        <ns3:inrtn_err_rtn_desc>
+                            <xsl:value-of select="$Catch-1/exceptiondata/*"/>
+                        </ns3:inrtn_err_rtn_desc>
+                        <ns3:inrtn_msg_body>
+                            <xsl:value-of select="&quot;FAILED IN JMS QUEUE SENDER: Timer of Region.&quot;"/>
+                        </ns3:inrtn_msg_body>
+                        <ns3:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns3:cre8_ts>
+                        <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                            <ns3:u_code>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                            </ns3:u_code>
+                        </xsl:if>
+                        <ns3:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_LOW"/>
+                        </ns3:sev_id>
+                    </ns3:ErrorManagementSchema>
+                </ns3:Body>
+            </ns3:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Queue Sender">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>248</pd:x>
+        <pd:y>238</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_INICIOARTICULOS_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>%%Connections/JMS/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                <JMSExpiration>%%Connections/JMS/Properties/GLB_JMS_EXPIRATION%%</JMSExpiration>
+                <JMSPriority>%%Connections/JMS/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <Body>
+                    <xsl:value-of select="&quot;Iniciar proceso Region&quot;"/>
+                </Body>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch-1</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: ProcessArticulosScheduler_Starter
+Fecha de creación: 22/01/2014
+Creado por: Juan Alberto Gonzalez Aguilar
+Variables globales:  GLB_QUEUEINICIOARTICULOS
+Descripción: 
+Proceso encargado de mandar un mensaje a la queue HEB.COMMON.PMM.InicioArticulos
+cada minuto</pd:description>
+        <pd:x>295</pd:x>
+        <pd:y>73</pd:y>
+        <pd:width>570</pd:width>
+        <pd:height>126</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-1</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

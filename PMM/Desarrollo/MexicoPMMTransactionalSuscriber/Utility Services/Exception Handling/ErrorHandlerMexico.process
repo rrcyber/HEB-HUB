@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:ns2="http://xmlns.tibco.com/body" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions">
+    <pd:name>Utility Services/Exception Handling/ErrorHandlerMexico.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Project" type="xsd:string"/>
+                    <xsd:element name="Tibcoprocess" type="xsd:string"/>
+                    <xsd:element name="MailSupport" type="xsd:string"/>
+                    <xsd:element name="Tablename" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="TrackingId" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="MsgError" type="xsd:string"/>
+                    <xsd:element name="Queue" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="Info" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="CustomID" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="PublicationTable" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="sendmail" type="xsd:boolean"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>141</pd:startX>
+    <pd:startY>66</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>552</pd:endX>
+    <pd:endY>67</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1322780215385</pd:targetNamespace>
+    <pd:activity name="Send Mail">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>392</pd:x>
+        <pd:y>141</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>mail.heb.com.mx</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns:mailActivityInput>
+                <from>
+                    <xsl:value-of select="&quot;SoporteTibco@hebmex.com&quot;"/>
+                </from>
+                <to>
+                    <xsl:value-of select="$Start/root/MailSupport"/>
+                </to>
+                <subject>
+                    <xsl:value-of select="concat(&quot;Ocurrio un error en el suscriber &quot;,substring-before($Start/root/Tibcoprocess,&quot;/&quot;),&quot; del server  &quot;, BW:getHostName(),&quot;.&quot;)"/>
+                </subject>
+                <ns2:bodyElement>
+                    <bodyText>
+                        <xsl:value-of select="concat(&#xA;&quot;Server: &quot;,BW:getHostName(),&quot;&#xD;&#xA;&#xD;&#xA;&quot;,&#xA;&quot;Proceso de Error: &quot;,$Start/root/Tibcoprocess,&quot;&#xD;&#xA;&#xD;&#xA;&quot;,&#xA;&quot;Error: &quot;,$Start/root/MsgError,&quot;&#xD;&#xA;&#xD;&#xA;&quot;,&#xA;&quot;Publication Table: &quot;,$Start/root/PublicationTable,&quot;&#xD;&#xA;&#xD;&#xA;&quot;,&#xA;&quot;Tracking ID: &quot;,$Start/root/TrackingId,&quot;&#xD;&#xA;&#xD;&#xA;&quot;,&#xA;&quot;Extra Info: &quot;,$Start/root/Info)"/>
+                    </bodyText>
+                </ns2:bodyElement>
+            </ns:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Insert_Error">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>264</pd:x>
+        <pd:y>66</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSDI/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/DBSDI JDBC CONNECTION.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO TIBCO_ERROR_HANDLER (PROJECT_NAME,TIBCO_PROCESS,TABLE_NAME,TRACKING_ID,
+DATE_CREATED,MSG_ERROR,INFO,QUEUE,CUSTOM_ID,HOST,PUBLICATION_TABLE)
+VALUES (?,?,?,?,CURRENT_TIMESTAMP,?,?,?,?,?,?)
+</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PROJECTNAME</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TIBCOPROCESS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TABLENAME</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRACKING_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>MSG_ERROR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>INFO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>QUEUE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CUSTOM_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>HOST</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PUBLICATIONTABLE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <PROJECTNAME>
+                    <xsl:value-of select="$Start/root/Project"/>
+                </PROJECTNAME>
+                <TIBCOPROCESS>
+                    <xsl:value-of select="$Start/root/Tibcoprocess"/>
+                </TIBCOPROCESS>
+                <TABLENAME>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/root/Tablename)">
+                            <xsl:value-of select="$Start/root/Tablename"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TABLENAME>
+                <TRACKING_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/root/TrackingId)">
+                            <xsl:value-of select="$Start/root/TrackingId"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRACKING_ID>
+                <MSG_ERROR>
+                    <xsl:value-of select="$Start/root/MsgError"/>
+                </MSG_ERROR>
+                <INFO>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/root/Info)">
+                            <xsl:value-of select="$Start/root/Info"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </INFO>
+                <QUEUE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/root/Queue)">
+                            <xsl:value-of select="$Start/root/Queue"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </QUEUE>
+                <CUSTOM_ID>
+                    <xsl:value-of select="$Start/root/CustomID"/>
+                </CUSTOM_ID>
+                <HOST>
+                    <xsl:value-of select="BW:getHostName()"/>
+                </HOST>
+                <PUBLICATIONTABLE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/root/PublicationTable)">
+                            <xsl:value-of select="$Start/root/PublicationTable"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PUBLICATIONTABLE>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Insert_Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Mail</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_Error</pd:from>
+        <pd:to>Send Mail</pd:to>
+        <pd:xpathDescription>SendMail</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/root/sendmail = 1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_Error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

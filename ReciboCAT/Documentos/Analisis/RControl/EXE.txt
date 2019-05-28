@@ -1,0 +1,42 @@
+SELECT a.APPT_ID, D.DC_ID, D.WHSE_ID, LPAD(D.PROD_ID,18) AS PROD_ID, D.PRDD_ID, SUM(D.RCT_QTY/E.UNIT_SHIP_CSE) AS RCT_QTY, SUM(NVL(D.CATCH_WGT , 0)) AS CATCH_WGT, LPAD(D.PO_ID,18) AS PO_ID, A.DEPDTIM, E.UNIT_SHIP_CSE
+from IAPT a  
+inner join IAPTD B on B.APPT_ID= a.APPT_ID  
+inner join IRCT C  on C.APPT_ID = B.APPT_ID and C.PO_ID = B.PO_ID   
+inner join IRCTD D on D.RCPT_ID = C.RCPT_ID and D.PO_ID = C.PO_ID 
+inner join IPOD E  on E.PO_ID = D.PO_ID and E.PROD_ID = D.PROD_ID and E.POD_ID = D.POD_ID 
+left outer join (select distinct RCPT_ID, PO_ID 
+				 from IRCTD  
+				 where nvl(RDST_ID, ' ') <> 'D' ) F on f.RCPT_ID = C.RCPT_ID and F.PO_ID = C.PO_ID 
+where nvl(D.RDST_ID, ' ') = 'D' 
+--and D.PO_ID =13845857
+and D.PO_ID = 50335305
+and F.RCPT_ID is null 
+and a.DEPDTIM between sysdate - 30/1440 and sysdate
+GROUP BY D.DC_ID, D.WHSE_ID, D.PROD_ID, E.UNIT_SHIP_CSE, D.PO_ID, D.PRDD_ID, A.DEPDTIM, a.APPT_ID
+order by a.DEPDTIM desc
+
+SELECT a.DEPDTIM ,a.* from IAPT a where a.APPT_ID  = 768626
+update IAPT set DEPDTIM = sysdate where APPT_ID  = 768626
+
+-----------------------------------------
+
+
+SELECT D.DC_ID, D.WHSE_ID, LPAD(D.PROD_ID,18) AS PROD_ID, D.PRDD_ID, SUM(D.RCT_QTY/E.UNIT_SHIP_CSE) AS RCT_QTY, SUM(NVL(D.CATCH_WGT , 0)) AS CATCH_WGT, LPAD(D.PO_ID,18) AS PO_ID, A.DEPDTIM, E.UNIT_SHIP_CSE
+from IAPT a  
+inner join IAPTD B on B.APPT_ID= a.APPT_ID  
+inner join IRCT C  on C.APPT_ID = B.APPT_ID and C.PO_ID = B.PO_ID   
+inner join IRCTD D on D.RCPT_ID = C.RCPT_ID and D.PO_ID = C.PO_ID 
+inner join IPOD E  on E.PO_ID = D.PO_ID and E.PROD_ID = D.PROD_ID and E.POD_ID = D.POD_ID 
+left outer join (select distinct RCPT_ID, PO_ID 
+				 from IRCTD  
+				 where nvl(RDST_ID, ' ') <> 'D' ) F on f.RCPT_ID = C.RCPT_ID and F.PO_ID = C.PO_ID 
+where nvl(D.RDST_ID, ' ') = 'D' 
+and F.RCPT_ID is null 
+and a.DEPDTIM between sysdate - 30/1440 and sysdate
+GROUP BY D.DC_ID, D.WHSE_ID, D.PROD_ID, E.UNIT_SHIP_CSE, D.PO_ID, D.PRDD_ID, A.DEPDTIM
+
+
+
+
+
+

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx="http://www.tibco.com/schemas/ItemSyncPMMPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:ns2="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd5" xmlns:pfx2="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd3" xmlns:pfx3="http://www.tibco.com/schemas/FillRateImpPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd4" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/SDIVPCCSI.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx6="http://xmlns.heb.com/ei/SDIVPCCSI_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/schemas/ItemSyncPMMPublisher/Shared Resources/Schema Definitions/Custom/Schema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/MD_ITEM_SYNC.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/SDIVPCCSI.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIVPCCSI.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIVPCCSI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIVPCCSI_DATA_SOAP.xsd"/>
+    <pd:name>PmmItemSync Processes/Sub Process/SDIVPCCSICasePack.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Body" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>75</pd:startX>
+    <pd:startY>162</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>693</pd:endX>
+    <pd:endY>163</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1449181484341</pd:targetNamespace>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>212</pd:x>
+        <pd:y>163</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx6:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/Body"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>355</pd:x>
+        <pd:y>88</pd:y>
+        <pd:width>193</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>52</pd:collapsedWidth>
+        <pd:collapsedHeight>69</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Parse-XML/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:SDIVPCCSI/pfx6:RECORD</pd:over>
+            <pd:iterationElementSlot>Record_SDIVPCCSI</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>SDIVPCCSICasePack</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SDIVPCCSICasePack</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="SDIVPCCSICasePack">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>451</pd:x>
+            <pd:y>165</pd:y>
+            <config>
+                <processName>/PmmItemSync Processes/Sub Process/Insert SDIVPCCSI_CasePack.process</processName>
+            </config>
+            <pd:inputBindings>
+                <pfx6:SDIVPCCSI>
+                    <xsl:for-each select="$Record_SDIVPCCSI/pfx6:RECORD">
+                        <pfx6:RECORD>
+                            <pfx6:BATCH_NUM>
+                                <xsl:copy-of select="pfx6:BATCH_NUM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:BATCH_NUM"/>
+                            </pfx6:BATCH_NUM>
+                            <pfx6:TECH_KEY>
+                                <xsl:copy-of select="pfx6:TECH_KEY/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:TECH_KEY"/>
+                            </pfx6:TECH_KEY>
+                            <pfx6:TRAN_TYPE>
+                                <xsl:copy-of select="pfx6:TRAN_TYPE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:TRAN_TYPE"/>
+                            </pfx6:TRAN_TYPE>
+                            <pfx6:PRD_LVL_NUMBER>
+                                <xsl:copy-of select="pfx6:PRD_LVL_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_LVL_NUMBER"/>
+                            </pfx6:PRD_LVL_NUMBER>
+                            <pfx6:CASE_PACK_ID>
+                                <xsl:copy-of select="pfx6:CASE_PACK_ID/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CASE_PACK_ID"/>
+                            </pfx6:CASE_PACK_ID>
+                            <pfx6:VENDOR_NUMBER>
+                                <xsl:copy-of select="pfx6:VENDOR_NUMBER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VENDOR_NUMBER"/>
+                            </pfx6:VENDOR_NUMBER>
+                            <pfx6:VPC_PRD_COST>
+                                <xsl:copy-of select="pfx6:VPC_PRD_COST/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_PRD_COST"/>
+                            </pfx6:VPC_PRD_COST>
+                            <pfx6:VPC_CASE_QTY>
+                                <xsl:copy-of select="pfx6:VPC_CASE_QTY/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_QTY"/>
+                            </pfx6:VPC_CASE_QTY>
+                            <pfx6:VPC_CASE_STD_PACK>
+                                <xsl:copy-of select="pfx6:VPC_CASE_STD_PACK/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_STD_PACK"/>
+                            </pfx6:VPC_CASE_STD_PACK>
+                            <pfx6:VPC_CST_START>
+                                <xsl:copy-of select="pfx6:VPC_CST_START/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CST_START"/>
+                            </pfx6:VPC_CST_START>
+                            <pfx6:VPC_CST_END>
+                                <xsl:copy-of select="pfx6:VPC_CST_END/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CST_END"/>
+                            </pfx6:VPC_CST_END>
+                            <pfx6:CASE_PACK_DESC>
+                                <xsl:copy-of select="pfx6:CASE_PACK_DESC/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CASE_PACK_DESC"/>
+                            </pfx6:CASE_PACK_DESC>
+                            <pfx6:DATE_CREATED>
+                                <xsl:copy-of select="pfx6:DATE_CREATED/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:DATE_CREATED"/>
+                            </pfx6:DATE_CREATED>
+                            <pfx6:DOWNLOAD_DATE_1>
+                                <xsl:copy-of select="pfx6:DOWNLOAD_DATE_1/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:DOWNLOAD_DATE_1"/>
+                            </pfx6:DOWNLOAD_DATE_1>
+                            <pfx6:DOWNLOAD_DATE_2>
+                                <xsl:copy-of select="pfx6:DOWNLOAD_DATE_2/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:DOWNLOAD_DATE_2"/>
+                            </pfx6:DOWNLOAD_DATE_2>
+                            <pfx6:PRD_SLL_UOM>
+                                <xsl:copy-of select="pfx6:PRD_SLL_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PRD_SLL_UOM"/>
+                            </pfx6:PRD_SLL_UOM>
+                            <pfx6:CURR_CODE>
+                                <xsl:copy-of select="pfx6:CURR_CODE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CURR_CODE"/>
+                            </pfx6:CURR_CODE>
+                            <pfx6:SUBS_ACCEPTED>
+                                <xsl:copy-of select="pfx6:SUBS_ACCEPTED/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:SUBS_ACCEPTED"/>
+                            </pfx6:SUBS_ACCEPTED>
+                            <pfx6:VPC_CASE_QTY_UOM>
+                                <xsl:copy-of select="pfx6:VPC_CASE_QTY_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_QTY_UOM"/>
+                            </pfx6:VPC_CASE_QTY_UOM>
+                            <pfx6:NUMBER_OF_INNERS>
+                                <xsl:copy-of select="pfx6:NUMBER_OF_INNERS/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:NUMBER_OF_INNERS"/>
+                            </pfx6:NUMBER_OF_INNERS>
+                            <pfx6:INV_UNITS_PER_INNER>
+                                <xsl:copy-of select="pfx6:INV_UNITS_PER_INNER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:INV_UNITS_PER_INNER"/>
+                            </pfx6:INV_UNITS_PER_INNER>
+                            <pfx6:INV_UOM>
+                                <xsl:copy-of select="pfx6:INV_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:INV_UOM"/>
+                            </pfx6:INV_UOM>
+                            <pfx6:EACHES_PER_INNER>
+                                <xsl:copy-of select="pfx6:EACHES_PER_INNER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:EACHES_PER_INNER"/>
+                            </pfx6:EACHES_PER_INNER>
+                            <pfx6:GRADE_CODE>
+                                <xsl:copy-of select="pfx6:GRADE_CODE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:GRADE_CODE"/>
+                            </pfx6:GRADE_CODE>
+                            <pfx6:VPC_CASE_GROSS_WGT>
+                                <xsl:copy-of select="pfx6:VPC_CASE_GROSS_WGT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_GROSS_WGT"/>
+                            </pfx6:VPC_CASE_GROSS_WGT>
+                            <pfx6:VPC_CASE_WGT>
+                                <xsl:copy-of select="pfx6:VPC_CASE_WGT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_WGT"/>
+                            </pfx6:VPC_CASE_WGT>
+                            <pfx6:VPC_CASE_WGT_UOM>
+                                <xsl:copy-of select="pfx6:VPC_CASE_WGT_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_WGT_UOM"/>
+                            </pfx6:VPC_CASE_WGT_UOM>
+                            <pfx6:VPC_PRD_STATUS>
+                                <xsl:copy-of select="pfx6:VPC_PRD_STATUS/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_PRD_STATUS"/>
+                            </pfx6:VPC_PRD_STATUS>
+                            <pfx6:VPC_CASE_WIDTH>
+                                <xsl:copy-of select="pfx6:VPC_CASE_WIDTH/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_WIDTH"/>
+                            </pfx6:VPC_CASE_WIDTH>
+                            <pfx6:VPC_CASE_LEN>
+                                <xsl:copy-of select="pfx6:VPC_CASE_LEN/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_LEN"/>
+                            </pfx6:VPC_CASE_LEN>
+                            <pfx6:VPC_CASE_HEIGHT>
+                                <xsl:copy-of select="pfx6:VPC_CASE_HEIGHT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_HEIGHT"/>
+                            </pfx6:VPC_CASE_HEIGHT>
+                            <pfx6:VPC_CASE_CUBE>
+                                <xsl:copy-of select="pfx6:VPC_CASE_CUBE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_CUBE"/>
+                            </pfx6:VPC_CASE_CUBE>
+                            <pfx6:VPC_CASE_DIM_UOM>
+                                <xsl:copy-of select="pfx6:VPC_CASE_DIM_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CASE_DIM_UOM"/>
+                            </pfx6:VPC_CASE_DIM_UOM>
+                            <pfx6:VPC_PALLET_HI>
+                                <xsl:copy-of select="pfx6:VPC_PALLET_HI/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_PALLET_HI"/>
+                            </pfx6:VPC_PALLET_HI>
+                            <pfx6:VPC_PALLET_TIER>
+                                <xsl:copy-of select="pfx6:VPC_PALLET_TIER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_PALLET_TIER"/>
+                            </pfx6:VPC_PALLET_TIER>
+                            <pfx6:PACK_BY_NO_DAYS>
+                                <xsl:copy-of select="pfx6:PACK_BY_NO_DAYS/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:PACK_BY_NO_DAYS"/>
+                            </pfx6:PACK_BY_NO_DAYS>
+                            <pfx6:RCV_BY_NO_DAYS>
+                                <xsl:copy-of select="pfx6:RCV_BY_NO_DAYS/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:RCV_BY_NO_DAYS"/>
+                            </pfx6:RCV_BY_NO_DAYS>
+                            <pfx6:SELL_BY_NO_DAYS>
+                                <xsl:copy-of select="pfx6:SELL_BY_NO_DAYS/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:SELL_BY_NO_DAYS"/>
+                            </pfx6:SELL_BY_NO_DAYS>
+                            <pfx6:VPC_CP_DSD>
+                                <xsl:copy-of select="pfx6:VPC_CP_DSD/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CP_DSD"/>
+                            </pfx6:VPC_CP_DSD>
+                            <pfx6:VPC_PRIMARY_FLAG>
+                                <xsl:copy-of select="pfx6:VPC_PRIMARY_FLAG/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_PRIMARY_FLAG"/>
+                            </pfx6:VPC_PRIMARY_FLAG>
+                            <pfx6:VPC_ACTIVE_FLAG>
+                                <xsl:copy-of select="pfx6:VPC_ACTIVE_FLAG/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_ACTIVE_FLAG"/>
+                            </pfx6:VPC_ACTIVE_FLAG>
+                            <pfx6:SLL_UNITS_PER_INNER>
+                                <xsl:copy-of select="pfx6:SLL_UNITS_PER_INNER/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:SLL_UNITS_PER_INNER"/>
+                            </pfx6:SLL_UNITS_PER_INNER>
+                            <pfx6:CASE_CUBE_UOM>
+                                <xsl:copy-of select="pfx6:CASE_CUBE_UOM/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:CASE_CUBE_UOM"/>
+                            </pfx6:CASE_CUBE_UOM>
+                            <pfx6:ASSOCIATED_PRD_UPC>
+                                <xsl:copy-of select="pfx6:ASSOCIATED_PRD_UPC/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:ASSOCIATED_PRD_UPC"/>
+                            </pfx6:ASSOCIATED_PRD_UPC>
+                            <pfx6:VPC_CUBE_ORD_FCT>
+                                <xsl:copy-of select="pfx6:VPC_CUBE_ORD_FCT/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_CUBE_ORD_FCT"/>
+                            </pfx6:VPC_CUBE_ORD_FCT>
+                            <pfx6:VPC_BUY_MULTIPLE>
+                                <xsl:copy-of select="pfx6:VPC_BUY_MULTIPLE/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_BUY_MULTIPLE"/>
+                            </pfx6:VPC_BUY_MULTIPLE>
+                            <pfx6:VPC_APPLY_LINK>
+                                <xsl:copy-of select="pfx6:VPC_APPLY_LINK/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:VPC_APPLY_LINK"/>
+                            </pfx6:VPC_APPLY_LINK>
+                            <pfx6:COST_LINK_ID>
+                                <xsl:copy-of select="pfx6:COST_LINK_ID/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:COST_LINK_ID"/>
+                            </pfx6:COST_LINK_ID>
+                            <pfx6:FLAG>
+                                <xsl:copy-of select="pfx6:FLAG/@xsi:nil"/>
+                                <xsl:value-of select="pfx6:FLAG"/>
+                            </pfx6:FLAG>
+                        </pfx6:RECORD>
+                    </xsl:for-each>
+                </pfx6:SDIVPCCSI>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/DIGITAL_INVOICE_RESPONSE" xmlns:ns1="http://www.sat.gob.mx/psgecfd" xmlns:ns4="http://www.sat.gob.mx/detallista" xmlns:ns3="http://www.sat.gob.mx/cfd/3" xmlns:ns0="http://xmlns.heb.com/ei/CFD_SCHEMA" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/AMECE_APERAK.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_RESPONSE.xsd" xmlns:pfx2="http://www.sat.gob.mx/cfd/2">
+    <xsd:import namespace="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" schemaLocation="/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_REQUEST.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_RESPONSE.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_RESPONSE.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/AMECE_APERAK.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/AMECE_APERAK.xsd"/>
+    <xsd:import namespace="http://www.sat.gob.mx/psgecfd" schemaLocation="/Shared Resources/Schema Definitions/Custom/psgecfd.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/DIGITAL_INVOICE_RESPONSE" schemaLocation="/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_RESPONSE.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Custom/Process_CDF_Type.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="PARAM_INPUT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ISSUER_TYPE" type="xsd:string"/>
+                    <xsd:element name="ID_PRO_BRO" type="xsd:string"/>
+                    <xsd:element name="Afiliado" type="xsd:string"/>
+                    <xsd:element ref="pfx:SET_DIGITAL_INVOICE_REQUEST"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>65</pd:startX>
+    <pd:startY>322</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Maper-Output/ns2:SET_DIGITAL_INVOICE_RESPONSE"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx3:SET_DIGITAL_INVOICE_RESPONSE"/>
+    <pd:endX>1640</pd:endX>
+    <pd:endY>285</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Afiliado>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Afiliado" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Afiliado>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1303768647498</pd:targetNamespace>
+    <pd:group name="Processing Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>458</pd:x>
+        <pd:y>118</pd:y>
+        <pd:width>745</pd:width>
+        <pd:height>406</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx2:Comprobante</pd:over>
+            <pd:iterationElementSlot>CFDElement</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:outSlot>ValidationResult</pd:outSlot>
+            <pd:activityOutputName>Map Data</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Validate_Issuer_Fiscal_Data</pd:to>
+            <pd:xpathDescription>Valida</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>not(contains($CFDElement/pfx2:Comprobante/@sello,'CFO-HEB-FORMATO'))</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Validate_Invoice_Number</pd:to>
+            <pd:xpathDescription>Valida</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>not(contains($CFDElement/pfx2:Comprobante/@sello,'CFO-HEB-FORMATO'))</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Validate_Receiver_Fiscal_Data</pd:to>
+            <pd:xpathDescription>Valida</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>not(contains($CFDElement/pfx2:Comprobante/@sello,'CFO-HEB-FORMATO'))</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Validate_CFD_Complement</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Error - No Save it</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Save_CFD</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate_Invoice_Number</pd:from>
+            <pd:to>Validate_Certificate</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate_Issuer_Fiscal_Data</pd:from>
+            <pd:to>Join</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate_Receiver_Fiscal_Data</pd:from>
+            <pd:to>Join</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate_Certificate</pd:from>
+            <pd:to>Join</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>Error - No Save it</pd:to>
+            <pd:xpathDescription>Invoice with Errors</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>Save_CFD</pd:to>
+            <pd:xpathDescription>Invoice Approved - Save it</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>(($Validate_Invoice_Number/VALIDATION_RESULT/VALID="true") and 
+($Validate_Certificate/VALIDATOR_RESULT/VALID="true") and 
+($Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID="true") and 
+($Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID="true") and 
+($Validate_CFD_Complement/OUTPUT/VALID="true")and
+$Afiliado/root/Afiliado= "false") or
+(($Validate_Invoice_Number/VALIDATION_RESULT/VALID="true") and 
+($Validate_Certificate/VALIDATOR_RESULT/VALID="true") and 
+($Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID="true") and 
+($Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID="true") and 
+$Afiliado/root/Afiliado= "true") or
+(
+($Validate_CFD_Complement/OUTPUT/VALID="true")and
+contains($CFDElement/pfx2:Comprobante/@sello,'CFO-HEB-FORMATO'))</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Join</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate_CFD_Complement</pd:from>
+            <pd:to>Join</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Validate_Issuer_Fiscal_Data">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>588</pd:x>
+            <pd:y>182</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_Issuer_Fiscal_Data.process</processName>
+            </config>
+            <pd:inputBindings>
+                <PARAM_INPUT>
+                    <xsl:choose>
+                        <xsl:when test="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU=3">
+                            <ISSUER_TYPE>
+                                <xsl:value-of select="$Get_Ven_Status/RESULT/TYPE"/>
+                            </ISSUER_TYPE>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <ISSUER_TYPE>
+                                <xsl:value-of select="$Start/PARAM_INPUT/ISSUER_TYPE"/>
+                            </ISSUER_TYPE>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <ISSUER_RFC>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/pfx2:Emisor/@rfc"/>
+                    </ISSUER_RFC>
+                </PARAM_INPUT>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate_Receiver_Fiscal_Data">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>600</pd:x>
+            <pd:y>273</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_Receiver_Fiscal_Data.process</processName>
+            </config>
+            <pd:inputBindings>
+                <RECEIVER_RFC>
+                    <xsl:value-of select="$CFDElement/pfx2:Comprobante/pfx2:Receptor/@rfc"/>
+                </RECEIVER_RFC>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate_Invoice_Number">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>591</pd:x>
+            <pd:y>363</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_Invoice_Number.process</processName>
+            </config>
+            <pd:inputBindings>
+                <VALIDATE_INVOICE_NUMBER_IN>
+                    <RFC>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/pfx2:Emisor/@rfc"/>
+                    </RFC>
+                    <SERIES>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/@serie"/>
+                    </SERIES>
+                    <NUMBER>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/@folio"/>
+                    </NUMBER>
+                    <APPROVAL_NUMBER>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/@noAprobacion"/>
+                    </APPROVAL_NUMBER>
+                    <APPROVAL_YEAR>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/@anoAprobacion"/>
+                    </APPROVAL_YEAR>
+                </VALIDATE_INVOICE_NUMBER_IN>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate_Certificate">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>714</pd:x>
+            <pd:y>364</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_Certificate.process</processName>
+            </config>
+            <pd:inputBindings>
+                <VALIDATOR_INPUT>
+                    <ISSUE_DATE>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/@fecha"/>
+                    </ISSUE_DATE>
+                    <CERTIFICATE_NUMBER>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/@noCertificado"/>
+                    </CERTIFICATE_NUMBER>
+                    <RFC>
+                        <xsl:value-of select="$CFDElement/pfx2:Comprobante/pfx2:Emisor/@rfc"/>
+                    </RFC>
+                </VALIDATOR_INPUT>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>975</pd:x>
+            <pd:y>333</pd:y>
+            <config>
+                <element ref="pfx4:AckErrorApplication"/>
+            </config>
+            <pd:inputBindings>
+                <AckErrorApplication>
+                    <xsl:choose>
+                        <xsl:when test="(($Validate_Invoice_Number/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Certificate/VALIDATOR_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_CFD_Complement/OUTPUT/VALID=&quot;true&quot;)and&#xA;$Afiliado/root/Afiliado= &quot;false&quot;) or&#xA;(($Validate_Invoice_Number/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Certificate/VALIDATOR_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID=&quot;true&quot;) and &#xA;$Afiliado/root/Afiliado= &quot;true&quot;) or&#xA;(&#xA;(&#xA;($Validate_CFD_Complement/OUTPUT/VALID=&quot;true&quot;)and&#xA;contains($CFDElement/pfx2:Comprobante/@sello,'CFO-HEB-FORMATO')))">
+                            <xsl:attribute name="documentStatus">
+                                <xsl:value-of select="&quot;CONFIRMATION&quot;"/>
+                            </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="documentStatus">
+                                <xsl:value-of select="&quot;REJECT&quot;"/>
+                            </xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <ackErrorApplicationIdentification>
+                        <entityType>
+                            <xsl:value-of select="&quot;305&quot;"/>
+                        </entityType>
+                        <uniqueCreatorIdentification>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProcessId"/>
+                        </uniqueCreatorIdentification>
+                    </ackErrorApplicationIdentification>
+                    <ApplicationInformation>
+                        <deliveryDatePresent>
+                            <xsl:value-of select="current-date()"/>
+                        </deliveryDatePresent>
+                    </ApplicationInformation>
+                    <ReferenceNumber>
+                        <xsl:attribute name="type">
+                            <xsl:value-of select="&quot;IV&quot;"/>
+                        </xsl:attribute>
+                        <referenceIdentification>
+                            <xsl:value-of select="$CFDElement/pfx2:Comprobante/@folio"/>
+                        </referenceIdentification>
+                        <referenceDate>
+                            <xsl:value-of select="tib:format-date('yyyyMMdd', current-date())"/>
+                        </referenceDate>
+                    </ReferenceNumber>
+                    <Buyer>
+                        <gln>
+                            <xsl:value-of select="$CFDElement/pfx2:Comprobante/pfx2:Receptor/@rfc"/>
+                        </gln>
+                        <nameAndAddress>
+                            <name>
+                                <xsl:value-of select="substring($CFDElement/pfx2:Comprobante/pfx2:Receptor/@nombre, 1, 35)"/>
+                            </name>
+                        </nameAndAddress>
+                    </Buyer>
+                    <Seller>
+                        <gln>
+                            <xsl:value-of select="$CFDElement/pfx2:Comprobante/pfx2:Emisor/@rfc"/>
+                        </gln>
+                        <nameAndAddress>
+                            <name>
+                                <xsl:value-of select="substring($CFDElement/pfx2:Comprobante/pfx2:Emisor/@nombre, 1, 35)"/>
+                            </name>
+                        </nameAndAddress>
+                    </Seller>
+                    <xsl:if test="(($Validate_Invoice_Number/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Certificate/VALIDATOR_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_CFD_Complement/OUTPUT/VALID=&quot;true&quot;)and&#xA;$Afiliado/root/Afiliado= &quot;false&quot;)">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="&quot;INF0000&quot;"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="&quot;DOCUMENTO VALIDO&quot;"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="($Validate_Invoice_Number/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID=&quot;true&quot;) and &#xA;($Validate_Certificate/VALIDATOR_RESULT/VALID=&quot;true&quot;) and&#xA;($Afiliado/root/Afiliado= &quot;true&quot;)">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="&quot;INF0005&quot;"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="&quot;DOCUMENTO VALIDO FISCALMENTE&quot;"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="($Validate_Invoice_Number/VALIDATION_RESULT/VALID=&quot;false&quot;) and &#xA;($Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID=&quot;false&quot;) and &#xA;($Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID=&quot;false&quot;) and &#xA;($Validate_Certificate/VALIDATOR_RESULT/VALID=&quot;false&quot;) and&#xA;($Afiliado/root/Afiliado= &quot;true&quot;)">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="&quot;INF0006&quot;"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="&quot;DOCUMENTO NO VALIDO FISCALMENTE&quot;"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="(($Validate_CFD_Complement/OUTPUT/VALID=&quot;true&quot;)and&#xA;contains($CFDElement/pfx2:Comprobante/@sello,'CFO-HEB-FORMATO'))">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="&quot;INF0007&quot;"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="&quot;DOCUMENTO CFO VALIDO&quot;"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="$Validate_Certificate/VALIDATOR_RESULT/VALID=&quot;false&quot;">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="$Validate_Certificate/VALIDATOR_RESULT/CODE"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="$Validate_Certificate/VALIDATOR_RESULT/DESCRIPTION"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="$Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/VALID=&quot;false&quot;">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="$Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/CODE"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="$Validate_Receiver_Fiscal_Data/VALIDATOR_RESULT/DESCRIPTION"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="$Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/VALID=&quot;false&quot;">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="$Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/CODE"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="$Validate_Issuer_Fiscal_Data/VALIDATION_RESULT/DESCRIPTION"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="$Validate_Invoice_Number/VALIDATION_RESULT/VALID=&quot;false&quot;">
+                        <messageError>
+                            <errorCode>
+                                <xsl:value-of select="$Validate_Invoice_Number/VALIDATION_RESULT/CODE"/>
+                            </errorCode>
+                            <errorDescription>
+                                <text>
+                                    <xsl:value-of select="$Validate_Invoice_Number/VALIDATION_RESULT/DESCRIPTION"/>
+                                </text>
+                            </errorDescription>
+                        </messageError>
+                    </xsl:if>
+                    <xsl:if test="$Validate_CFD_Complement/OUTPUT/VALID=&quot;false&quot;  and ($Afiliado/root/Afiliado= &quot;false&quot;)">
+                        <xsl:for-each select="$Validate_CFD_Complement/OUTPUT/MESSAGE_DEFINITION/MESSAGE">
+                            <messageError>
+                                <errorCode>
+                                    <xsl:value-of select="CODE"/>
+                                </errorCode>
+                                <errorDescription>
+                                    <text>
+                                        <xsl:value-of select="DESCRIPTION"/>
+                                    </text>
+                                </errorDescription>
+                            </messageError>
+                        </xsl:for-each>
+                    </xsl:if>
+                </AckErrorApplication>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Join">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>780</pd:x>
+            <pd:y>275</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Error - No Save it">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>1087</pd:x>
+            <pd:y>386</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Save_CFD">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>1086</pd:x>
+            <pd:y>276</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Save_CFD.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns0:CDF_CONTENT>
+                    <xsl:copy-of select="$CFDElement/pfx2:Comprobante"/>
+                </ns0:CDF_CONTENT>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate_CFD_Complement">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>568</pd:x>
+            <pd:y>463</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_CFD_Complement.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns0:CDF_CONTENT>
+                    <xsl:copy-of select="$CFDElement/pfx2:Comprobante"/>
+                </ns0:CDF_CONTENT>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Get_Ven_Status">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>187</pd:x>
+        <pd:y>99</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Get_Ven_Status.process</processName>
+        </config>
+        <pd:inputBindings>
+            <INPUT>
+                <BURO_ID>
+                    <xsl:value-of select="$Start/PARAM_INPUT/ID_PRO_BRO"/>
+                </BURO_ID>
+                <VENDOR_RFC>
+                    <xsl:value-of select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx2:Comprobante[1]/pfx2:Emisor/@rfc"/>
+                </VENDOR_RFC>
+                <xsl:if test="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU">
+                    <ISBUREAU>
+                        <xsl:value-of select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU"/>
+                    </ISBUREAU>
+                </xsl:if>
+            </INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="IS BURO">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>183</pd:x>
+        <pd:y>319</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Get_Response_Message">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1355</pd:x>
+        <pd:y>99</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Custom/Get_Response_Message.process</processName>
+        </config>
+        <pd:inputBindings>
+            <CODE>
+                <xsl:value-of select="$Get_Ven_Status/RESULT/CODE"/>
+            </CODE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Valida Proveedor-Buro">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>290</pd:x>
+        <pd:y>107</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Maper Output">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>1356</pd:x>
+        <pd:y>289</pd:y>
+        <config>
+            <element ref="ns2:SET_DIGITAL_INVOICE_RESPONSE"/>
+        </config>
+        <pd:inputBindings>
+            <ns2:SET_DIGITAL_INVOICE_RESPONSE>
+                <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <xsl:when test="$Get_Response_Message/MESSAGE/CODE = 'ERR0300'">
+                        <ns2:AckErrorApplication>
+                            <xsl:attribute name="documentStatus">
+                                <xsl:value-of select="&quot;REJECT&quot;"/>
+                            </xsl:attribute>
+                            <ns2:ackErrorApplicationIdentification>
+                                <ns2:entityType>
+                                    <xsl:value-of select="&quot;305&quot;"/>
+                                </ns2:entityType>
+                                <ns2:uniqueCreatorIdentification>
+                                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProcessId"/>
+                                </ns2:uniqueCreatorIdentification>
+                            </ns2:ackErrorApplicationIdentification>
+                            <ns2:ReferenceNumber>
+                                <xsl:attribute name="type">
+                                    <xsl:value-of select="&quot;IV&quot;"/>
+                                </xsl:attribute>
+                                <ns2:referenceIdentification>
+                                    <xsl:value-of select="$CFDElement/pfx2:Comprobante/@sello"/>
+                                </ns2:referenceIdentification>
+                                <ns2:referenceDate>
+                                    <xsl:value-of select="tib:format-date('yyyyMMdd', current-date())"/>
+                                </ns2:referenceDate>
+                            </ns2:ReferenceNumber>
+                            <ns2:Buyer>
+                                <ns2:gln>
+                                    <xsl:value-of select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx2:Comprobante[1]/pfx2:Receptor/@rfc"/>
+                                </ns2:gln>
+                                <ns2:nameAndAddress>
+                                    <ns2:name>
+                                        <xsl:value-of select="substring($Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx2:Comprobante[1]/pfx2:Receptor/@nombre[1], 1, 35)"/>
+                                    </ns2:name>
+                                </ns2:nameAndAddress>
+                            </ns2:Buyer>
+                            <ns2:Seller>
+                                <ns2:gln>
+                                    <xsl:value-of select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx2:Comprobante[1]/pfx2:Emisor/@rfc"/>
+                                </ns2:gln>
+                                <ns2:nameAndAddress>
+                                    <ns2:name>
+                                        <xsl:value-of select="substring($Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx2:Comprobante[1]/pfx2:Emisor/@nombre, 1, 35)"/>
+                                    </ns2:name>
+                                </ns2:nameAndAddress>
+                            </ns2:Seller>
+                            <ns2:messageError>
+                                <ns2:errorCode>
+                                    <xsl:value-of select="$Get_Response_Message/MESSAGE/CODE"/>
+                                </ns2:errorCode>
+                                <ns2:errorDescription>
+                                    <ns2:text>
+                                        <xsl:value-of select="$Get_Response_Message/MESSAGE/DESCRIPTION"/>
+                                    </ns2:text>
+                                </ns2:errorDescription>
+                            </ns2:messageError>
+                        </ns2:AckErrorApplication>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:for-each select="$ValidationResult/AccumulatedOutput/AckErrorApplication">
+                            <ns2:AckErrorApplication>
+                                <xsl:if test="@contentVersion">
+                                    <xsl:attribute name="contentVersion">
+                                        <xsl:value-of select="@contentVersion"/>
+                                    </xsl:attribute>
+                                </xsl:if>
+                                <xsl:if test="@documentStructureVersion">
+                                    <xsl:attribute name="documentStructureVersion">
+                                        <xsl:value-of select="@documentStructureVersion"/>
+                                    </xsl:attribute>
+                                </xsl:if>
+                                <xsl:if test="@creationDate">
+                                    <xsl:attribute name="creationDate">
+                                        <xsl:value-of select="@creationDate"/>
+                                    </xsl:attribute>
+                                </xsl:if>
+                                <xsl:if test="@documentStatus">
+                                    <xsl:attribute name="documentStatus">
+                                        <xsl:value-of select="@documentStatus"/>
+                                    </xsl:attribute>
+                                </xsl:if>
+                                <xsl:for-each select="ackErrorApplicationIdentification">
+                                    <ns2:ackErrorApplicationIdentification>
+                                        <xsl:if test="@type">
+                                            <xsl:attribute name="type">
+                                                <xsl:value-of select="@type"/>
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <ns2:entityType>
+                                            <xsl:value-of select="entityType"/>
+                                        </ns2:entityType>
+                                        <ns2:uniqueCreatorIdentification>
+                                            <xsl:value-of select="uniqueCreatorIdentification"/>
+                                        </ns2:uniqueCreatorIdentification>
+                                    </ns2:ackErrorApplicationIdentification>
+                                </xsl:for-each>
+                                <xsl:for-each select="ApplicationInformation">
+                                    <ns2:ApplicationInformation>
+                                        <ns2:deliveryDatePresent>
+                                            <xsl:value-of select="deliveryDatePresent"/>
+                                        </ns2:deliveryDatePresent>
+                                    </ns2:ApplicationInformation>
+                                </xsl:for-each>
+                                <xsl:for-each select="ReferenceNumber">
+                                    <ns2:ReferenceNumber>
+                                        <xsl:if test="@type">
+                                            <xsl:attribute name="type">
+                                                <xsl:value-of select="@type"/>
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <ns2:referenceIdentification>
+                                            <xsl:value-of select="referenceIdentification"/>
+                                        </ns2:referenceIdentification>
+                                        <ns2:referenceDate>
+                                            <xsl:value-of select="referenceDate"/>
+                                        </ns2:referenceDate>
+                                    </ns2:ReferenceNumber>
+                                </xsl:for-each>
+                                <xsl:for-each select="supplierNumber">
+                                    <ns2:supplierNumber>
+                                        <ns2:referenceIdentification>
+                                            <xsl:value-of select="referenceIdentification"/>
+                                        </ns2:referenceIdentification>
+                                        <ns2:referenceDate>
+                                            <xsl:value-of select="referenceDate"/>
+                                        </ns2:referenceDate>
+                                    </ns2:supplierNumber>
+                                </xsl:for-each>
+                                <xsl:for-each select="additionalReferenceNumber">
+                                    <ns2:additionalReferenceNumber>
+                                        <ns2:referenceIdentification>
+                                            <xsl:value-of select="referenceIdentification"/>
+                                        </ns2:referenceIdentification>
+                                    </ns2:additionalReferenceNumber>
+                                </xsl:for-each>
+                                <xsl:for-each select="despatchAdviceNumber">
+                                    <ns2:despatchAdviceNumber>
+                                        <ns2:referenceIdentification>
+                                            <xsl:value-of select="referenceIdentification"/>
+                                        </ns2:referenceIdentification>
+                                    </ns2:despatchAdviceNumber>
+                                </xsl:for-each>
+                                <xsl:for-each select="Buyer">
+                                    <ns2:Buyer>
+                                        <ns2:gln>
+                                            <xsl:value-of select="gln"/>
+                                        </ns2:gln>
+                                        <xsl:for-each select="nameAndAddress">
+                                            <ns2:nameAndAddress>
+                                                <ns2:name>
+                                                    <xsl:value-of select="name"/>
+                                                </ns2:name>
+                                            </ns2:nameAndAddress>
+                                        </xsl:for-each>
+                                    </ns2:Buyer>
+                                </xsl:for-each>
+                                <xsl:for-each select="Seller">
+                                    <ns2:Seller>
+                                        <ns2:gln>
+                                            <xsl:value-of select="gln"/>
+                                        </ns2:gln>
+                                        <xsl:for-each select="nameAndAddress">
+                                            <ns2:nameAndAddress>
+                                                <ns2:name>
+                                                    <xsl:value-of select="name"/>
+                                                </ns2:name>
+                                            </ns2:nameAndAddress>
+                                        </xsl:for-each>
+                                    </ns2:Seller>
+                                </xsl:for-each>
+                                <xsl:for-each select="messageError">
+                                    <ns2:messageError>
+                                        <xsl:if test="@sequence">
+                                            <xsl:attribute name="sequence">
+                                                <xsl:value-of select="@sequence"/>
+                                            </xsl:attribute>
+                                        </xsl:if>
+                                        <ns2:errorCode>
+                                            <xsl:value-of select="errorCode"/>
+                                        </ns2:errorCode>
+                                        <xsl:for-each select="errorDescription">
+                                            <ns2:errorDescription>
+                                                <ns2:text>
+                                                    <xsl:value-of select="text"/>
+                                                </ns2:text>
+                                            </ns2:errorDescription>
+                                        </xsl:for-each>
+                                        <xsl:if test="referenceIdentification">
+                                            <ns2:referenceIdentification>
+                                                <xsl:value-of select="referenceIdentification"/>
+                                            </ns2:referenceIdentification>
+                                        </xsl:if>
+                                    </ns2:messageError>
+                                </xsl:for-each>
+                                <xsl:if test="string-length($Get_Response_Message/MESSAGE/CODE)>1">
+                                    <ns2:messageError>
+                                        <ns2:errorCode>
+                                            <xsl:value-of select="$Get_Response_Message/MESSAGE/CODE"/>
+                                        </ns2:errorCode>
+                                        <ns2:errorDescription>
+                                            <ns2:text>
+                                                <xsl:value-of select="$Get_Response_Message/MESSAGE/DESCRIPTION"/>
+                                            </ns2:text>
+                                        </ns2:errorDescription>
+                                    </ns2:messageError>
+                                </xsl:if>
+                            </ns2:AckErrorApplication>
+                        </xsl:for-each>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </ns2:SET_DIGITAL_INVOICE_RESPONSE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map-Data-1">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>1475</pd:x>
+        <pd:y>294</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Error" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="ErrorCorto" type="xsd:string"/>
+                                        <xsd:element name="Mensaje" type="xsd:string"/>
+                                        <xsd:element name="ID_Proveedor" type="xsd:string"/>
+                                        <xsd:element name="ID_Factura" type="xsd:string"/>
+                                        <xsd:element name="RFC" type="xsd:string"/>
+                                        <xsd:element name="DATE" type="xsd:string"/>
+                                        <xsd:element name="TipoProveedor" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$Maper-Output/ns2:SET_DIGITAL_INVOICE_RESPONSE/ns2:AckErrorApplication">
+                    <xsl:for-each select="ns2:messageError">
+                        <Error>
+                            <ErrorCorto>
+                                <xsl:value-of select="ns2:errorCode"/>
+                            </ErrorCorto>
+                            <Mensaje>
+                                <xsl:value-of select="ns2:errorDescription/ns2:text"/>
+                            </Mensaje>
+                            <ID_Proveedor>
+                                <xsl:value-of select="$Start/PARAM_INPUT/ID_PRO_BRO"/>
+                            </ID_Proveedor>
+                            <ID_Factura>
+                                <xsl:value-of select="../ns2:ReferenceNumber/ns2:referenceIdentification"/>
+                            </ID_Factura>
+                            <RFC>
+                                <xsl:value-of select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/pfx2:Comprobante[1]/pfx2:Emisor/@rfc"/>
+                            </RFC>
+                            <DATE>
+                                <xsl:value-of select="current-date()"/>
+                            </DATE>
+                            <TipoProveedor>
+                                <xsl:value-of select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU"/>
+                            </TipoProveedor>
+                        </Error>
+                    </xsl:for-each>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>315</pd:x>
+        <pd:y>320</pd:y>
+        <config>
+            <variableName>Afiliado</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:choose>
+                    <xsl:when test="$Start/PARAM_INPUT/Afiliado= &quot;INF0002&quot;or $Start/PARAM_INPUT/ISSUER_TYPE=2">
+                        <Afiliado>
+                            <xsl:value-of select="true()"/>
+                        </Afiliado>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <Afiliado>
+                            <xsl:value-of select="false()"/>
+                        </Afiliado>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>293</pd:x>
+        <pd:y>224</pd:y>
+        <config>
+            <variableName>Afiliado</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <xsl:when test="$Get_Ven_Status/RESULT/CODE= &quot;INF0002&quot;or$Get_Ven_Status/RESULT/TYPE= 2">
+                        <Afiliado>
+                            <xsl:value-of select="true()"/>
+                        </Afiliado>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <Afiliado>
+                            <xsl:value-of select="false()"/>
+                        </Afiliado>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>IS BURO</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Ven_Status</pd:from>
+        <pd:to>Valida Proveedor-Buro</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>IS BURO</pd:from>
+        <pd:to>Get_Ven_Status</pd:to>
+        <pd:xpathDescription>SI BURO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ISBUREAU=3</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>IS BURO</pd:from>
+        <pd:to>Assign</pd:to>
+        <pd:xpathDescription>No BURO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida Proveedor-Buro</pd:from>
+        <pd:to>Assign-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Valida Proveedor-Buro</pd:from>
+        <pd:to>Get_Response_Message</pd:to>
+        <pd:xpathDescription>Proveedor no afiliado</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Get_Ven_Status/RESULT/CODE ='ERR0300'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Processing Group</pd:from>
+        <pd:to>Get_Response_Message</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Response_Message</pd:from>
+        <pd:to>Maper Output</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Maper Output</pd:from>
+        <pd:to>Map-Data-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map-Data-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>Processing Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1</pd:from>
+        <pd:to>Processing Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

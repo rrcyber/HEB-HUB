@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Validate_SkuInvalid.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>184</pd:startX>
+    <pd:startY>59</pd:startY>
+    <pd:returnBindings>
+        <ProductsInvalid>
+            <xsl:for-each select="$JDBC-Promo-Exceptions/resultSet/Record">
+                <Products>
+                    <promo_id>
+                        <xsl:value-of select="source_promo_id"/>
+                    </promo_id>
+                    <promo_type>
+                        <xsl:value-of select="promo_type"/>
+                    </promo_type>
+                </Products>
+            </xsl:for-each>
+        </ProductsInvalid>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="ProductsInvalid">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Products" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="promo_id" type="xsd:string"/>
+                                <xsd:element name="promo_type" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>410</pd:endX>
+    <pd:endY>61</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1426800073115</pd:targetNamespace>
+    <pd:activity name="JDBC Promo Exceptions">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>298</pd:x>
+        <pd:y>69</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement> SELECT DISTINCT source_promo_id, promo_type
+ FROM Mag_import_sku_invalid</statement>
+            <optionalOrNillable>true</optionalOrNillable>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>source_promo_id</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>promo_type</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Promo Exceptions</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Promo Exceptions</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

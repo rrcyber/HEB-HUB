@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>PmmPOPublisher Processes/Sub Process/getEDIADDIFIELD.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="VENDOR_NUMBER">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="value" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>123</pd:startX>
+    <pd:startY>117</pd:startY>
+    <pd:returnBindings>
+        <resultSet>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                <Record>
+                    <LABEL>
+                        <xsl:value-of select="LABEL"/>
+                    </LABEL>
+                    <VALUE>
+                        <xsl:value-of select="VALUE"/>
+                    </VALUE>
+                </Record>
+            </xsl:for-each>
+        </resultSet>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="resultSet">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Record" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="LABEL" type="xsd:string"/>
+                                <xsd:element name="VALUE" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>423</pd:endX>
+    <pd:endY>117</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1374180997862</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>271</pd:x>
+        <pd:y>117</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/PMM/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT
+  RTRIM(LTRIM(A.LABEL)) AS LABEL,
+  RTRIM(LTRIM(B.VALUE)) AS VALUE
+FROM
+  PMM.BASGENEE A INNER JOIN PMM.BASVALEE B
+    ON A.ENTITY_NAME = B.ENTITY_NAME
+    AND A.FIELD_CODE = B.FIELD_CODE
+  INNER JOIN PMM.VPCMSTEE C
+    ON B.TECH_KEY1 = C.VPC_TECH_KEY
+WHERE 
+  A.FIELD_CODE IN ('EI','EC','EP','TR','ER','TP','CA','TN','PO','VO','EM')
+  AND LTRIM(RTRIM(C.VENDOR_NUMBER)) = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>VENDOR_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <wizardData/>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/PMM JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>LABEL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VALUE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <VENDOR_NUMBER>
+                    <xsl:value-of select="$Start/VENDOR_NUMBER/value"/>
+                </VENDOR_NUMBER>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

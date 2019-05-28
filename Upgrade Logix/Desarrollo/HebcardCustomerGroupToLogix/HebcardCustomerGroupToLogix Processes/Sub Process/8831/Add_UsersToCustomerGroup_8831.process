@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns14="http://xmlns.heb.com/ei/error" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CustomerGroupUpdate.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://www.copienttech.com/LogixGroupManagement/">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CustomerGroupUpdate.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/CustomerGroupUpdate.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <wsdl:import namespace="http://www.copienttech.com/LogixGroupManagement/" location="/Shared Resources/WSDL/LogixGroupManagement.wsdl"/>
+    <pd:name>HebcardCustomerGroupToLogix Processes/Sub Process/8831/Add_UsersToCustomerGroup_8831.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>27</pd:startX>
+    <pd:startY>131</pd:startY>
+    <pd:returnBindings>
+        <records>
+            <xsl:value-of select="count($JDBC-Query/resultSet/Record)"/>
+        </records>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1639</pd:endX>
+    <pd:endY>138</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <BulkData>
+            <xsd:element name="Tarjetas" type="xsd:string"/>
+        </BulkData>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1412780555980</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>240</pd:x>
+        <pd:y>134</pd:y>
+        <config>
+            <timeout>%%Connections/Database/HEBCARD/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/HEBCARD/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBCARD.sharedjdbc</jdbcSharedConfig>
+            <statement>select  a.tarjetaid,a.FECHA_ASIGNA,s.REFERENCIA
+from  SUSCRIPTOR(nolock) s 
+left join tarjeta(nolock) a on (s.CUENTAID=a.cuentaid)
+and s.STATUSID='A'
+where a.STATUSID='A'
+and SUBSTRING(s.CUENTAID,1,1)='1'
+and s.EMPRESAID in (1,2) 
+and substring(a.TARJETAID,1,4) IN ('2601','2101') 
+and FECHA_ASIGNA &gt; ?
+order by FECHA_ASIGNA asc</statement>
+            <optionalOrNillable>true</optionalOrNillable>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>FECHA_ASIGNA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>tarjetaid</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FECHA_ASIGNA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>REFERENCIA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <FECHA_ASIGNA>
+                    <xsl:value-of select="$Get_DateInitial_Add/Initial_Date"/>
+                </FECHA_ASIGNA>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_DateInitial_Add">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>125</pd:x>
+        <pd:y>132</pd:y>
+        <config>
+            <processName>/HebcardCustomerGroupToLogix Processes/Sub Process/8831/Get_DateInitial_Add_8831.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Set_DateInitial_Add">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1411</pd:x>
+        <pd:y>139</pd:y>
+        <config>
+            <processName>/HebcardCustomerGroupToLogix Processes/Sub Process/8831/Set_DateInitial_Add_8831.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="var" select="count($JDBC-Query/resultSet/Record)"/>
+            <DATE>
+                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss.SSS ',$JDBC-Query/resultSet/Record[$var]/FECHA_ASIGNA)"/>
+            </DATE>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>271</pd:x>
+        <pd:y>344</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>1053</pd:x>
+        <pd:y>136</pd:y>
+        <config>
+            <element ref="pfx:CustomerGroupUpdate"/>
+        </config>
+        <pd:inputBindings>
+            <CustomerGroupUpdate>
+                <ImportByLogixID>
+                    <ID>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/P8831/IdGroup"/>
+                    </ID>
+                    <Name>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/P8831/NameGroup"/>
+                    </Name>
+                    <BulkData>
+                        <xsl:value-of select="$BulkData/Tarjetas"/>
+                    </BulkData>
+                    <Operation>
+                        <xsl:value-of select="'augment'"/>
+                    </Operation>
+                </ImportByLogixID>
+            </CustomerGroupUpdate>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>1163</pd:x>
+        <pd:y>137</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>true</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term ref="pfx:CustomerGroupUpdate"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Map-Data/CustomerGroupUpdate"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_Ws">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1306</pd:x>
+        <pd:y>136</pd:y>
+        <config>
+            <processName>/HebcardCustomerGroupToLogix Processes/Sub Process/Folder/Call_Ws.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <GUID>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/P8831/Guid"/>
+                </GUID>
+                <xml>
+                    <xsl:value-of select="$Render-XML/xmlString"/>
+                </xml>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1524</pd:x>
+        <pd:y>139</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns14:AuditingSchema>
+                <ns14:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns14:inrtn_id>
+                <ns14:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                </ns14:inrtn_nm>
+                <ns14:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                </ns14:inrtn_instn_nm>
+                <ns14:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProcessId"/>
+                </ns14:inrtn_proc_id>
+                <ns14:inrtn_rec_cnt>
+                    <xsl:value-of select="count($JDBC-Query/resultSet/Record)"/>
+                </ns14:inrtn_rec_cnt>
+                <ns14:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                </ns14:inrtn_cre8_ts>
+            </ns14:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>782</pd:x>
+        <pd:y>57</pd:y>
+        <pd:width>182</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$OutTarjeta/AccumulatedOutput/tarjetaid</pd:over>
+            <pd:iterationElementSlot>tarjeta</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Assign</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Assign">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>866</pd:x>
+            <pd:y>134</pd:y>
+            <config>
+                <variableName>BulkData</variableName>
+            </config>
+            <pd:inputBindings>
+                <Tarjetas>
+                    <xsl:value-of select="concat($BulkData/Tarjetas, $tarjeta/tarjetaid, ',' ,$_globalVariables/ns1:GlobalVariables/ProjectConfig/P8831/IdUserType, &quot;&#xA;&quot;)"/>
+                </Tarjetas>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Generate-Error-1-1-1-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1310</pd:x>
+        <pd:y>245</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="'Error al eliminar registros en el servicio Logix Group Management'"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="concat($_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $Call_Ws/Result/code)"/>
+                </messageCode>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="concat($_globalVariables/ns1:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $Call_Ws/Result/code)"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="'Error al eliminar registros en el servicio Logix Group Management'"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1148</pd:x>
+        <pd:y>236</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>366</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>324</pd:width>
+        <pd:height>248</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$JDBC-Query/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>in_User</pd:iterationElementSlot>
+            <pd:indexSlot>TEMP_EMPLID</pd:indexSlot>
+            <pd:outSlot>OutTarjeta</pd:outSlot>
+            <pd:activityOutputName>AcumulateEmpleado</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_EmplidTEMP</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>AcumulateEmpleado</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_EmplidTEMP</pd:from>
+            <pd:to>AcumulateEmpleado</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Get_EmplidTEMP/root/Count =0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_EmplidTEMP</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Get_EmplidTEMP">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>473</pd:x>
+            <pd:y>74</pd:y>
+            <config>
+                <processName>/HebcardCustomerGroupToLogix Processes/Sub Process/8831/Get_EmplidTEMP_8831.process</processName>
+            </config>
+            <pd:inputBindings>
+                <EMPLID>
+                    <xsl:value-of select="$in_User/Record/REFERENCIA"/>
+                </EMPLID>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="AcumulateEmpleado">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>605</pd:x>
+            <pd:y>74</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="tarjetaid" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <tarjetaid>
+                    <xsl:value-of select="$in_User/Record/tarjetaid"/>
+                </tarjetaid>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>533</pd:x>
+            <pd:y>189</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_DateInitial_Add</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Set_DateInitial_Add</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>Call_Ws</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_Ws</pd:from>
+        <pd:to>Set_DateInitial_Add</pd:to>
+        <pd:xpathDescription>exito</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_Ws/Result/code = '0'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_Ws</pd:from>
+        <pd:to>Generate-Error-1-1-1-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Generate-Error-1-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>Generate-Error-1-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_DateInitial_Add</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC-Query/resultSet/Record)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($OutTarjeta/AccumulatedOutput/tarjetaid)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

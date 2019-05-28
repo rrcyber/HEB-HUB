@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>Project Name Processes/Sub Process/SEND_RCONTROL.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>150</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>450</pd:endX>
+    <pd:endY>64</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1513894990812</pd:targetNamespace>
+    <pd:activity name="FECHACITA-2">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>306</pd:x>
+        <pd:y>61</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>update v set v.FECHACITA = p.min_date_equivalent
+from SC_BITACORACITAS v
+inner join (select w.ProveedorId, min(d.date_equivalent) min_date_equivalent
+from SC_CITABODEGA w inner join dates d on w.DiaSemana = d.DiaSemana
+group by w.ProveedorId) p on v.PROVEEDORID = p.ProveedorId
+where	v.FECHA_RECEPCION &lt;= CONVERT(varchar,getdate(),112) and v.FECHACITA is null</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP-JDBC.sharedjdbc</jdbcSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>FECHACITA-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>FECHACITA-2</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

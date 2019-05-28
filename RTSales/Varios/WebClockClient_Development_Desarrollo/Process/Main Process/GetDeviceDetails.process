@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com.mx/1369930841350" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://xmlns.heb.com/ei/WebClock4Kronos/GetDeviceDetails_Reply" xmlns:ns1="http://xmlns.heb.com/ei/WebClock4Kronos/GetDeviceDetails_Request" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns5="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:ns6="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns7="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Main Process/GetDeviceDetails.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="pfx:GetDeviceDetails_Request"/>
+    <pd:startX>48</pd:startX>
+    <pd:startY>159</pd:startY>
+    <pd:returnBindings>
+        <pfx:GetDeviceDetails_Reply>
+            <Reply>
+                <ns:GetDeviceDetails_Reply>
+                    <ns:DEVICE_SERIAL_NUM>
+                        <xsl:value-of select="if(count($JDBC_DeviceDetails/resultSet/Record) >0)&#xA;then $JDBC_DeviceDetails/resultSet/Record[1]/LECTOR_SERIALNUMBER&#xA;else &quot;&quot;"/>
+                    </ns:DEVICE_SERIAL_NUM>
+                    <ns:STORE_ID>
+                        <xsl:value-of select="if(count($JDBC_DeviceDetails/resultSet/Record) >0)&#xA;then  $JDBC_DeviceDetails/resultSet/Record[1]/LECTOR_SUCURSALID&#xA;else &quot;&quot;"/>
+                    </ns:STORE_ID>
+                    <ns:DEVICE_ID>
+                        <xsl:value-of select="if(count($JDBC_DeviceDetails/resultSet/Record) >0)&#xA;then $JDBC_DeviceDetails/resultSet/Record[1]/LECTOR_ID &#xA;else &quot;&quot;"/>
+                    </ns:DEVICE_ID>
+                    <ns:STORE_NAME>
+                        <xsl:value-of select="if(count($JDBC_DeviceDetails/resultSet/Record) >0)&#xA;then $JDBC_DeviceDetails/resultSet/Record[1]/Sucursal_Nombre&#xA;else &quot;&quot;"/>
+                    </ns:STORE_NAME>
+                    <ns:DEVICE_ALIAS>
+                        <xsl:value-of select="if(count($JDBC_DeviceDetails/resultSet/Record) >0)&#xA;then $JDBC_DeviceDetails/resultSet/Record[1]/LECTOR_ALIAS&#xA;else &quot;&quot;"/>
+                    </ns:DEVICE_ALIAS>
+                    <ns:SERVER_URL>
+                        <xsl:value-of select="&quot;&quot;"/>
+                    </ns:SERVER_URL>
+                    <ns:CURRENTCLIENTVERSION>
+                        <xsl:value-of select="if(count($JDBC_DeviceDetails/resultSet/Record) >0)&#xA;then $JDBC-Query/resultSet/Record[1]/CURRENTVERSION&#xA;else &quot;&quot;"/>
+                    </ns:CURRENTCLIENTVERSION>
+                    <ns:EmployeeID>
+                        <xsl:for-each select="$JDBC_SOCIO_SIN_HUELLA/resultSet/Record/EMPLID">
+                            <ns:EmployeeIDs>
+                                <xsl:value-of select="."/>
+                            </ns:EmployeeIDs>
+                        </xsl:for-each>
+                    </ns:EmployeeID>
+                </ns:GetDeviceDetails_Reply>
+            </Reply>
+        </pfx:GetDeviceDetails_Reply>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="pfx:GetDeviceDetails_Reply"/>
+    <pd:endX>572</pd:endX>
+    <pd:endY>156</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1370021613553</pd:targetNamespace>
+    <pd:activity name="JDBC_DeviceDetails">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>217</pd:x>
+        <pd:y>159</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select	
+le.LECTOR_ID,
+le.LECTOR_ALIAS,
+le.LECTOR_SERIALNUMBER,
+le.LECTOR_SUCURSALID,
+le.LECTOR_UBICACION,
+le.LECTOR_FECHAREG,
+le.LECTOR_USUARIOREC,
+le.LECTOR_FECHAMOD,
+le.LECTOR_USUARIOMOD,
+ls.DEPTO_ID,
+ls.SUCURSAL_ID,
+su.Sucursal_Nombre
+from	Lectores le inner join
+		LECTOR_DEPTO_SUC ls on le.lector_id = ls.lector_id inner join
+		SUCURSALES su on su.sucursal_Id=le.LECTOR_SUCURSALID
+where	le.LECTOR_SERIALNUMBER =?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SERIALNUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>LECTOR_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_ALIAS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_SERIALNUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_SUCURSALID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_UBICACION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_FECHAREG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_USUARIOREC</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_FECHAMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LECTOR_USUARIOMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEPTO_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SUCURSAL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Sucursal_Nombre</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <SERIALNUMBER>
+                    <xsl:value-of select="$Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request/ns1:DEVICE_SERIAL_NUM"/>
+                </SERIALNUMBER>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>340</pd:x>
+        <pd:y>157</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>Select	CURRENTVERSION
+from	WEBCLOCKCLIENTVERSION 
+where	active=1</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>CURRENTVERSION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC_SOCIO_SIN_HUELLA">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>453</pd:x>
+        <pd:y>155</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select * from dbo.SOCIO_SIN_HUELLA
+where estatus = 1</statement>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>REGID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EMPLID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TIENDA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DISPOSITIVO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FECHAREG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>USUARIOREG</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FECHAMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>USUARIOMOD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ESTATUS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 21">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>218</pd:x>
+        <pd:y>36</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns6:ProviderSOAPFault>
+                                <ns6:FaultCode>
+                                    <xsl:value-of select="21"/>
+                                </ns6:FaultCode>
+                                <ns6:FaultString>
+                                    <xsl:value-of select="&quot;No se obtuvieron detalle del dispositivo en la BD de WebClock&quot;"/>
+                                </ns6:FaultString>
+                                <ns6:FaultActor>
+                                    <xsl:value-of select="concat(&quot;No.Terminal: &quot;,$Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request/ns1:DEVICE_SERIAL_NUM)"/>
+                                </ns6:FaultActor>
+                                <ns6:ProviderSOAPErrorMsg>
+                                    <ns6:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request)"/>
+                                    </ns6:MessageId>
+                                </ns6:ProviderSOAPErrorMsg>
+                            </ns6:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>130</pd:x>
+        <pd:y>300</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>645</pd:x>
+        <pd:y>296</pd:y>
+        <config>
+            <processName>/Utility Service/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:MSG_Container>
+                <ns12:Header>
+                    <ns12:ProjectName>
+                        <xsl:value-of select="$_processContext/ns3:ProcessContext/ProjectName"/>
+                    </ns12:ProjectName>
+                    <ns12:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/ExceptionHandling/GLB_SOURCE_DOMAIN"/>
+                    </ns12:Source_Domain>
+                    <ns12:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/ExceptionHandling/GLB_DESTINATION_DOMAIN"/>
+                    </ns12:Destination_Domain>
+                    <ns12:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/ExceptionHandling/GLB_TRANSACTION_TYPE"/>
+                    </ns12:Transaction_Type>
+                    <ns12:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns12:TimeStamp>
+                </ns12:Header>
+                <ns12:Body>
+                    <ns12:ErrorManagementSchema>
+                        <ns12:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns12:inrtn_id>
+                        <ns12:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns12:inrtn_instn_nm>
+                        <ns12:inrtn_err_rtn_desc>
+                            <xsl:value-of select="string($_error)"/>
+                        </ns12:inrtn_err_rtn_desc>
+                        <ns12:inrtn_msg_body>
+                            <xsl:value-of select="tib:render-xml($Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request)"/>
+                        </ns12:inrtn_msg_body>
+                        <ns12:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm;ss', current-dateTime())"/>
+                        </ns12:cre8_ts>
+                        <xsl:if test="$_error/ns3:ErrorReport/MsgCode">
+                            <ns12:u_code>
+                                <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                            </ns12:u_code>
+                        </xsl:if>
+                        <ns12:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns12:sev_id>
+                    </ns12:ErrorManagementSchema>
+                </ns12:Body>
+            </ns12:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>498</pd:x>
+        <pd:y>297</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>769</pd:x>
+        <pd:y>295</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 22">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>343</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns6:ProviderSOAPFault>
+                                <ns6:FaultCode>
+                                    <xsl:value-of select="22"/>
+                                </ns6:FaultCode>
+                                <ns6:FaultString>
+                                    <xsl:value-of select="&quot;No se obtuvo la version en la BD de WebClock&quot;"/>
+                                </ns6:FaultString>
+                                <ns6:FaultActor>
+                                    <xsl:value-of select="concat(&quot;No.Terminal: &quot;,$Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request/ns1:DEVICE_SERIAL_NUM)"/>
+                                </ns6:FaultActor>
+                                <ns6:ProviderSOAPErrorMsg>
+                                    <ns6:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request)"/>
+                                    </ns6:MessageId>
+                                </ns6:ProviderSOAPErrorMsg>
+                            </ns6:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>341</pd:x>
+        <pd:y>291</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns6:ProviderSOAPFault>
+                                <ns6:FaultCode>
+                                    <xsl:value-of select="10"/>
+                                </ns6:FaultCode>
+                                <ns6:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/Mensajes/Fault_10"/>
+                                </ns6:FaultString>
+                                <ns6:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns6:FaultActor>
+                                <ns6:ProviderSOAPErrorMsg>
+                                    <ns6:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request)"/>
+                                    </ns6:MessageId>
+                                </ns6:ProviderSOAPErrorMsg>
+                            </ns6:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>51</pd:x>
+        <pd:y>304</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                                <xsl:when test="string-length($_error)!=0">
+                                    <ns6:ProviderSOAPFault>
+                                        <ns6:FaultCode>
+                                            <xsl:value-of select="10"/>
+                                        </ns6:FaultCode>
+                                        <ns6:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/Mensajes/Fault_10"/>
+                                        </ns6:FaultString>
+                                        <ns6:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns6:FaultActor>
+                                        <ns6:ProviderSOAPErrorMsg>
+                                            <ns6:Message>
+                                                <xsl:value-of select="$_error/ns3:ErrorReport/Msg"/>
+                                            </ns6:Message>
+                                            <ns6:MessageId>
+                                                <xsl:value-of select="tib:render-xml($Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request)"/>
+                                            </ns6:MessageId>
+                                            <ns6:ErrorCode>
+                                                <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                                            </ns6:ErrorCode>
+                                        </ns6:ProviderSOAPErrorMsg>
+                                    </ns6:ProviderSOAPFault>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <ns6:ProviderSOAPFault>
+                                        <ns6:FaultCode>
+                                            <xsl:value-of select="34"/>
+                                        </ns6:FaultCode>
+                                        <ns6:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns7:GlobalVariables/Mensajes/Fault_34"/>
+                                        </ns6:FaultString>
+                                        <ns6:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns6:FaultActor>
+                                        <ns6:ProviderSOAPErrorMsg>
+                                            <ns6:Message>
+                                                <xsl:value-of select="$_error/ns3:ErrorReport/Msg"/>
+                                            </ns6:Message>
+                                            <ns6:MessageId>
+                                                <xsl:value-of select="tib:render-xml($Start/pfx:GetDeviceDetails_Request/Request/ns1:GetDeviceDetails_Request)"/>
+                                            </ns6:MessageId>
+                                            <ns6:ErrorCode>
+                                                <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                                            </ns6:ErrorCode>
+                                        </ns6:ProviderSOAPErrorMsg>
+                                    </ns6:ProviderSOAPFault>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>593</pd:x>
+        <pd:y>396</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC_DeviceDetails</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_DeviceDetails</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>JDBC_SOCIO_SIN_HUELLA</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_SOCIO_SIN_HUELLA</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_DeviceDetails</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_DeviceDetails</pd:from>
+        <pd:to>Fault 21</pd:to>
+        <pd:xpathDescription>No Records</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_DeviceDetails/resultSet/Record) = 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_SOCIO_SIN_HUELLA</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Fault 22</pd:to>
+        <pd:xpathDescription>No Records</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC-Query/resultSet/Record) = 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:xpathDescription>Client Fault</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "ProviderSOAPFault")</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

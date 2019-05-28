@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://xmlns.tibco.com/body" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://www.tibco.com/schemas/TIB_Monitoreo_OC/Shared_Resources/Schemas/Common/Server_80_Price.xsd" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://www.tibco.com/schemas/TIB_Monitoreo_OC/Shared_Resources/Schemas/Common/Server_80_Price.xsd" schemaLocation="/Shared_Resources/Schemas/Common/Server_80_Price.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>Error Process Subscriber Processes/Sub Process/Error_Send_EMail.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="header" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="project_Name" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="source_Domain" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="destination_Domain" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="transaction_Type" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="timeStamp" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="body" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="inrtn_id" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="inrtn_instn_nm" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="inrtn_err_rtn_desc" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="inrtn_msg_body" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="cre8_ts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                                <xsd:element name="u_code" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="sev_id" type="xsd:string" minOccurs="0"/>
+                                <xsd:element name="fault" minOccurs="0">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="code" type="xsd:string" minOccurs="0"/>
+                                            <xsd:element name="reason" type="xsd:string" minOccurs="0"/>
+                                            <xsd:element name="detail" type="xsd:string" minOccurs="0"/>
+                                        </xsd:sequence>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>86</pd:startX>
+    <pd:startY>190</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>893</pd:endX>
+    <pd:endY>188</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1391191507356</pd:targetNamespace>
+    <pd:activity name="Error_Email_Select">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>207</pd:x>
+        <pd:y>190</pd:y>
+        <config>
+            <processName>/Error Process Subscriber Processes/Sub Process/Error_Email_Select.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <project>
+                    <xsl:value-of select="$Start/group/header/project_Name"/>
+                </project>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>291</pd:x>
+        <pd:y>35</pd:y>
+        <pd:width>262</pd:width>
+        <pd:height>292</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Error_Email_Select/root/root</pd:over>
+            <pd:iterationElementSlot>detailArray</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:outSlot>exit</pd:outSlot>
+            <pd:activityOutputName>Map Data</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Validate Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Group</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Group</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>contains($Start/group/body/u_code, $detailArray/root/group_name)</pd:xpath>
+        </pd:transition>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>411</pd:x>
+            <pd:y>252</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="email" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:if test="$detailArray/root/email">
+                        <email>
+                            <xsl:value-of select="$detailArray/root/email"/>
+                        </email>
+                    </xsl:if>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Group">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>411</pd:x>
+            <pd:y>118</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>649</pd:x>
+        <pd:y>73</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <renderDefaultPrefix>true</renderDefaultPrefix>
+            <term>
+                <xsd:element name="ERROR_Container">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Header">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="ProjectName" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="TransactionType" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="ErrorSeverity" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="TimeStamp" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="InstanceName" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="ErrorDescription" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="ErrorCode" type="xsd:string" minOccurs="0"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <ERROR_Container>
+                <Header>
+                    <xsl:if test="$Start/group/header/project_Name">
+                        <ProjectName>
+                            <xsl:value-of select="$Start/group/header/project_Name"/>
+                        </ProjectName>
+                    </xsl:if>
+                    <xsl:if test="$Start/group/header/transaction_Type">
+                        <TransactionType>
+                            <xsl:value-of select="$Start/group/header/transaction_Type"/>
+                        </TransactionType>
+                    </xsl:if>
+                    <xsl:if test="$Start/group/body/sev_id">
+                        <ErrorSeverity>
+                            <xsl:value-of select="$Start/group/body/sev_id"/>
+                        </ErrorSeverity>
+                    </xsl:if>
+                    <xsl:if test="$Start/group/body/cre8_ts[1]">
+                        <TimeStamp>
+                            <xsl:value-of select="$Start/group/body/cre8_ts[1]"/>
+                        </TimeStamp>
+                    </xsl:if>
+                    <xsl:if test="$Start/group/body/inrtn_instn_nm">
+                        <InstanceName>
+                            <xsl:value-of select="$Start/group/body/inrtn_instn_nm"/>
+                        </InstanceName>
+                    </xsl:if>
+                    <xsl:if test="$Start/group/body/inrtn_err_rtn_desc">
+                        <ErrorDescription>
+                            <xsl:value-of select="$Start/group/body/inrtn_err_rtn_desc"/>
+                        </ErrorDescription>
+                    </xsl:if>
+                    <xsl:if test="$Start/group/body/u_code">
+                        <ErrorCode>
+                            <xsl:value-of select="$Start/group/body/u_code"/>
+                        </ErrorCode>
+                    </xsl:if>
+                </Header>
+            </ERROR_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Transform XML">
+        <pd:type>com.tibco.plugin.xml.XMLTransformActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLTransformActivity</pd:resourceType>
+        <pd:x>775</pd:x>
+        <pd:y>73</pd:y>
+        <config>
+            <engine>TibcoXML</engine>
+            <inputStyle>text</inputStyle>
+            <stylesheet>/Shared Resources/Schema Definitions/Custom/XSLT File.xslt</stylesheet>
+        </config>
+        <pd:inputBindings>
+            <textInput>
+                <xmlString>
+                    <xsl:value-of select="$Render-XML/xmlString"/>
+                </xmlString>
+            </textInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send-File-Error">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>891</pd:x>
+        <pd:y>74</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>%%ExceptionHandling/GLB_ERR_EMAIL_HOST%%</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns12:mailActivityInput>
+                <from>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_EMAIL_FROM"/>
+                </from>
+                <xsl:for-each select="$exit/AccumulatedOutput/root">
+                    <xsl:if test="email">
+                        <to>
+                            <xsl:value-of select="email"/>
+                        </to>
+                    </xsl:if>
+                </xsl:for-each>
+                <subject>
+                    <xsl:value-of select="concat('TIBCO','  - ',$Start/group/header/project_Name,' - ','ERROR(S)' )"/>
+                </subject>
+                <ns2:bodyElement>
+                    <bodyText>
+                        <xsl:value-of select="$Transform-XML/xmlString"/>
+                    </bodyText>
+                </ns2:bodyElement>
+                <Headers>
+                    <Content-Type>
+                        <xsl:value-of select="'text/html'"/>
+                    </Content-Type>
+                </Headers>
+            </ns12:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Error_Email_Select</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error_Email_Select</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Transform XML</pd:from>
+        <pd:to>Send-File-Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send-File-Error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>Transform XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($exit/AccumulatedOutput/root) &lt; 1 = 'true'</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

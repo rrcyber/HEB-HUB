@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns02="www.tibco.com/plugin/Sleep">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>Processes/Starter Process/FacturaElectronicaToReplic_Detail_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>27</pd:x>
+        <pd:y>185</pd:y>
+        <config>
+            <StartTime>1415110200000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%RetryConfig/GBL_TIME_INTERVAL%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>628</pd:endX>
+    <pd:endY>188</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns1:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1415112576059</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>99</pd:x>
+        <pd:y>14</pd:y>
+        <pd:width>358</pd:width>
+        <pd:height>331</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/pfx:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>FacturaElectronicaToReplic_Detail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FacturaElectronicaToReplic_Detail</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>FacturaElectronicaToReplic_Detail</pd:from>
+            <pd:to>Java Code</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:xpathDescription>Type Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Error Process</pd:to>
+            <pd:xpathDescription>Suspend</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/pfx:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Error Process</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="FacturaElectronicaToReplic_Detail">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>273</pd:x>
+            <pd:y>70</pd:y>
+            <config>
+                <processName>/Processes/Main Process/FacturaElectronicaToReplic_Detail_Main.process</processName>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Java Code">
+            <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+            <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+            <pd:x>274</pd:x>
+            <pd:y>189</pd:y>
+            <config>
+                <fileName>FacturaElectronicaToReplic_Detail_StarterJavaCode</fileName>
+                <packageName>Processes.StarterProcess.FacturaElectronicaToReplic_Detail_Starter</packageName>
+                <fullsource>package Processes.StarterProcess.FacturaElectronicaToReplic_Detail_Starter;
+import java.util.*;
+import java.io.*;
+public class FacturaElectronicaToReplic_Detail_StarterJavaCode{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String ERROR_CODE = "";
+	protected String ERRORS = "";
+	protected String TYPE_ERROR = "";
+	public String getERROR_CODE() {
+		return ERROR_CODE;
+	}
+	public void setERROR_CODE(String val) {
+		ERROR_CODE = val;
+	}
+	public String getERRORS() {
+		return ERRORS;
+	}
+	public void setERRORS(String val) {
+		ERRORS = val;
+	}
+	public String getTYPE_ERROR() {
+		return TYPE_ERROR;
+	}
+	public void setTYPE_ERROR(String val) {
+		TYPE_ERROR = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public FacturaElectronicaToReplic_Detail_StarterJavaCode() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String ERROR_CODE
+	In  : String ERRORS
+	Out : String TYPE_ERROR
+* Available Variables: DO NOT MODIFY *****/
+
+  TYPE_ERROR="false";
+           String [] ErrorArray  = ERRORS.split(",");
+
+     for (int i = 0; i &lt; ErrorArray.length; i++) {
+	if ((ErrorArray[i]).equals(ERROR_CODE))
+	{
+         TYPE_ERROR="true" ;
+         break;
+         }
+ 
+	
+ }   }
+}
+</fullsource>
+                <inputData>
+                    <row>
+                        <fieldName>ERROR_CODE</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                    <row>
+                        <fieldName>ERRORS</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </inputData>
+                <outputData>
+                    <row>
+                        <fieldName>TYPE_ERROR</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </outputData>
+                <byteCode>
+                    <class>
+                        <name>FacturaElectronicaToReplic_Detail_StarterJavaCode</name>
+                        <byteCode>yv66vgAAADEANQkACwAiCQALACMJAAsAJAoADAAlCAAmCAAnCAAoCgApACoKACkAKwgALAcALQcALgEACkVSUk9SX0NPREUBABJMamF2YS9sYW5nL1N0cmluZzsBAAZFUlJPUlMBAApUWVBFX0VSUk9SAQANZ2V0RVJST1JfQ09ERQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADXNldEVSUk9SX0NPREUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAAlnZXRFUlJPUlMBAAlzZXRFUlJPUlMBAA1nZXRUWVBFX0VSUk9SAQANc2V0VFlQRV9FUlJPUgEABjxpbml0PgEAAygpVgEABmludm9rZQEACkV4Y2VwdGlvbnMHAC8BAApTb3VyY2VGaWxlAQA2RmFjdHVyYUVsZWN0cm9uaWNhVG9SZXBsaWNfRGV0YWlsX1N0YXJ0ZXJKYXZhQ29kZS5qYXZhDAANAA4MAA8ADgwAEAAODAAbABwBAAABAAVmYWxzZQEAASwHADAMADEAMgwAMwA0AQAEdHJ1ZQEAdFByb2Nlc3Nlcy9TdGFydGVyUHJvY2Vzcy9GYWN0dXJhRWxlY3Ryb25pY2FUb1JlcGxpY19EZXRhaWxfU3RhcnRlci9GYWN0dXJhRWxlY3Ryb25pY2FUb1JlcGxpY19EZXRhaWxfU3RhcnRlckphdmFDb2RlAQAQamF2YS9sYW5nL09iamVjdAEAE2phdmEvbGFuZy9FeGNlcHRpb24BABBqYXZhL2xhbmcvU3RyaW5nAQAFc3BsaXQBACcoTGphdmEvbGFuZy9TdHJpbmc7KVtMamF2YS9sYW5nL1N0cmluZzsBAAZlcXVhbHMBABUoTGphdmEvbGFuZy9PYmplY3Q7KVoAIQALAAwAAAADAAQADQAOAAAABAAPAA4AAAAEABAADgAAAAgAAQARABIAAQATAAAAHQABAAEAAAAFKrQAAbAAAAABABQAAAAGAAEAAAAKAAEAFQAWAAEAEwAAACIAAgACAAAABiortQABsQAAAAEAFAAAAAoAAgAAAA0ABQAOAAEAFwASAAEAEwAAAB0AAQABAAAABSq0AAKwAAAAAQAUAAAABgABAAAAEAABABgAFgABABMAAAAiAAIAAgAAAAYqK7UAArEAAAABABQAAAAKAAIAAAATAAUAFAABABkAEgABABMAAAAdAAEAAQAAAAUqtAADsAAAAAEAFAAAAAYAAQAAABYAAQAaABYAAQATAAAAIgACAAIAAAAGKiu1AAOxAAAAAQAUAAAACgACAAAAGQAFABoAAQAbABwAAQATAAAAPwACAAEAAAAXKrcABCoSBbUAASoSBbUAAioSBbUAA7EAAAABABQAAAAWAAUAAAAcAAQABgAKAAcAEAAIABYAHQABAB0AHAACABMAAABpAAIAAwAAADUqEga1AAMqtAACEge2AAhMAz0cK76iAB8rHDIqtAABtgAJmQAMKhIKtQADpwAJhAIBp//hsQAAAAEAFAAAACIACAAAACUABgAmABAAKAAYACkAJQArACsALAAuACgANAAwAB4AAAAEAAEAHwABACAAAAACACE=</byteCode>
+                    </class>
+                </byteCode>
+            </config>
+            <pd:inputBindings>
+                <javaCodeActivityInput>
+                    <ERROR_CODE>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </ERROR_CODE>
+                    <ERRORS>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ConditionForSuspend"/>
+                    </ERRORS>
+                </javaCodeActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Error Process">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>274</pd:x>
+            <pd:y>290</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns1:MSG_Container>
+                    <ns1:Header>
+                        <ns1:ProjectName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </ns1:ProjectName>
+                        <ns1:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </ns1:Source_Domain>
+                        <ns1:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </ns1:Destination_Domain>
+                        <ns1:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ProjectConfig/TransactionType"/>
+                        </ns1:Transaction_Type>
+                        <ns1:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns1:TimeStamp>
+                    </ns1:Header>
+                    <ns1:Body>
+                        <ns1:ErrorManagementSchema>
+                            <ns1:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </ns1:inrtn_id>
+                            <ns1:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                            </ns1:inrtn_instn_nm>
+                            <ns1:inrtn_err_rtn_desc>
+                                <xsl:value-of select="concat(&#xA;'Message Code: ',$_error/ns:ErrorReport/MsgCode,&quot;&#xA;&quot;,&#xA;'Error Message: ',$_error/ns:ErrorReport/Msg,&quot;&#xA;&quot;,&#xA;'Error Class: ',$_error/ns:ErrorReport/Class,&quot;&#xA;&quot;,&#xA;tib:render-xml($_error/ns:ErrorReport/Data),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;'STACKTRACE: ',$_error/ns:ErrorReport/StackTrace,&quot;&#xA;&quot;&#xA;)"/>
+                            </ns1:inrtn_err_rtn_desc>
+                            <ns1:inrtn_msg_body>
+                                <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                            </ns1:inrtn_msg_body>
+                            <ns1:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                            </ns1:cre8_ts>
+                            <ns1:u_code>
+                                <xsl:value-of select="if ($Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true') then&#xA;concat($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_TECHNICAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else if (contains($_error/ns:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;concat($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $_error/ns:ErrorReport/MsgCode) &#xA;else &#xA;concat($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns:ErrorReport/MsgCode)"/>
+                            </ns1:u_code>
+                            <ns1:sev_id>
+                                <xsl:value-of select="if ($Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true') then&#xA;($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH) &#xA;else if (contains($_error/ns:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED) &#xA;else &#xA;($_globalVariables/pfx:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED)"/>
+                            </ns1:sev_id>
+                        </ns1:ErrorManagementSchema>
+                    </ns1:Body>
+                </ns1:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>153</pd:x>
+            <pd:y>289</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns0:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns0:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>422</pd:x>
+            <pd:y>290</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns02:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/pfx:GlobalVariables/RetryConfig/GLB_MAX_RETRIES"/>
+                    </IntervalInMillisec>
+                </ns02:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>554</pd:x>
+        <pd:y>274</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns0:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <ns1:MSG_Container>
+                        <xsl:copy-of select="$_error_FacturaElectronicaToReplic_Detail/ns1:MSG_Container/ancestor-or-self::*/namespace::node()"/>
+                        <xsl:copy-of select="$_error_FacturaElectronicaToReplic_Detail/ns1:MSG_Container/@*"/>
+                        <xsl:copy-of select="$_error_FacturaElectronicaToReplic_Detail/ns1:MSG_Container/node()"/>
+                    </ns1:MSG_Container>
+                </data>
+            </ns0:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>695</pd:x>
+        <pd:y>305</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=MSG_Container namespace=http://xmlns.heb.com/ei/ErrorManagementSchema</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error-Process-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>808</pd:x>
+        <pd:y>306</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Catch/ns1:MSG_Container"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error-2">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>930</pd:x>
+        <pd:y>305</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns0:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns0:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not (exists($_error_FacturaElectronicaToReplic_Detail/ns1:MSG_Container))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error-Process-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error-Process-1</pd:from>
+        <pd:to>Generate-Error-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

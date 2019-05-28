@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx5="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIBASCUR_ADB_Adapter_Cfg" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/EXCHANGE_RATE_INFORMATION" xmlns:pfx3="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ActiveDatabaseAdapterConfiguration" xmlns:pfx2="http://xmlns.heb.com/ei/PROVIDER_INFORMATION" xmlns:pfx="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ADASDIConnection" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIBASCUR_ADB_Adapter_Cfg" schemaLocation="/AESchemas/ae/ADB/PMMSDIBASCUR_ADB_Adapter_Cfg.aeschema"/>
+    <pd:name>MexicoPMMSpecialProcessesPublisher Processes/Main Process/ExchangeRate/Send_ExchangeRate_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx5:PMM.HEB__P__SDIBASCUR"/>
+    <pd:startX>230</pd:startX>
+    <pd:startY>128</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>584</pd:endX>
+    <pd:endY>128</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1272992257379</pd:targetNamespace>
+    <pd:activity name="Publisher">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>356</pd:x>
+        <pd:y>128</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Topics/MIG_EXCHANGERATE_TOPIC%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx4:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <Body>
+                    <pfx4:MSG_CONTAINER>
+                        <pfx4:Header>
+                            <pfx4:ProjectName>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                            </pfx4:ProjectName>
+                            <pfx4:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx4:Source_Domain>
+                            <pfx4:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx4:Destination_Domain>
+                            <pfx4:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                            </pfx4:Transaction_Type>
+                            <pfx4:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx4:TimeStamp>
+                        </pfx4:Header>
+                        <pfx4:Body>
+                            <pfx4:EXCHANGE_RATE>
+                                <pfx4:TRAN_TYPE>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TRAN__TYPE"/>
+                                </pfx4:TRAN_TYPE>
+                                <pfx4:AUDIT_NUMBER>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/AUDIT__NUMBER"/>
+                                </pfx4:AUDIT_NUMBER>
+                                <pfx4:ISS_TYPE>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ISS__TYPE/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ISS__TYPE"/>
+                                </pfx4:ISS_TYPE>
+                                <pfx4:ORG_LVL_CHILD>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ORG__LVL__CHILD"/>
+                                </pfx4:ORG_LVL_CHILD>
+                                <pfx4:CURR_CODE>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/CURR__CODE"/>
+                                </pfx4:CURR_CODE>
+                                <pfx4:TO_CURR_CODE>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TO__CURR__CODE"/>
+                                </pfx4:TO_CURR_CODE>
+                                <pfx4:ISS_TECH_KEY>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ISS__TECH__KEY"/>
+                                </pfx4:ISS_TECH_KEY>
+                                <pfx4:ORG_LVL_NUMBER>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ORG__LVL__NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ORG__LVL__NUMBER"/>
+                                </pfx4:ORG_LVL_NUMBER>
+                                <pfx4:RATE_YR>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__YR/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__YR"/>
+                                </pfx4:RATE_YR>
+                                <pfx4:RATE_PR>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__PR/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__PR"/>
+                                </pfx4:RATE_PR>
+                                <pfx4:RATE_WK>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__WK/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__WK"/>
+                                </pfx4:RATE_WK>
+                                <pfx4:RATE_DY>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__DY/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__DY"/>
+                                </pfx4:RATE_DY>
+                                <pfx4:RATE_DATE>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__DATE/dateTime/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__DATE/dateTime"/>
+                                </pfx4:RATE_DATE>
+                                <pfx4:RATE_RATE>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__RATE/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__RATE"/>
+                                </pfx4:RATE_RATE>
+                                <pfx4:DATE_CREATED>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/DATE__CREATED/dateTime/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/DATE__CREATED/dateTime"/>
+                                </pfx4:DATE_CREATED>
+                                <pfx4:RATE_RECIPRICAL>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__RECIPRICAL/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__RECIPRICAL"/>
+                                </pfx4:RATE_RECIPRICAL>
+                                <pfx4:MD_FLAG>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/MD__FLAG/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/MD__FLAG"/>
+                                </pfx4:MD_FLAG>
+                                <pfx4:FRM_RND_MULT>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/FRM__RND__MULT/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/FRM__RND__MULT"/>
+                                </pfx4:FRM_RND_MULT>
+                                <pfx4:TO_RND_MULT>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TO__RND__MULT/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TO__RND__MULT"/>
+                                </pfx4:TO_RND_MULT>
+                                <pfx4:RND_TYPE>
+                                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RND__TYPE/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RND__TYPE"/>
+                                </pfx4:RND_TYPE>
+                            </pfx4:EXCHANGE_RATE>
+                        </pfx4:Body>
+                    </pfx4:MSG_CONTAINER>
+                </Body>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update Record">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>472</pd:x>
+        <pd:y>128</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/PMM JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE PMM.SDIBASCUR SET DOWNLOAD_DATE_1=SYSDATE
+WHERE ORG_LVL_CHILD=? AND CURR_CODE=? AND TO_CURR_CODE=? AND ISS_TECH_KEY=? AND TRAN_TYPE=? 
+AND  AUDIT_NUMBER=? AND RATE_YR=? AND RATE_PR=? AND RATE_WK=? AND RATE_DY=?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>ORG_LVL_CHILD</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CURR_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TO_CURR_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ISS_TECH_KEY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRAN_TYPE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>AUDIT_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RATE_YR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RATE_PR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RATE_WK</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RATE_DY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <ORG_LVL_CHILD>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ORG__LVL__CHILD/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ORG__LVL__CHILD"/>
+                </ORG_LVL_CHILD>
+                <CURR_CODE>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/CURR__CODE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/CURR__CODE"/>
+                </CURR_CODE>
+                <TO_CURR_CODE>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TO__CURR__CODE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TO__CURR__CODE"/>
+                </TO_CURR_CODE>
+                <ISS_TECH_KEY>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ISS__TECH__KEY/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/ISS__TECH__KEY"/>
+                </ISS_TECH_KEY>
+                <TRAN_TYPE>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TRAN__TYPE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/TRAN__TYPE"/>
+                </TRAN_TYPE>
+                <AUDIT_NUMBER>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/AUDIT__NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/AUDIT__NUMBER"/>
+                </AUDIT_NUMBER>
+                <RATE_YR>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__YR/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__YR"/>
+                </RATE_YR>
+                <RATE_PR>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__PR/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__PR"/>
+                </RATE_PR>
+                <RATE_WK>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__WK/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__WK"/>
+                </RATE_WK>
+                <RATE_DY>
+                    <xsl:copy-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__DY/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx5:PMM.HEB__P__SDIBASCUR/RATE__DY"/>
+                </RATE_DY>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Publisher</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Publisher</pd:from>
+        <pd:to>Update Record</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update Record</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

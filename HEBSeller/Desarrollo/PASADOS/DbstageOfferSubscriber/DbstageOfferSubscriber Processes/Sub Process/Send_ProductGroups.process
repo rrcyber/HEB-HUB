@@ -1,0 +1,650 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <pd:name>DbstageOfferSubscriber Processes/Sub Process/Send_ProductGroups.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:Offer"/>
+    <pd:startX>105</pd:startX>
+    <pd:startY>206</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1828</pd:endX>
+    <pd:endY>202</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <ProductGroups>
+            <xsd:element name="productGroups" type="xsd:string"/>
+        </ProductGroups>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1413472079035</pd:targetNamespace>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>197</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>1541</pd:width>
+        <pd:height>397</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/ProductGroup</pd:over>
+            <pd:iterationElementSlot>group</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Assign</pd:to>
+            <pd:xpathDescription>grupo no repetido</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>not(contains($ProductGroups/productGroups, $group/ProductGroup/Header/ProductGroupID))</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Delete</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign</pd:from>
+            <pd:to>JDBC-STAGE-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-STAGE-1</pd:from>
+            <pd:to>Products Parse Data</pd:to>
+            <pd:xpathDescription>no existe</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>empty( $JDBC-STAGE-1/resultSet/Record)</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Products Parse Data</pd:from>
+            <pd:to>Group (3)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (3)</pd:from>
+            <pd:to>JDBC-STAGE-1-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (4)</pd:from>
+            <pd:to>JDBC-Update</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-STAGE-1-1</pd:from>
+            <pd:to>Group (4)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Update</pd:from>
+            <pd:to>JDBC-STAGE ArtDesconocidos</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-STAGE-1</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-STAGE ArtDesconocidos</pd:from>
+            <pd:to>Group (4) (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (4) (1)</pd:from>
+            <pd:to>JDBC-Delete</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Products Parse Data">
+            <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+            <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+            <pd:x>542</pd:x>
+            <pd:y>160</pd:y>
+            <config>
+                <InputType>String</InputType>
+                <Encoding>ASCII</Encoding>
+                <ParseSharedConfig>/Shared Resources/Schema Definitions/Custom/Products Data Format.sharedparse</ParseSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <Input>
+                    <text>
+                        <xsl:value-of select="$group/ProductGroup/Products"/>
+                    </text>
+                    <noOfRecords>
+                        <xsl:value-of select="-1"/>
+                    </noOfRecords>
+                </Input>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>311</pd:x>
+            <pd:y>334</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Assign">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>308</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <variableName>ProductGroups</variableName>
+            </config>
+            <pd:inputBindings>
+                <productGroups>
+                    <xsl:value-of select="concat($ProductGroups/productGroups, $group/ProductGroup/Header/ProductGroupID, ',')"/>
+                </productGroups>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC-STAGE-1">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>423</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <statement>select DISTINCT group_id from mag_import_promo_prod_group
+where group_id = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <optionalOrNillable>false</optionalOrNillable>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>group</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>group_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <group>
+                        <xsl:choose>
+                            <xsl:when test="exists($group/ProductGroup/Header/ProductGroupID)">
+                                <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </group>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC-Update">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>1201</pd:x>
+            <pd:y>157</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO MAG_IMPORT_PROMO_PROD_COMPLETE (group_id, group_complete)
+VALUES(?, ?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>group_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>date_complete</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <group_id>
+                        <xsl:choose>
+                            <xsl:when test="exists($group/ProductGroup/Header/ProductGroupID)">
+                                <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </group_id>
+                    <date_complete>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                    </date_complete>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Group (3)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>636</pd:x>
+            <pd:y>75</pd:y>
+            <pd:width>161</pd:width>
+            <pd:height>140</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Products-Parse-Data/Output/Rows/Products</pd:over>
+                <pd:iterationElementSlot>product</pd:iterationElementSlot>
+                <pd:indexSlot>j</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC-Insert-temp</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC-Insert-temp</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC-Insert-temp">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>716</pd:x>
+                <pd:y>145</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO MAG_TEMP_PROMO_PRODUCT_GROUP (grupo_id, product_plu)
+VALUES(?, ?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>group_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>plu</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <group_id>
+                            <xsl:choose>
+                                <xsl:when test="exists($group/ProductGroup/Header/ProductGroupID)">
+                                    <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </group_id>
+                        <plu>
+                            <xsl:choose>
+                                <xsl:when test="exists(number($product/Products/strProduct[1]))">
+                                    <xsl:value-of select="number($product/Products/strProduct[1])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </plu>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:group name="Group (4)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>950</pd:x>
+            <pd:y>56</pd:y>
+            <pd:width>180</pd:width>
+            <pd:height>180</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-STAGE-1-1/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>sku</pd:iterationElementSlot>
+                <pd:indexSlot>k</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert Stage</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Stage</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert Stage">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>1046</pd:x>
+                <pd:y>147</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO mag_import_promo_prod_group (group_id, product_sku)
+VALUES(?, ?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>group_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>sku</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <group_id>
+                            <xsl:choose>
+                                <xsl:when test="exists($group/ProductGroup/Header/ProductGroupID)">
+                                    <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </group_id>
+                        <sku>
+                            <xsl:copy-of select="$sku/Record/COD_ARTICULO/@xsi:nil"/>
+                            <xsl:value-of select="$sku/Record/COD_ARTICULO"/>
+                        </sku>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC-STAGE-1-1">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>864</pd:x>
+            <pd:y>144</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <statement>SELECT DISTINCT COD_ARTICULO 
+FROM OCODP dp
+inner join mag_import_products prod on prod.sku = dp.cod_articulo
+WHERE prod.status = 1
+and((COD_TICODPRO = 1 
+AND CONVERT(BIGINT, SUBSTRING(COD_CODIGOPROD,1,DATALENGTH(COD_CODIGOPROD)-1)) IN 
+(SELECT product_PLU FROM MAG_TEMP_PROMO_PRODUCT_GROUP WHERE grupo_id = ?))
+OR (COD_TICODPRO &lt;&gt; 1 AND COD_CODIGOPROD IN 
+(SELECT product_PLU FROM MAG_TEMP_PROMO_PRODUCT_GROUP WHERE grupo_id = ?)))</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <optionalOrNillable>true</optionalOrNillable>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>group_id</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>group_id_2</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>COD_ARTICULO</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <group_id>
+                        <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                    </group_id>
+                    <group_id_2>
+                        <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                    </group_id_2>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC-Delete">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>1647</pd:x>
+            <pd:y>158</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>DELETE MAG_TEMP_PROMO_PRODUCT_GROUP
+WHERE GRUPO_ID = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>group_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <group_id>
+                        <xsl:choose>
+                            <xsl:when test="exists($group/ProductGroup/Header/ProductGroupID)">
+                                <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </group_id>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC-STAGE ArtDesconocidos">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>1315</pd:x>
+            <pd:y>165</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <statement>select product_PLU from mag_temp_Promo_Product_Group
+outer apply (SELECT cod_articulo FROM OCODP WHERE COD_TICODPRO = 1
+                           and CONVERT(BIGINT, SUBSTRING(COD_CODIGOPROD,1,DATALENGTH(COD_CODIGOPROD)-1)) = product_PLU ) as a
+outer apply (SELECT cod_articulo FROM OCODP WHERE COD_TICODPRO &lt;&gt; 1
+                           and COD_CODIGOPROD = product_PLU ) as b
+where
+a.cod_articulo  is null and b.cod_articulo  is null</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <optionalOrNillable>true</optionalOrNillable>
+                <Prepared_Param_DataType/>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>product_PLU</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>bigint</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Group (4) (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>1404</pd:x>
+            <pd:y>79</pd:y>
+            <pd:width>173</pd:width>
+            <pd:height>140</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-STAGE-ArtDesconocidos/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>desc</pd:iterationElementSlot>
+                <pd:indexSlot>n</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC-Insert ArtDesconocidos</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC-Insert ArtDesconocidos</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC-Insert ArtDesconocidos">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>1494</pd:x>
+                <pd:y>142</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO RelacionArticulosDesconocidos (group_id, product, creation_date)
+VALUES(?, ?, ?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>group_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>product</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>creation_date</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <group_id>
+                            <xsl:choose>
+                                <xsl:when test="exists($group/ProductGroup/Header/ProductGroupID)">
+                                    <xsl:value-of select="$group/ProductGroup/Header/ProductGroupID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </group_id>
+                        <product>
+                            <xsl:copy-of select="$desc/Record/product_PLU/@xsi:nil"/>
+                            <xsl:value-of select="$desc/Record/product_PLU"/>
+                        </product>
+                        <creation_date>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </creation_date>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Custom/Loger Error.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ERROR" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ID_ERROR" type="xsd:string"/>
+                                <xsd:element name="MENSAJE" type="xsd:string"/>
+                                <xsd:element name="ID_PROVEDOR" type="xsd:string"/>
+                                <xsd:element name="RFC_PROVEDOR" type="xsd:string"/>
+                                <xsd:element name="ID_FACTURA" type="xsd:string"/>
+                                <xsd:element name="TIPO_PROVEDOR" type="xsd:string"/>
+                                <xsd:element name="FECHA" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>148</pd:startX>
+    <pd:startY>63</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>541</pd:endX>
+    <pd:endY>66</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1307454856418</pd:targetNamespace>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>313</pd:x>
+        <pd:y>47</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO dbo.catlogerrores
+(ERR_CORTO,ERR_MENSAJE,ERR_PROVID,ERR_RFC,ERR_FACTURAID,ERR_TIPOPROV,ERR_FECHA)
+VALUES(?,?,?,?,?,?,getdate())</statement>
+            <batchUpdate>true</batchUpdate>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>ERR_CORTO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERR_MENSAJE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERR_PROVID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERR_RFC</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERR_FACTURAID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ERR_TIPOPROV</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <xsl:for-each select="$Start/root/ERROR">
+                    <Record>
+                        <ERR_CORTO>
+                            <xsl:value-of select="ID_ERROR"/>
+                        </ERR_CORTO>
+                        <ERR_MENSAJE>
+                            <xsl:value-of select="if (string-length(current()/MENSAJE) >=99)&#xA;then substring(current()/MENSAJE, 1, 99)&#xA;else current()/MENSAJE"/>
+                        </ERR_MENSAJE>
+                        <ERR_PROVID>
+                            <xsl:value-of select="ID_PROVEDOR"/>
+                        </ERR_PROVID>
+                        <ERR_RFC>
+                            <xsl:value-of select="RFC_PROVEDOR"/>
+                        </ERR_RFC>
+                        <ERR_FACTURAID>
+                            <xsl:value-of select="ID_FACTURA"/>
+                        </ERR_FACTURAID>
+                        <ERR_TIPOPROV>
+                            <xsl:value-of select="TIPO_PROVEDOR"/>
+                        </ERR_TIPOPROV>
+                    </Record>
+                </xsl:for-each>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

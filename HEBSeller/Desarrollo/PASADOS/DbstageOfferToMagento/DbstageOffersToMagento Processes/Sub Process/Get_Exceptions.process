@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="www.tibco.com/plugin/Sleep" xmlns:ns13="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx="http://www.tibco.com/pe/DeployedVarsType">
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Get_Exceptions.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>202</pd:startX>
+    <pd:startY>80</pd:startY>
+    <pd:returnBindings>
+        <Group>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                <Products>
+                    <promo_id>
+                        <xsl:value-of select="winner_promo_id"/>
+                    </promo_id>
+                    <promo_type>
+                        <xsl:value-of select="winner_promo_type"/>
+                    </promo_type>
+                    <sku>
+                        <xsl:value-of select="sku"/>
+                    </sku>
+                    <website>
+                        <xsl:value-of select="website"/>
+                    </website>
+                    <invalidating_promo_type>
+                        <xsl:value-of select="promo_type"/>
+                    </invalidating_promo_type>
+                    <invalidating_source_promo_id>
+                        <xsl:value-of select="promo_id"/>
+                    </invalidating_source_promo_id>
+                </Products>
+            </xsl:for-each>
+        </Group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Products" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="promo_id" type="xsd:string"/>
+                                <xsd:element name="promo_type" type="xsd:string"/>
+                                <xsd:element name="sku" type="xsd:string"/>
+                                <xsd:element name="website" type="xsd:string"/>
+                                <xsd:element name="invalidating_promo_type" type="xsd:string"/>
+                                <xsd:element name="invalidating_source_promo_id" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>426</pd:endX>
+    <pd:endY>85</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1416850563627</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>309</pd:x>
+        <pd:y>83</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT DISTINCT winners.promo_id as winner_promo_id, winners.promo_type as winner_promo_type, Loosers.sku, Loosers.website, Loosers.promo_type,  Loosers.promo_id
+FROM mag_import_HistorialPromociones Loosers
+inner join mag_import_HistorialPromociones winners on loosers.sku = winners.SKU and Loosers.website = winners.website
+WHERE loosers.[status] = 'I' and winners.[status] = 'A'
+</statement>
+            <optionalOrNillable>true</optionalOrNillable>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>winner_promo_id</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>winner_promo_type</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>sku</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>website</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>promo_type</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>promo_id</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

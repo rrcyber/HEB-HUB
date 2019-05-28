@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="www.tibco.com/plugin/Timer" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx="http://xmlns.heb.com/ei/PARTNER_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PARTNER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PARTNER_INFORMATION_SOAP.xsd"/>
+    <pd:name>PeopleSoftIdentityManagementMX/Main Process/Employee_PeopleSoft_Data_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>45</pd:startX>
+    <pd:startY>121</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>606</pd:endX>
+    <pd:endY>123</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <varProcess>
+            <xsd:element name="bProcessed" type="xsd:string"/>
+        </varProcess>
+        <varCurrentEmpl>
+            <xsd:element name="strEmpl" type="xsd:string"/>
+        </varCurrentEmpl>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1268939340178</pd:targetNamespace>
+    <pd:activity name="Employee_Selection_Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>350</pd:x>
+        <pd:y>123</pd:y>
+        <config>
+            <processName>/PeopleSoftIdentityManagementMX/Employee_PeopleSoft_Process/Employee_Selection_Process.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <param>
+                    <xsl:value-of select="$New-Records-PeopleSoft-JDBC-Query/resultSet"/>
+                </param>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ErrorProcess (1)">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>342</pd:x>
+        <pd:y>255</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess (1).process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns2:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                    <Code>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </Code>
+                </xsl:if>
+                <Message>
+                    <xsl:value-of select="tib:render-xml($_error/ns2:ErrorReport, 0,0)"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Employee_Selection_Process</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Employee_Selection_Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Employee_Selection_Process</pd:from>
+        <pd:to>ErrorProcess (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

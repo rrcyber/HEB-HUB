@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>DbstageOfferSubscriber Processes/Main Process/Send_Offers_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:Offer"/>
+    <pd:startX>70</pd:startX>
+    <pd:startY>61</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="exists($Start/Offer/Conditions/Product/ProductGroupID) and exists($Start/Offer/Rewards/Discount/DiscountedProductGroupID)">
+                <records>
+                    <xsl:value-of select="'1'"/>
+                </records>
+            </xsl:when>
+            <xsl:otherwise>
+                <records>
+                    <xsl:value-of select="'0'"/>
+                </records>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="records" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>1080</pd:endX>
+    <pd:endY>60</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1413385743454</pd:targetNamespace>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>659</pd:x>
+        <pd:y>279</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>360</pd:x>
+        <pd:y>276</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Send_Conditions">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>507</pd:x>
+        <pd:y>202</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_Conditions.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_Locations">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>513</pd:x>
+        <pd:y>439</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_Locations.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Start/Offer"/>
+                <promo_type>
+                    <xsl:value-of select="$Map-Data/promo_type"/>
+                </promo_type>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_Offer">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>503</pd:x>
+        <pd:y>119</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_Offer.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Start/Offer"/>
+                <promo_type>
+                    <xsl:value-of select="$Map-Data/promo_type"/>
+                </promo_type>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_ProductGroups">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>508</pd:x>
+        <pd:y>356</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_ProductGroups.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_Rewards">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>506</pd:x>
+        <pd:y>277</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_Rewards.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_History">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>784</pd:x>
+        <pd:y>280</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_History.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:if test="$Start/Offer/Header/IncentiveID">
+                    <promo_id>
+                        <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                    </promo_id>
+                </xsl:if>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_PromoAhorro">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>517</pd:x>
+        <pd:y>549</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_PromoAhorro.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Start/Offer"/>
+                <promo_type>
+                    <xsl:value-of select="$Map-Data/promo_type"/>
+                </promo_type>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_TotalCarrito">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>536</pd:x>
+        <pd:y>827</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_TotalCarrito.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Start/Offer"/>
+                <promo_type>
+                    <xsl:value-of select="$Map-Data/promo_type"/>
+                </promo_type>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-2">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>294</pd:x>
+        <pd:y>61</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-3">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>378</pd:x>
+        <pd:y>631</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Send_ProductGroups-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>523</pd:x>
+        <pd:y>633</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_ProductGroups.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update_CompletedPromo">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>909</pd:x>
+        <pd:y>281</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Update_CompletedPromo.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-4">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>655</pd:x>
+        <pd:y>635</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Send_PromoAhorroHistory">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>787</pd:x>
+        <pd:y>635</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_PromoAhorroHistory.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:if test="$Start/Offer/Header/IncentiveID">
+                    <promo_id>
+                        <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                    </promo_id>
+                </xsl:if>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-5">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>77</pd:x>
+        <pd:y>362</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Update_CompletedPromoAhorro">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>927</pd:x>
+        <pd:y>632</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Update_CompletedPromoAhorro.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update_CompletedTotalCarrito">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>816</pd:x>
+        <pd:y>869</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Update_CompletedTotalCarrito.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>78</pd:x>
+        <pd:y>213</pd:y>
+        <config>
+            <element>
+                <xsd:element name="promo_type" type="xsd:string"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <xsl:choose>
+                <xsl:when test="$Start/Offer/Rewards/Discount/AmountTypeID = 4 and $Start/Offer/Rewards/Discount/ChargebackDeptID = 123 and exists($Start/Offer/Conditions/TriggerCode/PLU)">
+                    <promo_type>
+                        <xsl:value-of select="'COUPON'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/AmountTypeID = 4 and ($Start/Offer/Rewards/Discount/ChargebackDeptID = 123 or  $Start/Offer/Rewards/Discount/ChargebackDeptID =1979 or  $Start/Offer/Rewards/Discount/ChargebackDeptID =1842)">
+                    <promo_type>
+                        <xsl:value-of select="'COMBO'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/DiscountTypeID = 2 and $Start/Offer/Rewards/Discount/ChargebackDeptID = 1473">
+                    <promo_type>
+                        <xsl:value-of select="'PRAHORRO'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/DiscountTypeID = 3 and $Start/Offer/Rewards/Discount/ChargebackDeptID = 1687">
+                    <promo_type>
+                        <xsl:value-of select="'CARTDISC'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/AmountTypeID = 1 and $Start/Offer/Rewards/Discount/ChargebackDeptID = 124 and exists($Start/Offer/Conditions/TriggerCode/PLU)">
+                    <promo_type>
+                        <xsl:value-of select="'COUPON'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/AmountTypeID = 1 and $Start/Offer/Rewards/Discount/ChargebackDeptID = 124">
+                    <promo_type>
+                        <xsl:value-of select="'REBAJA'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/AmountTypeID = 3 and $Start/Offer/Rewards/Discount/ChargebackDeptID = 124 and exists($Start/Offer/Conditions/TriggerCode/PLU)">
+                    <promo_type>
+                        <xsl:value-of select="'COUPON'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/AmountTypeID = 3 and $Start/Offer/Rewards/Discount/ChargebackDeptID = 124">
+                    <promo_type>
+                        <xsl:value-of select="'DISCOUNT'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/ChargebackDeptID = 1687 and exists($Start/Offer/Conditions/TriggerCode/PLU)">
+                    <promo_type>
+                        <xsl:value-of select="'COUPON'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:when test="$Start/Offer/Rewards/Discount/ChargebackDeptID = 1983 or $Start/Offer/Rewards/Discount/ChargebackDeptID = 1843">
+                    <promo_type>
+                        <xsl:value-of select="'AHORRA'"/>
+                    </promo_type>
+                </xsl:when>
+                <xsl:otherwise>
+                    <promo_type>
+                        <xsl:value-of select="'OTRO'"/>
+                    </promo_type>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send_PromoAhorroLocations">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>524</pd:x>
+        <pd:y>722</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_PromoAhorroLocations.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-6">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>385</pd:x>
+        <pd:y>873</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Send_TotalCarritoLocations">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>544</pd:x>
+        <pd:y>914</pd:y>
+        <config>
+            <processName>/DbstageOfferSubscriber Processes/Sub Process/Send_TotalCarritoLocations.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-7">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>688</pd:x>
+        <pd:y>869</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>54</pd:x>
+        <pd:y>960</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>229</pd:x>
+        <pd:y>959</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="tib:render-xml($_error/ns:ErrorReport,0,0)"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:xpathDescription>oferta con condicion y premio</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>exists($Start/Offer/Conditions/Product/ProductGroupID) and exists($Start/Offer/Rewards/Discount/DiscountedProductGroupID)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_Offer</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_Conditions</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_Rewards</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_ProductGroups</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Send_Offer</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Send_Conditions</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Send_Rewards</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Send_ProductGroups</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:xpathDescription>oferta sin condicion y/o premio</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Send_History</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_History</pd:from>
+        <pd:to>Update_CompletedPromo</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_PromoAhorro</pd:from>
+        <pd:to>Null-4</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_TotalCarrito</pd:from>
+        <pd:to>Null-7</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>Send_PromoAhorro</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>Send_ProductGroups-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_ProductGroups-1</pd:from>
+        <pd:to>Null-4</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_CompletedPromo</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-4</pd:from>
+        <pd:to>Send_PromoAhorroHistory</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_PromoAhorroHistory</pd:from>
+        <pd:to>Update_CompletedPromoAhorro</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-5</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-5</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:xpathDescription>Promo Ahorro</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Map-Data/promo_type = 'PRAHORRO'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-5</pd:from>
+        <pd:to>Null-6</pd:to>
+        <pd:xpathDescription>Total Carrito</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Map-Data/promo_type = 'CARTDISC'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Send_Locations</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_Locations</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_CompletedPromoAhorro</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_CompletedTotalCarrito</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Null-5</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:xpathDescription>promo_tyoe = 'OTRO'</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Map-Data/promo_type = 'OTRO'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>Send_PromoAhorroLocations</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_PromoAhorroLocations</pd:from>
+        <pd:to>Null-4</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-6</pd:from>
+        <pd:to>Send_TotalCarrito</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-6</pd:from>
+        <pd:to>Send_TotalCarritoLocations</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_TotalCarritoLocations</pd:from>
+        <pd:to>Null-7</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-7</pd:from>
+        <pd:to>Update_CompletedTotalCarrito</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

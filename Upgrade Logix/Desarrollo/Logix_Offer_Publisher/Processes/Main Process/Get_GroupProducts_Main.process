@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx="http://xmlns.heb.com/ei/OFFER_LIST_RESPONSE" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx5="com/tibco/pe/commands" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/error" xmlns:pfx3="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:pfx7="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALL_PRODUCT_GROUPS.xsd">
+    <xsd:import namespace="http://xmlns.heb.com/ei/OFFER_LIST_RESPONSE" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER_LIST_RESPONSE.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALL_PRODUCT_GROUPS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/ALL_PRODUCT_GROUPS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Main Process/Get_GroupProducts_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>73</pd:startX>
+    <pd:startY>455</pd:startY>
+    <pd:returnBindings>
+        <pfx:GET_OFFER_LIST_RESPONSE>
+            <xsl:copy-of select="$concentradoGroups/AccumulatedOutput/Offer"/>
+        </pfx:GET_OFFER_LIST_RESPONSE>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1380</pd:endX>
+    <pd:endY>267</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx7:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1403107738322</pd:targetNamespace>
+    <pd:activity name="Get_AllGroupProducts">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>309</pd:x>
+        <pd:y>455</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Get_AllGroupProducts.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <FECHA_INICIAL>
+                    <xsl:value-of select="$Get_DateInitial_Products/Initial_Date"/>
+                </FECHA_INICIAL>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="CPE_INCNTS_GROUP">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>475</pd:x>
+        <pd:y>239</pd:y>
+        <pd:width>566</pd:width>
+        <pd:height>417</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get_AllGroupProducts/group/root</pd:over>
+            <pd:iterationElementSlot>iteratorGroup</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:outSlot>concentradoGroups</pd:outSlot>
+            <pd:activityOutputName>Map GroupProducts</pd:activityOutputName>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_AllProducts</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Set_DateInitial_Products-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map GroupProducts</pd:from>
+            <pd:to>Generate Error 1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map GroupProducts</pd:from>
+            <pd:to>Render XML</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Render XML</pd:from>
+            <pd:to>Generate Error 1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_AllProducts</pd:from>
+            <pd:to>Map GroupProducts</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Render XML</pd:from>
+            <pd:to>JMS Topic Publisher</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JMS Topic Publisher</pd:from>
+            <pd:to>Generate Error 2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JMS Topic Publisher</pd:from>
+            <pd:to>Set_DateInitial_Products-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Map GroupProducts">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>729</pd:x>
+            <pd:y>471</pd:y>
+            <config>
+                <element ref="pfx6:groupProducts"/>
+            </config>
+            <pd:inputBindings>
+                <groupProducts>
+                    <Auxilary>
+                        <ProductGroup>
+                            <Header>
+                                <xsl:if test="$iteratorGroup/root/ProductGroupID">
+                                    <ProductGroupID>
+                                        <xsl:value-of select="$iteratorGroup/root/ProductGroupID"/>
+                                    </ProductGroupID>
+                                </xsl:if>
+                                <xsl:if test="$iteratorGroup/root/name">
+                                    <Name>
+                                        <xsl:value-of select="$iteratorGroup/root/name"/>
+                                    </Name>
+                                </xsl:if>
+                                <xsl:if test="$iteratorGroup/root/AnyProduct">
+                                    <AnyProduct>
+                                        <xsl:value-of select="$iteratorGroup/root/AnyProduct"/>
+                                    </AnyProduct>
+                                </xsl:if>
+                                <xsl:if test="$iteratorGroup/root/Deleted">
+                                    <Deleted>
+                                        <xsl:value-of select="$iteratorGroup/root/Deleted"/>
+                                    </Deleted>
+                                </xsl:if>
+                                <xsl:if test="$iteratorGroup/root/LastUpdate">
+                                    <LastUpdated>
+                                        <xsl:value-of select="$iteratorGroup/root/LastUpdate"/>
+                                    </LastUpdated>
+                                </xsl:if>
+                            </Header>
+                            <xsl:for-each select="$Get_AllProducts/group/root">
+                                <Products>
+                                    <xsl:if test="Product">
+                                        <Name>
+                                            <xsl:value-of select="Product"/>
+                                        </Name>
+                                    </xsl:if>
+                                </Products>
+                            </xsl:for-each>
+                        </ProductGroup>
+                    </Auxilary>
+                </groupProducts>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error 1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>615</pd:x>
+            <pd:y>560</pd:y>
+            <config>
+                <faultName>Exception</faultName>
+            </config>
+            <pd:inputBindings>
+                <pfx3:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                    <data>
+                        <Exception>
+                            <Domain>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Domain"/>
+                            </Domain>
+                            <Deployment>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Deployment"/>
+                            </Deployment>
+                            <Project>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </Project>
+                            <EngineName>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                            </EngineName>
+                            <TimeStamp>
+                                <xsl:value-of select="current-dateTime()"/>
+                            </TimeStamp>
+                            <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                <Code>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                </Code>
+                            </xsl:if>
+                            <Message>
+                                <xsl:value-of select="tib:render-xml($_error/ns1:ErrorReport, 0,0)"/>
+                            </Message>
+                        </Exception>
+                    </data>
+                </pfx3:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Render XML">
+            <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+            <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+            <pd:x>826</pd:x>
+            <pd:y>559</pd:y>
+            <config>
+                <renderAsText>text</renderAsText>
+                <validateInput>false</validateInput>
+                <term ref="pfx6:groupProducts"/>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-GroupProducts/groupProducts"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error 2">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>828</pd:x>
+            <pd:y>322</pd:y>
+            <config>
+                <faultName>Exception</faultName>
+            </config>
+            <pd:inputBindings>
+                <pfx3:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                    <data>
+                        <Exception>
+                            <Domain>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Domain"/>
+                            </Domain>
+                            <Deployment>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Deployment"/>
+                            </Deployment>
+                            <Project>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </Project>
+                            <EngineName>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                            </EngineName>
+                            <TimeStamp>
+                                <xsl:value-of select="current-dateTime()"/>
+                            </TimeStamp>
+                            <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                <Code>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                </Code>
+                            </xsl:if>
+                            <Message>
+                                <xsl:value-of select="tib:render-xml($_error/ns1:ErrorReport, 0,0)"/>
+                            </Message>
+                        </Exception>
+                    </data>
+                </pfx3:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_AllProducts">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>578</pd:x>
+            <pd:y>450</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Get_AllProducts.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ProductGroupID>
+                    <xsl:value-of select="$Get_AllGroupProducts/group/root[$index]/ProductGroupID"/>
+                </ProductGroupID>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JMS Topic Publisher">
+            <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+            <pd:x>827</pd:x>
+            <pd:y>450</pd:y>
+            <config>
+                <PermittedMessageType>Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Topics/GLB_COMMON_COPIENTGROUPPRODUCTS_OFFEREXPORT_TOPIC%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>%%Connections/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                    <JMSExpiration>%%Connections/Properties/GLB_JMS_EXPIRATION%%</JMSExpiration>
+                    <JMSPriority>%%Connections/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/EMS.sharedjmscon</ConnectionReference>
+            </config>
+            <pd:inputBindings>
+                <ns0:ActivityInput>
+                    <Body>
+                        <xsl:value-of select="$Render-XML/xmlString"/>
+                    </Body>
+                </ns0:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Set_DateInitial_Products-1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>940</pd:x>
+            <pd:y>441</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Set_DateInitial_Products.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                    <xsl:when test="exists($iteratorGroup/root/LastLoaded)">
+                        <xsl:choose>
+                            <xsl:when test="tib:compare-dateTime($iteratorGroup/root/LastUpdate,  $iteratorGroup/root/LastLoaded) = -1">
+                                <DATE>
+                                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss.SSS ',$iteratorGroup/root/LastLoaded)"/>
+                                </DATE>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <DATE>
+                                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss.SSS ',$iteratorGroup/root/LastUpdate)"/>
+                                </DATE>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <DATE>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss.SSS ',$iteratorGroup/root/LastUpdate)"/>
+                        </DATE>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>1183</pd:x>
+        <pd:y>550</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>false</catchAll>
+            <fault>localname=Exception</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Audit Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1160</pd:x>
+        <pd:y>329</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:AuditingSchema>
+                <pfx4:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </pfx4:inrtn_id>
+                <pfx4:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </pfx4:inrtn_nm>
+                <pfx4:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </pfx4:inrtn_instn_nm>
+                <pfx4:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </pfx4:inrtn_proc_id>
+                <pfx4:inrtn_rec_cnt>
+                    <xsl:value-of select="count($Get_AllGroupProducts/group/root)"/>
+                </pfx4:inrtn_rec_cnt>
+                <pfx4:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </pfx4:inrtn_cre8_ts>
+            </pfx4:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="transition 1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>412</pd:x>
+        <pd:y>455</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Get_DateInitial_Products">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>180</pd:x>
+        <pd:y>456</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Get_DateInitial_Products.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="transition 3">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>1261</pd:x>
+        <pd:y>423</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess (1)">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1380</pd:x>
+        <pd:y>548</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess (1).process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Catch/Exception"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_AllGroupProducts_IncentiveID">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>180</pd:x>
+        <pd:y>173</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Get_AllGroupProducts_IncentiveID.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <FECHA_INICIAL>
+                    <xsl:value-of select="$Get_DateInitial_Products/Initial_Date"/>
+                </FECHA_INICIAL>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>588</pd:x>
+        <pd:y>101</pd:y>
+        <pd:width>303</pd:width>
+        <pd:height>129</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Get_AllGroupProducts_IncentiveID/group/param</pd:over>
+            <pd:iterationElementSlot>IndividualPromotion</pd:iterationElementSlot>
+            <pd:indexSlot>PromotionGroup</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_Offer_Main</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_Offer_Main</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Get_Offer_Main">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>746</pd:x>
+            <pd:y>167</pd:y>
+            <config>
+                <processName>/Processes/Main Process/Get_Offer_Main.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <param>
+                        <xsl:value-of select="$IndividualPromotion/param/IncentiveId"/>
+                    </param>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>CPE_INCNTS_GROUP</pd:from>
+        <pd:to>Audit Process</pd:to>
+        <pd:xpathDescription>GroupProducts inserted </pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Audit Process</pd:from>
+        <pd:to>transition 3</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CPE_INCNTS_GROUP</pd:from>
+        <pd:to>transition 3</pd:to>
+        <pd:xpathDescription>not GroupProducts</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>empty($Get_AllGroupProducts/group/root/ProductGroupID)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>transition 1</pd:from>
+        <pd:to>CPE_INCNTS_GROUP</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_AllGroupProducts</pd:from>
+        <pd:to>transition 1</pd:to>
+        <pd:xpathDescription>Not GroupProducts</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_DateInitial_Products</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_DateInitial_Products</pd:from>
+        <pd:to>Get_AllGroupProducts</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>transition 3</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_DateInitial_Products</pd:from>
+        <pd:to>Get_AllGroupProducts_IncentiveID</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_AllGroupProducts_IncentiveID</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.sat.gob.mx/cfd/3" xmlns:ns="http://www.sat.gob.mx/cfd/2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/CFDI_SCHEMA" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MessageResponse.xsd" xmlns:pfx="http://xmlns.heb.com/ei/CFD_SCHEMA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/CFD_SCHEMA" schemaLocation="/Shared Resources/Schema Definitions/Custom/CFD_SCHEMA.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MessageResponse.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/MessageResponse.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/CFDI_SCHEMA" schemaLocation="/Shared Resources/Schema Definitions/Custom/CFDI_SCHEMA.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_CFDI_Complement.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:CDFI_CONTENT"/>
+    <pd:startX>218</pd:startX>
+    <pd:startY>106</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="not(contains($Call-Procedure/resultSet/UnresolvedResultsets,'CODE'))">
+                <OUTPUT>
+                    <VALID>
+                        <xsl:value-of select="true()"/>
+                    </VALID>
+                </OUTPUT>
+            </xsl:when>
+            <xsl:otherwise>
+                <OUTPUT>
+                    <VALID>
+                        <xsl:value-of select="false()"/>
+                    </VALID>
+                    <xsl:copy-of select="$Parse-Message/MESSAGE_DEFINITION"/>
+                </OUTPUT>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="OUTPUT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="VALID" type="xsd:boolean"/>
+                    <xsd:element name="MESSAGE_DEFINITION" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="MESSAGE" type="pfx2:MESSAGE" minOccurs="0" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>663</pd:endX>
+    <pd:endY>112</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1304948132202</pd:targetNamespace>
+    <pd:activity name="Parse Resultset">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>321</pd:x>
+        <pd:y>216</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term>
+                <xsd:element name="Resultsets">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Update1" type="xsd:string"/>
+                            <xsd:element name="ResultSet1">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="Record1">
+                                            <xsd:complexType>
+                                                <xsd:sequence>
+                                                    <xsd:element name="OutputColumn1" type="xsd:string"/>
+                                                </xsd:sequence>
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Call-Procedure/resultSet/UnresolvedResultsets"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="No Error">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>465</pd:x>
+        <pd:y>45</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>318</pd:x>
+        <pd:y>112</pd:y>
+        <config>
+            <timeout>%%Connections/Database/VISORFE/GBL_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/VISORFE/GBL_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spSel_GetCFDIComplement;1</ProcedureName>
+            <useSchema>false</useSchema>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@INVOICE</colName>
+                    <colType>1</colType>
+                    <dataType>-1</dataType>
+                    <typeName>xml</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <INVOICE>
+                        <xsl:value-of select="tib:render-xml($Start/pfx3:CDFI_CONTENT/ns1:Comprobante, true())"/>
+                    </INVOICE>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse Message">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>609</pd:x>
+        <pd:y>217</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term>
+                <xsd:element name="MESSAGE_DEFINITION">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="MESSAGE" type="pfx2:MESSAGE" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Parse-Resultset/Resultsets/ResultSet1/Record1/OutputColumn1"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>475</pd:x>
+        <pd:y>217</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <message>
+                    <xsl:value-of select="tib:render-xml($Parse-Resultset/Resultsets)"/>
+                </message>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>No Error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>No Error</pd:to>
+        <pd:xpathDescription>No Error Found</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not(contains($Call-Procedure/resultSet/UnresolvedResultsets,'CODE'))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>Parse Resultset</pd:to>
+        <pd:xpathDescription>Errors Found</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Resultset</pd:from>
+        <pd:to>Log</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Message</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log</pd:from>
+        <pd:to>Parse Message</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

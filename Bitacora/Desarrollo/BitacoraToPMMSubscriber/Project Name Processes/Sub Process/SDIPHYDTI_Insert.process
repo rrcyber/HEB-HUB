@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx4="http://xmlns.heb.com/ei/SDIRCVHDI_DATA" xmlns:pfx5="http://xmlns.heb.com/ei/SDIPHYDTI_DATA" xmlns:ns0="www.tibco.com/plugin/Sleep">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIRCVHDI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIRCVHDI_DATA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SDIPHYDTI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDIPHYDTI_DATA.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/SDIPHYDTI_Insert.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx5:SDIPHYDTI"/>
+    <pd:startX>157</pd:startX>
+    <pd:startY>123</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>611</pd:endX>
+    <pd:endY>122</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1347035903986</pd:targetNamespace>
+    <pd:group name="Retry ">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:description>Reintentamos determinado numero de veces hacer el Insert</pd:description>
+        <pd:x>266</pd:x>
+        <pd:y>25</pd:y>
+        <pd:width>279</pd:width>
+        <pd:height>312</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>false</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Transaction</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Transaction</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Transaction</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Transaction">
+            <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:description>Insertamos todos los registros, si falla se da rollback a todo</pd:description>
+            <pd:x>321</pd:x>
+            <pd:y>63</pd:y>
+            <pd:width>140</pd:width>
+            <pd:height>140</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>transactionGroup</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:transactionType>JDBCTransaction</pd:transactionType>
+                <pd:includeCheckpoint>false</pd:includeCheckpoint>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:description/>
+                <pd:x>380</pd:x>
+                <pd:y>128</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <batchUpdate>true</batchUpdate>
+                    <statement>INSERT INTO pmm.SDIPHYDTI (CONTROL_NUMBER,
+ORG_LVL_NUMBER,
+BATCH_NUMBER ,
+SEQUENCE_NUMBER ,
+PRD_LVL_NUMBER ,
+PRD_UPC,
+INV_TYPE_CODE,
+ACTUAL_COUNT,
+USER_ID,
+COUNT_DATE,
+COUNT_TIME ,
+USER_FLD_1 ,
+USER_FLD_2 ,
+USER_FLD_3 ,
+DOWNLOAD_DATE_1,
+NOTES,
+INNER_PACK_ID ,
+PHYS_INNERS,
+PHYS_SELL_UNITS,
+PHYS_WEIGHT,
+PHYS_WEIGHT_UOM ,
+PHYS_SELL_UOM ,
+PHYS_CASES)
+ VALUES 
+(? ,? ,? ,? ,?
+,? ,? ,? ,?,TO_DATE(?,'yyyy-mm-dd hh24:mi:ss')
+,? ,? ,? ,?,TO_DATE(?,'yyyy-mm-dd hh24:mi:ss')
+,? ,? ,? ,?,?
+,? ,? ,? )</statement>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>CONTROL_NUMBER</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ORG_LVL_NUMBER</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>BATCH_NUMBER</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>SEQUENCE_NUMBER</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PRD_LVL_NUMBER</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PRD_UPC</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>INV_TYPE_CODE</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ACTUAL_COUNT</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>USER_ID</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>COUNT_DATE</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>COUNT_TIME</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>USER_FLD_1</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>USER_FLD_2</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>USER_FLD_3</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>DOWNLOAD_DATE_1</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>NOTES</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>INNER_PACK_ID</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PHYS_INNERS</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PHYS_SELL_UNITS</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PHYS_WEIGHT</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PHYS_WEIGHT_UOM</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PHYS_SELL_UOM</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>PHYS_CASES</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <xsl:for-each select="$Start/pfx5:SDIPHYDTI/pfx5:ITEM">
+                            <Record>
+                                <CONTROL_NUMBER>
+                                    <xsl:copy-of select="pfx5:CONTROL_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:CONTROL_NUMBER"/>
+                                </CONTROL_NUMBER>
+                                <ORG_LVL_NUMBER>
+                                    <xsl:copy-of select="pfx5:ORG_LVL_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:ORG_LVL_NUMBER"/>
+                                </ORG_LVL_NUMBER>
+                                <BATCH_NUMBER>
+                                    <xsl:copy-of select="pfx5:BATCH_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:BATCH_NUMBER"/>
+                                </BATCH_NUMBER>
+                                <SEQUENCE_NUMBER>
+                                    <xsl:copy-of select="pfx5:SEQUENCE_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:SEQUENCE_NUMBER"/>
+                                </SEQUENCE_NUMBER>
+                                <PRD_LVL_NUMBER>
+                                    <xsl:copy-of select="pfx5:PRD_LVL_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PRD_LVL_NUMBER"/>
+                                </PRD_LVL_NUMBER>
+                                <PRD_UPC>
+                                    <xsl:copy-of select="pfx5:PRD_UPC/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PRD_UPC"/>
+                                </PRD_UPC>
+                                <INV_TYPE_CODE>
+                                    <xsl:copy-of select="pfx5:INV_TYPE_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:INV_TYPE_CODE"/>
+                                </INV_TYPE_CODE>
+                                <ACTUAL_COUNT>
+                                    <xsl:copy-of select="pfx5:ACTUAL_COUNT/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:ACTUAL_COUNT"/>
+                                </ACTUAL_COUNT>
+                                <USER_ID>
+                                    <xsl:copy-of select="pfx5:USER_ID/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:USER_ID"/>
+                                </USER_ID>
+                                <COUNT_DATE>
+                                    <xsl:copy-of select="pfx5:COUNT_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:COUNT_DATE"/>
+                                </COUNT_DATE>
+                                <COUNT_TIME>
+                                    <xsl:copy-of select="pfx5:COUNT_TIME/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:COUNT_TIME"/>
+                                </COUNT_TIME>
+                                <USER_FLD_1>
+                                    <xsl:copy-of select="pfx5:USER_FLD_1/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:USER_FLD_1"/>
+                                </USER_FLD_1>
+                                <USER_FLD_2>
+                                    <xsl:copy-of select="pfx5:USER_FLD_2/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:USER_FLD_2"/>
+                                </USER_FLD_2>
+                                <USER_FLD_3>
+                                    <xsl:copy-of select="pfx5:USER_FLD_3/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:USER_FLD_3"/>
+                                </USER_FLD_3>
+                                <DOWNLOAD_DATE_1>
+                                    <xsl:copy-of select="pfx5:DOWNLOAD_DATE_1/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:DOWNLOAD_DATE_1"/>
+                                </DOWNLOAD_DATE_1>
+                                <NOTES>
+                                    <xsl:copy-of select="pfx5:NOTES/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:NOTES"/>
+                                </NOTES>
+                                <INNER_PACK_ID>
+                                    <xsl:copy-of select="pfx5:INNER_PACK_ID/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:INNER_PACK_ID"/>
+                                </INNER_PACK_ID>
+                                <PHYS_INNERS>
+                                    <xsl:copy-of select="pfx5:PHYS_INNERS/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PHYS_INNERS"/>
+                                </PHYS_INNERS>
+                                <PHYS_SELL_UNITS>
+                                    <xsl:copy-of select="pfx5:PHYS_SELL_UNITS/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PHYS_SELL_UNITS"/>
+                                </PHYS_SELL_UNITS>
+                                <PHYS_WEIGHT>
+                                    <xsl:copy-of select="pfx5:PHYS_WEIGHT/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PHYS_WEIGHT"/>
+                                </PHYS_WEIGHT>
+                                <PHYS_WEIGHT_UOM>
+                                    <xsl:copy-of select="pfx5:PHYS_WEIGHT_UOM/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PHYS_WEIGHT_UOM"/>
+                                </PHYS_WEIGHT_UOM>
+                                <PHYS_SELL_UOM>
+                                    <xsl:copy-of select="pfx5:PHYS_SELL_UOM/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PHYS_SELL_UOM"/>
+                                </PHYS_SELL_UOM>
+                                <PHYS_CASES>
+                                    <xsl:copy-of select="pfx5:PHYS_CASES/@xsi:nil"/>
+                                    <xsl:value-of select="pfx5:PHYS_CASES"/>
+                                </PHYS_CASES>
+                            </Record>
+                        </xsl:for-each>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>342</pd:x>
+            <pd:y>263</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GLB_SP_RETRY_DELAY_"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>456</pd:x>
+            <pd:y>261</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <pfx3:ActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Retry </pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry </pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

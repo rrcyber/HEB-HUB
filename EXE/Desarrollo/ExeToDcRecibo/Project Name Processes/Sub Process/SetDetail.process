@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx="http://www.tibco.com/pe/EngineTypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/SetDetail.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>48</pd:startX>
+    <pd:startY>200</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endType/>
+    <pd:endX>745</pd:endX>
+    <pd:endY>196</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1511819374641</pd:targetNamespace>
+    <pd:activity name="Get_PO_RECIBO_Dtl_01">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>157</pd:x>
+        <pd:y>199</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>1</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/Interfase_08.sharedjdbc</jdbcSharedConfig>
+            <statement>select distinct vendor,
+		receipt_number,
+		upc,
+		product,
+		case when catch_weight &gt; 0 then catch_weight else qty_received end as quantity
+	from po_recibo
+where eai_processflag = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>eai_processflag</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>vendor</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>receipt_number</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>upc</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>numeric</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>product</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>quantity</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <eai_processflag>
+                    <xsl:value-of select="'N'"/>
+                </eai_processflag>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Transactional Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>238</pd:x>
+        <pd:y>32</pd:y>
+        <pd:width>451</pd:width>
+        <pd:height>316</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Iteration Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Iteration Group</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Iteration Group">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>283</pd:x>
+            <pd:y>70</pd:y>
+            <pd:width>343</pd:width>
+            <pd:height>238</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Get_PO_RECIBO_Dtl_01/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>Iterate</pd:iterationElementSlot>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Set_PO_RECIBO_Dtl_08</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Update_Status_DTL_Y</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Set_PO_RECIBO_Dtl_08</pd:from>
+                <pd:to>Null</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>error</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null</pd:from>
+                <pd:to>Generate Error</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null</pd:from>
+                <pd:to>Update_Status_DTL_Y</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>contains($_error/pfx:ErrorReport/Msg, 'Primary')</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Set_PO_RECIBO_Dtl_08</pd:from>
+                <pd:to>Update_Status_DTL_Y</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Set_PO_RECIBO_Dtl_08">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>373</pd:x>
+                <pd:y>198</pd:y>
+                <config>
+                    <timeout>10</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/BDDIS_08.sharedjdbc</jdbcSharedConfig>
+                    <statement>insert into ReciboDetalle
+	(fad_proveedor,
+	fad_factura,
+	fad_upc,
+	fad_sucursal,
+	fad_articulo,
+	fad_cantida)
+values 
+	(?,?,?,?,?,?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>Proveedor</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Factura</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Upc</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Sucursal</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Producto</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Cantidad</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <Proveedor>
+                            <xsl:value-of select="$Iterate/Record/vendor"/>
+                        </Proveedor>
+                        <Factura>
+                            <xsl:value-of select="concat('R', $Iterate/Record/receipt_number)"/>
+                        </Factura>
+                        <Upc>
+                            <xsl:choose>
+                                <xsl:when test="exists($Iterate/Record/upc)">
+                                    <xsl:value-of select="$Iterate/Record/upc"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </Upc>
+                        <Sucursal>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/VariablesGenerales/Sucursal"/>
+                        </Sucursal>
+                        <Producto>
+                            <xsl:value-of select="$Iterate/Record/product"/>
+                        </Producto>
+                        <Cantidad>
+                            <xsl:value-of select="$Iterate/Record/quantity"/>
+                        </Cantidad>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Update_Status_DTL_Y">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>488</pd:x>
+                <pd:y>126</pd:y>
+                <config>
+                    <timeout>10</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <statement>UPDATE PO_RECIBO SET EAI_PROCESSFLAG = 'Y' 
+WHERE  EAI_PROCESSFLAG = 'N' 
+and PRODUCT = ?
+and UPC = ?
+and VENDOR = ?
+and RECEIPT_NUMBER = ?</statement>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/Interfase_08.sharedjdbc</jdbcSharedConfig>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>PRODUCT</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>UPC</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>VENDOR</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>RECEIPT_NUMBER</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <PRODUCT>
+                            <xsl:value-of select="$Iterate/Record/product"/>
+                        </PRODUCT>
+                        <UPC>
+                            <xsl:choose>
+                                <xsl:when test="exists($Iterate/Record/upc)">
+                                    <xsl:value-of select="$Iterate/Record/upc"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </UPC>
+                        <VENDOR>
+                            <xsl:value-of select="$Iterate/Record/vendor"/>
+                        </VENDOR>
+                        <RECEIPT_NUMBER>
+                            <xsl:value-of select="$Iterate/Record/receipt_number"/>
+                        </RECEIPT_NUMBER>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Null">
+                <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                <pd:resourceType>ae.activities.null</pd:resourceType>
+                <pd:x>479</pd:x>
+                <pd:y>246</pd:y>
+                <config/>
+                <pd:inputBindings/>
+            </pd:activity>
+            <pd:activity name="Generate Error">
+                <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+                <pd:resourceType>ae.activities.throw</pd:resourceType>
+                <pd:x>570</pd:x>
+                <pd:y>247</pd:y>
+                <config>
+                    <faultName>Error</faultName>
+                </config>
+                <pd:inputBindings>
+                    <ns0:ActivityInput xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema"/>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_PO_RECIBO_Dtl_01</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_PO_RECIBO_Dtl_01</pd:from>
+        <pd:to>Transactional Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Transactional Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

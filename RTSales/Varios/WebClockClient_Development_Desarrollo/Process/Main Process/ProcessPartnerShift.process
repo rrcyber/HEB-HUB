@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com.mx/1369930841350" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://xmlns.heb.com/ei/WebClock4Kronos/ProcessPartnerShift_Reply" xmlns:ns1="http://xmlns.heb.com/ei/WebClock4Kronos/ProcessPartnerShift_Request" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns3="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns5="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns32="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions">
+    <xsd:import namespace="http://xmlns.heb.com/ei/WebClock4Kronos/ProcessPartnerShift_Request" schemaLocation="/Shared Resources/Schema Definitions/Custom/ProcessPartnerShft_Request.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/WebClock4Kronos/ProcessPartnerShift_Reply" schemaLocation="/Shared Resources/Schema Definitions/Custom/ProcessPartnerShift_Reply.xsd"/>
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Main Process/ProcessPartnerShift.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="pfx:ProcessPartnerShift_Request"/>
+    <pd:startX>131</pd:startX>
+    <pd:startY>185</pd:startY>
+    <pd:returnBindings>
+        <pfx:ProcessPartnerShift_Reply>
+            <reply>
+                <ns:ProcessPartnerShift_Reply>
+                    <ns:IsManager>
+                        <xsl:value-of select="if($Call_GetUserFromFingerScan/AssociateFound ='0')&#xA;then 'false'&#xA;else $JDBC_IsUserManager/resultSet/Record[1]/puesto_manager"/>
+                    </ns:IsManager>
+                    <ns:IsShiftInserted>
+                        <xsl:value-of select="if($Call_GetUserFromFingerScan/AssociateFound !=0)&#xA;then if($JDBC_IsUserManager/resultSet/Record/Manager ='IsManager')&#xA; &#x9;then 'false'&#xA;&#x9;else if($Call_InsertPunch/IsPunchInserted='1')&#xA;&#x9;&#x9;then 'true' else 'false'  &#xA;else if ($JDBC_SOCIO_SIN_HUELLA/resultSet/Record/emplid !=0)&#xA;then if($JDBC_SOCIO_SIN_HUELLA/resultSet/Record/puesto_manager ='IsManager')&#xA; &#x9;then 'false'&#xA;else if($Call_InsertPunch/IsPunchInserted='1')&#xA;&#x9;&#x9;then 'true' else 'false'  &#xA;else 'false'"/>
+                    </ns:IsShiftInserted>
+                    <ns:Message>
+                        <xsl:value-of select="if($Call_GetUserFromFingerScan/AssociateFound !=0 or $JDBC_SOCIO_SIN_HUELLA/resultSet/Record !=0)&#xA;&#x9;then &#xA;&#x9;&#x9;if($JDBC_IsUserManager/resultSet/Record[1]/Manager='IsManager' )&#xA; &#x9;&#x9;then $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_32 &#xA;&#x9;&#x9;else&#xA;&#x9;&#x9;&#x9; if($Call_InsertPunch/IsPunchInserted  =1)&#xA;&#x9;&#x9;&#x9;&#x9;then $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_33 &#xA;&#x9;&#x9;&#x9;else &#xA;&#x9;&#x9;&#x9;&#x9;if($Call_InsertPunch/IsPunchInserted  =-1)&#xA;&#x9;&#x9;&#x9;&#x9;then  $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_41 &#xA;&#x9;&#x9;&#x9;&#x9;else $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_23 &#xA;else $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_23"/>
+                    </ns:Message>
+                    <ns:getErrorCode>
+                        <xsl:value-of select="if($Call_GetUserFromFingerScan/AssociateFound !=0)&#xA;&#x9;then &#xA;&#x9;&#x9;if($JDBC_IsUserManager/resultSet/Record[1]/Manager='IsManager' )&#xA; &#x9;&#x9;then $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_32 &#xA;&#x9;&#x9;else&#xA;&#x9;&#x9;&#x9; if($Call_InsertPunch/IsPunchInserted  =1)&#xA;&#x9;&#x9;&#x9;&#x9;then $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_41 &#xA;&#x9;&#x9;&#x9;else &#xA;&#x9;&#x9;&#x9;&#x9;if($Call_InsertPunch/IsPunchInserted  =2)&#xA;&#x9;&#x9;&#x9;&#x9;then  $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_41 &#xA;&#x9;&#x9;&#x9;&#x9;else $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_40 &#xA;else $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_40"/>
+                    </ns:getErrorCode>
+                    <ns:PARTNER_INFO>
+                        <ns:NAME>
+                            <xsl:value-of select="if (empty($JDBC_IsUserManager/resultSet/Record))&#xA;then $JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/socio_nombre&#xA;else $JDBC_IsUserManager/resultSet/Record[1]/socio_nombre"/>
+                        </ns:NAME>
+                        <ns:PARTNER_ID>
+                            <xsl:value-of select="if (empty($JDBC_IsUserManager/resultSet/Record))&#xA;then&#xA;$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/emplid&#xA;else&#xA;$Call_GetUserFromFingerScan/AssociateFound"/>
+                        </ns:PARTNER_ID>
+                    </ns:PARTNER_INFO>
+                </ns:ProcessPartnerShift_Reply>
+            </reply>
+        </pfx:ProcessPartnerShift_Reply>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="pfx:ProcessPartnerShift_Reply"/>
+    <pd:endX>842</pd:endX>
+    <pd:endY>229</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1370020546595</pd:targetNamespace>
+    <pd:activity name="Call_GetUserFromFingerScan">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>276</pd:x>
+        <pd:y>183</pd:y>
+        <config>
+            <processName>/Process/Sub Process/GetUserFromFingerScan.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <StoreId>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:StoreId"/>
+                </StoreId>
+                <FingerScan>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:FingerScan"/>
+                </FingerScan>
+                <DeviceId>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:DeviceId"/>
+                </DeviceId>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>422</pd:x>
+        <pd:y>35</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="JDBC_IsUserManager">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>462</pd:x>
+        <pd:y>184</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select	isnull(b.puesto_manager, '0') as puesto_manager,
+		a.socio_nombre,
+		case when b.puesto_manager = 1 then 'IsManager' else 'NotManager' end as Manager 
+from	SOCIOS a left join 
+		puestos b on a.socio_puestoid = b.PUESTO_ID and 
+				a.SOCIO_DEPTOID = b.PUESTO_DEPTOID and
+				a.socio_sucursalId= b.puesto_sucursalId
+where	a.SOCIO_ID =?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>AssociateId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>puesto_manager</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>socio_nombre</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Manager</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <AssociateId>
+                    <xsl:value-of select="$Call_GetUserFromFingerScan/AssociateFound"/>
+                </AssociateId>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>607</pd:x>
+        <pd:y>105</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="JDBC_SOCIO_SIN_HUELLA">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>131</pd:x>
+        <pd:y>424</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select emplid,socio_nombre,tienda,dispositivo,c.puesto_manager
+from SOCIO_SIN_HUELLA a
+join SOCIOS b on a.EMPLID = b.SOCIO_ID and a.TIENDA = b.SOCIO_SUCURSALID
+join PUESTOS c on b.SOCIO_SUCURSALID = c.PUESTO_SUCURSALID
+and b.SOCIO_DEPTOID = c.PUESTO_DEPTOID
+and b.SOCIO_PUESTOID = PUESTO_ID
+where a.emplid = ?</statement>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>emplid</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>socio_nombre</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>tienda</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>dispositivo</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>puesto_manager</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>emplid</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <emplid>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:SocioId)">
+                            <xsl:value-of select="$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:SocioId"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </emplid>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_InsertPunch">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>465</pd:x>
+        <pd:y>330</pd:y>
+        <config>
+            <processName>/Process/Sub Process/Insert_PSPUNCHS.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <AssociateId>
+                    <xsl:value-of select="if (empty($JDBC_IsUserManager/resultSet/Record))&#xA;then $JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/emplid&#xA;else $Call_GetUserFromFingerScan/AssociateFound"/>
+                </AssociateId>
+                <StoreId>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:StoreId"/>
+                </StoreId>
+                <DeviceId>
+                    <xsl:value-of select="$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:DeviceId"/>
+                </DeviceId>
+                <PunchDateTime>
+                    <xsl:value-of select="current-dateTime()"/>
+                </PunchDateTime>
+                <Estatus>
+                    <xsl:value-of select="0"/>
+                </Estatus>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 30">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>130</pd:x>
+        <pd:y>556</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="30"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_30"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_30"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request)"/>
+                                    </ns32:MessageId>
+                                    <ns32:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;Socio: &quot;,$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:SocioId,&quot; Sucursal:  &quot;,$Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:StoreId)"/>
+                                    </ns32:ErrorCode>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>304</pd:x>
+        <pd:y>303</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="10"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_10"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request)"/>
+                                    </ns32:MessageId>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault_30">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>463</pd:x>
+        <pd:y>59</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="30"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_30"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_30"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request)"/>
+                                    </ns32:MessageId>
+                                    <ns32:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;No.Socio: &quot;,$Call_GetUserFromFingerScan/AssociateFound,&quot; Nombre: &quot;,$JDBC_IsUserManager/resultSet/Record[1]/socio_nombre)"/>
+                                    </ns32:ErrorCode>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 41">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>588</pd:x>
+        <pd:y>487</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="41"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_41"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="if (empty($JDBC_IsUserManager/resultSet/Record))&#xA;then (concat( $JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/emplid,&quot; |  &quot;,$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/socio_nombre))&#xA;else (concat( $Call_GetUserFromFingerScan/AssociateFound,&quot; |  &quot;,$JDBC_IsUserManager/resultSet/Record[1]/socio_nombre))"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_41"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request)"/>
+                                    </ns32:MessageId>
+                                    <ns32:ErrorCode>
+                                        <xsl:value-of select="if (empty($JDBC_IsUserManager/resultSet/Record))&#xA;then (concat( &quot;No.Socio: &quot;,$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/emplid,&quot; Nombre: &quot;,$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/socio_nombre))&#xA;else (concat( &quot;No.Socio: &quot;,$Call_GetUserFromFingerScan/AssociateFound,&quot; Nombre: &quot;,$JDBC_IsUserManager/resultSet/Record[1]/socio_nombre))"/>
+                                    </ns32:ErrorCode>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>694</pd:x>
+        <pd:y>515</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1003</pd:x>
+        <pd:y>518</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>130</pd:x>
+        <pd:y>40</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                                <xsl:when test="string-length($_error)!=0">
+                                    <ns32:ProviderSOAPFault>
+                                        <ns32:FaultCode>
+                                            <xsl:value-of select="10"/>
+                                        </ns32:FaultCode>
+                                        <ns32:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_10"/>
+                                        </ns32:FaultString>
+                                        <ns32:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns32:FaultActor>
+                                        <ns32:ProviderSOAPErrorMsg>
+                                            <ns32:Message>
+                                                <xsl:value-of select="$_error/ns5:ErrorReport/Msg"/>
+                                            </ns32:Message>
+                                            <ns32:ErrorCode>
+                                                <xsl:value-of select="$_error/ns5:ErrorReport/MsgCode"/>
+                                            </ns32:ErrorCode>
+                                        </ns32:ProviderSOAPErrorMsg>
+                                    </ns32:ProviderSOAPFault>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <ns32:ProviderSOAPFault>
+                                        <ns32:FaultCode>
+                                            <xsl:value-of select="34"/>
+                                        </ns32:FaultCode>
+                                        <ns32:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mensajes/Fault_34"/>
+                                        </ns32:FaultString>
+                                        <ns32:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns32:FaultActor>
+                                        <ns32:ProviderSOAPErrorMsg>
+                                            <ns32:Message>
+                                                <xsl:value-of select="$_error/ns5:ErrorReport/Msg"/>
+                                            </ns32:Message>
+                                            <ns32:ErrorCode>
+                                                <xsl:value-of select="$_error/ns5:ErrorReport/MsgCode"/>
+                                            </ns32:ErrorCode>
+                                        </ns32:ProviderSOAPErrorMsg>
+                                    </ns32:ProviderSOAPFault>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>877</pd:x>
+        <pd:y>515</pd:y>
+        <config>
+            <processName>/Utility Service/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:MSG_Container>
+                <ns12:Header>
+                    <ns12:ProjectName>
+                        <xsl:value-of select="$_processContext/ns5:ProcessContext/ProjectName"/>
+                    </ns12:ProjectName>
+                    <ns12:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_SOURCE_DOMAIN"/>
+                    </ns12:Source_Domain>
+                    <ns12:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_DESTINATION_DOMAIN"/>
+                    </ns12:Destination_Domain>
+                    <ns12:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_TRANSACTION_TYPE"/>
+                    </ns12:Transaction_Type>
+                    <ns12:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns12:TimeStamp>
+                </ns12:Header>
+                <ns12:Body>
+                    <ns12:ErrorManagementSchema>
+                        <ns12:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns12:inrtn_id>
+                        <ns12:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns12:inrtn_instn_nm>
+                        <ns12:inrtn_err_rtn_desc>
+                            <xsl:value-of select="string($_error)"/>
+                        </ns12:inrtn_err_rtn_desc>
+                        <ns12:inrtn_msg_body>
+                            <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request)"/>
+                        </ns12:inrtn_msg_body>
+                        <ns12:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm;ss', current-dateTime())"/>
+                        </ns12:cre8_ts>
+                        <ns12:u_code>
+                            <xsl:value-of select="$_error/ns5:ErrorReport/MsgCode"/>
+                        </ns12:u_code>
+                        <ns12:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns12:sev_id>
+                    </ns12:ErrorManagementSchema>
+                </ns12:Body>
+            </ns12:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 40">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>338</pd:x>
+        <pd:y>479</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns4:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <ns32:ProviderSOAPFault>
+                                <ns32:FaultCode>
+                                    <xsl:value-of select="40"/>
+                                </ns32:FaultCode>
+                                <ns32:FaultString>
+                                    <xsl:value-of select="if($Call_InsertPunch/IsPunchInserted  =2)&#xA;&#x9;&#x9;&#x9;&#x9;then  $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_41 &#xA;&#x9;&#x9;&#x9;&#x9;else $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_40"/>
+                                </ns32:FaultString>
+                                <ns32:FaultActor>
+                                    <xsl:value-of select="if (empty($JDBC_IsUserManager/resultSet/Record))&#xA;then (concat( &quot;No.Socio: &quot;,$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/emplid,&quot; Nombre: &quot;,$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/socio_nombre))&#xA;else (concat( &quot;No.Socio: &quot;,$Call_GetUserFromFingerScan/AssociateFound,&quot; Nombre: &quot;,$JDBC_IsUserManager/resultSet/Record[1]/socio_nombre))"/>
+                                </ns32:FaultActor>
+                                <ns32:ProviderSOAPErrorMsg>
+                                    <ns32:Message>
+                                        <xsl:value-of select="if($Call_InsertPunch/IsPunchInserted  =2)&#xA;&#x9;&#x9;&#x9;&#x9;then  $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_41 &#xA;&#x9;&#x9;&#x9;&#x9;else $_globalVariables/ns2:GlobalVariables/Mensajes/Fault_40"/>
+                                    </ns32:Message>
+                                    <ns32:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request)"/>
+                                    </ns32:MessageId>
+                                    <ns32:ErrorCode>
+                                        <xsl:value-of select="if (empty($JDBC_IsUserManager/resultSet/Record))&#xA;then (concat( &quot;No.Socio: &quot;,$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/emplid,&quot; Nombre: &quot;,$JDBC_SOCIO_SIN_HUELLA/resultSet/Record[1]/socio_nombre))&#xA;else (concat( &quot;No.Socio: &quot;,$Call_GetUserFromFingerScan/AssociateFound,&quot; Nombre: &quot;,$JDBC_IsUserManager/resultSet/Record[1]/socio_nombre))"/>
+                                    </ns32:ErrorCode>
+                                </ns32:ProviderSOAPErrorMsg>
+                            </ns32:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>781</pd:x>
+        <pd:y>594</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Call_GetUserFromFingerScan</pd:from>
+        <pd:to>JDBC_IsUserManager</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_GetUserFromFingerScan</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>AssotiateNotFound</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_GetUserFromFingerScan/AssociateFound='0'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call_GetUserFromFingerScan</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>string-length($Start/pfx:ProcessPartnerShift_Request/request/ns1:ProcessPartnerShift_Request/ns1:SocioId)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_IsUserManager</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16738048</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JDBC_IsUserManager/resultSet/Record[1]/Manager='IsManager'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC_SOCIO_SIN_HUELLA</pd:to>
+        <pd:xpathDescription>Con SocioId</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_IsUserManager</pd:from>
+        <pd:to>Call_InsertPunch</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_InsertPunch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_SOCIO_SIN_HUELLA</pd:from>
+        <pd:to>Call_InsertPunch</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_SOCIO_SIN_HUELLA</pd:from>
+        <pd:to>Fault 30</pd:to>
+        <pd:xpathDescription>No Socio </pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_SOCIO_SIN_HUELLA/resultSet/Record)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_SOCIO_SIN_HUELLA</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_IsUserManager</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_IsUserManager</pd:from>
+        <pd:to>Fault_30</pd:to>
+        <pd:xpathDescription>No Record</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_IsUserManager/resultSet/Record)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_InsertPunch</pd:from>
+        <pd:to>Fault 41</pd:to>
+        <pd:xpathDescription>Marcaje 15 min</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_InsertPunch/IsPunchInserted =-1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_InsertPunch</pd:from>
+        <pd:to>Fault 40</pd:to>
+        <pd:xpathDescription>Otra Area</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_InsertPunch/IsPunchInserted=2</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:xpathDescription>Client Fault</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "ProviderSOAPFault")</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

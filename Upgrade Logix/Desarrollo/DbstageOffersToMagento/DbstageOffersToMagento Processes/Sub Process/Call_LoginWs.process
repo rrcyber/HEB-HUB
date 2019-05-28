@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns2="http://xmlns.tibco.com/encodings/mime" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://xmlns.heb.com/ei/loginResponseParam" xmlns:ns3="http://xmlns.heb.com/ei/loginParam" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.example.com/1420752924429" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="urn:Magento" xmlns:pfx2="http://www.copienttech.com/LogixGroupManagement/">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <wsdl:import namespace="http://www.copienttech.com/LogixGroupManagement/" location="/Shared Resources/WSDL/LogixGroupManagement.wsdl"/>
+    <wsdl:import namespace="urn:Magento"/>
+    <wsdl:import namespace="http://xmlns.example.com/1420752924429" location="/Shared Resources/WSDL/v2_soap_interno.wsdl"/>
+    <wsdl:import namespace="urn:Magento" location="/Shared Resources/WSDL/WSDL_Login.wsdl"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Call_LoginWs.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>55</pd:startX>
+    <pd:startY>62</pd:startY>
+    <pd:returnBindings>
+        <Result>
+            <sessionId>
+                <xsl:value-of select="$SOAPRequestReply/outputMessage/pfx3:loginResponseParam/result"/>
+            </sessionId>
+        </Result>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Result">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="sessionId" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>347</pd:endX>
+    <pd:endY>68</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412807116554</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>61</pd:x>
+        <pd:y>235</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>262</pd:x>
+        <pd:y>231</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                </messageCode>
+                <data>
+                    <pfx:MSG_Container>
+                        <pfx:Header>
+                            <pfx:ProjectName>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </pfx:ProjectName>
+                            <pfx:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx:Source_Domain>
+                            <pfx:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx:Destination_Domain>
+                            <pfx:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/TransactionType"/>
+                            </pfx:Transaction_Type>
+                            <pfx:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx:TimeStamp>
+                        </pfx:Header>
+                        <pfx:Body>
+                            <pfx:ErrorManagementSchema>
+                                <pfx:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </pfx:inrtn_id>
+                                <pfx:inrtn_instn_nm>
+                                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                                </pfx:inrtn_instn_nm>
+                                <pfx:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="concat(&#xA;'Message Code: ',$_error/ns1:ErrorReport/MsgCode,&quot;&#xA;&quot;,&#xA;'Error Message: ',$_error/ns1:ErrorReport/Msg,&quot;&#xA;&quot;,&#xA;'Error Class: ',$_error/ns1:ErrorReport/Class,&quot;&#xA;&quot;,&#xA;tib:render-xml($_error/ns1:ErrorReport/Data),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;'STACKTRACE: ',$_error/ns1:ErrorReport/StackTrace,&quot;&#xA;&quot;)"/>
+                                </pfx:inrtn_err_rtn_desc>
+                                <pfx:inrtn_msg_body>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                </pfx:inrtn_msg_body>
+                                <pfx:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </pfx:cre8_ts>
+                                <pfx:u_code>
+                                    <xsl:value-of select="if (contains($_error/ns1:ErrorReport/MsgCode, 'BW-JDBC')) then&#xA;concat($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_TECHNICAL,'-', $_error/ns1:ErrorReport/MsgCode) &#xA;else if (contains($_error/ns1:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;concat($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $_error/ns1:ErrorReport/MsgCode) &#xA;else &#xA;concat($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns1:ErrorReport/MsgCode)"/>
+                                </pfx:u_code>
+                                <pfx:sev_id>
+                                    <xsl:value-of select="if (contains($_error/ns1:ErrorReport/MsgCode, 'BW-JDBC')) then&#xA;$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH&#xA;else if (contains($_error/ns1:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED&#xA;else &#xA;$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_LOW"/>
+                                </pfx:sev_id>
+                            </pfx:ErrorManagementSchema>
+                        </pfx:Body>
+                    </pfx:MSG_Container>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SOAPRequestReply">
+        <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+        <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+        <pd:x>203</pd:x>
+        <pd:y>69</pd:y>
+        <config>
+            <timeout>60000</timeout>
+            <service>pfx3:MagentoService</service>
+            <servicePort>Mage_Api_Model_Server_Wsi_HandlerPort</servicePort>
+            <operation>login</operation>
+            <soapAction/>
+            <endpointURL>%%ProjectConfig/Endpoint%%</endpointURL>
+            <soapAttachmentStyle>SwA</soapAttachmentStyle>
+            <timeoutType>Seconds</timeoutType>
+            <authScheme>NONE</authScheme>
+        </config>
+        <pd:inputBindings>
+            <inputMessage>
+                <pfx3:loginParam>
+                    <username>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/username"/>
+                    </username>
+                    <apiKey>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/apiKey"/>
+                    </apiKey>
+                </pfx3:loginParam>
+            </inputMessage>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SOAPRequestReply</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SOAPRequestReply</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

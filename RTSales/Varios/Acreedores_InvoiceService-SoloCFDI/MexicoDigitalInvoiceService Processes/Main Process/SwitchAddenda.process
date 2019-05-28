@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/AddendaTransporte" xmlns:pfx2="http://xmlns.heb.com/ei/Addenda" xmlns:ns="http://www.tibco.com/schemas/Acreedores_InvoiceService/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx3="http://www.sat.gob.mx/cfd/3">
+    <xsd:import namespace="http://xmlns.heb.com/ei/AddendaTransporte" schemaLocation="/Shared Resources/Schema Definitions/Custom/AddendaTransporte.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Addenda" schemaLocation="/Shared Resources/Schema Definitions/Custom/Addenda.xsd"/>
+    <xsd:import namespace="http://www.sat.gob.mx/cfd/3" schemaLocation="/Shared Resources/Schema Definitions/Custom/cfdv32.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Main Process/SwitchAddenda.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:Comprobante"/>
+    <pd:startX>147</pd:startX>
+    <pd:startY>150</pd:startY>
+    <pd:returnBindings>
+        <VALIDATION_RESULT>
+            <VALID>
+                <xsl:value-of select="if($Start/pfx3:Comprobante/pfx3:Addenda/SIH_Acreedores/@Area ='6' and&#xA;&#x9;exists($Start/pfx3:Comprobante/pfx3:Addenda/pfx:Transporte)&#xA;)&#xA;then $Call_ValidarAddendaTransporte/Validacion/Valido &#xA;else false()"/>
+            </VALID>
+            <CODE>
+                <xsl:value-of select="if($Start/pfx3:Comprobante/pfx3:Addenda/SIH_Acreedores/@Area ='6' and&#xA;&#x9;exists($Start/pfx3:Comprobante/pfx3:Addenda/pfx:Transporte)&#xA;)&#xA;then &#x9;if($Call_ValidarAddendaTransporte/Validacion/Valido = 'true')&#xA;&#x9;&#x9;then ''&#xA;&#x9;&#x9;else 'ERR0501'&#xA;else 'ERR0500'"/>
+            </CODE>
+            <DESCRIPTION>
+                <xsl:value-of select="if($Start/pfx3:Comprobante/pfx3:Addenda/SIH_Acreedores/@Area ='6' and&#xA;&#x9;exists($Start/pfx3:Comprobante/pfx3:Addenda/pfx:Transporte)&#xA;)&#xA;then &#x9;if($Call_ValidarAddendaTransporte/Validacion/Valido = 'true')&#xA;&#x9;&#x9;then ''&#xA;&#x9;&#x9;else $Call_ValidarAddendaTransporte/Validacion/Excepciones&#xA;else 'NO SE VALIDO LA ADDENDA'"/>
+            </DESCRIPTION>
+            <subArea>
+                <xsl:value-of select="if($Start/pfx3:Comprobante/pfx3:Addenda/SIH_Acreedores/@Area ='6' and&#xA;&#x9;exists($Start/pfx3:Comprobante/pfx3:Addenda/pfx:Transporte)&#xA;)&#xA;then $Call_ValidarAddendaTransporte/Validacion/SubArea&#xA;else '1'"/>
+            </subArea>
+            <xsl:if test="$Call_ValidarAddendaTransporte/Validacion/Referencia">
+                <Referencia>
+                    <xsl:value-of select="$Call_ValidarAddendaTransporte/Validacion/Referencia"/>
+                </Referencia>
+            </xsl:if>
+        </VALIDATION_RESULT>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="VALIDATION_RESULT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="VALID" type="xsd:boolean"/>
+                    <xsd:element name="CODE" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="subArea" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="Referencia" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>453</pd:endX>
+    <pd:endY>152</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1379975663266</pd:targetNamespace>
+    <pd:activity name="Call_ValidarAddendaTransporte">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>303</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/ValidarAdenda_Transporte.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Start/pfx3:Comprobante/pfx3:Addenda/pfx:Transporte"/>
+                <Subtotal>
+                    <xsl:value-of select="$Start/pfx3:Comprobante/@subTotal"/>
+                </Subtotal>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call_ValidarAddendaTransporte</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-13421569</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx3:Comprobante/pfx3:Addenda/SIH_Acreedores/@Area= '6' and
+exists($Start/pfx3:Comprobante/pfx3:Addenda/pfx:Transporte)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_ValidarAddendaTransporte</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16763905</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

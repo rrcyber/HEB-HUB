@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns22="http://xmlns.tibco.com/body" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>MagentoToPos Processes/Sub Process/Validation_RTSales.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="pedido" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>121</pd:startX>
+    <pd:startY>138</pd:startY>
+    <pd:returnBindings>
+        <ticket>
+            <xsl:value-of select="if (string-length($Get_RTSales/resultSet/Record[1]/Ticket)!=0)&#xA;then&#xA;$Get_RTSales/resultSet/Record[1]/Ticket&#xA;else&#xA;'0'"/>
+        </ticket>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="ticket" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>420</pd:endX>
+    <pd:endY>140</pd:endY>
+    <pd:errorSchemas>
+        <Fault ref="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1441923801284</pd:targetNamespace>
+    <pd:activity name="Get_RTSales">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>265</pd:x>
+        <pd:y>137</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTG/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTG/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/Connection_SXD201050.sharedjdbc</jdbcSharedConfig>
+            <statement>select dt.Ticket,pt.pedido,
+SUBSTRING(Detalle,13,12) monto,ik_codigo,pt.PK_FechaVenta,pt.fechacarga
+from DetalleTicket DT
+inner join (select ticket,pk_sucursal,
+CONVERT(varchar,fechacarga,112)fechacarga,
+CONVERT(varchar,PK_FechaVenta,112)PK_FechaVenta,
+SUBSTRING(Detalle,30,12)pedido
+from DetalleTicket
+where IK_Codigo in ('AW')
+and PK_FechaVenta &gt;= CONVERT(varchar,GETDATE(),112)
+and SUBSTRING(Detalle,30,12) = ? ) PT
+on DT.Ticket = PT.ticket and DT.PK_Sucursal = PT.pk_sucursal
+and CONVERT(varchar,dt.PK_FechaVenta,112)=PT.PK_FechaVenta
+where IK_Codigo = 'F-'
+order by 1
+</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>pedido</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>Ticket</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>pedido</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>monto</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ik_codigo</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PK_FechaVenta</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>fechacarga</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <pedido>
+                    <xsl:value-of select="$Start/pedido"/>
+                </pedido>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>417</pd:x>
+        <pd:y>265</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <pfx:Code>
+                            <xsl:value-of select="'Fault 01'"/>
+                        </pfx:Code>
+                        <pfx:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_01"/>
+                        </pfx:Reason>
+                    </pfx:Fault>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send Mail">
+        <pd:type>com.tibco.plugin.mail.MailPubActivity</pd:type>
+        <pd:resourceType>ae.activities.MailActivityResource</pd:resourceType>
+        <pd:x>265</pd:x>
+        <pd:y>264</pd:y>
+        <config>
+            <newMimeSupport>true</newMimeSupport>
+            <inputOutputVersion>5.2.0</inputOutputVersion>
+            <host>%%MailConfiguration/Host%%</host>
+            <InputHeaders>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </InputHeaders>
+        </config>
+        <pd:inputBindings>
+            <ns1:mailActivityInput>
+                <from>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/From"/>
+                </from>
+                <to>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/To"/>
+                </to>
+                <subject>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/Subject"/>
+                </subject>
+                <ns22:bodyElement>
+                    <bodyText>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MailConfiguration/Body"/>
+                    </bodyText>
+                </ns22:bodyElement>
+            </ns1:mailActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_RTSales</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_RTSales</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_RTSales</pd:from>
+        <pd:to>Send Mail</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Mail</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

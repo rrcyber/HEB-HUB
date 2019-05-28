@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://xmlns.heb.com/ei/DistributionList" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/DistributionList" schemaLocation="/Shared Resources/Schema Definitions/Custom/DISTRIBUTION_LIST_INFORMATION_DATA_SOAP.xsd"/>
+    <pd:name>Heb2bOrdenCompraReciboSubscriber/Main Process/SetReciboOrdenCompra_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Input" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>119</pd:startX>
+    <pd:startY>125</pd:startY>
+    <pd:returnBindings>
+        <PMG_PO_NUMBER>
+            <xsl:value-of select="$Parse-XML/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:DistributionListInformationData[1]/pfx2:PO_NUMBER"/>
+        </PMG_PO_NUMBER>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="PMG_PO_NUMBER" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>644</pd:endX>
+    <pd:endY>127</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1492697236792</pd:targetNamespace>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>244</pd:x>
+        <pd:y>124</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx2:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/Input"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>341</pd:x>
+        <pd:y>49</pd:y>
+        <pd:width>210</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>52</pd:collapsedWidth>
+        <pd:collapsedHeight>69</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Parse-XML/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:DistributionListInformationData</pd:over>
+            <pd:iterationElementSlot>Element</pd:iterationElementSlot>
+            <pd:indexSlot>I</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Update</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Update</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Update">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>447</pd:x>
+            <pd:y>128</pd:y>
+            <config>
+                <timeout>%%Connections/Database/JDBC_HEB2B/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>UPDATE OrdenCompraDistribucion SET FechaPlanEntrega = ?, FechaEmbarqueTienda=?, FechaEntregatienda = ?,  CantidadEmbarcadaTienda=? , CantidadEntregadaTienda = ?
+WHERE IdOrdenCompra = ?
+AND IdArticulo = ?
+AND IDSucursal = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_SXD201110_HEB2B.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>FechaPlanEntrega</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FechaEmbarqueTienda</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FechaEntregatienda</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CantidadEmbarcadaTienda</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CantidadEntregadaTienda</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>IdIrdenCompra</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>IdArticulo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>IdSucursal</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <FechaPlanEntrega>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:PMG_EXP_RCT_DATE/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:PMG_EXP_RCT_DATE"/>
+                    </FechaPlanEntrega>
+                    <FechaEmbarqueTienda>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:DTE_TRF_SHIP/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:DTE_TRF_SHIP"/>
+                    </FechaEmbarqueTienda>
+                    <FechaEntregatienda>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:DATE_RCV/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:DATE_RCV"/>
+                    </FechaEntregatienda>
+                    <CantidadEmbarcadaTienda>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:TRF_QTY_SHIP/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:TRF_QTY_SHIP"/>
+                    </CantidadEmbarcadaTienda>
+                    <CantidadEntregadaTienda>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:RCV_SELL_QTY/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:RCV_SELL_QTY"/>
+                    </CantidadEntregadaTienda>
+                    <IdIrdenCompra>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:PO_NUMBER"/>
+                    </IdIrdenCompra>
+                    <IdArticulo>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:PRD_LVL_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:PRD_LVL_NUMBER"/>
+                    </IdArticulo>
+                    <IdSucursal>
+                        <xsl:copy-of select="$Element/pfx2:DistributionListInformationData/pfx2:STORE/@xsi:nil"/>
+                        <xsl:value-of select="$Element/pfx2:DistributionListInformationData/pfx2:STORE"/>
+                    </IdSucursal>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

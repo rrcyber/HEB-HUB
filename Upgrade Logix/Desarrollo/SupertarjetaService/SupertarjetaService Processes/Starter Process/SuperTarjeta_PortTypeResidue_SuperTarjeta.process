@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd3" xmlns:ns="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:ns3="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlPfx="http://xmlns.example.com/1418946732074" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <wsdl:import namespace="http://xmlns.example.com/1418946732074" location="/Shared Resources/WSDL/SuperTarjetaService.wsdl"/>
+    <pd:name>SupertarjetaService Processes/Starter Process/SuperTarjeta_PortTypeResidue_SuperTarjeta.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="wsdlPfx:Residue_SuperTarjeta_Request"/>
+    <pd:startX>150</pd:startX>
+    <pd:startY>65</pd:startY>
+    <pd:returnBindings>
+        <wsdlPfx:Residue_SuperTarjeta_Replay>
+            <Replay>
+                <xsl:copy-of select="$Call-Process-Residue/ns1:ResidueOut"/>
+            </Replay>
+        </wsdlPfx:Residue_SuperTarjeta_Replay>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="wsdlPfx:Residue_SuperTarjeta_Replay"/>
+    <pd:endX>450</pd:endX>
+    <pd:endY>65</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="wsdlPfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1418947269640</pd:targetNamespace>
+    <pd:activity name="Call Process Residue">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>286</pd:x>
+        <pd:y>73</pd:y>
+        <config>
+            <processName>/SupertarjetaService Processes/Main Process/Residue_Supertarjeta_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/wsdlPfx:Residue_SuperTarjeta_Request/Request/ns:ResidueIn"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 11">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>153</pd:x>
+        <pd:y>186</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <data>
+                    <wsdlPfx:Fault>
+                        <Fault>
+                            <ns3:ProviderSOAPFault>
+                                <ns3:FaultCode>
+                                    <xsl:value-of select="11"/>
+                                </ns3:FaultCode>
+                                <ns3:FaultString>
+                                    <xsl:value-of select="&quot;Los datos de Tarjeta ó CVV son Incorrectos, Favor de Validar&quot;"/>
+                                </ns3:FaultString>
+                                <ns3:FaultActor>
+                                    <xsl:value-of select="&quot;Web Service Super Tarjeta&quot;"/>
+                                </ns3:FaultActor>
+                            </ns3:ProviderSOAPFault>
+                        </Fault>
+                    </wsdlPfx:Fault>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Process Residue</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Process Residue</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Fault 11</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

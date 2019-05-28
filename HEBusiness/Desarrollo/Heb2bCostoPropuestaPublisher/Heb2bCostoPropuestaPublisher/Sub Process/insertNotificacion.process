@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <pd:name>Heb2bCostoPropuestaPublisher/Sub Process/insertNotificacion.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="IdEstatus" type="xsd:string"/>
+                    <xsd:element name="Idpropuesta" type="xsd:string"/>
+                    <xsd:element name="IdDestinatario" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>29</pd:startX>
+    <pd:startY>233</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>645</pd:endX>
+    <pd:endY>233</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1419633423436</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>143</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>388</pd:width>
+        <pd:height>446</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:errorCondition>$i &gt;= $_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>InserNotificacion</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>InserNotificacion</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>JDBC Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java Code</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Java-Code/javaCodeActivityOutput/TYPE_ERROR = 'true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>InserNotificacion</pd:from>
+            <pd:to>Java Code</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Error ProcessBD</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$i = $_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>323</pd:x>
+            <pd:y>393</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns1:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_RETRAY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns1:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>483</pd:x>
+            <pd:y>393</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Java Code">
+            <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+            <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+            <pd:x>324</pd:x>
+            <pd:y>234</pd:y>
+            <config>
+                <fileName>insertNotificacionJavaCode</fileName>
+                <packageName>Heb2bCostoPropuestaPublisher.SubProcess.insertNotificacion</packageName>
+                <fullsource>package Heb2bCostoPropuestaPublisher.SubProcess.insertNotificacion;
+import java.util.*;
+import java.io.*;
+public class insertNotificacionJavaCode{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String ERROR_CODE = "";
+	protected String ERRORS = "";
+	protected String TYPE_ERROR = "";
+	public String getERROR_CODE() {
+		return ERROR_CODE;
+	}
+	public void setERROR_CODE(String val) {
+		ERROR_CODE = val;
+	}
+	public String getERRORS() {
+		return ERRORS;
+	}
+	public void setERRORS(String val) {
+		ERRORS = val;
+	}
+	public String getTYPE_ERROR() {
+		return TYPE_ERROR;
+	}
+	public void setTYPE_ERROR(String val) {
+		TYPE_ERROR = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public insertNotificacionJavaCode() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String ERROR_CODE
+	In  : String ERRORS
+	Out : String TYPE_ERROR
+* Available Variables: DO NOT MODIFY *****/
+
+	  TYPE_ERROR="false";
+           String [] ErrorArray  = ERRORS.split(",");
+
+     for (int i = 0; i &lt; ErrorArray.length; i++) {
+	if ((ErrorArray[i]).equals(ERROR_CODE))
+	{
+         TYPE_ERROR="true" ;
+         break;
+         }
+ 
+	
+ }   
+}
+}
+</fullsource>
+                <inputData>
+                    <row>
+                        <fieldName>ERROR_CODE</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                    <row>
+                        <fieldName>ERRORS</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </inputData>
+                <outputData>
+                    <row>
+                        <fieldName>TYPE_ERROR</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </outputData>
+                <byteCode>
+                    <class>
+                        <name>insertNotificacionJavaCode</name>
+                        <byteCode>yv66vgAAADEANQkACwAiCQALACMJAAsAJAoADAAlCAAmCAAnCAAoCgApACoKACkAKwgALAcALQcALgEACkVSUk9SX0NPREUBABJMamF2YS9sYW5nL1N0cmluZzsBAAZFUlJPUlMBAApUWVBFX0VSUk9SAQANZ2V0RVJST1JfQ09ERQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADXNldEVSUk9SX0NPREUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAAlnZXRFUlJPUlMBAAlzZXRFUlJPUlMBAA1nZXRUWVBFX0VSUk9SAQANc2V0VFlQRV9FUlJPUgEABjxpbml0PgEAAygpVgEABmludm9rZQEACkV4Y2VwdGlvbnMHAC8BAApTb3VyY2VGaWxlAQAfaW5zZXJ0Tm90aWZpY2FjaW9uSmF2YUNvZGUuamF2YQwADQAODAAPAA4MABAADgwAGwAcAQAAAQAFZmFsc2UBAAEsBwAwDAAxADIMADMANAEABHRydWUBAFVIZWIyYkNvc3RvUHJvcHVlc3RhUHVibGlzaGVyL1N1YlByb2Nlc3MvaW5zZXJ0Tm90aWZpY2FjaW9uL2luc2VydE5vdGlmaWNhY2lvbkphdmFDb2RlAQAQamF2YS9sYW5nL09iamVjdAEAE2phdmEvbGFuZy9FeGNlcHRpb24BABBqYXZhL2xhbmcvU3RyaW5nAQAFc3BsaXQBACcoTGphdmEvbGFuZy9TdHJpbmc7KVtMamF2YS9sYW5nL1N0cmluZzsBAAZlcXVhbHMBABUoTGphdmEvbGFuZy9PYmplY3Q7KVoAIQALAAwAAAADAAQADQAOAAAABAAPAA4AAAAEABAADgAAAAgAAQARABIAAQATAAAAHQABAAEAAAAFKrQAAbAAAAABABQAAAAGAAEAAAAKAAEAFQAWAAEAEwAAACIAAgACAAAABiortQABsQAAAAEAFAAAAAoAAgAAAA0ABQAOAAEAFwASAAEAEwAAAB0AAQABAAAABSq0AAKwAAAAAQAUAAAABgABAAAAEAABABgAFgABABMAAAAiAAIAAgAAAAYqK7UAArEAAAABABQAAAAKAAIAAAATAAUAFAABABkAEgABABMAAAAdAAEAAQAAAAUqtAADsAAAAAEAFAAAAAYAAQAAABYAAQAaABYAAQATAAAAIgACAAIAAAAGKiu1AAOxAAAAAQAUAAAACgACAAAAGQAFABoAAQAbABwAAQATAAAAPwACAAEAAAAXKrcABCoSBbUAASoSBbUAAioSBbUAA7EAAAABABQAAAAWAAUAAAAcAAQABgAKAAcAEAAIABYAHQABAB0AHAACABMAAABpAAIAAwAAADUqEga1AAMqtAACEge2AAhMAz0cK76iAB8rHDIqtAABtgAJmQAMKhIKtQADpwAJhAIBp//hsQAAAAEAFAAAACIACAAAACUABgAmABAAKAAYACkAJQArACsALAAuACgANAAxAB4AAAAEAAEAHwABACAAAAACACE=</byteCode>
+                    </class>
+                </byteCode>
+            </config>
+            <pd:inputBindings>
+                <javaCodeActivityInput>
+                    <ERROR_CODE>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </ERROR_CODE>
+                    <ERRORS>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_ConditionForSuspend"/>
+                    </ERRORS>
+                </javaCodeActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="InserNotificacion">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>327</pd:x>
+            <pd:y>65</pd:y>
+            <config>
+                <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO Notificacion
+(IdNotificacionEvento, FechaAlta, Usuario, Destinatarios, Estatus, Parametros)
+VALUES
+(?,GETDATE (),1,?,1,?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>IdNotificacionEvento</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Destinatarios</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Parametros</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <xsl:choose>
+                    <xsl:when test="$Start/root/IdEstatus = 11">
+                        <jdbcUpdateActivityInput>
+                            <IdNotificacionEvento>
+                                <xsl:value-of select="42"/>
+                            </IdNotificacionEvento>
+                            <Destinatarios>
+                                <xsl:value-of select="$Start/root/IdDestinatario"/>
+                            </Destinatarios>
+                            <Parametros>
+                                <xsl:value-of select="$Start/root/Idpropuesta"/>
+                            </Parametros>
+                        </jdbcUpdateActivityInput>
+                    </xsl:when>
+                    <xsl:when test="$Start/root/IdEstatus = 13">
+                        <jdbcUpdateActivityInput>
+                            <IdNotificacionEvento>
+                                <xsl:value-of select="43"/>
+                            </IdNotificacionEvento>
+                            <Destinatarios>
+                                <xsl:value-of select="$Start/root/IdDestinatario"/>
+                            </Destinatarios>
+                            <Parametros>
+                                <xsl:value-of select="$Start/root/Idpropuesta"/>
+                            </Parametros>
+                        </jdbcUpdateActivityInput>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <jdbcUpdateActivityInput>
+                            <IdNotificacionEvento>
+                                <xsl:value-of select="14"/>
+                            </IdNotificacionEvento>
+                            <Destinatarios>
+                                <xsl:value-of select="$Start/root/IdDestinatario"/>
+                            </Destinatarios>
+                            <Parametros>
+                                <xsl:value-of select="$Start/root/Idpropuesta"/>
+                            </Parametros>
+                        </jdbcUpdateActivityInput>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Error ProcessBD">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>203</pd:x>
+            <pd:y>393</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns13:MSG_Container>
+                    <ns13:Header>
+                        <ns13:ProjectName>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                        </ns13:ProjectName>
+                        <ns13:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </ns13:Source_Domain>
+                        <ns13:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </ns13:Destination_Domain>
+                        <ns13:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                        </ns13:Transaction_Type>
+                        <ns13:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns13:TimeStamp>
+                    </ns13:Header>
+                    <ns13:Body>
+                        <ns13:ErrorManagementSchema>
+                            <ns13:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </ns13:inrtn_id>
+                            <ns13:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                            </ns13:inrtn_instn_nm>
+                            <ns13:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/StackTrace"/>
+                            </ns13:inrtn_err_rtn_desc>
+                            <ns13:inrtn_msg_body>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                            </ns13:inrtn_msg_body>
+                            <ns13:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </ns13:cre8_ts>
+                            <ns13:u_code>
+                                <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                            </ns13:u_code>
+                            <ns13:sev_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                            </ns13:sev_id>
+                        </ns13:ErrorManagementSchema>
+                    </ns13:Body>
+                </ns13:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,966 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns03="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COSTOS.xsd" xmlns:ns02="www.tibco.com/plugin/Sleep" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns0="http://xmlns.tibco.com/bw/activity/xml/render/bytesEnvelope/2003/05" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COSTOS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/COSTOS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>Heb2bCostoPropuestaPublisher/Sub Process/Heb2bTopicCostoPropuesta_Publisher.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:CAMBIOS"/>
+    <pd:startX>29</pd:startX>
+    <pd:startY>515</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1555</pd:endX>
+    <pd:endY>515</pd:endY>
+    <pd:errorSchemas>
+        <ERROR ref="pfx2:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1391206600873</pd:targetNamespace>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>154</pd:x>
+        <pd:y>170</pd:y>
+        <pd:width>1055</pd:width>
+        <pd:height>679</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java-Code</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group</pd:from>
+            <pd:to>Java-Code</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-52429</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Java-Code</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Java-Code/javaCodeActivityOutput/TYPE_ERROR ='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Error Process BD1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:group name="Group">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>314</pd:x>
+            <pd:y>216</pd:y>
+            <pd:width>887</pd:width>
+            <pd:height>232</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Start/CAMBIOS/CAMBIO</pd:over>
+                <pd:iterationElementSlot>PROPUESTA</pd:iterationElementSlot>
+                <pd:indexSlot>J</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Query</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Notificacion</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Render XML</pd:from>
+                <pd:to>JMS Topic Publisher</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JMS Topic Publisher</pd:from>
+                <pd:to>UpdatePCAD_InsertBPC</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Query</pd:from>
+                <pd:to>UpdateErrorFD</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>UpdateErrorFD</pd:from>
+                <pd:to>JDBC-Query-1</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>UpdatePCAD_InsertBPC</pd:from>
+                <pd:to>Null</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Null</pd:from>
+                <pd:to>Notificacion</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Query</pd:from>
+                <pd:to>Render XML</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>count($JDBC-Query/resultSet/Record) !=0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Update Rechazado</pd:from>
+                <pd:to>Null</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC-Query-1</pd:from>
+                <pd:to>JDBC Update Rechazado</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Query">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>417</pd:x>
+                <pd:y>284</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/Database/JDBC_HEBB/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <statement>SELECT 
+IDDETALLE, 
+PROVEEDOR,
+CASEPACK, 
+SKU, 
+ID, 
+FECHAINICIO, 
+COSTOCASEPACK , 
+SUCURSAL, 
+FECHAINICIODETALLE
+from (
+SELECT 
+PCD.ID IDDETALLE, 
+P.IDPMM PROVEEDOR, 
+CP.IDPMM CASEPACK, 
+A.SKU as sku , 
+PCA.ID as id,
+PCA.FECHAINICIO as fechainicio ,
+PCD.COSTOCASEPACK AS COSTOCASEPACK , 
+null SUCURSAL,
+FECHAINICIODETALLE =
+CASE WHEN PCD.FECHAINICIO IS NULL
+			THEN CASE WHEN CONVERT(VARCHAR(8), PCA.FECHAINICIO, 112) &gt; CONVERT(varchar(8), GETDATE(),112)
+					THEN PCA.FECHAINICIO
+					ELSE getdate()+1
+					END
+			ELSE CASE WHEN CONVERT(VARCHAR(8), PCD.FECHAINICIO, 112) &gt; CONVERT(varchar(8), GETDATE(),112)
+					THEN PCD.FECHAINICIO
+					ELSE getdate()+1
+					END  
+      END
+FROM PROPUESTACOSTOARTICULO PCA
+JOIN PROVEEDOR P ON PCA.IDPROVEEDOR = P.ID
+JOIN PROPUESTACOSTOARTICULODETALLE PCD ON PCA.ID = PCD.IDPROPUESTACOSTO
+JOIN CASEPACK CP ON CP.ID = PCD.IDCASEPACK
+JOIN ARTICULO A ON CP.IDARTICULO = A.ID
+WHERE CP.ESACTIVO = 1 AND PCA.ID = ? AND PCD.COSTOCASEPACK IS NOT NULL AND PCD.IDESTATUS = 9
+union
+SELECT 
+PCD.ID IDDETALLE, 
+P.IDPMM PROVEEDOR, 
+CP.IDPMM CASEPACK, 
+A.SKU, 
+PCA.ID, 
+PCA.FECHAINICIO,
+PCDS.COSTOCASEPACK AS COSTOCASEPACK,
+S.IDPMM SUCURSAL, 
+FECHAINICIODETALLE =
+CASE WHEN PCD.FECHAINICIO IS NULL
+			THEN CASE WHEN CONVERT(VARCHAR(8), PCA.FECHAINICIO, 112) &gt; CONVERT(varchar(8), GETDATE(),112)
+					THEN PCA.FECHAINICIO
+					ELSE getdate()+1
+					END
+			ELSE CASE WHEN CONVERT(VARCHAR(8), PCD.FECHAINICIO, 112) &gt; CONVERT(varchar(8), GETDATE(),112)
+					THEN PCD.FECHAINICIO
+					ELSE getdate()+1
+					END  
+      END
+FROM PROPUESTACOSTOARTICULO PCA
+JOIN PROVEEDOR P ON PCA.IDPROVEEDOR = P.ID
+JOIN PROPUESTACOSTOARTICULODETALLE PCD ON PCA.ID = PCD.IDPROPUESTACOSTO
+JOIN CASEPACK CP ON CP.ID = PCD.IDCASEPACK
+JOIN ARTICULO A ON CP.IDARTICULO = A.ID
+LEFT JOIN PROPUESTACOSTOARTICULODETALLESUCURSAL PCDS ON PCD.ID = PCDS.IDPROPUESTACOSTOARTICULODETALLE
+LEFT JOIN SUCURSAL S ON PCDS.IDSUCURSAL = S.ID
+WHERE CP.ESACTIVO = 1 AND  PCA.ID = ? AND PCD.IDESTATUS = 9 AND PCDS.COSTOCASEPACK IS NOT NULL)a
+order by casepack , sucursal</statement>
+                    <wizardData/>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>IdPropuestaCosto</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>IdPropuestaCosto2</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <processInSubsets>false</processInSubsets>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>IDDETALLE</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>PROVEEDOR</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>CASEPACK</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SKU</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>ID</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>FECHAINICIO</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>COSTOCASEPACK</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>SUCURSAL</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    <QueryOutputCachedSchemaColumns>FECHAINICIODETALLE</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <IdPropuestaCosto>
+                            <xsl:choose>
+                                <xsl:when test="exists($PROPUESTA/CAMBIO/ID)">
+                                    <xsl:value-of select="$PROPUESTA/CAMBIO/ID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdPropuestaCosto>
+                        <IdPropuestaCosto2>
+                            <xsl:choose>
+                                <xsl:when test="exists($PROPUESTA/CAMBIO/ID)">
+                                    <xsl:value-of select="$PROPUESTA/CAMBIO/ID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdPropuestaCosto2>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Render XML">
+                <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+                <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+                <pd:x>528</pd:x>
+                <pd:y>285</pd:y>
+                <config>
+                    <renderAsText>text</renderAsText>
+                    <validateInput>false</validateInput>
+                    <term ref="pfx:COSTOS"/>
+                </config>
+                <pd:inputBindings>
+                    <COSTOS>
+                        <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                            <COSTO>
+                                <IDPROPUESTA>
+                                    <xsl:value-of select="ID"/>
+                                </IDPROPUESTA>
+                                <PROVEEDOR>
+                                    <xsl:value-of select="PROVEEDOR"/>
+                                </PROVEEDOR>
+                                <CASEPACK>
+                                    <xsl:value-of select="CASEPACK"/>
+                                </CASEPACK>
+                                <SKU>
+                                    <xsl:value-of select="SKU"/>
+                                </SKU>
+                                <xsl:if test="COSTOCASEPACK">
+                                    <COSTOCASEPACK>
+                                        <xsl:value-of select="COSTOCASEPACK"/>
+                                    </COSTOCASEPACK>
+                                </xsl:if>
+                                <xsl:if test="SUCURSAL">
+                                    <SUCURSAL>
+                                        <xsl:value-of select="SUCURSAL"/>
+                                    </SUCURSAL>
+                                </xsl:if>
+                                <xsl:if test="FECHAINICIO">
+                                    <FECHAINICIO>
+                                        <xsl:value-of select="FECHAINICIO"/>
+                                    </FECHAINICIO>
+                                </xsl:if>
+                                <IDDETALLE>
+                                    <xsl:value-of select="IDDETALLE"/>
+                                </IDDETALLE>
+                                <xsl:if test="FECHAINICIODETALLE">
+                                    <FECHAINICIODETALLE>
+                                        <xsl:value-of select="FECHAINICIODETALLE"/>
+                                    </FECHAINICIODETALLE>
+                                </xsl:if>
+                            </COSTO>
+                        </xsl:for-each>
+                    </COSTOS>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="JMS Topic Publisher">
+                <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+                <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+                <pd:x>635</pd:x>
+                <pd:y>279</pd:y>
+                <config>
+                    <PermittedMessageType>Text</PermittedMessageType>
+                    <SessionAttributes>
+                        <transacted>false</transacted>
+                        <acknowledgeMode>1</acknowledgeMode>
+                        <maxSessions>1</maxSessions>
+                        <destination>%%Destinations/Topics/GLB_COSTOPROPUESTA_TOPIC%%</destination>
+                    </SessionAttributes>
+                    <ConfigurableHeaders>
+                        <JMSDeliveryMode>%%Connections/JMS/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                        <JMSExpiration>%%Connections/JMS/Properties/GLB_JMS_EXPIRATION%%</JMSExpiration>
+                        <JMSPriority>%%Connections/JMS/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+                    </ConfigurableHeaders>
+                    <ConnectionReference>/Shared Resources/Connections/JMS/JMSConnection.sharedjmscon</ConnectionReference>
+                    <ApplicationProperties>/Shared Resources/Connections/JMS/JMS Application Properties.sharedjmsapp</ApplicationProperties>
+                </config>
+                <pd:inputBindings>
+                    <ns03:ActivityInput>
+                        <JMSCorrelationID>
+                            <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/ID"/>
+                        </JMSCorrelationID>
+                        <Body>
+                            <xsl:value-of select="$Render-XML/xmlString"/>
+                        </Body>
+                    </ns03:ActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="UpdatePCAD_InsertBPC">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>755</pd:x>
+                <pd:y>287</pd:y>
+                <config>
+                    <processName>/Heb2bCostoPropuestaPublisher/Sub Process/UpdatePCAD_InsertBPC.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <COSTOS>
+                        <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                            <COSTO>
+                                <IDPROPUESTA>
+                                    <xsl:value-of select="ID"/>
+                                </IDPROPUESTA>
+                                <PROVEEDOR>
+                                    <xsl:value-of select="PROVEEDOR"/>
+                                </PROVEEDOR>
+                                <CASEPACK>
+                                    <xsl:value-of select="CASEPACK"/>
+                                </CASEPACK>
+                                <SKU>
+                                    <xsl:value-of select="SKU"/>
+                                </SKU>
+                                <xsl:if test="COSTOCASEPACK">
+                                    <COSTOCASEPACK>
+                                        <xsl:value-of select="COSTOCASEPACK"/>
+                                    </COSTOCASEPACK>
+                                </xsl:if>
+                                <xsl:if test="SUCURSAL">
+                                    <SUCURSAL>
+                                        <xsl:value-of select="SUCURSAL"/>
+                                    </SUCURSAL>
+                                </xsl:if>
+                                <xsl:if test="FECHAINICIO">
+                                    <FECHAINICIO>
+                                        <xsl:value-of select="FECHAINICIO"/>
+                                    </FECHAINICIO>
+                                </xsl:if>
+                                <IDDETALLE>
+                                    <xsl:value-of select="IDDETALLE"/>
+                                </IDDETALLE>
+                                <FECHAINICIODETALLE>
+                                    <xsl:value-of select="FECHAINICIODETALLE"/>
+                                </FECHAINICIODETALLE>
+                            </COSTO>
+                        </xsl:for-each>
+                    </COSTOS>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="UpdateErrorFD">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>413</pd:x>
+                <pd:y>394</pd:y>
+                <config>
+                    <processName>/Heb2bCostoPropuestaPublisher/Sub Process/UpdateErrorFD.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <COSTOS>
+                        <COSTO>
+                            <xsl:if test="$PROPUESTA/CAMBIO/ID">
+                                <IDPROPUESTA>
+                                    <xsl:value-of select="$PROPUESTA/CAMBIO/ID"/>
+                                </IDPROPUESTA>
+                            </xsl:if>
+                        </COSTO>
+                    </COSTOS>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Notificacion">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>1046</pd:x>
+                <pd:y>346</pd:y>
+                <config>
+                    <processName>/Heb2bCostoPropuestaPublisher/Sub Process/Notificacion.process</processName>
+                </config>
+                <pd:inputBindings>
+                    <xsl:choose>
+                        <xsl:when test="count($JDBC-Query-1/resultSet) > 0">
+                            <root>
+                                <IdPropuesta1>
+                                    <xsl:value-of select="$Start/CAMBIOS/CAMBIO[1]/ID"/>
+                                </IdPropuesta1>
+                                <IdEstatus>
+                                    <xsl:value-of select="11"/>
+                                </IdEstatus>
+                                <IdPropuesta>
+                                    <xsl:value-of select="$Start/CAMBIOS/CAMBIO[1]/ID"/>
+                                </IdPropuesta>
+                            </root>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <root>
+                                <IdPropuesta1>
+                                    <xsl:value-of select="$Start/CAMBIOS/CAMBIO[1]/ID"/>
+                                </IdPropuesta1>
+                                <IdEstatus>
+                                    <xsl:value-of select="13"/>
+                                </IdEstatus>
+                                <IdPropuesta>
+                                    <xsl:value-of select="$Start/CAMBIOS/CAMBIO[1]/ID"/>
+                                </IdPropuesta>
+                            </root>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Null">
+                <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                <pd:resourceType>ae.activities.null</pd:resourceType>
+                <pd:x>907</pd:x>
+                <pd:y>286</pd:y>
+                <config/>
+                <pd:inputBindings/>
+            </pd:activity>
+            <pd:activity name="JDBC Update Rechazado">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>736</pd:x>
+                <pd:y>386</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <statement>insert into bitacorapropuestacosto
+(IdPropuestaCostoArticuloDetalle, IdEstatus, FechaCaptura, UsuarioCaptura, FechaModificacion, UsuarioModificacion)
+values 
+(?, 13, Getdate(), 1, Getdate(), 1)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>IdPropuesta</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <IdPropuesta>
+                            <xsl:choose>
+                                <xsl:when test="exists($JDBC-Query-1/resultSet/Record[1]/ID)">
+                                    <xsl:value-of select="$JDBC-Query-1/resultSet/Record[1]/ID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdPropuesta>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="JDBC-Query-1">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>568</pd:x>
+                <pd:y>375</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/Database/JDBC_HEBB/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                    <statement>select ID from propuestacostoarticulodetalle where idpropuestacosto = ?</statement>
+                    <wizardData/>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>IdPropuestaCosto</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>ID</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <IdPropuestaCosto>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/CAMBIOS/CAMBIO[1]/ID)">
+                                    <xsl:value-of select="$Start/CAMBIOS/CAMBIO[1]/ID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </IdPropuestaCosto>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>581</pd:x>
+            <pd:y>646</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns02:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_RETRAY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns02:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>701</pd:x>
+            <pd:y>646</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns2:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                    </message>
+                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns2:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Error Process BD1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>466</pd:x>
+            <pd:y>646</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <pfx2:MSG_Container>
+                    <pfx2:Header>
+                        <pfx2:ProjectName>
+                            <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                        </pfx2:ProjectName>
+                        <pfx2:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </pfx2:Source_Domain>
+                        <pfx2:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </pfx2:Destination_Domain>
+                        <pfx2:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                        </pfx2:Transaction_Type>
+                        <pfx2:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </pfx2:TimeStamp>
+                    </pfx2:Header>
+                    <pfx2:Body>
+                        <pfx2:ErrorManagementSchema>
+                            <pfx2:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </pfx2:inrtn_id>
+                            <pfx2:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                            </pfx2:inrtn_instn_nm>
+                            <pfx2:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                            </pfx2:inrtn_err_rtn_desc>
+                            <pfx2:inrtn_msg_body>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                            </pfx2:inrtn_msg_body>
+                            <pfx2:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx2:cre8_ts>
+                            <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                <pfx2:u_code>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                </pfx2:u_code>
+                            </xsl:if>
+                            <pfx2:sev_id>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                            </pfx2:sev_id>
+                        </pfx2:ErrorManagementSchema>
+                    </pfx2:Body>
+                </pfx2:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Java-Code">
+            <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+            <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+            <pd:x>583</pd:x>
+            <pd:y>525</pd:y>
+            <config>
+                <fileName>Heb2bTopicCostoPropuesta_PublisherJavaCode</fileName>
+                <packageName>Heb2bCostoPropuestaPublisher.SubProcess.Heb2bTopicCostoPropuesta_Publisher</packageName>
+                <fullsource>package Heb2bCostoPropuestaPublisher.SubProcess.Heb2bTopicCostoPropuesta_Publisher;
+import java.util.*;
+import java.io.*;
+public class Heb2bTopicCostoPropuesta_PublisherJavaCode{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String ERROR_CODE = "";
+	protected String ERRORS = "";
+	protected String TYPE_ERROR = "";
+	public String getERROR_CODE() {
+		return ERROR_CODE;
+	}
+	public void setERROR_CODE(String val) {
+		ERROR_CODE = val;
+	}
+	public String getERRORS() {
+		return ERRORS;
+	}
+	public void setERRORS(String val) {
+		ERRORS = val;
+	}
+	public String getTYPE_ERROR() {
+		return TYPE_ERROR;
+	}
+	public void setTYPE_ERROR(String val) {
+		TYPE_ERROR = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public Heb2bTopicCostoPropuesta_PublisherJavaCode() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String ERROR_CODE
+	In  : String ERRORS
+	Out : String TYPE_ERROR
+* Available Variables: DO NOT MODIFY *****/
+
+	  TYPE_ERROR="false";
+           String [] ErrorArray  = ERRORS.split(",");
+
+     for (int i = 0; i &lt; ErrorArray.length; i++) {
+	if ((ErrorArray[i]).equals(ERROR_CODE))
+	{
+         TYPE_ERROR="true" ;
+         break;
+         }
+ 
+	
+ }   
+}
+}
+</fullsource>
+                <inputData>
+                    <row>
+                        <fieldName>ERROR_CODE</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                    <row>
+                        <fieldName>ERRORS</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </inputData>
+                <outputData>
+                    <row>
+                        <fieldName>TYPE_ERROR</fieldName>
+                        <fieldType>string</fieldType>
+                        <fieldRequired>optional</fieldRequired>
+                    </row>
+                </outputData>
+                <byteCode>
+                    <class>
+                        <name>Heb2bTopicCostoPropuesta_PublisherJavaCode</name>
+                        <byteCode>yv66vgAAADEANQkACwAiCQALACMJAAsAJAoADAAlCAAmCAAnCAAoCgApACoKACkAKwgALAcALQcALgEACkVSUk9SX0NPREUBABJMamF2YS9sYW5nL1N0cmluZzsBAAZFUlJPUlMBAApUWVBFX0VSUk9SAQANZ2V0RVJST1JfQ09ERQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADXNldEVSUk9SX0NPREUBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAAlnZXRFUlJPUlMBAAlzZXRFUlJPUlMBAA1nZXRUWVBFX0VSUk9SAQANc2V0VFlQRV9FUlJPUgEABjxpbml0PgEAAygpVgEABmludm9rZQEACkV4Y2VwdGlvbnMHAC8BAApTb3VyY2VGaWxlAQAvSGViMmJUb3BpY0Nvc3RvUHJvcHVlc3RhX1B1Ymxpc2hlckphdmFDb2RlLmphdmEMAA0ADgwADwAODAAQAA4MABsAHAEAAAEABWZhbHNlAQABLAcAMAwAMQAyDAAzADQBAAR0cnVlAQB1SGViMmJDb3N0b1Byb3B1ZXN0YVB1Ymxpc2hlci9TdWJQcm9jZXNzL0hlYjJiVG9waWNDb3N0b1Byb3B1ZXN0YV9QdWJsaXNoZXIvSGViMmJUb3BpY0Nvc3RvUHJvcHVlc3RhX1B1Ymxpc2hlckphdmFDb2RlAQAQamF2YS9sYW5nL09iamVjdAEAE2phdmEvbGFuZy9FeGNlcHRpb24BABBqYXZhL2xhbmcvU3RyaW5nAQAFc3BsaXQBACcoTGphdmEvbGFuZy9TdHJpbmc7KVtMamF2YS9sYW5nL1N0cmluZzsBAAZlcXVhbHMBABUoTGphdmEvbGFuZy9PYmplY3Q7KVoAIQALAAwAAAADAAQADQAOAAAABAAPAA4AAAAEABAADgAAAAgAAQARABIAAQATAAAAHQABAAEAAAAFKrQAAbAAAAABABQAAAAGAAEAAAAKAAEAFQAWAAEAEwAAACIAAgACAAAABiortQABsQAAAAEAFAAAAAoAAgAAAA0ABQAOAAEAFwASAAEAEwAAAB0AAQABAAAABSq0AAKwAAAAAQAUAAAABgABAAAAEAABABgAFgABABMAAAAiAAIAAgAAAAYqK7UAArEAAAABABQAAAAKAAIAAAATAAUAFAABABkAEgABABMAAAAdAAEAAQAAAAUqtAADsAAAAAEAFAAAAAYAAQAAABYAAQAaABYAAQATAAAAIgACAAIAAAAGKiu1AAOxAAAAAQAUAAAACgACAAAAGQAFABoAAQAbABwAAQATAAAAPwACAAEAAAAXKrcABCoSBbUAASoSBbUAAioSBbUAA7EAAAABABQAAAAWAAUAAAAcAAQABgAKAAcAEAAIABYAHQABAB0AHAACABMAAABpAAIAAwAAADUqEga1AAMqtAACEge2AAhMAz0cK76iAB8rHDIqtAABtgAJmQAMKhIKtQADpwAJhAIBp//hsQAAAAEAFAAAACIACAAAACUABgAmABAAKAAYACkAJQArACsALAAuACgANAAxAB4AAAAEAAEAHwABACAAAAACACE=</byteCode>
+                    </class>
+                </byteCode>
+            </config>
+            <pd:inputBindings>
+                <javaCodeActivityInput>
+                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                        <ERROR_CODE>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </ERROR_CODE>
+                    </xsl:if>
+                    <ERRORS>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Heb2bCostoPropuestaPublisherVariables/GLB_ConditionForSuspend"/>
+                    </ERRORS>
+                </javaCodeActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>139</pd:x>
+        <pd:y>926</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>303</pd:x>
+        <pd:y>926</pd:y>
+        <config>
+            <faultName>ERROR</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <xsl:if test="$_error/ns1:ErrorReport/StackTrace">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <pfx2:MSG_Container>
+                        <pfx2:Header>
+                            <pfx2:ProjectName>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </pfx2:ProjectName>
+                            <pfx2:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx2:Source_Domain>
+                            <pfx2:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx2:Destination_Domain>
+                            <pfx2:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                            </pfx2:Transaction_Type>
+                            <pfx2:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx2:TimeStamp>
+                        </pfx2:Header>
+                        <pfx2:Body>
+                            <pfx2:ErrorManagementSchema>
+                                <pfx2:inrtn_id>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                                </pfx2:inrtn_id>
+                                <pfx2:inrtn_instn_nm>
+                                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                                </pfx2:inrtn_instn_nm>
+                                <pfx2:inrtn_err_rtn_desc>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                                </pfx2:inrtn_err_rtn_desc>
+                                <pfx2:inrtn_msg_body>
+                                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                </pfx2:inrtn_msg_body>
+                                <pfx2:cre8_ts>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </pfx2:cre8_ts>
+                                <pfx2:u_code>
+                                    <xsl:value-of select="concat($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,$_error/ns1:ErrorReport/MsgCode)"/>
+                                </pfx2:u_code>
+                                <pfx2:sev_id>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                                </pfx2:sev_id>
+                            </pfx2:ErrorManagementSchema>
+                        </pfx2:Body>
+                    </pfx2:MSG_Container>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Error-2">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1414</pd:x>
+        <pd:y>645</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <xsl:if test="$_error/ns1:ErrorReport/StackTrace">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not(exists($_error/ns1:ErrorReport))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>Generate-Error-2</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: Heb2bTopicCostoPropuesta_Publisher
+Fecha de creación: 05/02/2014
+Creado por: Liliana Garibay
+Variables globales: HEB.COMMON.PMM.COSTOPROPUESTA.TOPIC
+Descripción: Proceso que se encarga de  publicar los datos a un Topic.</pd:description>
+        <pd:x>229</pd:x>
+        <pd:y>71</pd:y>
+        <pd:width>442</pd:width>
+        <pd:height>108</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

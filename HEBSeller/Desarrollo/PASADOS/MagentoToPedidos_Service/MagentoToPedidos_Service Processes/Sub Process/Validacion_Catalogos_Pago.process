@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/Pedido" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Pedido" schemaLocation="/Shared Resources/Schema Definitions/Custom/Pedido.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>MagentoToPedidos_Service Processes/Sub Process/Validacion_Catalogos_Pago.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Pedido"/>
+    <pd:startX>112</pd:startX>
+    <pd:startY>222</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <TipoServicio>
+                <xsl:value-of select="$Validacion_TipoServicio/resultSet/Record[1]/TipoServicio"/>
+            </TipoServicio>
+            <TipoEntrega>
+                <xsl:value-of select="$Validacion_TipoEntrega/resultSet/Record[1 ]/TipoEntrega"/>
+            </TipoEntrega>
+            <Estatus>
+                <xsl:value-of select="$Validacion_Estatus/resultSet/Record[1]/Estatus"/>
+            </Estatus>
+            <Plataforma>
+                <xsl:value-of select="$Validacion_Plataforma/resultSet/Record[1]/Plataforma"/>
+            </Plataforma>
+            <GrupoCliente>
+                <xsl:value-of select="$Validacion_GrupoCliente/resultSet/Record[1]/GrupoCliente"/>
+            </GrupoCliente>
+            <FormaPago>
+                <xsl:value-of select="$Validacion_FormaPago/resultSet/Record[1]/FormaPago"/>
+            </FormaPago>
+            <IdEstatus>
+                <xsl:value-of select="$Validacion_IdEstatus/resultSet/Record[1]/IdEstatus"/>
+            </IdEstatus>
+            <TipoTarjeta>
+                <xsl:value-of select="$Validacion_TipoTarjeta/resultSet/Record[1]/TipoTarjeta"/>
+            </TipoTarjeta>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1003</pd:endX>
+    <pd:endY>217</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns12:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1430949546591</pd:targetNamespace>
+    <pd:activity name="Fault15">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1021</pd:x>
+        <pd:y>116</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <ns12:Fault>
+                        <ns12:Code>
+                            <xsl:value-of select="'Fault15'"/>
+                        </ns12:Code>
+                        <ns12:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/Mensajes/Fault_15"/>
+                        </ns12:Reason>
+                    </ns12:Fault>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>334</pd:x>
+        <pd:y>471</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>774</pd:x>
+        <pd:y>473</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns1:ErrorReport/StackTrace">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                    </message>
+                </xsl:if>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                </messageCode>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>486</pd:x>
+        <pd:y>576</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>588</pd:x>
+        <pd:y>471</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <Code>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </Code>
+                </xsl:if>
+                <Message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>204</pd:x>
+        <pd:y>73</pd:y>
+        <pd:width>680</pd:width>
+        <pd:height>279</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx:Pedido/pfx:Pago</pd:over>
+            <pd:iterationElementSlot>TipoTarjeta</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>E_TipoTarjeta</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>E_FormaPago</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validacion_TipoTarjeta</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validacion_FormaPago</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>E_FormaPago</pd:to>
+            <pd:xpathDescription>error catalogo pago</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Map-Data/root/FormaPago='error' and string-length($TipoTarjeta/pfx:Pago/pfx:IdFormaPago)!=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>E_TipoTarjeta</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Map-Data/root/TipoTarjeta='error' and string-length($TipoTarjeta/pfx:Pago/pfx:TipoTarjeta)!=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Validacion_FormaPago</pd:to>
+            <pd:xpathDescription>Record</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>string-length($TipoTarjeta/pfx:Pago/pfx:IdFormaPago)!=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Validacion_TipoTarjeta</pd:to>
+            <pd:xpathDescription>Record</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>string-length($TipoTarjeta/pfx:Pago/pfx:TipoTarjeta)!=0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Validacion_TipoTarjeta">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>414</pd:x>
+            <pd:y>297</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_MAX_CONNECTIONS%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <statement>select
+(select top 1 ClaveExterna as tipotarjeta  from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1) as TipoTarjeta</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>CatalogoMaestroId</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>TipoTarjeta</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>TipoTarjeta</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <CatalogoMaestroId>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroidTipoTarjeta"/>
+                    </CatalogoMaestroId>
+                    <TipoTarjeta>
+                        <xsl:value-of select="if (string-length($Start/pfx:Pedido/pfx:Pago[1]/pfx:TipoTarjeta)=0)&#xA; then 'null' &#xA;else $Start/pfx:Pedido/pfx:Pago[1]/pfx:TipoTarjeta"/>
+                    </TipoTarjeta>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>538</pd:x>
+            <pd:y>218</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="TipoTarjeta" type="xsd:string"/>
+                                <xsd:element name="FormaPago" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Validacion_TipoTarjeta/resultSet/Record[1]/TipoTarjeta)!=0">
+                            <TipoTarjeta>
+                                <xsl:value-of select="'success'"/>
+                            </TipoTarjeta>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <TipoTarjeta>
+                                <xsl:value-of select="'error'"/>
+                            </TipoTarjeta>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="string-length($Validacion_FormaPago/resultSet/Record[1])!=0">
+                            <FormaPago>
+                                <xsl:value-of select="'success'"/>
+                            </FormaPago>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <FormaPago>
+                                <xsl:value-of select="'error'"/>
+                            </FormaPago>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="E_TipoTarjeta">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>713</pd:x>
+            <pd:y>298</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>INSERT INTO mag_import_errors (if_run_id, Interface_name, If_error_ds, Created_date, Description) VALUES (?, ?, ?, ?, ?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>if_run_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>interface_name</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>if_errors_ds</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>created_date</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>description</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <if_run_id xsi:nil="true"/>
+                    <interface_name>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/Validacion/InterfaceName"/>
+                    </interface_name>
+                    <if_errors_ds>
+                        <xsl:value-of select="concat('Tipo de tarjeta',' = ' ,$TipoTarjeta/pfx:Pago/pfx:TipoTarjeta )"/>
+                    </if_errors_ds>
+                    <created_date>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </created_date>
+                    <description>
+                        <xsl:value-of select="'eCom_PedidoPago.Tipo de Tarjeta'"/>
+                    </description>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validacion_FormaPago">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>412</pd:x>
+            <pd:y>129</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_MAX_CONNECTIONS%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>Select
+(select top 1 ClaveExterna as formapago from CatalogoMaestroDetalle where CatalogoMaestroId = ? and ClaveExterna = ? and Activo = 1) as FormaPago</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>CatalogoMaestroId</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FormaPago</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>FormaPago</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <CatalogoMaestroId>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/maestroIdFormaDePago"/>
+                    </CatalogoMaestroId>
+                    <FormaPago>
+                        <xsl:value-of select="$TipoTarjeta/pfx:Pago/pfx:IdFormaPago"/>
+                    </FormaPago>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="E_FormaPago">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>697</pd:x>
+            <pd:y>129</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO mag_import_errors (if_run_id, Interface_name, If_error_ds, Created_date, Description) VALUES (?, ?, ?, ?, ?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>if_run_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>interface_name</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>if_error_ds</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>created_date</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>description</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <if_run_id xsi:nil="true"/>
+                    <interface_name>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Variables/Validacion/InterfaceName"/>
+                    </interface_name>
+                    <if_error_ds>
+                        <xsl:value-of select="concat('Forma de Pago',' = ' ,$TipoTarjeta/pfx:Pago/pfx:IdFormaPago)"/>
+                    </if_error_ds>
+                    <created_date>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </created_date>
+                    <description>
+                        <xsl:value-of select="'eCom_PedidoPago. Forma de Pago'"/>
+                    </description>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>286</pd:x>
+            <pd:y>222</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "Fault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:xpathDescription>Error Desconocido</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Fault15</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

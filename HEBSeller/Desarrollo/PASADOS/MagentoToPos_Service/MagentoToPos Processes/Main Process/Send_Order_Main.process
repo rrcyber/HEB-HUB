@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx13="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Order_Detail.xsd" xmlns:pfx12="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Schema_tools.xsd" xmlns:pfx11="http://www.tibco.com/schemas/MagentoToPosService/Shared Resources/Schema Definitions/Custom/Schema1.xsd" xmlns:pfx10="http://xmlns.heb.com/ei/OrderResponse" xmlns:ns22="http://xmlns.heb.com/ei/OutVenta" xmlns:pfx5="http://xmlns.heb.com/ei/PedidoRequest" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam" xmlns:pfx3="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam" xmlns:pfx2="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:pfx9="http://www.heb.com/web_order" xmlns:pfx8="http://xmlns.heb.com/ei/OrderRequest" xmlns:pfx7="http://xmlns.heb.com/ei/Pedido" xmlns:pfx6="http://xmlns.heb.com/ei/PedidoResponse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns14="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/Supertarjeta" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Supertarjeta" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaIn.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SupertarjetaOut" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoRequest" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoRequest.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoResponse" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoResponse.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Pedido" schemaLocation="/Shared Resources/Schema Definitions/Custom/Pedido.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/OrderResponse" schemaLocation="/Shared Resources/Schema Definitions/Custom/OrderReplay.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/OrderRequest" schemaLocation="/Shared Resources/Schema Definitions/Custom/OrderRequest.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Order_Detail.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Order_Detail.xsd"/>
+    <xsd:import namespace="http://www.heb.com/web_order" schemaLocation="/Shared Resources/Schema Definitions/Custom/External_Order.xsd"/>
+    <pd:name>MagentoToPos Processes/Main Process/Send_Order_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx8:OrderRequest"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>190</pd:startY>
+    <pd:returnBindings>
+        <pfx10:OrderResponse>
+            <pfx10:Codigo>
+                <xsl:value-of select="'001'"/>
+            </pfx10:Codigo>
+            <xsl:choose>
+                <xsl:when test="string-length($Call_Response_POS/Resultset/Ticket)!=0">
+                    <pfx10:Descripcion>
+                        <xsl:value-of select="$Call_Response_POS/Resultset/Ticket"/>
+                    </pfx10:Descripcion>
+                </xsl:when>
+                <xsl:when test="string-length($Validation_Bitacora_RTSales/Records/Ticket)!=0">
+                    <pfx10:Descripcion>
+                        <xsl:value-of select="$Validation_Bitacora_RTSales/Records/Ticket"/>
+                    </pfx10:Descripcion>
+                </xsl:when>
+                <xsl:otherwise>
+                    <pfx10:Descripcion>
+                        <xsl:value-of select="'0'"/>
+                    </pfx10:Descripcion>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pfx10:OrderResponse>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx10:OrderResponse"/>
+    <pd:endX>1359</pd:endX>
+    <pd:endY>192</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns2:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <Error>
+            <xsd:element name="error" type="xsd:string"/>
+        </Error>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1412351440454</pd:targetNamespace>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>183</pd:x>
+        <pd:y>190</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx9:order"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/pfx8:OrderRequest/pfx8:Order"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Queue Sender">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>869</pd:x>
+        <pd:y>192</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_ORDER_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>%%Connections/JMS/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                <JMSExpiration>%%Connections/JMS/Properties/GLB_JMS_EXPIRATION%%</JMSExpiration>
+                <JMSPriority>%%Connections/JMS/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings>
+            <ns14:ActivityInput>
+                <JMSCorrelationID>
+                    <xsl:value-of select="concat('WORP',tib:right($Call-Process-Get-All-Ticket/pfx9:WebOrder/pfx9:Header/pfx9:StoreId, '5'))"/>
+                </JMSCorrelationID>
+                <Body>
+                    <xsl:value-of select="$Call-XMLToPos/root/xmlstring"/>
+                </Body>
+            </ns14:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10_1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>184</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <ns2:Fault>
+                        <ns2:Code>
+                            <xsl:value-of select="'Fault 10'"/>
+                        </ns2:Code>
+                        <ns2:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_10"/>
+                        </ns2:Reason>
+                    </ns2:Fault>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Faul 12">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>870</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <ns2:Fault>
+                        <ns2:Code>
+                            <xsl:value-of select="'Fault 12'"/>
+                        </ns2:Code>
+                        <ns2:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_12"/>
+                        </ns2:Reason>
+                    </ns2:Fault>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>190</pd:x>
+        <pd:y>289</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <ns2:Fault>
+                        <ns2:Code>
+                            <xsl:value-of select="'Fault 10'"/>
+                        </ns2:Code>
+                        <ns2:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_10"/>
+                        </ns2:Reason>
+                    </ns2:Fault>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>27</pd:x>
+        <pd:y>537</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>337</pd:x>
+        <pd:y>508</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns1:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>166</pd:x>
+        <pd:y>438</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <Code>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </Code>
+                </xsl:if>
+                <Message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>196</pd:x>
+        <pd:y>620</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Call_Response_POS">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1037</pd:x>
+        <pd:y>196</pd:y>
+        <config>
+            <processName>/MagentoToPos Processes/Main Process/Response_POS_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <pedido>
+                    <xsl:value-of select="$Parse-XML/pfx9:order/pfx9:header/pfx9:web_order_id"/>
+                </pedido>
+                <tienda>
+                    <xsl:value-of select="concat('WORP',tib:right($Call-Process-Get-All-Ticket/pfx9:WebOrder/pfx9:Header/pfx9:StoreId, '5'))"/>
+                </tienda>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Faul 21">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>711</pd:x>
+        <pd:y>320</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <ns2:Fault>
+                        <ns2:Code>
+                            <xsl:value-of select="'Fault 21'"/>
+                        </ns2:Code>
+                        <ns2:Reason>
+                            <xsl:value-of select="concat($_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_21,' ',$Parse-XML/pfx9:order/pfx9:detail[1]/pfx9:sku,' ',$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_22)"/>
+                        </ns2:Reason>
+                    </ns2:Fault>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault-10-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1034</pd:x>
+        <pd:y>318</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <ns2:Fault>
+                        <ns2:Code>
+                            <xsl:value-of select="'Fault 10'"/>
+                        </ns2:Code>
+                        <ns2:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_10"/>
+                        </ns2:Reason>
+                    </ns2:Fault>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validation_Bitacora_RTSales">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>378</pd:x>
+        <pd:y>190</pd:y>
+        <config>
+            <processName>/MagentoToPos Processes/Sub Process/Validation_POSBItacora.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx11:Request_Insert>
+                <pfx11:idSucursal>
+                    <xsl:value-of select="$Parse-XML/pfx9:order/pfx9:header/pfx9:store_id"/>
+                </pfx11:idSucursal>
+                <pfx11:NumeroPedido>
+                    <xsl:value-of select="$Parse-XML/pfx9:order/pfx9:header/pfx9:web_order_id"/>
+                </pfx11:NumeroPedido>
+                <pfx11:nMontoTotal>
+                    <xsl:value-of select="$Parse-XML/pfx9:order/pfx9:header/pfx9:order_total"/>
+                </pfx11:nMontoTotal>
+                <pfx11:Estatus>
+                    <xsl:value-of select="''"/>
+                </pfx11:Estatus>
+                <pfx11:Accion>
+                    <xsl:value-of select="''"/>
+                </pfx11:Accion>
+                <pfx11:TicketGeneradoPOS>
+                    <xsl:value-of select="''"/>
+                </pfx11:TicketGeneradoPOS>
+                <pfx11:Mensaje>
+                    <xsl:value-of select="''"/>
+                </pfx11:Mensaje>
+                <pfx11:dtFechaMod>
+                    <xsl:value-of select="''"/>
+                </pfx11:dtFechaMod>
+            </pfx11:Request_Insert>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>380</pd:x>
+        <pd:y>426</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Update_Estatus_POSBitacora">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1221</pd:x>
+        <pd:y>193</pd:y>
+        <config>
+            <processName>/MagentoToPos Processes/Sub Process/Update_POSBitacora.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Result>
+                <Estatus>
+                    <xsl:value-of select="'4'"/>
+                </Estatus>
+                <xsl:choose>
+                    <xsl:when test="string-length($Call_Response_POS/Resultset/Ticket)!=0">
+                        <TicketGeneradoPOS>
+                            <xsl:value-of select="$Call_Response_POS/Resultset/Ticket"/>
+                        </TicketGeneradoPOS>
+                    </xsl:when>
+                    <xsl:when test="string-length($Validation_Bitacora_RTSales/Records/Ticket)!=0">
+                        <TicketGeneradoPOS>
+                            <xsl:value-of select="$Validation_Bitacora_RTSales/Records/Ticket"/>
+                        </TicketGeneradoPOS>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <TicketGeneradoPOS>
+                            <xsl:value-of select="'0'"/>
+                        </TicketGeneradoPOS>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <NumeroPedido>
+                    <xsl:value-of select="$Parse-XML/pfx9:order/pfx9:header/pfx9:web_order_id"/>
+                </NumeroPedido>
+            </Result>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-2">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>506</pd:x>
+        <pd:y>296</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Call XMLToPos">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>709</pd:x>
+        <pd:y>191</pd:y>
+        <config>
+            <processName>/MagentoToPos Processes/Sub Process/XMLToPos.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Call-Process-Get-All-Ticket/pfx9:WebOrder"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call Process Get All Ticket">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>577</pd:x>
+        <pd:y>195</pd:y>
+        <config>
+            <processName>/MagentoToPos Processes/Sub Process/Get_All_Ticket.process</processName>
+        </config>
+        <pd:inputBindings>
+            <order>
+                <xsl:value-of select="$Start/pfx8:OrderRequest/pfx8:Order"/>
+            </order>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>Call_Response_POS</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Fault 10_1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>Faul 12</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:xpathDescription>Client Fault</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "Fault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_Response_POS</pd:from>
+        <pd:to>Update_Estatus_POSBitacora</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_Response_POS</pd:from>
+        <pd:to>Fault-10-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-52480</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_Response_POS/Resultset/Ticket=000000</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validation_Bitacora_RTSales</pd:from>
+        <pd:to>Call Process Get All Ticket</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Validation_Bitacora_RTSales/Records/Result = 1 and $Validation_Bitacora_RTSales/Records/Ticket=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validation_Bitacora_RTSales</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:xpathDescription>Ticket</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Validation_Bitacora_RTSales/Records/Ticket !=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Update_Estatus_POSBitacora</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_Estatus_POSBitacora</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validation_Bitacora_RTSales</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validation_Bitacora_RTSales</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call XMLToPos</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call XMLToPos</pd:from>
+        <pd:to>Faul 21</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Process Get All Ticket</pd:from>
+        <pd:to>Call XMLToPos</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

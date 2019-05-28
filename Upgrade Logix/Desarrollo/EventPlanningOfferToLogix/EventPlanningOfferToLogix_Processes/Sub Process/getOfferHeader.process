@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Discounted.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/LogixOffer.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/LogixOffer.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Discounted.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Discounted.xsd"/>
+    <pd:name>EventPlanningOfferToLogix_Processes/Sub Process/getOfferHeader.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>139</pd:startX>
+    <pd:startY>117</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:copy-of select="$Map-Data/Offer"/>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx2:Offer" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>485</pd:endX>
+    <pd:endY>117</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1396991710468</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>230</pd:x>
+        <pd:y>117</pd:y>
+        <config>
+            <timeout>%%Connections/Database/XPORTAL/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/XPORTAL/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/XPORTAL.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT TOP 1
+  A.*,
+  CASE WHEN (TOTALCOMPRA*TOTALREGALO*TOTALTDAS)&gt;1000000 THEN 200 ELSE 100 END           AS "OFFER/REWARDS/DISCOUNT/CHARGEBACKDEPT"
+FROM (
+  SELECT
+    BE.Id,
+    C.INDICE AS FOLIO,
+    LEFT('COMB ' + C.INDICE + ' - ' + REPLACE(G.DESCRIPCION_DEL_FOLIO, 'COMBO ', '') ,100) AS "OFFER/NAME",
+    E.ID_DEL_EVENTO + ', FOLIO: ' + C.INDICE                                            AS "OFFER/DESCRIPTION", 
+    CONVERT(CHAR(10), DATEADD (DAY, -1 , G.FECHA_INICIAL) ,126)                         AS "OFFER/STARTDATE", 
+    CONVERT(CHAR(10), G.FECHA_FINAL,126)                                                AS "OFFER/ENDDATE", 
+    CONVERT(CHAR(10), DATEADD (DAY, -1 , G.FECHA_INICIAL) ,126)                         AS "OFFER/ELIGIBILITYSTARTDATE", 
+    CONVERT(CHAR(10), G.FECHA_FINAL,126)                                                AS "OFFER/ELIGIBILITYENDDATE", 
+    CONVERT(CHAR(10), DATEADD (DAY, -2 , G.FECHA_INICIAL) ,126)                         AS "OFFER/TESTINGSTARTDATE", 
+    CONVERT(CHAR(10), G.FECHA_FINAL,126)                                                AS "OFFER/TESTINGENDDATE",
+    LEFT(E.ID_DEL_EVENTO + ', FOLIO:' + C.INDICE + ' ' + ' GRUPO:' + C.COMPRA1  ,100)   AS "OFFER/CONDITIONS/PRODUCT/PRODUCTLIST NAME", 
+    C.COMPRA                                                                            AS "OFFER/CONDITIONS/PRODUCT/PRODUCTLIST QUANTITY",
+    LEFT(E.ID_DEL_EVENTO + ', FOLIO:' + C.INDICE + ' ' + 'GRUPO:' + C.Y_LLEVATE  ,100)  AS "OFFER/REWARDS/DISCOUNT/PRODUCT LIST NAME", 
+    C.LLEVATE_PAQUETE                                                                   AS "OFFER/REWARDS/DISCOUNT/ITEMLIMIT",
+    UPPER(C.Y_LLEVATE)                                                                  AS "OFFER/REWARDS/DISCOUNT/RECEIPTDESCRIPTION",
+    COUNT(DISTINCT TR.XVARTICULOP_TRIGGER) AS TOTALCOMPRA,
+    COUNT(DISTINCT TA.XVARTICULOL_TARGET) AS TOTALREGALO,
+    COUNT(DISTINCT P.INDICE) AS TOTALTDAS
+  FROM
+    CATEVENT E (NOLOCK) JOIN CATCOMEVENTOGC G(NOLOCK)
+      ON G.XQASOCIACION = E.INDICE JOIN CATDCOMBO C(NOLOCK)
+      ON C.XQASOCIACION = G.INDICE
+    JOIN  CATPRECIOCLUSTER P(NOLOCK)
+      ON P.XQASOCIACION = C.INDICE
+    JOIN CATDATRIGGER TR(NOLOCK)
+      ON TR.XQASOCIACION = P.INDICE
+    JOIN CATDATARGET TA(NOLOCK)
+      ON TA.XQASOCIACION = P.INDICE
+    JOIN BITACORAENVIOLOGIX BE (NOLOCK)
+      ON E.ID_DEL_EVENTO = BE.FOLIOREFERENCIA1
+      AND C.INDICE = BE.FOLIOREFERENCIA2
+      AND BE.ESTATUSENVIO = 0
+      AND BE.TIPOENVIO = 'COMBOLOCO'
+  GROUP BY
+  BE.Id,
+    C.INDICE,
+    LEFT('COMB ' + C.INDICE + ' - ' + REPLACE(G.DESCRIPCION_DEL_FOLIO, 'COMBO ', '') ,100), 
+    E.ID_DEL_EVENTO + ', FOLIO: ' + C.INDICE , 
+    G.FECHA_INICIAL , 
+    G.FECHA_FINAL , 
+    G.FECHA_INICIAL , 
+    G.FECHA_FINAL , 
+    G.FECHA_INICIAL - 1 , 
+    G.FECHA_FINAL ,
+    LEFT(E.ID_DEL_EVENTO + ', FOLIO:' + C.INDICE + ' ' + ' GRUPO:' + C.COMPRA1  ,100) , 
+    C.COMPRA ,
+    LEFT(E.ID_DEL_EVENTO + ', FOLIO:' + C.INDICE + ' ' + 'GRUPO:' + C.Y_LLEVATE  ,100) , 
+    C.LLEVATE_PAQUETE ,
+    UPPER(C.Y_LLEVATE) ) A</statement>
+            <wizardData/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>Id</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FOLIO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERDESCRIPTION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERSTARTDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERENDDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERELIGIBILITYSTARTDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERELIGIBILITYENDDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERTESTINGSTARTDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERTESTINGENDDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERCONDITIONSPRODUCTPRODUCTLISTNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERCONDITIONSPRODUCTPRODUCTLISTQUANTITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>6</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>float</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERREWARDSDISCOUNTPRODUCTLISTNAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERREWARDSDISCOUNTITEMLIMIT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>6</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>float</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERREWARDSDISCOUNTRECEIPTDESCRIPTION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TOTALCOMPRA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TOTALREGALO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TOTALTDAS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OFFERREWARDSDISCOUNTCHARGEBACKDEPT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>368</pd:x>
+        <pd:y>51</pd:y>
+        <config>
+            <element ref="pfx2:Offer"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record[1]">
+                <Offer>
+                    <xsl:attribute name="type">
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EventPlanningOfferToLogixVariables/OFFER_ELEMENT_DEFAULT_VALUES/Offer_Type"/>
+                    </xsl:attribute>
+                    <ClientOfferID>
+                        <xsl:value-of select="Id"/>
+                    </ClientOfferID>
+                    <Name>
+                        <xsl:value-of select="OFFERNAME"/>
+                    </Name>
+                    <xsl:if test="OFFERDESCRIPTION">
+                        <Description>
+                            <xsl:value-of select="OFFERDESCRIPTION"/>
+                        </Description>
+                    </xsl:if>
+                    <StartDate>
+                        <xsl:value-of select="tib:format-date('yyyy-MM-dd', OFFERSTARTDATE)"/>
+                    </StartDate>
+                    <EndDate>
+                        <xsl:value-of select="tib:format-date('yyyy-MM-dd', OFFERENDDATE)"/>
+                    </EndDate>
+                    <EligibilityStartDate>
+                        <xsl:value-of select="tib:format-date('yyyy-MM-dd', OFFERELIGIBILITYSTARTDATE)"/>
+                    </EligibilityStartDate>
+                    <EligibilityEndDate>
+                        <xsl:value-of select="tib:format-date('yyyy-MM-dd', OFFERELIGIBILITYENDDATE)"/>
+                    </EligibilityEndDate>
+                    <TestingStartDate>
+                        <xsl:value-of select="tib:format-date('yyyy-MM-dd', OFFERTESTINGSTARTDATE)"/>
+                    </TestingStartDate>
+                    <TestingEndDate>
+                        <xsl:value-of select="tib:format-date('yyyy-MM-dd', OFFERTESTINGENDDATE)"/>
+                    </TestingEndDate>
+                    <Limits>
+                        <Frequency>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EventPlanningOfferToLogixVariables/OFFER_ELEMENT_DEFAULT_VALUES/Offer_Limits_Frequency"/>
+                        </Frequency>
+                    </Limits>
+                    <Conditions>
+                        <Product>
+                            <xsl:for-each select="OFFERCONDITIONSPRODUCTPRODUCTLISTNAME">
+                                <ProductList>
+                                    <xsl:attribute name="quantity">
+                                        <xsl:value-of select="../OFFERCONDITIONSPRODUCTPRODUCTLISTQUANTITY"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="name">
+                                        <xsl:value-of select="."/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="unitType">
+                                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EventPlanningOfferToLogixVariables/OFFER_ELEMENT_DEFAULT_VALUES/Offer_Conditions_Product_ProductList_unitType"/>
+                                    </xsl:attribute>
+                                    <xsl:value-of select="&quot;&quot;"/>
+                                </ProductList>
+                            </xsl:for-each>
+                        </Product>
+                    </Conditions>
+                    <Rewards>
+                        <Discount>
+                            <DiscountType>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EventPlanningOfferToLogixVariables/OFFER_ELEMENT_DEFAULT_VALUES/Offer_Rewards_Discount_DiscountType"/>
+                            </DiscountType>
+                            <ProductList>
+                                <xsl:if test="OFFERREWARDSDISCOUNTPRODUCTLISTNAME">
+                                    <xsl:attribute name="name">
+                                        <xsl:value-of select="OFFERREWARDSDISCOUNTPRODUCTLISTNAME"/>
+                                    </xsl:attribute>
+                                </xsl:if>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </ProductList>
+                            <AmountType>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EventPlanningOfferToLogixVariables/OFFER_ELEMENT_DEFAULT_VALUES/Offer_Rewards_Discount_AmountType"/>
+                            </AmountType>
+                            <ItemLimit>
+                                <xsl:value-of select="round(OFFERREWARDSDISCOUNTITEMLIMIT)"/>
+                            </ItemLimit>
+                            <ChargebackDept>
+                                <xsl:value-of select="OFFERREWARDSDISCOUNTCHARGEBACKDEPT"/>
+                            </ChargebackDept>
+                            <xsl:if test="OFFERREWARDSDISCOUNTRECEIPTDESCRIPTION">
+                                <ReceiptDescription>
+                                    <xsl:value-of select="OFFERREWARDSDISCOUNTRECEIPTDESCRIPTION"/>
+                                </ReceiptDescription>
+                            </xsl:if>
+                        </Discount>
+                    </Rewards>
+                </Offer>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>368</pd:x>
+        <pd:y>201</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:xpathDescription>Empty?</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not(empty($JDBC-Query/resultSet/Record))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

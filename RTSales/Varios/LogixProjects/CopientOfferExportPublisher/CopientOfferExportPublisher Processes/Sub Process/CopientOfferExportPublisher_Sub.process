@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:pfx2="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>CopientOfferExportPublisher Processes/Sub Process/CopientOfferExportPublisher_Sub.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="FileContent" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>28</pd:startX>
+    <pd:startY>171</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>542</pd:endX>
+    <pd:endY>159</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1247134670997</pd:targetNamespace>
+    <pd:activity name="CopyXMLFile">
+        <pd:type>com.tibco.plugin.file.FileCopyActivity</pd:type>
+        <pd:resourceType>ae.activities.FileCopyActivity</pd:resourceType>
+        <pd:x>120</pd:x>
+        <pd:y>91</pd:y>
+        <config>
+            <createMissingDirectories>true</createMissingDirectories>
+            <overwrite>true</overwrite>
+        </config>
+        <pd:inputBindings>
+            <ns:CopyActivityConfig>
+                <fromFileName>
+                    <xsl:value-of select="concat(tib:substring-before-last($Start/root/FileContent, '.ok'),'.xml')"/>
+                </fromFileName>
+                <toFileName>
+                    <xsl:value-of select="concat($_globalVariables/ns1:GlobalVariables/FilePaths/FileLocation,$_globalVariables/ns1:GlobalVariables/FilePaths/ArchiveDir,&#xA;substring-before(tib:substring-after-last($Start/root/FileContent, '\'),'.ok'),'.xml')"/>
+                </toFileName>
+            </ns:CopyActivityConfig>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="RemoveXMLFile">
+        <pd:type>com.tibco.plugin.file.FileRemoveActivity</pd:type>
+        <pd:resourceType>ae.activities.FileRemoveActivity</pd:resourceType>
+        <pd:x>269</pd:x>
+        <pd:y>92</pd:y>
+        <config/>
+        <pd:inputBindings>
+            <ns:RemoveActivityInputClass>
+                <fileName>
+                    <xsl:value-of select="concat(tib:substring-before-last($Start/root/FileContent, '.ok'),'.xml')"/>
+                </fileName>
+            </ns:RemoveActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="CopyOKFile">
+        <pd:type>com.tibco.plugin.file.FileCopyActivity</pd:type>
+        <pd:resourceType>ae.activities.FileCopyActivity</pd:resourceType>
+        <pd:x>120</pd:x>
+        <pd:y>236</pd:y>
+        <config>
+            <createMissingDirectories>true</createMissingDirectories>
+            <overwrite>true</overwrite>
+        </config>
+        <pd:inputBindings>
+            <ns:CopyActivityConfig>
+                <fromFileName>
+                    <xsl:value-of select="$Start/root/FileContent"/>
+                </fromFileName>
+                <toFileName>
+                    <xsl:value-of select="concat($_globalVariables/ns1:GlobalVariables/FilePaths/FileLocation,$_globalVariables/ns1:GlobalVariables/FilePaths/ArchiveDir,&#xA;tib:substring-after-last($Start/root/FileContent, '\'))"/>
+                </toFileName>
+            </ns:CopyActivityConfig>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="RemoveOKFile">
+        <pd:type>com.tibco.plugin.file.FileRemoveActivity</pd:type>
+        <pd:resourceType>ae.activities.FileRemoveActivity</pd:resourceType>
+        <pd:x>273</pd:x>
+        <pd:y>236</pd:y>
+        <config/>
+        <pd:inputBindings>
+            <ns:RemoveActivityInputClass>
+                <fileName>
+                    <xsl:value-of select="$Start/root/FileContent"/>
+                </fileName>
+            </ns:RemoveActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>407</pd:x>
+        <pd:y>158</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>CopyXMLFile</pd:from>
+        <pd:to>RemoveXMLFile</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RemoveXMLFile</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RemoveOKFile</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>CopyXMLFile</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>CopyOKFile</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CopyOKFile</pd:from>
+        <pd:to>RemoveOKFile</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

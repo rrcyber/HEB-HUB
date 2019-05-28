@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://xmlns.tibco.com/bw/plugin-api/messages/context" xmlns:ns="http://xmlns.tibco.com/encodings/mime" xmlns:ns3="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>MexicoDigitalInvoiceService Processes/Starter Process/Get_MexicoDigitalInvoiceService_WSDL_HTTP_Starter.process</pd:name>
+    <pd:startName>HTTP Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="HTTP Receiver">
+        <pd:type>com.tibco.plugin.http.HTTPEventSource</pd:type>
+        <pd:resourceType>httppalette.httpEventSource</pd:resourceType>
+        <pd:x>145</pd:x>
+        <pd:y>82</pd:y>
+        <config>
+            <outputMode>String</outputMode>
+            <defaultEncoding>UTF8</defaultEncoding>
+            <inputOutputVersion>5.3.0</inputOutputVersion>
+            <newMimeSupport>true</newMimeSupport>
+            <sharedChannel>/Shared Resources/Connections/HTTP/HTTP Connection.sharedhttp</sharedChannel>
+            <parsePostData>true</parsePostData>
+            <useHTTPAuthentication>false</useHTTPAuthentication>
+            <exposeSecurityContext>true</exposeSecurityContext>
+            <Headers>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Accept" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Charset" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Encoding" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Length" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Connection" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </Headers>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>686</pd:endX>
+    <pd:endY>82</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1299023306125</pd:targetNamespace>
+    <pd:activity name="RetrieveConcreteWSDL">
+        <pd:type>com.tibco.plugin.soap.urlaccess.RetrieveResource</pd:type>
+        <pd:resourceType>ae.activities.RetrieveResource</pd:resourceType>
+        <pd:x>317</pd:x>
+        <pd:y>79</pd:y>
+        <config/>
+        <pd:inputBindings>
+            <inputClass>
+                <xsl:choose>
+                    <xsl:when test="not(upper-case($HTTP-Receiver/ProcessStarterOutput/QueryString)='WSDL')">
+                        <resourcePath>
+                            <xsl:value-of select="$HTTP-Receiver/ProcessStarterOutput/QueryString"/>
+                        </resourcePath>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <resourcePath>
+                            <xsl:value-of select="&quot;/Shared Resources/WSDL/Concrete/MexicoDigitalInvoiceService.wsdl&quot;"/>
+                        </resourcePath>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:if test="$HTTP-Receiver/ProcessStarterOutput/PostData">
+                    <filter>
+                        <xsl:value-of select="$HTTP-Receiver/ProcessStarterOutput/PostData"/>
+                    </filter>
+                </xsl:if>
+            </inputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SendConcreteWSDL">
+        <pd:type>com.tibco.plugin.http.HTTPResponseActivity</pd:type>
+        <pd:resourceType>httppalette.httpWebResponse</pd:resourceType>
+        <pd:x>491</pd:x>
+        <pd:y>88</pd:y>
+        <config>
+            <closeConnection>true</closeConnection>
+            <eventSource>HTTP Receiver</eventSource>
+            <Headers>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="StatusLine" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Set-Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Location" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </Headers>
+        </config>
+        <pd:inputBindings>
+            <ResponseActivityInput>
+                <xsl:if test="$RetrieveConcreteWSDL/outputClass/resourceBytes">
+                    <binaryContent>
+                        <xsl:value-of select="$RetrieveConcreteWSDL/outputClass/resourceBytes"/>
+                    </binaryContent>
+                </xsl:if>
+                <asciiContent>
+                    <xsl:value-of select="$RetrieveConcreteWSDL/outputClass/resourceData"/>
+                </asciiContent>
+            </ResponseActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="OnError">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>319</pd:x>
+        <pd:y>213</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Log">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>411</pd:x>
+        <pd:y>301</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat($_error/ns2:ErrorReport/Msg, &quot;&#xD;&quot;, &quot;*******************************&quot;, &quot;&#xD;&quot;, $_error/ns2:ErrorReport/StackTrace)"/>
+                </message>
+                <xsl:if test="$_error/ns2:ErrorReport/MsgCode">
+                    <msgCode>
+                        <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                    </msgCode>
+                </xsl:if>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>HTTP Receiver</pd:from>
+        <pd:to>RetrieveConcreteWSDL</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RetrieveConcreteWSDL</pd:from>
+        <pd:to>SendConcreteWSDL</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendConcreteWSDL</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RetrieveConcreteWSDL</pd:from>
+        <pd:to>OnError</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendConcreteWSDL</pd:from>
+        <pd:to>OnError</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>OnError</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>OnError</pd:from>
+        <pd:to>Log</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

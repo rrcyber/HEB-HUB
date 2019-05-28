@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <pd:name>Processes/Starter Process/Twitter_Starter_Pluggin.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>39</pd:startX>
+    <pd:startY>121</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>766</pd:endX>
+    <pd:endY>124</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1415914307485</pd:targetNamespace>
+    <pd:activity name="Create CSV File">
+        <pd:type>com.tibco.plugin.file.FileCreateActivity</pd:type>
+        <pd:resourceType>ae.activities.FileCreateActivity</pd:resourceType>
+        <pd:x>255</pd:x>
+        <pd:y>122</pd:y>
+        <config>
+            <overwrite>true</overwrite>
+            <createMissingDirectories>true</createMissingDirectories>
+        </config>
+        <pd:inputBindings>
+            <ns:CreateActivityInputClass>
+                <fileName>
+                    <xsl:value-of select="&quot;C:\TIBCOFiles\Twitter\Response.csv&quot;"/>
+                </fileName>
+            </ns:CreateActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>443</pd:x>
+        <pd:y>29</pd:y>
+        <pd:width>230</pd:width>
+        <pd:height>170</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$TwitterSearch-Activity/TweetSearchOutput/Status</pd:over>
+            <pd:iterationElementSlot>array</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Generate Information File</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Generate Information File</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Generate Information File">
+            <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+            <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+            <pd:x>564</pd:x>
+            <pd:y>131</pd:y>
+            <config>
+                <encoding>text</encoding>
+                <compressFile>None</compressFile>
+                <append>true</append>
+                <createMissingDirectories>true</createMissingDirectories>
+            </config>
+            <pd:inputBindings>
+                <ns:WriteActivityInputTextClass>
+                    <fileName>
+                        <xsl:value-of select="$Create-CSV-File/ns:CreateActivityOutputClass/fileInfo/fullName"/>
+                    </fileName>
+                    <textContent>
+                        <xsl:value-of select="concat($array/Status/user/name ,&quot;|&quot;,$array/Status/user/description ,&quot;|&quot;,$array/Status/user/screenName ,&quot;|&quot;, $array/Status/user/followersCount,&quot;|&quot;,$array/Status/user/friendsCount,&quot;|&quot;,$array/Status/user/statusesCount,&quot;|&quot;,$array/Status/retweetCount,&quot;|&quot;,$array/Status/text,&quot;|&quot;,$array/Status/source,&quot;|&quot;,$array/Status/user/status/favorited)"/>
+                    </textContent>
+                    <addLineSeparator>
+                        <xsl:value-of select="&quot;true&quot;"/>
+                    </addLineSeparator>
+                </ns:WriteActivityInputTextClass>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="TwitterSearch Activity">
+        <pd:type>com.tibco.plugin.twitter.activities.TwitterSearchActivity</pd:type>
+        <pd:resourceType>twitter.activity.TwitterSearchActivity</pd:resourceType>
+        <pd:x>146</pd:x>
+        <pd:y>128</pd:y>
+        <config>
+            <SearchType>Tweets</SearchType>
+            <OAuthResource>/OAUth 1.0 Resource.sharedtwitterresource</OAuthResource>
+        </config>
+        <pd:inputBindings>
+            <SearchTweetInput>
+                <query>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_QUERY"/>
+                </query>
+                <geocode>
+                    <xsl:if test="$_globalVariables/ns1:GlobalVariables/TwitterSearch/SEARCH_GEOCODE/GLB_SEARCH_LATITUDE !=0">
+                        <latitude>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/SEARCH_GEOCODE/GLB_SEARCH_LATITUDE"/>
+                        </latitude>
+                    </xsl:if>
+                    <xsl:if test="$_globalVariables/ns1:GlobalVariables/TwitterSearch/SEARCH_GEOCODE/GLB_SEARCH_LONGITUDE !=0">
+                        <longitude>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/SEARCH_GEOCODE/GLB_SEARCH_LONGITUDE"/>
+                        </longitude>
+                    </xsl:if>
+                    <xsl:if test="$_globalVariables/ns1:GlobalVariables/TwitterSearch/SEARCH_GEOCODE/GLB_SEARCH_RADIUS !=0">
+                        <radius>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/SEARCH_GEOCODE/GLB_SEARCH_RADIUS"/>
+                        </radius>
+                    </xsl:if>
+                </geocode>
+                <xsl:if test="string-length($_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_LANGUAGE)!=0">
+                    <language>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_LANGUAGE"/>
+                    </language>
+                </xsl:if>
+                <xsl:if test="string-length($_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_LOCALE)!=0">
+                    <locale>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_LOCALE"/>
+                    </locale>
+                </xsl:if>
+                <xsl:if test="string-length($_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_RESULT_TYPE)!=0">
+                    <resultType>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_RESULT_TYPE"/>
+                    </resultType>
+                </xsl:if>
+                <count>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_COUNT"/>
+                </count>
+                <xsl:if test="string-length($_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_UNTIL)!=0">
+                    <until>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd', current-dateTime())"/>
+                    </until>
+                </xsl:if>
+                <xsl:if test="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_SINCE_ID!=0">
+                    <sinceId>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_SINCE_ID"/>
+                    </sinceId>
+                </xsl:if>
+                <xsl:if test="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_MAX_ID!=0">
+                    <maxId>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/TwitterSearch/GLB_SEARCH_MAX_ID"/>
+                    </maxId>
+                </xsl:if>
+            </SearchTweetInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate-Information-File-1">
+        <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+        <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+        <pd:x>368</pd:x>
+        <pd:y>124</pd:y>
+        <config>
+            <encoding>text</encoding>
+            <compressFile>None</compressFile>
+            <append>true</append>
+            <createMissingDirectories>true</createMissingDirectories>
+        </config>
+        <pd:inputBindings>
+            <ns:WriteActivityInputTextClass>
+                <fileName>
+                    <xsl:value-of select="$Create-CSV-File/ns:CreateActivityOutputClass/fileInfo/fullName"/>
+                </fileName>
+                <textContent>
+                    <xsl:value-of select="concat( &quot;NAME&quot;,&quot;|&quot;,&quot;DESCRIPTION&quot;,&quot;|&quot;,&quot;SCREENNAME&quot;,&quot;|&quot;,&quot;FOLOWERSCOUNT&quot;,&quot;|&quot;,&quot;STATUSESCOUNT&quot;,&quot;|&quot;,&quot;RETWEETCOUNT&quot;,&quot;|&quot;,&quot;TEXT&quot;,&quot;|&quot;,&quot;SOURCE&quot;,&quot;|&quot;,&quot;FAVORITED&quot;)"/>
+                </textContent>
+                <addLineSeparator>
+                    <xsl:value-of select="&quot;true&quot;"/>
+                </addLineSeparator>
+            </ns:WriteActivityInputTextClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>TwitterSearch Activity</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>TwitterSearch Activity</pd:from>
+        <pd:to>Create CSV File</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Create CSV File</pd:from>
+        <pd:to>Generate-Information-File-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Generate-Information-File-1</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

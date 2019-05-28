@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx2="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/TABLE_HEADER" xmlns:pfx4="http://xmlns.heb.com/ei/TABLE_DETAIL" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_HEADER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_HEADER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_DETAIL" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_DETAIL.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/PurchaseOrder_Reception_Update.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx3:HEADER_DATA"/>
+                    <xsd:element ref="pfx4:DETAIL_DATA"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>133</pd:startX>
+    <pd:startY>182</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <noOfUpdates>
+                <xsl:value-of select="number($JDBC-Update-Header/jdbcUpdateActivityOutput/noOfUpdates)+number($JDBC-Update-Detail/jdbcUpdateActivityOutput/noOfUpdates)"/>
+            </noOfUpdates>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="noOfUpdates" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>733</pd:endX>
+    <pd:endY>184</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1347575128806</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>210</pd:x>
+        <pd:y>48</pd:y>
+        <pd:width>435</pd:width>
+        <pd:height>257</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Update Header</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-Update-Detail</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Update Header</pd:from>
+            <pd:to>JDBC-Update-Detail</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Update Header">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>343</pd:x>
+            <pd:y>186</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <batchUpdate>false</batchUpdate>
+                <statement>UPDATE OORCO SET ORC_ESTADO = ?, ORC_FECMOD = ?
+WHERE ORC_SUCURSAL = ? AND ORC_ORDEN = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>ORC_ESTADO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ORC_FECMOD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ORC_SUCURSAL</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ORC_ORDEN</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <ORC_ESTADO>
+                        <xsl:copy-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_ESTADO/@xsi:nil"/>
+                        <xsl:value-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_ESTADO"/>
+                    </ORC_ESTADO>
+                    <ORC_FECMOD>
+                        <xsl:copy-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_FECMOD/@xsi:nil"/>
+                        <xsl:value-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_FECMOD"/>
+                    </ORC_FECMOD>
+                    <ORC_SUCURSAL>
+                        <xsl:copy-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_SUCURSAL/@xsi:nil"/>
+                        <xsl:value-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_SUCURSAL"/>
+                    </ORC_SUCURSAL>
+                    <ORC_ORDEN>
+                        <xsl:copy-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_ORDEN/@xsi:nil"/>
+                        <xsl:value-of select="$Start/group/pfx3:HEADER_DATA/pfx3:ORC_ORDEN"/>
+                    </ORC_ORDEN>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC-Update-Detail">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>498</pd:x>
+            <pd:y>186</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <batchUpdate>true</batchUpdate>
+                <statement>UPDATE OAROR SET ARO_RECEPCION = ?, ARO_FEREC = ?, 
+ARO_ESTADO = ?, ARO_ARTREC = ?
+WHERE ARO_SUCURSAL = ? AND ARO_ORDEN = ? AND ARO_ARTICULO = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>ARO_RECEPCION</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ARO_FEREC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ARO_ESTADO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ARO_ARTREC</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ARO_SUCURSAL</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ARO_ORDEN</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ARO_ARTICULO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:for-each select="$Start/group/pfx4:DETAIL_DATA/pfx4:ITEM">
+                        <Record>
+                            <ARO_RECEPCION>
+                                <xsl:copy-of select="pfx4:ARO_RECEPCION/@xsi:nil"/>
+                                <xsl:value-of select="pfx4:ARO_RECEPCION"/>
+                            </ARO_RECEPCION>
+                            <ARO_FEREC>
+                                <xsl:copy-of select="pfx4:ARO_FEREC/@xsi:nil"/>
+                                <xsl:value-of select="pfx4:ARO_FEREC"/>
+                            </ARO_FEREC>
+                            <ARO_ESTADO>
+                                <xsl:copy-of select="pfx4:ARO_ESTADO/@xsi:nil"/>
+                                <xsl:value-of select="pfx4:ARO_ESTADO"/>
+                            </ARO_ESTADO>
+                            <ARO_ARTREC>
+                                <xsl:copy-of select="pfx4:ARO_ARTREC/@xsi:nil"/>
+                                <xsl:value-of select="pfx4:ARO_ARTREC"/>
+                            </ARO_ARTREC>
+                            <ARO_SUCURSAL>
+                                <xsl:copy-of select="pfx4:ARO_SUCURSAL/@xsi:nil"/>
+                                <xsl:value-of select="pfx4:ARO_SUCURSAL"/>
+                            </ARO_SUCURSAL>
+                            <ARO_ORDEN>
+                                <xsl:copy-of select="pfx4:ARO_ORDEN/@xsi:nil"/>
+                                <xsl:value-of select="pfx4:ARO_ORDEN"/>
+                            </ARO_ORDEN>
+                            <ARO_ARTICULO>
+                                <xsl:copy-of select="pfx4:ARO_ARTICULO/@xsi:nil"/>
+                                <xsl:value-of select="pfx4:ARO_ARTICULO"/>
+                            </ARO_ARTICULO>
+                        </Record>
+                    </xsl:for-each>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>776</pd:x>
+        <pd:y>276</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>Mex_OfferExport_Subscriber Processes/Sub Process/Mex_HEB_A_Domicilio_Sucursal.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Offer"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>215</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>729</pd:endX>
+    <pd:endY>216</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1334065193357</pd:targetNamespace>
+    <pd:group name="Sucursales">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>126</pd:x>
+        <pd:y>4</pd:y>
+        <pd:width>505</pd:width>
+        <pd:height>410</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/LocationGroup/Locations/Location</pd:over>
+            <pd:iterationElementSlot>current</pd:iterationElementSlot>
+            <pd:indexSlot>SucursalIndex</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Null-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Verifica Sucursal</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>lower-case($current/Location/Header/TestingLocation)='false'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Actualiza Sucursal</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Crea Sucursal</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Verifica Sucursal</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Verifica Sucursal</pd:from>
+            <pd:to>Crea Sucursal</pd:to>
+            <pd:xpathDescription>Nueva</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Verifica-Sucursal/resultSet/Record/Existe = 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Verifica Sucursal</pd:from>
+            <pd:to>Actualiza Sucursal</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Verifica-Sucursal/resultSet/Record/Existe &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:activity name="Crea Sucursal">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>510</pd:x>
+            <pd:y>79</pd:y>
+            <config>
+                <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                <statement>insert into ComboSucursal (ComboLocoId, SucursalId, Estatus, FechaModificacion)
+values(?,?,?,?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>ComboLocoId</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SucursalId</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>Estatus</parameterName>
+                        <dataType>BIT</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FechaModificacion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <ComboLocoId>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </ComboLocoId>
+                    <SucursalId>
+                        <xsl:choose>
+                            <xsl:when test="exists(number(tib:right($current/Location/Header/ExtLocationCode,4)) + 2000)">
+                                <xsl:value-of select="number(tib:right($current/Location/Header/ExtLocationCode,4)) + 2000"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </SucursalId>
+                    <Estatus>
+                        <xsl:value-of select="1"/>
+                    </Estatus>
+                    <FechaModificacion>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;,current-dateTime())"/>
+                    </FechaModificacion>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Verifica Sucursal">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>218</pd:x>
+            <pd:y>79</pd:y>
+            <config>
+                <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/DB/HEBADom/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                <statement>select Existe = count(*) from ComboSucursal where ComboLocoId = ? and SucursalId = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>ComboLocoId</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SucursalId</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>Existe</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <ComboLocoId>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </ComboLocoId>
+                    <SucursalId>
+                        <xsl:choose>
+                            <xsl:when test="exists(number(tib:right($current/Location/Header/ExtLocationCode,4)) + 2000)">
+                                <xsl:value-of select="number(tib:right($current/Location/Header/ExtLocationCode,4)) + 2000"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </SucursalId>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Actualiza Sucursal">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>363</pd:x>
+            <pd:y>218</pd:y>
+            <config>
+                <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                <statement>update ComboSucursal
+set FechaModificacion = ?,
+Estatus = 1
+where ComboLocoId = ?
+and SucursalId = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>FechaModificacion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ComboLocoId</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SucursalId</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <FechaModificacion>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;,current-dateTime())"/>
+                    </FechaModificacion>
+                    <ComboLocoId>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </ComboLocoId>
+                    <SucursalId>
+                        <xsl:choose>
+                            <xsl:when test="exists(number(tib:right($current/Location/Header/ExtLocationCode,4)) + 2000)">
+                                <xsl:value-of select="number(tib:right($current/Location/Header/ExtLocationCode,4)) + 2000"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </SucursalId>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null-1">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>274</pd:x>
+            <pd:y>337</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Sucursales</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Sucursales</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

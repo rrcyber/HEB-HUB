@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Discounted.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OfferResponse.xsd" xmlns:pfx="http://www.copienttech.com/ExternalOfferConnector/">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OfferResponse.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OfferResponse.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Discounted.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Discounted.xsd"/>
+    <wsdl:import namespace="http://www.copienttech.com/ExternalOfferConnector/" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>EventPlanningOfferToLogix_Processes/Sub Process/addOffer.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="OfferID" type="xsd:string"/>
+                    <xsd:element ref="pfx3:Offer"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>118</pd:startX>
+    <pd:startY>51</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>590</pd:endX>
+    <pd:endY>51</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1397232733978</pd:targetNamespace>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>408</pd:x>
+        <pd:y>51</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx2:ExternalOfferConnector"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$SOAPRequestReply/outputMessage/pfx:AddOfferResponse/pfx:AddOfferResult"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render XML - LogixXSD">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>202</pd:x>
+        <pd:y>59</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <renderDefaultPrefix>true</renderDefaultPrefix>
+            <textEncoding>UTF-8</textEncoding>
+            <cdataSections>
+                <row expandedName="ProductList"/>
+                <row expandedName="ProductList"/>
+            </cdataSections>
+            <term ref="pfx3:Offer"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/root/Offer"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="setOfferStatus">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>497</pd:x>
+        <pd:y>51</pd:y>
+        <config>
+            <processName>/EventPlanningOfferToLogix_Processes/Sub Process/setOfferStatus.process</processName>
+        </config>
+        <pd:inputBindings>
+            <OfferStatus>
+                <OfferID>
+                    <xsl:value-of select="$Start/root/OfferID"/>
+                </OfferID>
+                <OfferStatus>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EventPlanningOfferToLogixVariables/OFFER_STATUS_RESPONSE_RECEIVED"/>
+                </OfferStatus>
+                <xsl:copy-of select="$Parse-XML/ExternalOfferConnector"/>
+            </OfferStatus>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SOAPRequestReply">
+        <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+        <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+        <pd:x>308</pd:x>
+        <pd:y>51</pd:y>
+        <config>
+            <timeout>%%LogixWS/TIMEOUT%%</timeout>
+            <service>pfx:Service</service>
+            <servicePort>ServiceSoap</servicePort>
+            <operation>AddOffer</operation>
+            <soapAction>http://www.copienttech.com/ExternalOfferConnector/AddOffer</soapAction>
+            <endpointURL>%%LogixWS/ENDPOINT_URL%%</endpointURL>
+        </config>
+        <pd:inputBindings>
+            <inputMessage>
+                <pfx:AddOffer>
+                    <pfx:ExternalSourceID>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EventPlanningOfferToLogixVariables/LOGIX_EXTERNAL_SOURCE_ID"/>
+                    </pfx:ExternalSourceID>
+                    <pfx:OfferXml>
+                        <xsl:value-of select="$Render-XML---LogixXSD/xmlString"/>
+                    </pfx:OfferXml>
+                </pfx:AddOffer>
+            </inputMessage>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Render XML - LogixXSD</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SOAPRequestReply</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>setOfferStatus</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>setOfferStatus</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML - LogixXSD</pd:from>
+        <pd:to>SOAPRequestReply</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

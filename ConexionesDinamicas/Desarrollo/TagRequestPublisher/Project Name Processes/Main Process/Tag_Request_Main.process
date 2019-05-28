@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/IMPRESION_ETIQUETAS_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/IMPRESION_ETIQUETAS_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/IMPRESION_ETIQUETAS_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Main Process/Tag_Request_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="STOREID" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>45</pd:startX>
+    <pd:startY>211</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>829</pd:endX>
+    <pd:endY>213</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1415807639101</pd:targetNamespace>
+    <pd:activity name="GetVariable">
+        <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+        <pd:x>47</pd:x>
+        <pd:y>406</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>164</pd:x>
+        <pd:y>64</pd:y>
+        <pd:width>578</pd:width>
+        <pd:height>274</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>count($Parse-Data/Output/Rows/ImpresionEtiquetas) = 0</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>DynamicConnectionQuery</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>No_Records_ImpresionEtiquetas</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>DynamicConnectionUpdate</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Topic_Tag_Impresion</pd:from>
+            <pd:to>DynamicConnectionUpdate</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>DynamicConnectionQuery</pd:from>
+            <pd:to>Parse Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Parse Data</pd:from>
+            <pd:to>Topic_Tag_Impresion</pd:to>
+            <pd:xpathDescription>Records</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($Parse-Data/Output/Rows/ImpresionEtiquetas) &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Parse Data</pd:from>
+            <pd:to>No_Records_ImpresionEtiquetas</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Topic_Tag_Impresion">
+            <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+            <pd:x>441</pd:x>
+            <pd:y>128</pd:y>
+            <config>
+                <PermittedMessageType>XML Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Topics/GLB_TAG_IMPRESION_TOPIC%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+                <InDataxsdString ref="pfx:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <ns:ActivityInput>
+                    <Body>
+                        <pfx:MSG_CONTAINER>
+                            <pfx:Header>
+                                <pfx:ProjectName>
+                                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                                </pfx:ProjectName>
+                                <pfx:Source_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectNameVariables/GLB_SOURCE_DOMAIN"/>
+                                </pfx:Source_Domain>
+                                <pfx:Destination_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectNameVariables/GLB_DESTINATION_DOMAIN"/>
+                                </pfx:Destination_Domain>
+                                <pfx:Transaction_Type>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectNameVariables/GLB_TRANSACTION_TYPE"/>
+                                </pfx:Transaction_Type>
+                                <pfx:TimeStamp>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                                </pfx:TimeStamp>
+                            </pfx:Header>
+                            <pfx:Body>
+                                <xsl:for-each select="$Parse-Data/Output/Rows/ImpresionEtiquetas">
+                                    <xsl:for-each select="ITEM">
+                                        <pfx:IMPRESION_ETIQUETAS>
+                                            <pfx:Sucursal>
+                                                <xsl:value-of select="Sucursal"/>
+                                            </pfx:Sucursal>
+                                            <pfx:Articulo>
+                                                <xsl:value-of select="Articulo"/>
+                                            </pfx:Articulo>
+                                            <pfx:TipoEtiqueta>
+                                                <xsl:value-of select="TipoEtiqueta"/>
+                                            </pfx:TipoEtiqueta>
+                                            <pfx:Fecha>
+                                                <xsl:value-of select="Fecha"/>
+                                            </pfx:Fecha>
+                                            <pfx:Estado>
+                                                <xsl:value-of select="Estado"/>
+                                            </pfx:Estado>
+                                            <pfx:UsuarioGenera>
+                                                <xsl:value-of select="UsuarioGenera"/>
+                                            </pfx:UsuarioGenera>
+                                            <pfx:UsuarioImprime>
+                                                <xsl:value-of select="UsuarioImprime"/>
+                                            </pfx:UsuarioImprime>
+                                            <pfx:Reimpresiones>
+                                                <xsl:value-of select="Reimpresiones"/>
+                                            </pfx:Reimpresiones>
+                                            <pfx:FechaUltimaImpresion>
+                                                <xsl:value-of select="FechaUltimaImpresion"/>
+                                            </pfx:FechaUltimaImpresion>
+                                            <pfx:Sistema>
+                                                <xsl:value-of select="Sistema"/>
+                                            </pfx:Sistema>
+                                            <pfx:CantEtiquetas>
+                                                <xsl:value-of select="CantEtiquetas"/>
+                                            </pfx:CantEtiquetas>
+                                            <pfx:SucursalCompetencia>
+                                                <xsl:value-of select="SucursalCompetencia"/>
+                                            </pfx:SucursalCompetencia>
+                                            <pfx:SucCompetenciaDescri>
+                                                <xsl:value-of select="SucCompetenciaDescri"/>
+                                            </pfx:SucCompetenciaDescri>
+                                            <pfx:PrecioCompetencia>
+                                                <xsl:value-of select="PrecioCompetencia"/>
+                                            </pfx:PrecioCompetencia>
+                                            <pfx:FechaTomaCompetencia>
+                                                <xsl:value-of select="FechaTomaCompetencia"/>
+                                            </pfx:FechaTomaCompetencia>
+                                            <pfx:LimiteVenta>
+                                                <xsl:value-of select="LimiteVenta"/>
+                                            </pfx:LimiteVenta>
+                                        </pfx:IMPRESION_ETIQUETAS>
+                                    </xsl:for-each>
+                                </xsl:for-each>
+                            </pfx:Body>
+                        </pfx:MSG_CONTAINER>
+                    </Body>
+                </ns:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="No_Records_ImpresionEtiquetas">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>370</pd:x>
+            <pd:y>262</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="DynamicConnectionQuery">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>269</pd:x>
+            <pd:y>230</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/DynamicConnectionQuery.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <DB_URL>
+                        <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$Start/group/STOREID]/URL"/>
+                    </DB_URL>
+                    <USER>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                    </USER>
+                    <QUERY>
+                        <xsl:value-of select="concat(&quot;SELECT DISTINCT Sucursal,Articulo,TipoEtiqueta,Fecha=convert(varchar(30),Fecha,126),Estado,UsuarioGenera,UsuarioImprime,&quot;,&#xA;&quot;Reimpresiones,FechaUltimaImpresion=convert(varchar(30),max(FechaUltimaImpresion),126),Sistema,CantEtiquetas=sum(CantEtiquetas),&quot;,&#xA;&quot;SucursalCompetencia,SucCompetenciaDescri,PrecioCompetencia,FechaTomaCompetencia,LimiteVenta&quot;,&#xA;&quot; FROM BDCMP..ImpresionEtiquetas&quot;,&#xA;&quot; where fecha>= convert(varchar, getdate()-1,1)&quot;,&#xA;&quot; and fecha &lt; convert(varchar,getdate()+1,1)&quot;,&#xA;&quot; and Estado = 1 or Estado = 2&quot;,&#xA;&quot; GROUP BY Sucursal,Articulo,TipoEtiqueta,Fecha,Estado,UsuarioGenera,UsuarioImprime,Reimpresiones,Sistema,SucursalCompetencia,&quot;,&#xA;&quot;SucCompetenciaDescri,PrecioCompetencia,FechaTomaCompetencia,LimiteVenta&quot;)"/>
+                    </QUERY>
+                    <MAX_ROWS>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                    </MAX_ROWS>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Parse Data">
+            <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+            <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+            <pd:x>268</pd:x>
+            <pd:y>128</pd:y>
+            <config>
+                <InputType>String</InputType>
+                <Encoding>ASCII</Encoding>
+                <ParseSharedConfig>/Shared Resources/Schema Definitions/Data Format/ImpresionEtiquetas.sharedparse</ParseSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <Input>
+                    <text>
+                        <xsl:value-of select="$DynamicConnectionQuery/group/result"/>
+                    </text>
+                    <noOfRecords>
+                        <xsl:value-of select="count(tib:tokenize($DynamicConnectionQuery/group/result, &quot;&#xA;&quot;))"/>
+                    </noOfRecords>
+                </Input>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="DynamicConnectionUpdate">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>573</pd:x>
+            <pd:y>130</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/DynamicConnectionUpdate.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <DB_URL>
+                        <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$Start/group/STOREID]/URL"/>
+                    </DB_URL>
+                    <USER>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                    </USER>
+                    <MAX_ROWS>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                    </MAX_ROWS>
+                    <xsl:for-each select="$Parse-Data/Output/Rows/ImpresionEtiquetas">
+                        <QUERY>
+                            <xsl:value-of select="concat(&quot;UPDATE BDCMP..ImpresionEtiquetas&quot;,&#xA;&quot; SET Estado = 8, FechaUltimaImpresion = GETDATE()&quot;,&#xA;&quot; WHERE Fecha = '&quot;,./ITEM[1]/Fecha,&quot;'&quot;,&#xA;&quot; AND Sucursal = &quot;,./ITEM[1]/Sucursal,&#xA;&quot; AND TipoEtiqueta = &quot;,./ITEM[1]/TipoEtiqueta,&#xA;&quot; AND Articulo = &quot;,./ITEM[1]/Articulo)"/>
+                        </QUERY>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

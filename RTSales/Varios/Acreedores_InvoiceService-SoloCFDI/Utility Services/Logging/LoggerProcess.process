@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Utility Services/Logging/LoggerProcess.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>260</pd:x>
+        <pd:y>93</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GBL_LOGGER_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <_sequenceKey>ns:ActivityOutput/Body/LOG_MESSAGE/LOG_DATE</_sequenceKey>
+            <OutDataxsdString>
+                <xsd:element name="LOG_MESSAGE">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="USER_ID" type="xsd:string"/>
+                            <xsd:element name="SYSTEM_ID" type="xsd:string"/>
+                            <xsd:element name="LOG_DATE" type="xsd:string"/>
+                            <xsd:element name="LOGGER" type="xsd:string"/>
+                            <xsd:element name="LEVEL" type="xsd:string"/>
+                            <xsd:element name="MESSAGE" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </OutDataxsdString>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>679</pd:endX>
+    <pd:endY>93</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1302630528462</pd:targetNamespace>
+    <pd:activity name="Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>420</pd:x>
+        <pd:y>93</pd:y>
+        <config>
+            <timeout>%%Connections/Database/VISORFE/GBL_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/VISORFE/GBL_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spIns_SetLogMessage;1</ProcedureName>
+            <useSchema>true</useSchema>
+            <oraObjects/>
+            <oraTables/>
+            <ConfigurationError>output schema is null</ConfigurationError>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LOG_USER_ID</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LOG_SYSTEM_ID</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LOG_DATE</colName>
+                    <colType>1</colType>
+                    <dataType>-1</dataType>
+                    <typeName>text</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LOG_LOGGER</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LOG_LEVEL</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@LOG_MESSAGE</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <LOG_USER_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/USER_ID)">
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/USER_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOG_USER_ID>
+                    <LOG_SYSTEM_ID>
+                        <xsl:choose>
+                            <xsl:when test="exists($JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/SYSTEM_ID)">
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/SYSTEM_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOG_SYSTEM_ID>
+                    <LOG_DATE>
+                        <xsl:choose>
+                            <xsl:when test="exists($JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LOG_DATE)">
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LOG_DATE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOG_DATE>
+                    <LOG_LOGGER>
+                        <xsl:choose>
+                            <xsl:when test="exists($JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LOGGER)">
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LOGGER"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOG_LOGGER>
+                    <LOG_LEVEL>
+                        <xsl:choose>
+                            <xsl:when test="exists($JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LEVEL)">
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LEVEL"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOG_LEVEL>
+                    <LOG_MESSAGE>
+                        <xsl:choose>
+                            <xsl:when test="exists($JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/MESSAGE)">
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/MESSAGE"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </LOG_MESSAGE>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>574</pd:x>
+        <pd:y>93</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>421</pd:x>
+        <pd:y>240</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx:MSG_Container>
+                <pfx:Header>
+                    <pfx:ProjectName>
+                        <xsl:value-of select="1"/>
+                    </pfx:ProjectName>
+                    <pfx:TimeStamp>
+                        <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LOG_DATE"/>
+                    </pfx:TimeStamp>
+                </pfx:Header>
+                <pfx:Body>
+                    <pfx:ErrorManagementSchema>
+                        <pfx:inrtn_id>
+                            <xsl:value-of select="1"/>
+                        </pfx:inrtn_id>
+                        <pfx:inrtn_instn_nm>
+                            <xsl:value-of select="1"/>
+                        </pfx:inrtn_instn_nm>
+                        <pfx:inrtn_err_rtn_desc>
+                            <xsl:value-of select="1"/>
+                        </pfx:inrtn_err_rtn_desc>
+                        <pfx:inrtn_msg_body>
+                            <xsl:value-of select="1"/>
+                        </pfx:inrtn_msg_body>
+                        <pfx:cre8_ts>
+                            <xsl:value-of select="1"/>
+                        </pfx:cre8_ts>
+                        <pfx:sev_id>
+                            <xsl:value-of select="1"/>
+                        </pfx:sev_id>
+                    </pfx:ErrorManagementSchema>
+                    <pfx:Fault>
+                        <xsl:if test="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/SYSTEM_ID">
+                            <pfx:Code>
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/SYSTEM_ID"/>
+                            </pfx:Code>
+                        </xsl:if>
+                        <xsl:if test="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LOGGER">
+                            <pfx:Reason>
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/LOGGER"/>
+                            </pfx:Reason>
+                        </xsl:if>
+                        <xsl:if test="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/MESSAGE">
+                            <pfx:Detail>
+                                <xsl:value-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/LOG_MESSAGE/MESSAGE"/>
+                            </pfx:Detail>
+                        </xsl:if>
+                    </pfx:Fault>
+                </pfx:Body>
+            </pfx:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

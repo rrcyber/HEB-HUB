@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns14="http://xmlns.heb.com/ei/error" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CustomerGroupUpdate.xsd" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.copienttech.com/LogixGroupManagement/">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CustomerGroupUpdate.xsd"/>
+    <wsdl:import namespace="http://www.copienttech.com/LogixGroupManagement/"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Get_RepeatedProducts.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>187</pd:startX>
+    <pd:startY>98</pd:startY>
+    <pd:returnBindings>
+        <Group>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                <Products>
+                    <sku>
+                        <xsl:value-of select="sku"/>
+                    </sku>
+                    <sucursal>
+                        <xsl:value-of select="website"/>
+                    </sucursal>
+                </Products>
+            </xsl:for-each>
+        </Group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Products" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="sku" type="xsd:string"/>
+                                <xsd:element name="sucursal" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>402</pd:endX>
+    <pd:endY>101</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns2:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412780555980</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>294</pd:x>
+        <pd:y>97</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT c.sku, c.website
+FROM (
+ SELECT DISTINCT h.sku, h.promo_id, h.hierarchy, h.website
+ FROM mag_import_HistorialPromociones h
+ JOIN mag_import_flex_promo p ON (h.promo_id = p.source_promo_id)
+ JOIN mag_import_promo_prod_complete gc ON (h.grupo_id = gc.group_id)
+ WHERE p.complete_promo IS NOT NULL
+ AND gc.group_complete IS NOT NULL
+ AND h.status = 'A'
+ AND getdate() BETWEEN h.start_date and h.end_date
+ UNION
+ SELECT DISTINCT h.sku, h.promo_id, h.hierarchy, h.website
+ FROM mag_import_HistorialPromociones h
+ JOIN mag_import_promo_Save s ON (h.promo_id = s.source_promo_id)
+ JOIN mag_import_promo_prod_complete gc ON (h.grupo_id = gc.group_id)
+ WHERE s.completed_promo IS NOT NULL
+ AND gc.group_complete IS NOT NULL
+ AND h.status = 'A'
+ AND getdate() BETWEEN h.start_date and h.end_date
+) c
+GROUP BY c.sku, c.website
+HAVING count(c.sku) &gt; 1
+ORDER BY c.sku ASC</statement>
+            <optionalOrNillable>true</optionalOrNillable>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>sku</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>website</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx5="http://xmlns.heb.com/ei/OutDistributionList" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.heb.com/ei/OutTProveedorSkus" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/OutTransitoProveedorSKUs" xmlns:pfx2="http://xmlns.heb.com/ei/InTransitoSKUs" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/InTransitoSKUs" schemaLocation="/Shared Resources/Schema Definitions/Custom/InTransitoSKUs.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/OutTProveedorSkus" schemaLocation="/Shared Resources/Schema Definitions/Custom/OutTransitoProveedorSkus.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/OutTransitoProveedorSKUs" schemaLocation="/Shared Resources/Schema Definitions/Custom/OutTransitoProveedorSKU.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/OutDistributionList" schemaLocation="/Shared Resources/Schema Definitions/Custom/DISTRIBUTION_LIST_DAO.xsd"/>
+    <pd:name>Heb2bOrdenCompraReciboSubscriber/Sub Process/Get_information_PMM.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="OrdenCompra" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>128</pd:startX>
+    <pd:startY>102</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Render-Result/pfx5:OutDistributionList"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx5:OutDistributionList"/>
+    <pd:endX>488</pd:endX>
+    <pd:endY>107</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1463604731371</pd:targetNamespace>
+    <pd:activity name="SQL Direct">
+        <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+        <pd:x>261</pd:x>
+        <pd:y>103</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEB2B/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/JDBC_HEB2B/GLB_MAX_ROWS%%</maxRows>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <jdbcGeneralActivityInput>
+                <statement>
+                    <xsl:value-of select="concat(&quot;select distinct sdi.pmg_po_number pmg_po_number ,cast(vpc.vendor_number as number(10)) as vendor_number ,sdi.to_loc ,sdi.prd_lvl_number , To_Number(To_Char(pmh.pmg_entry_date, 'yyyymmdd')) as dte_entry , To_Number(To_Char(rcv.rcv_date, 'yyyymmdd')) as dte_rcv, To_Number(To_Char(trh.trf_ship_date, 'yyyymmdd')) as dte_trf_ship, pmd.pmg_sell_qty , trd.trf_qty_ship , sdi.quantity as rcv_sell_qty , To_Char(sdi.expect_recpt_date, 'yyyymmdd') as pmg_exp_rct_date , trh.expt_receipt_date from pmm.sditrfdte sdi join  pmm.trfhdree trh   on  sdi.trf_number     =  trh.trf_number join  pmm.trfdtlee trd on  trh.trf_number = trd.trf_number and sdi.prd_lvl_child  =  trd.prd_lvl_child join  pmm.prdmstee prd   on  sdi.prd_lvl_child  =  prd.prd_lvl_child join  pmm.rcvssdee rcv on sdi.pmg_po_number = rcv.pmg_po_number and sdi.prd_lvl_child  =  rcv.prd_lvl_child join  pmm.pmghdree pmh   on  sdi.pmg_po_number  =  pmh.pmg_po_number join  pmm.pmgdtlee pmd   on  pmh.pmg_po_number  =  pmd.pmg_po_number    and  sdi.prd_lvl_child  =  pmd.prd_lvl_child join  pmm.vpcmstee vpc   on  pmh.vpc_tech_key   =  vpc.vpc_tech_key where   sdi.action_code = '04' and     sdi.download_date_1 is null and sdi.pmg_po_number = &quot;,$Start/OrdenCompra,&quot; and vpc.vendor_number in (&quot;,$_globalVariables/ns:GlobalVariables/ProjectVariable/Vendors,&quot;)&quot;)"/>
+                </statement>
+            </jdbcGeneralActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render Result">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>374</pd:x>
+        <pd:y>105</pd:y>
+        <config>
+            <element ref="pfx5:OutDistributionList"/>
+        </config>
+        <pd:inputBindings>
+            <pfx5:OutDistributionList>
+                <xsl:choose>
+                    <xsl:when test="exists($SQL-Direct/jdbcGeneralActivityOutput/unknownResultset/row)">
+                        <xsl:for-each select="$SQL-Direct/jdbcGeneralActivityOutput/unknownResultset/row">
+                            <pfx5:Item>
+                                <pfx5:pmg_po_number>
+                                    <xsl:value-of select="column[1]/value"/>
+                                </pfx5:pmg_po_number>
+                                <pfx5:vendor_number>
+                                    <xsl:value-of select="column[2]/value"/>
+                                </pfx5:vendor_number>
+                                <pfx5:to_loc>
+                                    <xsl:value-of select="column[3]/value"/>
+                                </pfx5:to_loc>
+                                <pfx5:prd_lvl_number>
+                                    <xsl:value-of select="column[4]/value"/>
+                                </pfx5:prd_lvl_number>
+                                <pfx5:dte_entry>
+                                    <xsl:value-of select="column[5]/value"/>
+                                </pfx5:dte_entry>
+                                <pfx5:dte_rcv>
+                                    <xsl:value-of select="column[6]/value"/>
+                                </pfx5:dte_rcv>
+                                <pfx5:dte_trf_ship>
+                                    <xsl:value-of select="column[7]/value"/>
+                                </pfx5:dte_trf_ship>
+                                <pfx5:pmg_sell_qty>
+                                    <xsl:value-of select="column[8]/value"/>
+                                </pfx5:pmg_sell_qty>
+                                <pfx5:trf_qty_ship>
+                                    <xsl:value-of select="column[9]/value"/>
+                                </pfx5:trf_qty_ship>
+                                <pfx5:rcv_sell_qty>
+                                    <xsl:value-of select="column[10]/value"/>
+                                </pfx5:rcv_sell_qty>
+                                <pfx5:pmg_exp_rct_date>
+                                    <xsl:value-of select="column[11]/value"/>
+                                </pfx5:pmg_exp_rct_date>
+                                <pfx5:expt_receipt_date>
+                                    <xsl:value-of select="column[12]/value"/>
+                                </pfx5:expt_receipt_date>
+                            </pfx5:Item>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <pfx5:Item>
+                            <pfx5:pmg_po_number>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:pmg_po_number>
+                            <pfx5:vendor_number>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:vendor_number>
+                            <pfx5:to_loc>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:to_loc>
+                            <pfx5:prd_lvl_number>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:prd_lvl_number>
+                            <pfx5:dte_entry>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:dte_entry>
+                            <pfx5:dte_rcv>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:dte_rcv>
+                            <pfx5:dte_trf_ship>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:dte_trf_ship>
+                            <pfx5:pmg_sell_qty>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:pmg_sell_qty>
+                            <pfx5:trf_qty_ship>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:trf_qty_ship>
+                            <pfx5:rcv_sell_qty>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:rcv_sell_qty>
+                            <pfx5:pmg_exp_rct_date>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:pmg_exp_rct_date>
+                            <pfx5:expt_receipt_date>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </pfx5:expt_receipt_date>
+                        </pfx5:Item>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </pfx5:OutDistributionList>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SQL Direct</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SQL Direct</pd:from>
+        <pd:to>Render Result</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render Result</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

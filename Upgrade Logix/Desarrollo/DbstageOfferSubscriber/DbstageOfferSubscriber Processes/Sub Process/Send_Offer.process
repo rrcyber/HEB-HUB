@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <pd:name>DbstageOfferSubscriber Processes/Sub Process/Send_Offer.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx:Offer"/>
+                    <xsd:element name="promo_type" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>236</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>722</pd:endX>
+    <pd:endY>239</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1413469465080</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>148</pd:x>
+        <pd:y>93</pd:y>
+        <pd:width>466</pd:width>
+        <pd:height>271</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Delete Stage</pd:to>
+            <pd:xpathDescription/>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (1)</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Delete Stage</pd:from>
+            <pd:to>Group (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Group (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>332</pd:x>
+            <pd:y>140</pd:y>
+            <pd:width>210</pd:width>
+            <pd:height>170</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>repeat</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:repeatCondition>$i &gt;= count($Start/group/Offer/Conditions/Product/Tiers/Tier)</pd:repeatCondition>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert Stage</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Stage</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert Stage">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>432</pd:x>
+                <pd:y>206</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO MAG_IMPORT_FLEX_PROMO (promo_id, promo_type, source_promo_id, combo_name, start_date, end_date, cart_applicable_qty, banner_url, start_hour, end_hour, chargebackDept, coupon_id, priority, segmento_id, client_applicable_qty, promo_descrip)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>promo_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>promo_type</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>source_promo_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>combo_name</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>start_date</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>end_date</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>cart_applicable_qty</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>banner_url</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>start_hour</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>end_hour</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>chargebackDept</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>coupon_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>priority</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>segmento_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>client_applicable_qty</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>promo_descrip</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:when test="not(exists($Start/group/Offer/Conditions/Product/Tiers))">
+                                <promo_id>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(concat('LGX_', $Start/group/Offer/Header/IncentiveID))">
+                                            <xsl:value-of select="concat('LGX_', $Start/group/Offer/Header/IncentiveID)"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </promo_id>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <promo_id>
+                                    <xsl:choose>
+                                        <xsl:when test="exists(concat('LGX_', $i, '_', $Start/group/Offer/Header/IncentiveID))">
+                                            <xsl:value-of select="concat('LGX_', $i, '_', $Start/group/Offer/Header/IncentiveID)"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </promo_id>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <promo_type>
+                            <xsl:value-of select="$Start/group/promo_type"/>
+                        </promo_type>
+                        <source_promo_id>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/group/Offer/Header/IncentiveID)">
+                                    <xsl:value-of select="$Start/group/Offer/Header/IncentiveID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </source_promo_id>
+                        <combo_name>
+                            <xsl:value-of select="$Start/group/Offer/Header/IncentiveName"/>
+                        </combo_name>
+                        <start_date>
+                            <xsl:choose>
+                                <xsl:when test="exists(substring($Start/group/Offer/Header/StartDate, 1, 10))">
+                                    <xsl:value-of select="substring($Start/group/Offer/Header/StartDate, 1, 10)"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </start_date>
+                        <end_date>
+                            <xsl:choose>
+                                <xsl:when test="exists(substring($Start/group/Offer/Header/EndDate, 1, 10))">
+                                    <xsl:value-of select="substring($Start/group/Offer/Header/EndDate, 1, 10)"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </end_date>
+                        <cart_applicable_qty>
+                            <xsl:value-of select="$Start/group/Offer/Header/P3DistQtyLimit"/>
+                        </cart_applicable_qty>
+                        <banner_url>
+                            <xsl:value-of select="'BANNER_URL'"/>
+                        </banner_url>
+                        <start_hour>
+                            <xsl:value-of select="$Start/group/Offer/Header/StartTime"/>
+                        </start_hour>
+                        <end_hour>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/group/Offer/Header/EndTime)">
+                                    <xsl:value-of select="$Start/group/Offer/Header/EndTime"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </end_hour>
+                        <chargebackDept>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/group/Offer/Rewards/Discount/ChargebackDeptID)">
+                                    <xsl:value-of select="$Start/group/Offer/Rewards/Discount/ChargebackDeptID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </chargebackDept>
+                        <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:when test="exists($Start/group/Offer/Conditions/TriggerCode/PLU)">
+                                <coupon_id>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($Start/group/Offer/Conditions/TriggerCode[1]/PLU)">
+                                            <xsl:value-of select="$Start/group/Offer/Conditions/TriggerCode[1]/PLU"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </coupon_id>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <coupon_id xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:when test="not(exists($Start/group/Offer/Conditions/Product/Tiers))">
+                                <priority>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($Start/group/Offer/Header/Priority)">
+                                            <xsl:value-of select="$Start/group/Offer/Header/Priority"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </priority>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <priority>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($Start/group/Offer/Conditions/Product[1]/Tiers/Tier[$i]/TierLevel)">
+                                            <xsl:value-of select="$Start/group/Offer/Conditions/Product[1]/Tiers/Tier[$i]/TierLevel"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </priority>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:when test="$Start/group/Offer/Conditions/Customer[1]/CustomerGroupID = 1 or $Start/group/Offer/Conditions/Customer[1]/CustomerGroupID = 2">
+                                <segmento_id>
+                                    <xsl:choose>
+                                        <xsl:when test="exists('0')">
+                                            <xsl:value-of select="'0'"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </segmento_id>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <segmento_id>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($Start/group/Offer/Conditions/Customer[1]/CustomerGroupID)">
+                                            <xsl:value-of select="$Start/group/Offer/Conditions/Customer[1]/CustomerGroupID"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </segmento_id>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <client_applicable_qty>
+                            <xsl:value-of select="0"/>
+                        </client_applicable_qty>
+                        <promo_descrip xsi:nil="true"/>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC Delete Stage">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>251</pd:x>
+            <pd:y>233</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>DELETE FROM MAG_IMPORT_FLEX_PROMO
+WHERE SOURCE_PROMO_ID = ?
+AND PROMO_TYPE = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>promo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>promo_type</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <promo>
+                        <xsl:value-of select="$Start/group/Offer/Header/IncentiveID"/>
+                    </promo>
+                    <promo_type>
+                        <xsl:value-of select="$Start/group/promo_type"/>
+                    </promo_type>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

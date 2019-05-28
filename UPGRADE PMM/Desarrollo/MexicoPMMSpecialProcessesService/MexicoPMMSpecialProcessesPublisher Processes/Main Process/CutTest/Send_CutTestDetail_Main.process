@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ADASDIConnection" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx5="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIBASCUR_ADB_Adapter_Cfg" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/EXCHANGE_RATE_INFORMATION" xmlns:pfx3="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ActiveDatabaseAdapterConfiguration" xmlns:pfx2="http://xmlns.heb.com/ei/PROVIDER_INFORMATION" xmlns:pfx7="http://xmlns.heb.com/ei/CUT_TEST_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx6="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIINVCTP_ADB_Adapter_Cfg">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/CUT_TEST_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUT_TEST_INFORMATION_SOAP.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIINVCTP_ADB_Adapter_Cfg" schemaLocation="/AESchemas/ae/ADB/PMMSDIINVCTP_ADB_Adapter_Cfg.aeschema"/>
+    <pd:name>MexicoPMMSpecialProcessesPublisher Processes/Main Process/CutTest/Send_CutTestDetail_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx6:PMM.HEB__P__SDIINVCTP"/>
+    <pd:startX>230</pd:startX>
+    <pd:startY>127</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>584</pd:endX>
+    <pd:endY>128</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1272992257379</pd:targetNamespace>
+    <pd:activity name="Publisher">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>355</pd:x>
+        <pd:y>128</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Topics/MIG_CUTTESTDETAIL_TOPIC%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx7:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <Body>
+                    <pfx7:MSG_CONTAINER>
+                        <pfx7:Header>
+                            <pfx7:ProjectName>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                            </pfx7:ProjectName>
+                            <pfx7:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx7:Source_Domain>
+                            <pfx7:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx7:Destination_Domain>
+                            <pfx7:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                            </pfx7:Transaction_Type>
+                            <pfx7:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx7:TimeStamp>
+                        </pfx7:Header>
+                        <pfx7:Body>
+                            <pfx7:CUT_TEST_DETAIL>
+                                <pfx7:TRAN_TYPE>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/TRAN__TYPE"/>
+                                </pfx7:TRAN_TYPE>
+                                <pfx7:AUDIT_NUMBER>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/AUDIT__NUMBER"/>
+                                </pfx7:AUDIT_NUMBER>
+                                <pfx7:ISS_TECH_KEY>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ISS__TECH__KEY"/>
+                                </pfx7:ISS_TECH_KEY>
+                                <pfx7:PRD_LVL_CHILD>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__CHILD"/>
+                                </pfx7:PRD_LVL_CHILD>
+                                <pfx7:CUT_TEST_DATE>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__TEST__DATE/dateTime"/>
+                                </pfx7:CUT_TEST_DATE>
+                                <pfx7:CUT_TEST_NUMBER>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__TEST__NUMBER"/>
+                                </pfx7:CUT_TEST_NUMBER>
+                                <pfx7:PRD_LVL_CHILD_CUT>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__CHILD__CUT"/>
+                                </pfx7:PRD_LVL_CHILD_CUT>
+                                <pfx7:ORG_LVL_CHILD_POS>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ORG__LVL__CHILD__POS/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ORG__LVL__CHILD__POS"/>
+                                </pfx7:ORG_LVL_CHILD_POS>
+                                <pfx7:ORG_LVL_NUMBER_POS>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ORG__LVL__NUMBER__POS/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ORG__LVL__NUMBER__POS"/>
+                                </pfx7:ORG_LVL_NUMBER_POS>
+                                <pfx7:PRD_LVL_NUMBER>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__NUMBER"/>
+                                </pfx7:PRD_LVL_NUMBER>
+                                <pfx7:PRD_LVL_NUMBER_CUT>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__NUMBER__CUT/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__NUMBER__CUT"/>
+                                </pfx7:PRD_LVL_NUMBER_CUT>
+                                <pfx7:COMP_TYPE>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/COMP__TYPE/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/COMP__TYPE"/>
+                                </pfx7:COMP_TYPE>
+                                <pfx7:AVG_CUT_WEIGHT>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/AVG__CUT__WEIGHT/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/AVG__CUT__WEIGHT"/>
+                                </pfx7:AVG_CUT_WEIGHT>
+                                <pfx7:PRICE_REG>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__REG/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__REG"/>
+                                </pfx7:PRICE_REG>
+                                <pfx7:PRICE_PROMO>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__PROMO/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__PROMO"/>
+                                </pfx7:PRICE_PROMO>
+                                <pfx7:PRICE_REG_OVR>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__REG__OVR/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__REG__OVR"/>
+                                </pfx7:PRICE_REG_OVR>
+                                <pfx7:PRICE_PROMO_OVR>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__PROMO__OVR/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRICE__PROMO__OVR"/>
+                                </pfx7:PRICE_PROMO_OVR>
+                                <pfx7:CUT_SLS_VAL_REG>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__SLS__VAL__REG/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__SLS__VAL__REG"/>
+                                </pfx7:CUT_SLS_VAL_REG>
+                                <pfx7:CUT_SLS_VAL_PROMO>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__SLS__VAL__PROMO/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__SLS__VAL__PROMO"/>
+                                </pfx7:CUT_SLS_VAL_PROMO>
+                                <pfx7:YIELD_COST>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/YIELD__COST/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/YIELD__COST"/>
+                                </pfx7:YIELD_COST>
+                                <pfx7:CUT_MARGIN>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__MARGIN/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__MARGIN"/>
+                                </pfx7:CUT_MARGIN>
+                                <pfx7:ACT_AVG_WEIGHT>
+                                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ACT__AVG__WEIGHT/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ACT__AVG__WEIGHT"/>
+                                </pfx7:ACT_AVG_WEIGHT>
+                            </pfx7:CUT_TEST_DETAIL>
+                        </pfx7:Body>
+                    </pfx7:MSG_CONTAINER>
+                </Body>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update Record">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>472</pd:x>
+        <pd:y>128</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/PMM JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE PMM.SDIINVCTP SET DOWNLOAD_DATE_1=SYSDATE
+WHERE AUDIT_NUMBER=? AND TRAN_TYPE=? AND ISS_TECH_KEY=? AND PRD_LVL_CHILD=? AND CUT_TEST_DATE=TO_DATE( ?, 'yyyy-mm-dd hh24:mi:ss')  AND 
+CUT_TEST_NUMBER=? AND PRD_LVL_CHILD_CUT=? AND ORG_LVL_CHILD_POS=?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>AUDIT_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRAN_TYPE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ISS_TECH_KEY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PRD_LVL_CHILD</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CUT_TEST_DATE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CUT_TEST_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PRD_LVL_CHILD_CUT</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ORG_LVL_CHILD_POS</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <AUDIT_NUMBER>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/AUDIT__NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/AUDIT__NUMBER"/>
+                </AUDIT_NUMBER>
+                <TRAN_TYPE>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/TRAN__TYPE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/TRAN__TYPE"/>
+                </TRAN_TYPE>
+                <ISS_TECH_KEY>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ISS__TECH__KEY/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ISS__TECH__KEY"/>
+                </ISS_TECH_KEY>
+                <PRD_LVL_CHILD>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__CHILD/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__CHILD"/>
+                </PRD_LVL_CHILD>
+                <CUT_TEST_DATE>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__TEST__DATE/dateTime/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__TEST__DATE/dateTime"/>
+                </CUT_TEST_DATE>
+                <CUT_TEST_NUMBER>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__TEST__NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/CUT__TEST__NUMBER"/>
+                </CUT_TEST_NUMBER>
+                <PRD_LVL_CHILD_CUT>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__CHILD__CUT/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/PRD__LVL__CHILD__CUT"/>
+                </PRD_LVL_CHILD_CUT>
+                <ORG_LVL_CHILD_POS>
+                    <xsl:copy-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ORG__LVL__CHILD__POS/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx6:PMM.HEB__P__SDIINVCTP/ORG__LVL__CHILD__POS"/>
+                </ORG_LVL_CHILD_POS>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Publisher</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Publisher</pd:from>
+        <pd:to>Update Record</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update Record</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

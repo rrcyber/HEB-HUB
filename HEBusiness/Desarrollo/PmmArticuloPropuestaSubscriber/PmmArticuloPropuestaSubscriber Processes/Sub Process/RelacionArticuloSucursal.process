@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd" xmlns:ns02="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Categoria.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/error" xmlns:pfx3="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Jerarquia.xsd" xmlns:pfx9="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Llaves.xsd" xmlns:pfx8="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulo.xsd" xmlns:pfx7="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Cambios.xsd" xmlns:pfx6="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Jerarquia.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaArticulos/Jerarquia.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Categoria.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Categoria.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/error"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Cambios.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Cambios.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulo.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Articulo.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Llaves.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Llaves.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>PmmArticuloPropuestaSubscriber Processes/Sub Process/RelacionArticuloSucursal.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Relacion">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="articulo" type="xsd:string"/>
+                    <xsd:element name="sucursal" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>269</pd:startY>
+    <pd:returnBindings>
+        <Relacion>
+            <xsl:choose>
+                <xsl:when test="count($ExisteRelacion/resultSet/Record) > 0">
+                    <existeRelacion>
+                        <xsl:value-of select="1"/>
+                    </existeRelacion>
+                </xsl:when>
+                <xsl:otherwise>
+                    <existeRelacion>
+                        <xsl:value-of select="0"/>
+                    </existeRelacion>
+                </xsl:otherwise>
+            </xsl:choose>
+            <lvlChild>
+                <xsl:value-of select="$Articulo/resultSet/Record[1]/PRD_LVL_CHILD"/>
+            </lvlChild>
+            <aphKey>
+                <xsl:value-of select="$AphKey/resultSet/Record[1]/PRD_APH_KEY"/>
+            </aphKey>
+        </Relacion>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Relacion">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="existeRelacion" type="xsd:int"/>
+                    <xsd:element name="lvlChild" type="xsd:string"/>
+                    <xsd:element name="aphKey" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>623</pd:endX>
+    <pd:endY>274</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx6:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389130102045</pd:targetNamespace>
+    <pd:group name="Retry on error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>113</pd:x>
+        <pd:y>99</pd:y>
+        <pd:width>428</pd:width>
+        <pd:height>328</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:errorCondition>$i &gt;= $_globalVariables/pfx3:GlobalVariables/PmmArticuloPropuestaSubscriberVariables/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Articulo</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ExisteRelacion</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Articulo</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-52429</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>JDBC Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Error ProcessBD</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$i = $_globalVariables/pfx3:GlobalVariables/PmmArticuloPropuestaSubscriberVariables/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Articulo</pd:from>
+            <pd:to>AphKey</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>AphKey</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>AphKey</pd:from>
+            <pd:to>ExisteRelacion</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ExisteRelacion</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Articulo">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>207</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBPMM/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBPMM/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT PRD_LVL_CHILD FROM PMM.PRDMSTEE
+ WHERE PRD_LVL_ID = 1 AND PRD_LVL_NUMBER = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+                <wizardData>#Sat Feb 08 19:01:48 CST 2014&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=SELECT UM.IDPMM UNIDADVENTA, PAP.PRECIOVENTASUGERIDO,\n\t\tCASE WHEN PAP.IDFORMATO IS NOT NULL THEN SF.IDPMM\n\t\t\tWHEN PAP.IDCLUSTER IS NOT NULL THEN SC.IDPMM\n\t\t\tELSE S.IDPMM\n\t\tEND AS IDSUCURSAL,\n\t\t(SELECT F.IDPMM FROM FORMATO F\n\t\t\tINNER JOIN SUCURSAL S ON F.ID \= S.IDFORMATO WHERE S.IDPMM \= IDSUCURSAL) IDFORMATO\nFROM PROPUESTAARTICULO PA\nINNER JOIN UNIDADMEDIDAARTICULO UM ON PA.IDUNIDADVENTA \= UM.ID\nINNER JOIN PROPUESTAARTICULOPRECIO PAP ON PA.ID \= PAP.IDPROPUESTAARTICULO\nLEFT JOIN SUCURSAL SC ON PAP.IDCLUSTER \= SC.IDCLUSTER\nLEFT JOIN SUCURSAL SF ON PAP.IDFORMATO \= SF.IDFORMATO\nLEFT JOIN SUCURSAL S ON PAP.IDSUCURSAL \= S.ID\nWHERE PA.ID \= ?&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>articulo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PRD_LVL_CHILD</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <articulo>
+                        <xsl:value-of select="$Start/Relacion/articulo"/>
+                    </articulo>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>286</pd:x>
+            <pd:y>373</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns0:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/PmmArticuloPropuestaSubscriberVariables/GLB_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns0:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>392</pd:x>
+            <pd:y>373</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns02:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                    </message>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns02:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Error ProcessBD">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>175</pd:x>
+            <pd:y>373</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <pfx6:MSG_Container>
+                    <pfx6:Header>
+                        <pfx6:ProjectName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </pfx6:ProjectName>
+                        <pfx6:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </pfx6:Source_Domain>
+                        <pfx6:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </pfx6:Destination_Domain>
+                        <pfx6:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                        </pfx6:Transaction_Type>
+                        <pfx6:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </pfx6:TimeStamp>
+                    </pfx6:Header>
+                    <pfx6:Body>
+                        <pfx6:ErrorManagementSchema>
+                            <pfx6:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </pfx6:inrtn_id>
+                            <pfx6:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                            </pfx6:inrtn_instn_nm>
+                            <pfx6:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                            </pfx6:inrtn_err_rtn_desc>
+                            <pfx6:inrtn_msg_body>
+                                <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                            </pfx6:inrtn_msg_body>
+                            <pfx6:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx6:cre8_ts>
+                            <pfx6:u_code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </pfx6:u_code>
+                            <pfx6:sev_id>
+                                <xsl:value-of select="$_globalVariables/pfx3:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                            </pfx6:sev_id>
+                        </pfx6:ErrorManagementSchema>
+                    </pfx6:Body>
+                </pfx6:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="AphKey">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>328</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBPMM/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBPMM/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT AFD.PRD_APH_KEY from PMM.PRDFXSEE PRD
+JOIN PMM.ORGMSTEE ORG ON PRD.ORG_LVL_CHILD = ORG.ORG_LVL_CHILD
+JOIN PMM.PRDAFDEE AFD ON PRD.PRD_AFH_KEY = AFD.PRD_AFH_KEY 
+WHERE ORG.ORG_LVL_NUMBER = ? AND ROWNUM = 1</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>sucursal</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PRD_APH_KEY</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <sucursal>
+                        <xsl:value-of select="$Start/Relacion/sucursal"/>
+                    </sucursal>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ExisteRelacion">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>430</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBPMM/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBPMM/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT PRD_LVL_CHILD FROM PMM.PRDAPDEE
+WHERE PRD_LVL_CHILD = ?
+AND PRD_APH_KEY = ?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>lvlChild</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>aphKey</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PRD_LVL_CHILD</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <lvlChild>
+                        <xsl:choose>
+                            <xsl:when test="exists($Articulo/resultSet/Record[1]/PRD_LVL_CHILD)">
+                                <xsl:value-of select="$Articulo/resultSet/Record[1]/PRD_LVL_CHILD"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </lvlChild>
+                    <aphKey>
+                        <xsl:choose>
+                            <xsl:when test="exists($AphKey/resultSet/Record[1]/PRD_APH_KEY)">
+                                <xsl:value-of select="$AphKey/resultSet/Record[1]/PRD_APH_KEY"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </aphKey>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Retry on error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry on error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: RelacionArticuloSucursal
+Fecha de creación: 25/03/2014
+Creado por: Victor Sanchez
+Variables globales: GLB_MAX_RETRIES, GLB_RETRY_DELAY
+Descripción: Proceso que se encarga de verificar si existen relacion entre el articulo y la sucursal</pd:description>
+        <pd:x>180</pd:x>
+        <pd:y>42</pd:y>
+        <pd:width>359</pd:width>
+        <pd:height>83</pd:height>
+        <pd:fontName>Dialog.bold-plain-9</pd:fontName>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>dash</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

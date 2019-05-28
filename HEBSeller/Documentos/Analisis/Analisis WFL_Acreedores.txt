@@ -1,0 +1,161 @@
+
+				  
+
+******************************************************** Q1
+
+Aqui se unen las siguientes tablas:
+PS_VENDOR
+PS_VNDR_LOC_ADDR
+PS_HEB_VNDR_RFC
+PS_VENDOR_PAY	
+
+SELECT 
+	SYSADM.PS_HEB_VNDR_RFC.HEB_RFC, 
+	SYSADM.PS_HEB_VNDR_RFC.FACTORING_FLG, 
+	SYSADM.PS_HEB_VNDR_RFC.HEB_FACTOR_AFORO, 
+	SYSADM.PS_VENDOR.SETID, 
+	SYSADM.PS_VENDOR.VENDOR_ID, 
+	SYSADM.PS_VENDOR.NAME1, 
+	SYSADM.PS_VENDOR.NAME2, 
+	SYSADM.PS_VNDR_LOC_ADDR.COUNTRY, 
+	SYSADM.PS_VNDR_LOC_ADDR.ADDRESS1, 
+	SYSADM.PS_VNDR_LOC_ADDR.ADDRESS2, 
+	SYSADM.PS_VNDR_LOC_ADDR.ADDRESS3, 
+	SYSADM.PS_VNDR_LOC_ADDR.CITY, 
+	SYSADM.PS_VNDR_LOC_ADDR.STATE, 
+	SYSADM.PS_VNDR_LOC_ADDR.POSTAL, 
+	SYSADM.PS_VENDOR_PAY.CURRENCY_PYMNT 
+FROM 
+	SYSADM.PS_VENDOR, 
+	SYSADM.PS_HEB_VNDR_RFC, 
+	SYSADM.PS_VENDOR_PAY, 
+	SYSADM.PS_VNDR_LOC_ADDR 
+WHERE 
+	PS_VENDOR.SETID=PS_VNDR_LOC_ADDR.SETID
+	AND PS_VENDOR.VENDOR_ID=PS_VNDR_LOC_ADDR.VENDOR_ID
+	AND PS_VENDOR.SETID=PS_HEB_VNDR_RFC.SETID
+	AND PS_VENDOR.VENDOR_ID=PS_HEB_VNDR_RFC.VENDOR_ID
+	AND PS_VENDOR.SETID=PS_VENDOR_PAY.SETID
+	AND PS_VENDOR.VENDOR_ID=PS_VENDOR_PAY.VENDOR_ID
+	AND PS_VENDOR.SETID='HEBMX'
+	AND PS_HEB_VNDR_RFC.EFFDT = (SELECT MAX(EFFDT) FROM SYSADM.PS_HEB_VNDR_RFC 
+                            WHERE PS_VENDOR.SETID = PS_HEB_VNDR_RFC.SETID 
+                             AND PS_VENDOR.VENDOR_ID = PS_HEB_VNDR_RFC.VENDOR_ID)
+	AND PS_VNDR_LOC_ADDR.EFFDT= (SELECT MAX(EFFDT) FROM SYSADM.PS_VNDR_LOC_ADDR 
+                            WHERE PS_VENDOR.SETID = PS_VNDR_LOC_ADDR.SETID 
+                            AND PS_VENDOR.VENDOR_ID = PS_VNDR_LOC_ADDR.VENDOR_ID)
+	AND PS_VENDOR_PAY.EFFDT= (SELECT MAX(EFFDT) FROM SYSADM.PS_VENDOR_PAY  
+                          WHERE PS_VENDOR.SETID = PS_VENDOR_PAY.SETID 
+                          AND PS_VENDOR.VENDOR_ID = PS_VENDOR_PAY.VENDOR_ID 
+                          AND PS_VENDOR_PAY.EFF_STATUS='A')
+
+La informacion Q1 se ordenan por SETID,VENDOR_ID
+							
+********************************************************
+	
+******************************************************** Q2
+
+Se obtienen todos los telefones por vendedor donde los registros tengan la maxima fecha 
+
+SELECT 
+	SYSADM.PS_VENDOR_ADDR_PHN.SETID, 
+	SYSADM.PS_VENDOR_ADDR_PHN.VENDOR_ID, 
+	SYSADM.PS_VENDOR_ADDR_PHN.COUNTRY_CODE, 
+	SYSADM.PS_VENDOR_ADDR_PHN.PHONE, 
+	SYSADM.PS_VENDOR_ADDR_PHN.EXTENSION 
+FROM 
+	SYSADM.PS_VENDOR_ADDR_PHN 
+WHERE PS_VENDOR_ADDR_PHN.EFFDT= (SELECT MAX(B.EFFDT) FROM PS_VENDOR_ADDR_PHN B 
+			WHERE PS_VENDOR_ADDR_PHN.SETID= B.SETID AND PS_VENDOR_ADDR_PHN.VENDOR_ID=B.VENDOR_ID)
+							   
+Se ordenan por SETID,VENDOR_ID
+
+********************************************************
+	
+******************************************************** Q3
+
+Se obtienen todos los contactos por vendedor donde los registros tengan la maxima fecha 
+
+SELECT 
+	SYSADM.PS_VENDOR_CNTCT.SETID, 
+	SYSADM.PS_VENDOR_CNTCT.VENDOR_ID, 
+	SYSADM.PS_VENDOR_CNTCT.CONTACT_NAME, 
+	SYSADM.PS_VENDOR_CNTCT.EMAILID 
+FROM 
+	SYSADM.PS_VENDOR_CNTCT 
+WHERE 
+	PS_VENDOR_CNTCT.EFFDT = (SELECT MAX(B.EFFDT) FROM PS_VENDOR_CNTCT B 
+                               WHERE PS_VENDOR_CNTCT.SETID=B.SETID AND PS_VENDOR_CNTCT.VENDOR_ID=B.VENDOR_ID)
+							   
+Se ordenan por SETID,VENDOR_ID
+
+********************************************************
+
+******************************************************** J1
+
+Se realiza un Left join con la tabla de telefonos para obtener las datos entre las consultas (Q1 : Q2)
+
+left Join 
+ SETID= SETID
+VENDOR_ID=VENDOR_ID
+
+Se ordenan por SETID,VENDOR_ID
+
+********************************************************
+	
+	
+******************************************************** J2
+
+Se realiza un Left join con la tabla de telefonos para obtener las datos 
+Se realiza un Left join con la tabla de contacto para obtener las datos entre las consultas (J1 : Q3)
+
+left Join 
+ SETID= SETID
+VENDOR_ID=VENDOR_ID
+
+left Join 
+ SETID= SETID
+VENDOR_ID=VENDOR_ID
+
+
+********************************************************
+
+
+Se quitan los espacios de LTRIM(RTRIM(CURRENCY_PYMNT_in))
+Va y busca la clave de la moneda , con la clave de people soft
+
+********************************************************RT
+
+En esta transformación se eliminan caracteres especiales de algunos campos y se reducen las longitudes que van a la tabla destino
+
+**REGLAS DE TRANSFORMACION APLICADAS A LA INFORMACION
+
+VENDOR_ID_OUT		TO_INTEGER(VENDOR_ID1)
+HEB_RFC_OUT			SUBSTR(HEB_RFC,1,15)
+NOMBRE				REPLACECHR(0,rtrim(SUBSTR(NAME1,1,40)) ||' '|| rtrim(SUBSTR(NAME2,1,40)) , '|','')
+O_CALLE				RTRIM(LTRIM(ADDRESS1||' '||ADDRESS2))
+ADDRESS3			MapeoDirecto
+CITY				MapeoDirecto
+STATE				MapeoDirecto
+COUNTRY				MapeoDirecto
+TELEFONO			IIF(ISNULL(PHONE) OR RTRIM(LTRIM(PHONE))='','-',IIF(ISNULL(COUNTRY_CODE) OR LTRIM(RTRIM(COUNTRY_CODE))='',PHONE,'(' || COUNTRY_CODE || ')' || PHONE))
+O_EXTENSION			IIF(ISNULL(IN_EXTENSION) OR LTRIM(RTRIM(IN_EXTENSION))='','-',IN_EXTENSION)
+CODPOST				substr(POSTAL,1,10)
+O_CONTACT_NAME		IIF(ISNULL(IN_CONTACT_NAME) OR LTRIM(RTRIM(IN_CONTACT_NAME))='','-',IN_CONTACT_NAME)
+O_CURRENCY_PYMNT	IIF(ISNULL(IN_CURRENCY_PYMNT),1,IN_CURRENCY_PYMNT)
+EsAcreedor			1
+O_FACTORING_FLG		DECODE(UPPER(FACTORING_FLG),'Y',1,0)
+HEB_FACTOR_AFORO	MapeoDirecto
+O_ACEPTA_DEVOLUCION	0
+O_EMAILID			IIF(ISNULL(IN_EMAILID) OR LTRIM(RTRIM(IN_EMAILID))='','-',IN_EMAILID)
+
+
+********************************************************
+
+Actualiza los registros con DD_UPDATE 
+Se le agrega una llave lógica para realizar los movimientos. Se agrego la llave IdPmm
+	
+
+
+
+

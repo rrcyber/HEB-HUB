@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>DbstageOffersToMagento Processes/Sub Process/Send_NewTotalCarrito.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>81</pd:startX>
+    <pd:startY>87</pd:startY>
+    <pd:returnBindings>
+        <runId>
+            <xsl:value-of select="$Send_TotalCarrito/group/run_id"/>
+        </runId>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="runId" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>914</pd:endX>
+    <pd:endY>91</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1417471609653</pd:targetNamespace>
+    <pd:activity name="Send_TotalCarrito">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>209</pd:x>
+        <pd:y>87</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Send_TotalCarrito.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Send_TotalCarritoLocations">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>398</pd:x>
+        <pd:y>87</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Send_TotalCarritoLocations.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <last_complete_promo>
+                    <xsl:value-of select="$Send_TotalCarrito/group/last_completed_promo"/>
+                </last_complete_promo>
+                <run_id>
+                    <xsl:value-of select="$Send_TotalCarrito/group/run_id"/>
+                </run_id>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update_SendTotalCarritoDate">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>556</pd:x>
+        <pd:y>89</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Update_SendTotalCarritoDate.process</processName>
+        </config>
+        <pd:inputBindings>
+            <last_complete_promo>
+                <xsl:value-of select="$Send_TotalCarrito/group/last_completed_promo"/>
+            </last_complete_promo>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>290</pd:x>
+        <pd:y>192</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>735</pd:x>
+        <pd:y>94</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Send_TotalCarrito</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_TotalCarrito</pd:from>
+        <pd:to>Send_TotalCarritoLocations</pd:to>
+        <pd:xpathDescription>records</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Send_TotalCarrito/group/last_completed_promo !=''</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_TotalCarritoLocations</pd:from>
+        <pd:to>Update_SendTotalCarritoDate</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send_TotalCarrito</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_SendTotalCarritoDate</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

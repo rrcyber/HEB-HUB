@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx11="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:pfx10="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:pfx="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://xmlns.heb.com/ei/PURCHASE_ORDER_REQUEST" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema/Proveedores/DIGITAL_INVOICE_REQUEST.xsd" xmlns:pfx3="http://www.w3.org/2003/05/soap-envelope" xmlns:pfx2="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" xmlns:pfx9="http://xmlns.heb.com/ei/Message_Request" xmlns:pfx8="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema/Acreedores/Acreedores_DIGITAL_INVOICE_REQUEST.xsd" xmlns:pfx7="http://xmlns.heb.com/ei/DIGITAL_INVOICE_RESPONSE" xmlns:pfx6="http://www.tibco.com/pe/WriteToLogActivitySchema">
+    <xsd:import namespace="http://schemas.xmlsoap.org/soap/envelope/" schemaLocation="/Shared Resources/Schema/SOAPEnvelop.xsd"/>
+    <xsd:import namespace="http://www.w3.org/2003/05/soap-envelope" schemaLocation="/Shared Resources/Schema/soapV12_envelope.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" schemaLocation="/Shared Resources/Schema/Proveedores/DIGITAL_INVOICE_REQUEST.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASE_ORDER_REQUEST" schemaLocation="/Shared Resources/Schema/OrdenesCompra/PURCHASE_ORDER_REQUEST.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Message_Request" schemaLocation="/Shared Resources/Schema/Acreedores/MESSAGE_REQUEST.xsd"/>
+    <xsd:import namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" schemaLocation="/Shared Resources/Schema/addressing.xsd"/>
+    <xsd:import namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+    <pd:name>Process/SubProcess/RequestIdentification.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Req">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Request" type="xsd:string"/>
+                    <xsd:element name="URI" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>162</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <RequestType>
+                <xsl:value-of select="$GetVariable/RequestInfo/RequestType"/>
+            </RequestType>
+            <xsl:choose>
+                <xsl:when test="$Call_CreditorsTypeRequestIdentification/root/isCreditorsRequestType='true' and  not(empty($Call_CreditorsTypeRequestIdentification/root/pfx2:SET_DIGITAL_INVOICE_REQUEST))">
+                    <newPostData>
+                        <xsl:value-of select="$RenderEnvelopeOuttToString-1-1-1/xmlString"/>
+                    </newPostData>
+                </xsl:when>
+                <xsl:otherwise>
+                    <newPostData>
+                        <xsl:value-of select="$RenderEnvelopeOuttToString-1-1/xmlString"/>
+                    </newPostData>
+                </xsl:otherwise>
+            </xsl:choose>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="RequestType" type="xsd:string"/>
+                    <xsd:element name="newPostData" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1293</pd:endX>
+    <pd:endY>260</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Variable1 ref="pfx3:Envelope"/>
+        <Variable0 ref="pfx3:Envelope"/>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1414597780834</pd:targetNamespace>
+    <pd:activity name="RenderBodyRequestToString">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>323</pd:x>
+        <pd:y>269</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term>
+                <xsd:any/>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$ParseSOAPRequest/pfx3:Envelope/pfx3:Body/*"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetAcreedores">
+        <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+        <pd:x>726</pd:x>
+        <pd:y>285</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Variables/Shared Variable.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings>
+            <RequestInfo>
+                <RequestType>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EndPoints/Acreedores/RequestType"/>
+                </RequestType>
+                <StartTime>
+                    <xsl:value-of select="tib:timestamp()"/>
+                </StartTime>
+            </RequestInfo>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetVariable">
+        <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+        <pd:x>915</pd:x>
+        <pd:y>261</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Variables/Shared Variable.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>861</pd:x>
+        <pd:y>166</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="SetUnssuported">
+        <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+        <pd:x>444</pd:x>
+        <pd:y>722</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Variables/Shared Variable.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings>
+            <RequestInfo>
+                <RequestType>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EndPoints/Unknown"/>
+                </RequestType>
+                <StartTime>
+                    <xsl:value-of select="tib:timestamp()"/>
+                </StartTime>
+            </RequestInfo>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ParseSOAPRequest">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>194</pd:x>
+        <pd:y>161</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx3:Envelope"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/Req/Request"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetProveedores">
+        <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+        <pd:x>527</pd:x>
+        <pd:y>55</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Variables/Shared Variable.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings>
+            <RequestInfo>
+                <RequestType>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EndPoints/Proveedores/RequestType"/>
+                </RequestType>
+                <StartTime>
+                    <xsl:value-of select="tib:timestamp()"/>
+                </StartTime>
+            </RequestInfo>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetConsultaOC">
+        <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+        <pd:x>658</pd:x>
+        <pd:y>436</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Variables/Shared Variable.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings>
+            <RequestInfo>
+                <RequestType>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EndPoints/ConsultaOC/RequestType"/>
+                </RequestType>
+                <StartTime>
+                    <xsl:value-of select="tib:timestamp()"/>
+                </StartTime>
+            </RequestInfo>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>244</pd:x>
+        <pd:y>35</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-2">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>213</pd:x>
+        <pd:y>450</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Null-3">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>209</pd:x>
+        <pd:y>585</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Call_SuppliersTypeRequestIdentification">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>482</pd:x>
+        <pd:y>160</pd:y>
+        <config>
+            <processName>/Process/SubProcess/SuppliersTypeRequestIdentification.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <request>
+                    <xsl:value-of select="$RenderBodyRequestToString/xmlString"/>
+                </request>
+                <login>
+                    <xsl:value-of select="$GetSecurityToken/Token/user"/>
+                </login>
+                <password>
+                    <xsl:value-of select="$GetSecurityToken/Token/pass"/>
+                </password>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_CreditorsTypeRequestIdentification">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>479</pd:x>
+        <pd:y>291</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CreditorsTypeRequestIdentification.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <request>
+                    <xsl:value-of select="$RenderBodyRequestToString/xmlString"/>
+                </request>
+                <login>
+                    <xsl:value-of select="$GetSecurityToken/Token/user"/>
+                </login>
+                <password>
+                    <xsl:value-of select="$GetSecurityToken/Token/pass"/>
+                </password>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_PurcharseOrdersRequestIdentification">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>472</pd:x>
+        <pd:y>420</pd:y>
+        <config>
+            <processName>/Process/SubProcess/PurcharseOrdersRequestIdentification.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <request>
+                    <xsl:value-of select="$RenderBodyRequestToString/xmlString"/>
+                </request>
+                <login>
+                    <xsl:value-of select="$GetSecurityToken/Token/user"/>
+                </login>
+                <password>
+                    <xsl:value-of select="$GetSecurityToken/Token/pass"/>
+                </password>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_ControlRequestTypeIdentification">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>473</pd:x>
+        <pd:y>568</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlRequestTypeIdentification.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <request>
+                    <xsl:value-of select="$RenderBodyRequestToString/xmlString"/>
+                </request>
+                <login>
+                    <xsl:value-of select="$GetSecurityToken/Token/user"/>
+                </login>
+                <password>
+                    <xsl:value-of select="$GetSecurityToken/Token/pass"/>
+                </password>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetControl">
+        <pd:type>com.tibco.pe.core.SetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.setSharedVariable</pd:resourceType>
+        <pd:x>615</pd:x>
+        <pd:y>571</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Variables/Shared Variable.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings>
+            <RequestInfo>
+                <RequestType>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/EndPoints/Control/RequestType"/>
+                </RequestType>
+                <StartTime>
+                    <xsl:value-of select="tib:timestamp()"/>
+                </StartTime>
+            </RequestInfo>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-4">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>1293</pd:x>
+        <pd:y>35</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="RenderHeaderRequestToString-1">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>340</pd:x>
+        <pd:y>63</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <renderDefaultPrefix>false</renderDefaultPrefix>
+            <term>
+                <xsd:any/>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$ParseSOAPRequest/pfx3:Envelope/pfx3:Header/*"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetSecurityToken">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>331</pd:x>
+        <pd:y>167</pd:y>
+        <config>
+            <processName>/Process/SubProcess/GetSecurityToken.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <headerMsg>
+                    <xsl:value-of select="$RenderHeaderRequestToString-1/xmlString"/>
+                </headerMsg>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>912</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <variableName>Variable0</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$ParseSOAPRequest/pfx3:Envelope">
+                <pfx3:Envelope>
+                    <xsl:for-each select="pfx3:Header">
+                        <pfx3:Header/>
+                    </xsl:for-each>
+                    <xsl:for-each select="pfx3:Body">
+                        <pfx3:Body/>
+                    </xsl:for-each>
+                </pfx3:Envelope>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>1089</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <variableName>Variable0</variableName>
+        </config>
+        <pd:inputBindings>
+            <pfx3:Envelope>
+                <pfx3:Body>
+                    <xsl:choose>
+                        <xsl:when test="$Call_SuppliersTypeRequestIdentification/root/isSuppliersType='true'">
+                            <xsl:copy-of select="$Call_SuppliersTypeRequestIdentification/root/pfx3:Envelope/pfx3:Body/*"/>
+                        </xsl:when>
+                        <xsl:when test="$Call_CreditorsTypeRequestIdentification/root/isCreditorsRequestType='true'">
+                            <xsl:copy-of select="$Call_CreditorsTypeRequestIdentification/root/pfx3:Envelope/pfx3:Body/*"/>
+                        </xsl:when>
+                        <xsl:when test="$Call_PurcharseOrdersRequestIdentification/root/isPurchaseOrderRequestType='true'">
+                            <xsl:copy-of select="$Call_PurcharseOrdersRequestIdentification/root/pfx3:Envelope/pfx3:Body/*"/>
+                        </xsl:when>
+                        <xsl:when test="$Call_ControlRequestTypeIdentification/root/isControlRequestType='true'">
+                            <xsl:copy-of select="$Call_ControlRequestTypeIdentification/root/pfx3:Envelope/pfx3:Body/*"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:copy-of select="$Call_SuppliersTypeRequestIdentification/root/pfx3:Envelope/pfx3:Body/*"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </pfx3:Body>
+            </pfx3:Envelope>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="RenderEnvelopeOuttToString-1-1">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>1207</pd:x>
+        <pd:y>36</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term>
+                <xsd:any/>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Variable0/pfx3:Envelope"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="RenderEnvelopeOuttToString-1-1-1">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>1195</pd:x>
+        <pd:y>170</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term>
+                <xsd:any/>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$SetCreditorMsg/root/pfx3:Envelope"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-2">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>986</pd:x>
+        <pd:y>98</pd:y>
+        <config>
+            <variableName>Variable1</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$ParseSOAPRequest/pfx3:Envelope">
+                <pfx3:Envelope>
+                    <xsl:for-each select="pfx3:Header">
+                        <pfx3:Header/>
+                    </xsl:for-each>
+                    <xsl:for-each select="pfx3:Body">
+                        <pfx3:Body/>
+                    </xsl:for-each>
+                </pfx3:Envelope>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetCreditorMsg">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1057</pd:x>
+        <pd:y>168</pd:y>
+        <config>
+            <processName>/Process/SubProcess/SetCreditorMsg.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:copy-of select="$ParseSOAPRequest/pfx3:Envelope"/>
+                <xsl:copy-of select="$Call_CreditorsTypeRequestIdentification/root/pfx2:SET_DIGITAL_INVOICE_REQUEST"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>SetAcreedores</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>Assign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$GetVariable/RequestInfo/RequestType !=$_globalVariables/ns:GlobalVariables/EndPoints/Unknown</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetUnssuported</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>ParseSOAPRequest</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ParseSOAPRequest</pd:from>
+        <pd:to>RenderHeaderRequestToString-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetProveedores</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetConsultaOC</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16751002</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:xpathDescription>WSDL_Proveedor</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777114</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains($Start/Req/URI, 'WSDL') and
+contains($Start/Req/URI, 'PROVEEDOR')</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>SetProveedores</pd:to>
+        <pd:lineType>S-Shaped</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-2</pd:from>
+        <pd:to>SetAcreedores</pd:to>
+        <pd:lineType>S-Shaped</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>SetConsultaOC</pd:to>
+        <pd:lineType>S-Shaped</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null-2</pd:to>
+        <pd:xpathDescription>WSDL_Acreedor</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains($Start/Req/URI, 'WSDL') and
+contains($Start/Req/URI, 'ACREEDOR')</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:xpathDescription>WSDL_PO</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-10040320</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains($Start/Req/URI, 'WSDL') and
+contains($Start/Req/URI, 'PO')</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ParseSOAPRequest</pd:from>
+        <pd:to>SetUnssuported</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-6750208</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RenderBodyRequestToString</pd:from>
+        <pd:to>Call_SuppliersTypeRequestIdentification</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_SuppliersTypeRequestIdentification</pd:from>
+        <pd:to>SetProveedores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_SuppliersTypeRequestIdentification/root/isSuppliersType = 'true'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_SuppliersTypeRequestIdentification</pd:from>
+        <pd:to>Call_CreditorsTypeRequestIdentification</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_CreditorsTypeRequestIdentification</pd:from>
+        <pd:to>SetAcreedores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_CreditorsTypeRequestIdentification/root/isCreditorsRequestType='true'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_CreditorsTypeRequestIdentification</pd:from>
+        <pd:to>Call_PurcharseOrdersRequestIdentification</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_PurcharseOrdersRequestIdentification</pd:from>
+        <pd:to>SetConsultaOC</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_PurcharseOrdersRequestIdentification/root/isPurchaseOrderRequestType='true'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_PurcharseOrdersRequestIdentification</pd:from>
+        <pd:to>Call_ControlRequestTypeIdentification</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_ControlRequestTypeIdentification</pd:from>
+        <pd:to>SetControl</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_ControlRequestTypeIdentification/root/isControlRequestType='true'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetControl</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_ControlRequestTypeIdentification</pd:from>
+        <pd:to>SetUnssuported</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-4</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RenderHeaderRequestToString-1</pd:from>
+        <pd:to>GetSecurityToken</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetSecurityToken</pd:from>
+        <pd:to>RenderBodyRequestToString</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>GetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>Assign-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1</pd:from>
+        <pd:to>RenderEnvelopeOuttToString-1-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RenderEnvelopeOuttToString-1-1</pd:from>
+        <pd:to>Null-4</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>Assign-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Call_CreditorsTypeRequestIdentification/root/isCreditorsRequestType='true'  and  not(empty($Call_CreditorsTypeRequestIdentification/root/pfx2:SET_DIGITAL_INVOICE_REQUEST))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>RenderEnvelopeOuttToString-1-1-1</pd:from>
+        <pd:to>Null-4</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-2</pd:from>
+        <pd:to>SetCreditorMsg</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetCreditorMsg</pd:from>
+        <pd:to>RenderEnvelopeOuttToString-1-1-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

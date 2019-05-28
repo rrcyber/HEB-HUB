@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns1="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://xmlns.heb.com/ei/error" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulos.xsd" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalFormato.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalRegion.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursales.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursales.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/JerarquiaSucursales.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalRegion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalRegion.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalFormato.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/JerarquiaSucursalFormato.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulos.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Articulos.xsd"/>
+    <pd:name>Heb2bArticulosSubscriber/Main Process/SetChanges_Articulos_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx5:resultSet"/>
+                    <xsd:element name="jmsMessage" type="xsd:string"/>
+                    <xsd:element name="deliveryCount" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>279</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>306</pd:endX>
+    <pd:endY>282</pd:endY>
+    <pd:errorSchemas>
+        <error ref="ns1:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389371115171</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>79</pd:x>
+        <pd:y>365</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>false</catchAll>
+            <fault>localname=MSG_Container namespace=http://xmlns.heb.com/ei/ErrorManagementSchema</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>220</pd:x>
+        <pd:y>367</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            <spawn>true</spawn>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Catch/ns1:MSG_Container"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SetArticulosDataHEB2B">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>162</pd:x>
+        <pd:y>281</pd:y>
+        <config>
+            <processName>/Heb2bArticulosSubscriber/Sub Process/SetArticulosDataHEB2B.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:copy-of select="$Start/group/resultSet"/>
+                <jmsMessage>
+                    <xsl:value-of select="$Start/group/jmsMessage"/>
+                </jmsMessage>
+                <deliveryCount>
+                    <xsl:value-of select="$Start/group/deliveryCount"/>
+                </deliveryCount>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SetArticulosDataHEB2B</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SetArticulosDataHEB2B</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: SetChanges_Region__Main
+Fecha de creación: 15/01/2014
+Creado por: Juan Alberto Gonzalez Aguilar
+Variables globales:  N/A
+Descripción: 
+Proceso encargado de verificar si el proceso SetRegionDataHEB2B se ejecuto correctamente</pd:description>
+        <pd:x>301</pd:x>
+        <pd:y>68</pd:y>
+        <pd:width>583</pd:width>
+        <pd:height>117</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

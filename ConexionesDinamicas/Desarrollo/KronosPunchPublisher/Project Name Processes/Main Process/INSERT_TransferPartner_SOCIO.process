@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/TRANSFER_PARTHNER_SOCIOS" xmlns:pfx2="http://xmlns.heb.com/ei/TRANSFER_PARTHNER" xmlns:pfx="http://xmlns.heb.com/ei/ReplicaHuellas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ReplicaHuellas" schemaLocation="/Shared Resources/Schema Definitions/Custom/ReplicaHuellas.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TRANSFER_PARTHNER_SOCIOS" schemaLocation="/Shared Resources/Schema Definitions/Custom/TRANSFER_PARTHNER_SOCIOS.xsd"/>
+    <pd:name>Project Name Processes/Main Process/INSERT_TransferPartner_SOCIO.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:TRANSFER_PARTHNER_SOCIOS"/>
+    <pd:startX>46</pd:startX>
+    <pd:startY>153</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>667</pd:endX>
+    <pd:endY>155</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1456234251419</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>220</pd:x>
+        <pd:y>6</pd:y>
+        <pd:width>400</pd:width>
+        <pd:height>280</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>INSERT</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>INSERT</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>OK</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$INSERT/group/result='SUCCESS'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>UPDATE</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>UPDATE</pd:to>
+            <pd:xpathDescription>Update</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$INSERT/group/sqlState=23000</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>INSERT</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65485</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>300</pd:x>
+            <pd:y>217</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>494</pd:x>
+            <pd:y>111</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns0:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$INSERT/group/error_msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$INSERT/group/sqlState"/>
+                    </messageCode>
+                </ns0:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="INSERT">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>298</pd:x>
+            <pd:y>74</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/DynamicConnectionUpdate.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <DB_URL>
+                        <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$_processContext/ns1:ProcessContext/CustomId]/URL"/>
+                    </DB_URL>
+                    <USER>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                    </USER>
+                    <MAX_ROWS>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                    </MAX_ROWS>
+                    <xsl:for-each select="$Start/pfx3:TRANSFER_PARTHNER_SOCIOS/pfx3:ITEM">
+                        <QUERY>
+                            <xsl:value-of select="concat(&quot;INSERT INTO DBWCK..SOCIOS (SOCIO_ID,SOCIO_NOMBRE,SOCIO_DEPTOID,SOCIO_PUESTOID,SOCIO_SUCURSALID&quot;,&#xA;&quot;,SOCIO_ESTATUS,SOCIO_FECHAREG,SOCIO_FECHAEFECTIVA,SOCIO_USUARIOREG,SOCIO_FECHAMOD,SOCIO_USUARIOMOD&quot;,&#xA;&quot;,SOCIO_TIPOCONTRATO,SOCIO_COMPANIA,SOCIO_SEGUNDASUC,SOCIO_SEGUNDODEP,SOCIO_ZONAHORARIA)&quot;,&#xA;&quot; VALUES (&quot;,pfx3:SOCIO_ID,&quot;,&quot;,pfx3:SOCIO_NOMBRE,&quot;,&quot;,pfx3:DEPARTAMENTO,&quot;,&quot;,pfx3:SOCIO_PUESTOID,&quot;,&quot;,pfx3:SUCURSAL,&quot;,&quot;,&#xA;pfx3:SOCIO_ESTATUS,&quot;,&quot;,tib:format-dateTime('yyyy-MM-dd HH:mm:ss', pfx3:SOCIO_FECHAREG),&quot;,&quot;,tib:format-dateTime('yyyy-MM-dd HH:mm:ss', pfx3:SOCIO_FECHAEFECTIVA),&quot;,&quot;,pfx3:SOCIO_USUARIOREG,&quot;,&quot;,&#xA;tib:format-dateTime('yyyy-MM-dd HH:mm:ss', pfx3:SOCIO_FECHAMOD),&quot;,&quot;,pfx3:SOCIO_USUARIOMOD,&quot;,&quot;,pfx3:SOCIO_TIPOCONTRATO,&quot;,&quot;,pfx3:SOCIO_COMPANIA,&quot;,&quot;,&#xA;pfx3:SOCIO_SEGUNDASUC,&quot;,&quot;,pfx3:SOCIO_SEGUNDODEP,&quot;,&quot;,pfx3:SOCIO_ZONAHORARIA,&quot;)&quot;)"/>
+                        </QUERY>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="UPDATE">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>446</pd:x>
+            <pd:y>218</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/DynamicConnectionUpdate.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <DB_URL>
+                        <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$_processContext/ns1:ProcessContext/CustomId]/URL"/>
+                    </DB_URL>
+                    <USER>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                    </USER>
+                    <MAX_ROWS>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                    </MAX_ROWS>
+                    <xsl:for-each select="$Start/pfx3:TRANSFER_PARTHNER_SOCIOS/pfx3:ITEM">
+                        <QUERY>
+                            <xsl:value-of select="concat(&quot;UPDATE DBWCK..SOCIOS SET SOCIO_NOMBRE=&quot;,pfx3:SOCIO_NOMBRE,&#xA;&quot;,SOCIO_DEPTOID=&quot;,pfx3:SOCIO_ID,&#xA;&quot;,SOCIO_PUESTOID=&quot;,pfx3:SOCIO_PUESTOID,&#xA;&quot;,SOCIO_SUCURSALID=&quot;,pfx3:SUCURSAL,&#xA;&quot;,SOCIO_ESTATUS=&quot;,pfx3:SOCIO_ESTATUS,&#xA;&quot;,SOCIO_USUARIOMOD=&quot;,pfx3:SOCIO_USUARIOMOD,&#xA;&quot;,SOCIO_FECHAMOD=&quot;,tib:format-dateTime('yyyy-MM-dd HH:mm:ss', pfx3:SOCIO_FECHAMOD),&#xA;&quot; Where SOCIO_ID=&quot;,pfx3:SOCIO_ID)"/>
+                        </QUERY>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="GetVariable">
+        <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+        <pd:x>142</pd:x>
+        <pd:y>155</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

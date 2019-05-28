@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://www.tibco.com/namespaces/tnt/plugins/file">
+    <pd:name>Mex_OfferExport_Subscriber Processes/Starter Process/Subscription_Mex_ProductsExport_JMS_Starter.process</pd:name>
+    <pd:startName>JMS Product Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Product Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>66</pd:x>
+        <pd:y>58</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>%%Connections/JMS/Properties/GLB_ACK_MOD%%</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/HEB.MEX.OFFEREXPORT.COPIENTGROUPPRODUCTS.QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>468</pd:endX>
+    <pd:endY>51</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1259174796984</pd:targetNamespace>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>339</pd:x>
+        <pd:y>51</pd:y>
+        <config>
+            <ConfirmEvent>JMS Product Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>281</pd:x>
+        <pd:y>198</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns:MSG_Container>
+                <ns:Header>
+                    <ns:ProjectName>
+                        <xsl:value-of select="$_processContext/ns3:ProcessContext/ProjectName"/>
+                    </ns:ProjectName>
+                    <ns:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mex_OfferExport_Subscriber/Source_Domain"/>
+                    </ns:Source_Domain>
+                    <ns:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mex_OfferExport_Subscriber/Destination_Domain"/>
+                    </ns:Destination_Domain>
+                    <ns:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Mex_OfferExport_Subscriber/Transaction_Type"/>
+                    </ns:Transaction_Type>
+                    <ns:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy -MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns:TimeStamp>
+                </ns:Header>
+                <ns:Body>
+                    <ns:ErrorManagementSchema>
+                        <ns:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns:inrtn_id>
+                        <ns:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns:inrtn_instn_nm>
+                        <ns:inrtn_err_rtn_desc>
+                            <xsl:value-of select="string($_error)"/>
+                        </ns:inrtn_err_rtn_desc>
+                        <ns:inrtn_msg_body>
+                            <xsl:value-of select="$JMS-Product-Queue-Receiver/ns1:ActivityOutput/Body"/>
+                        </ns:inrtn_msg_body>
+                        <ns:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy -MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns:cre8_ts>
+                        <ns:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns:sev_id>
+                    </ns:ErrorManagementSchema>
+                </ns:Body>
+            </ns:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Publish_Mex_Products_Export_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>202</pd:x>
+        <pd:y>51</pd:y>
+        <config>
+            <processName>/Mex_OfferExport_Subscriber Processes/Main Process/Publish_Mex_Products_Export_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <GroupProducts>
+                    <xsl:value-of select="$JMS-Product-Queue-Receiver/ns1:ActivityOutput/Body"/>
+                </GroupProducts>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Publish_Mex_Products_Export_Main</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Publish_Mex_Products_Export_Main</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Product Queue Receiver</pd:from>
+        <pd:to>Publish_Mex_Products_Export_Main</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

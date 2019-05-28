@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns14="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://xmlns.heb.com/ei/LDAP_USER_INFORMATION" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://xmlns.heb.com/ei/TRFRECEPTION_INFORMATION" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx3="http://www.tibco.com/pe/WriteToLogActivitySchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/TRFRECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/TRFRECEPTION_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/LDAP_USER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/LDAP_USER_SCHEMA_SOAP.xsd"/>
+    <pd:name>EventPlanningOfferToLogix_Processes/Starter Process/AddOffer_SendStarterMessage_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>158</pd:x>
+        <pd:y>182</pd:y>
+        <config>
+            <StartTime>1395381660000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%EventPlanningOfferToLogixVariables/START_TIME_INTERVAL%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>634</pd:endX>
+    <pd:endY>182</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1350505492057</pd:targetNamespace>
+    <pd:group name="Retry Group on Error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>227</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>324</pd:width>
+        <pd:height>348</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns2:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>AddOffer (Main)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>AddOffer (Main)</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>AddOffer (Main)</pd:from>
+            <pd:to>Sleep</pd:to>
+            <pd:lineType>Straight</pd:lineType>
+            <pd:lineColor>-6750208</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>Retry</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep</pd:from>
+            <pd:to>ErrorProcess</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns2:GlobalVariables/RetryConfig/GLB_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>ErrorProcess</pd:from>
+            <pd:to>Retry</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="AddOffer (Main)">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>386</pd:x>
+            <pd:y>79</pd:y>
+            <config>
+                <processName>/EventPlanningOfferToLogix_Processes/Main Process/AddOffer_SendStarterMessage_Main.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$JMS-Queue-Receiver/ns:ActivityOutput/Body/pfx2:MSG_CONTAINER"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>317</pd:x>
+            <pd:y>187</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns13:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns13:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Retry">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>387</pd:x>
+            <pd:y>289</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>464</pd:x>
+            <pd:y>187</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns14:MSG_Container>
+                    <ns14:Header>
+                        <ns14:ProjectName>
+                            <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                        </ns14:ProjectName>
+                        <ns14:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/EventPlanningOfferToLogixVariables/GLB_SOURCE_DOMAIN"/>
+                        </ns14:Source_Domain>
+                        <ns14:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/EventPlanningOfferToLogixVariables/GLB_DESTINATION_DOMAIN"/>
+                        </ns14:Destination_Domain>
+                        <ns14:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/EventPlanningOfferToLogixVariables/GLB_TRANSACTION_TYPE"/>
+                        </ns14:Transaction_Type>
+                        <ns14:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime('dd/MM/yyyy HH:mm:ss', current-dateTime())"/>
+                        </ns14:TimeStamp>
+                    </ns14:Header>
+                    <ns14:Body>
+                        <ns14:ErrorManagementSchema>
+                            <ns14:inrtn_id>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                            </ns14:inrtn_id>
+                            <ns14:inrtn_instn_nm>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                            </ns14:inrtn_instn_nm>
+                            <ns14:inrtn_err_rtn_desc>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                            </ns14:inrtn_err_rtn_desc>
+                            <ns14:inrtn_msg_body>
+                                <xsl:value-of select="tib:render-xml($_error/ns1:ErrorReport)"/>
+                            </ns14:inrtn_msg_body>
+                            <ns14:cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime('dd/MM/yyyy HH:mm:ss', current-dateTime())"/>
+                            </ns14:cre8_ts>
+                            <ns14:sev_id>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                            </ns14:sev_id>
+                        </ns14:ErrorManagementSchema>
+                    </ns14:Body>
+                </ns14:MSG_Container>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>Retry Group on Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

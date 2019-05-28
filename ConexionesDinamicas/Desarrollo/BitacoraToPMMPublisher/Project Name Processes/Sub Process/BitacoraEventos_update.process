@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Project Name Processes/Sub Process/BitacoraEventos_update.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="folio" type="xsd:string"/>
+                    <xsd:element name="sucursal" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="URL" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>150</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <xsl:for-each select="$Parse-Data/Output/Rows/Merc_Bitacora_Eventos">
+                <xsl:for-each select="ITEM">
+                    <ITEM>
+                        <secuencia>
+                            <xsl:value-of select="secuencia"/>
+                        </secuencia>
+                        <sdi>
+                            <xsl:value-of select="sdi"/>
+                        </sdi>
+                        <folio>
+                            <xsl:value-of select="folio"/>
+                        </folio>
+                    </ITEM>
+                </xsl:for-each>
+            </xsl:for-each>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>477</pd:endX>
+    <pd:endY>64</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1363048007401</pd:targetNamespace>
+    <pd:activity name="Update MERC_BitacoraEventos">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>302</pd:x>
+        <pd:y>72</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/DynamicConnectionUpdate.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <DB_URL>
+                    <xsl:value-of select="$Start/root/URL"/>
+                </DB_URL>
+                <USER>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                </USER>
+                <MAX_ROWS>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                </MAX_ROWS>
+                <QUERY>
+                    <xsl:value-of select="concat(&quot;UPDATE BDCMP..MERC_BitacoraEventos SET sdi_flag = 9&quot;,&#xA;&quot; WHERE folio = '&quot;,$Start/root/folio, &quot;'&quot;,&#xA;&quot; AND sucursal = &quot;,$Start/root/sucursal)"/>
+                </QUERY>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>308</pd:x>
+        <pd:y>191</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <pfx:ActivityInput>
+                <xsl:if test="$Update-MERC_BitacoraEventos/group/error_msg">
+                    <message>
+                        <xsl:value-of select="$Update-MERC_BitacoraEventos/group/error_msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$Update-MERC_BitacoraEventos/group/sqlState">
+                    <messageCode>
+                        <xsl:value-of select="$Update-MERC_BitacoraEventos/group/sqlState"/>
+                    </messageCode>
+                </xsl:if>
+            </pfx:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Update MERC_BitacoraEventos</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update MERC_BitacoraEventos</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>OK</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Update-MERC_BitacoraEventos/group/result='SUCCESS'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update MERC_BitacoraEventos</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:xpathDescription>ERROR</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

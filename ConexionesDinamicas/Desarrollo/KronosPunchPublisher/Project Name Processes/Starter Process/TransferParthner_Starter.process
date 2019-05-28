@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Starter Process/TransferParthner_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xsl:if test="$Bitacora_Main/root/noOfUpdates">
+                <noOfUpdates>
+                    <xsl:value-of select="$Bitacora_Main/root/noOfUpdates"/>
+                </noOfUpdates>
+            </xsl:if>
+        </root>
+    </pd:returnBindings>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>96</pd:x>
+        <pd:y>240</pd:y>
+        <config>
+            <StartTime>1453356302000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%RetryConfig/GLB_RETRY_TRANSFER_PARTHNER%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>816</pd:endX>
+    <pd:endY>245</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Variable0>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="flag" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Variable0>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1351198034623</pd:targetNamespace>
+    <pd:activity name="Cambio Dia">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:description>Aun sin ser horario de servicio validamos que ya se realizo el cambio de dia en pmm</pd:description>
+        <pd:x>195</pd:x>
+        <pd:y>493</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="GetVariable">
+        <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+        <pd:x>193</pd:x>
+        <pd:y>241</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group (2)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>264</pd:x>
+        <pd:y>39</pd:y>
+        <pd:width>464</pd:width>
+        <pd:height>390</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$GetVariable/group/STOREID</pd:over>
+            <pd:iterationElementSlot>header</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>calculateThread</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:description>La tienda está actualmente siendo procesada</pd:description>
+            <pd:from>calculateThread</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>ALREADY IN PROCESS</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (1)</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:description>Tienda lista para ser procesada</pd:description>
+            <pd:from>calculateThread</pd:from>
+            <pd:to>Group (1)</pd:to>
+            <pd:xpathDescription>READY</pd:xpathDescription>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>tib:index-of($calculateThread/group/STOREID, $header/STOREID/STOREID)=-1</pd:xpath>
+        </pd:transition>
+        <pd:group name="Group (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>372</pd:x>
+            <pd:y>69</pd:y>
+            <pd:width>314</pd:width>
+            <pd:height>245</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>repeat</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:indexSlot>indexLoop</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:repeatCondition>$Variable0/root/flag=1</pd:repeatCondition>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Assign</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Assign-2</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Sleep-1-1</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Assign</pd:from>
+                <pd:to>Sleep-1-1</pd:to>
+                <pd:xpathDescription>WAIT</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Assign</pd:from>
+                <pd:to>TranPartner_Thread</pd:to>
+                <pd:xpathDescription>NEW THREAD</pd:xpathDescription>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$calculateThread/group/value&lt;=$_globalVariables/pfx2:GlobalVariables/THREADS/num</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>TranPartner_Thread</pd:from>
+                <pd:to>Assign-2</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Sleep-1-1">
+                <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+                <pd:resourceType>ae.activities.sleep</pd:resourceType>
+                <pd:x>610</pd:x>
+                <pd:y>142</pd:y>
+                <config/>
+                <pd:inputBindings>
+                    <ns1:SleepInputSchema>
+                        <IntervalInMillisec>
+                            <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/THREADS/wait_interval"/>
+                        </IntervalInMillisec>
+                    </ns1:SleepInputSchema>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Assign-2">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:x>627</pd:x>
+                <pd:y>246</pd:y>
+                <config>
+                    <variableName>Variable0</variableName>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <flag>
+                            <xsl:value-of select="1"/>
+                        </flag>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Assign">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:x>435</pd:x>
+                <pd:y>142</pd:y>
+                <config>
+                    <variableName>Variable0</variableName>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <flag>
+                            <xsl:value-of select="0"/>
+                        </flag>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="TranPartner_Thread">
+                <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                <pd:x>499</pd:x>
+                <pd:y>244</pd:y>
+                <config>
+                    <processName>/Project Name Processes/Thread Processes/TranPartner_Thread.process</processName>
+                    <spawn>true</spawn>
+                    <customId>$header/STOREID/STOREID</customId>
+                </config>
+                <pd:inputBindings>
+                    <group>
+                        <STOREID>
+                            <xsl:value-of select="$header/STOREID/STOREID"/>
+                        </STOREID>
+                    </group>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="calculateThread">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>334</pd:x>
+            <pd:y>353</pd:y>
+            <config>
+                <processName>/Project Name Processes/Thread Processes/TranPartner_calculateThread.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <operation>
+                        <xsl:value-of select="'QUERY'"/>
+                    </operation>
+                    <STOREID>
+                        <xsl:value-of select="''"/>
+                    </STOREID>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:description/>
+        <pd:from>Cambio Dia</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>Cambio Dia</pd:to>
+        <pd:xpathDescription>Error GetVariable</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>GetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>Group (2)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (2)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

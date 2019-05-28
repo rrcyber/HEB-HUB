@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/CheckpointSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/ExceptionSchema.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/SharedResources/Schemas/ExceptionSchema.xsd" schemaLocation="/SharedResources/Schemas/ExceptionSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/ExceptionSchema.xsd"/>
+    <pd:name>Error Process Subscriber Processes/Main Process/ExceptionHandler.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="ExceptionHandling">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx2:Exception"/>
+                    <xsd:element name="isOnlyToSave" type="xsd:boolean"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>145</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>593</pd:endX>
+    <pd:endY>144</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1431455968805</pd:targetNamespace>
+    <pd:activity name="Call_SendNotification">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>232</pd:x>
+        <pd:y>143</pd:y>
+        <config>
+            <processName>/Error Process Subscriber Processes/Sub Process/SendExceptionNotification.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/ExceptionHandling/Exception"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_SaveException">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>430</pd:x>
+        <pd:y>147</pd:y>
+        <config>
+            <processName>/Error Process Subscriber Processes/Sub Process/SaveException.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/ExceptionHandling/Exception"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call_SendNotification</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_SendNotification</pd:from>
+        <pd:to>Call_SaveException</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_SaveException</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

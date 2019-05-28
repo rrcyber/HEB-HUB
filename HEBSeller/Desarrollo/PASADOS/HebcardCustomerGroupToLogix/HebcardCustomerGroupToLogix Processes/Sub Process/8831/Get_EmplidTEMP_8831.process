@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>HebcardCustomerGroupToLogix Processes/Sub Process/8831/Get_EmplidTEMP_8831.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="EMPLID" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>123</pd:startX>
+    <pd:startY>163</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <EMPLID>
+                <xsl:value-of select="$JDBC-DBDWH/resultSet/Record[1]/vcIk_EMPLID"/>
+            </EMPLID>
+            <Count>
+                <xsl:value-of select="count($JDBC-DBDWH/resultSet/Record)"/>
+            </Count>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="EMPLID" type="xsd:string"/>
+                    <xsd:element name="Count" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>444</pd:endX>
+    <pd:endY>166</pd:endY>
+    <pd:errorSchemas>
+        <Schema0 ref="pfx:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1489516706193</pd:targetNamespace>
+    <pd:activity name="JDBC DBDWH">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>276</pd:x>
+        <pd:y>164</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBDWH/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBDWH/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT PS.vcIk_EMPLID,PS.vcIk_REG_TEMP,PS.dtIk_EFFDT
+FROM TR_PS_JOB PS
+WHERE 
+PS.dtIk_EFFDT = (SELECT MAX(C.dtIk_EFFDT) FROM TR_PS_JOB C WHERE PS.vcIk_EMPLID = C.vcIk_EMPLID)
+AND 
+PS.iIk_EFFSEQ = (SELECT MAX(D.iIk_EFFSEQ) FROM TR_PS_JOB D WHERE PS.vcIk_EMPLID = D.vcIk_EMPLID 
+AND PS.iIk_EFFSEQ = D.iIk_EFFSEQ)
+AND PS.vcIk_REG_TEMP IN ('T')
+AND PS.vcIk_EMPLID=?
+AND CONVERT(VARCHAR,PS.dtIk_EFFDT,112) &gt;= CONVERT(VARCHAR,GETDATE(),112)--FECHA DEL DIA.</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBDWH.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>EMPLID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>vcIk_EMPLID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>vcIk_REG_TEMP</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>dtIk_EFFDT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <EMPLID>
+                    <xsl:value-of select="$Start/EMPLID"/>
+                </EMPLID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC DBDWH</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC DBDWH</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

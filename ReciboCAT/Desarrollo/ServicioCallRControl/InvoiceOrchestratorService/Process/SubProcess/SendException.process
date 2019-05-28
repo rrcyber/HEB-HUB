@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/schemas/InvoiceOrquestratorRequestLoggerService/Shared Resources/Schema/InvoiceOrquestratorRequestLoggerService" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.example.com/1491838641739" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Common/ExceptionSchema.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema/Common/ExceptionSchema.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Common/ExceptionSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Common/ExceptionSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema/Common/ExceptionSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema/Common/ExceptionSchema.xsd" schemaLocation="/Shared Resources/Schema/Common/ExceptionSchema.xsd"/>
+    <wsdl:import namespace="http://xmlns.example.com/1491838641739" location="/Shared Resources/WSDL/WSLOG/wsdlLOG.wsdl"/>
+    <pd:name>Process/SubProcess/SendException.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Exception"/>
+    <pd:startX>59</pd:startX>
+    <pd:startY>68</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>385</pd:endX>
+    <pd:endY>70</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1439388666996</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>381</pd:x>
+        <pd:y>206</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="SOAPRequestReply">
+        <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+        <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+        <pd:x>203</pd:x>
+        <pd:y>70</pd:y>
+        <config>
+            <timeout>%%Connections/WSDLLOG/TimeOut%%</timeout>
+            <soapAttachmentStyle>SwA</soapAttachmentStyle>
+            <timeoutType>Seconds</timeoutType>
+            <service>pfx4:InvoiceOrquestratorRequestLoggerService</service>
+            <servicePort>InvoiceOrquestratorRequestLogger</servicePort>
+            <operation>SetInvoiceOrquestratorRequestException</operation>
+            <soapAction>/Process/Starters/InvoiceOrquestratorRequestLoggerService.serviceagent//SetInvoiceOrquestratorRequestException</soapAction>
+            <endpointURL>%%Connections/WSDLLOG/EndPointURL%%</endpointURL>
+            <authScheme>NONE</authScheme>
+            <policies>
+                <incomingAttachmentPolicy>
+                    <writeToFile>false</writeToFile>
+                    <writeToFileDir>C:\tmp\201310152</writeToFileDir>
+                    <createNonExistDir>true</createNonExistDir>
+                </incomingAttachmentPolicy>
+            </policies>
+            <requireBasicAuth>false</requireBasicAuth>
+            <ns0:ssl xmlns:ns0="http://www.tibco.com/xmlns/aemeta/services/2002">
+                <ns0:strongCipherSuitesOnly>true</ns0:strongCipherSuitesOnly>
+                <ns0:cert isRef="true">/Shared Resources/Certificates/.folder</ns0:cert>
+            </ns0:ssl>
+        </config>
+        <pd:inputBindings>
+            <inputMessage>
+                <ns2:Exception_Request>
+                    <ns2:Environment>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                    </ns2:Environment>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$Start/Exception/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$Start/Exception/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$Start/Exception/Project"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$Start/Exception/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="$Start/Exception/TimeStamp"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$Start/Exception/Code"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="$Start/Exception/Message"/>
+                        </Message>
+                    </Exception>
+                </ns2:Exception_Request>
+            </inputMessage>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SOAPRequestReply</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SOAPRequestReply</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

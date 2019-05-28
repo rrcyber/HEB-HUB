@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx11="http://xmlns.heb.com/ei/Pedido" xmlns:pfx10="http://xmlns.heb.com/ei/PedidoResponse" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://xmlns.heb.com/ei/SalidaSP" xmlns:pfx4="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/Supertarjeta" xmlns:pfx9="http://xmlns.heb.com/ei/PedidoRequest" xmlns:pfx8="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam" xmlns:pfx7="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam" xmlns:pfx6="http://xmlns.heb.com/ei/Resultsets" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Supertarjeta" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaIn.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SalidaSP" schemaLocation="/Shared Resources/Schema Definitions/Custom/SalidaSP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SupertarjetaOut" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Resultsets" schemaLocation="/Shared Resources/Schema Definitions/Custom/Resultsets.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoRequest" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoRequest.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PedidoResponse" schemaLocation="/Shared Resources/Schema Definitions/Custom/PedidoResponse.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesRequestParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/apiEntrepidsRunImportInterfacesResponseParam"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Pedido" schemaLocation="/Shared Resources/Schema Definitions/Custom/Pedido.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <pd:name>MagentoToPedidos_Service Processes/Sub Process/Send_Pago.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx11:Pedido"/>
+    <pd:startX>126</pd:startX>
+    <pd:startY>182</pd:startY>
+    <pd:returnBindings>
+        <pfx10:PedidoResponse>
+            <pfx10:Codigo>
+                <xsl:value-of select="'001'"/>
+            </pfx10:Codigo>
+            <pfx10:Descripcion>
+                <xsl:value-of select="'Exito'"/>
+            </pfx10:Descripcion>
+        </pfx10:PedidoResponse>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>918</pd:endX>
+    <pd:endY>181</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412351419698</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>692</pd:x>
+        <pd:y>381</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>970</pd:x>
+        <pd:y>383</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/StackTrace"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Pago">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>221</pd:x>
+        <pd:y>4</pd:y>
+        <pd:width>597</pd:width>
+        <pd:height>336</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query Referencia</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/pfx11:Pedido/pfx11:Pago/pfx11:NombreFormaPago='null'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Grouptest</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Grouptest</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query Referencia</pd:from>
+            <pd:to>Grouptest</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Query Referencia">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>367</pd:x>
+            <pd:y>76</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT Referencia FROM CatalogoMaestroDetalle WHERE CatalogoMaestroId = ? AND ClaveExterna = ?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>CatalogoMaestroId</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>ClaveExterna</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>Referencia</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <CatalogoMaestroId>
+                        <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Variables/maestroIdFormaDePago"/>
+                    </CatalogoMaestroId>
+                    <ClaveExterna>
+                        <xsl:value-of select="$Start/pfx11:Pedido/pfx11:Pago[1]/pfx11:IdFormaPago"/>
+                    </ClaveExterna>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Grouptest">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>518</pd:x>
+            <pd:y>92</pd:y>
+            <pd:width>177</pd:width>
+            <pd:height>157</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Start/pfx11:Pedido/pfx11:Pago</pd:over>
+                <pd:iterationElementSlot>pago</pd:iterationElementSlot>
+                <pd:indexSlot>a</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert Pago</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert Pago</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert Pago">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>596</pd:x>
+                <pd:y>179</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTAGE.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO eCom_PedidoFormaPago (Pago_ID, Pedido_ID, Nombre_Pago, Numero_Referencia, Monto_autorizado, Monto_final, Numero_aprobacion, Fecha_aprobacion, Num_Tarjeta, Nombre_tarjeta, Banco, Tipo_Tarjeta, Estatus_Pago, FechaModificacion)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>Pago_ID</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Pedido_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Nombre_Pago</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Numero_Referencia</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Monto_autorizado</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Monto_final</parameterName>
+                            <dataType>DECIMAL</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Numero_aprobacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Fecha_aprobacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Num_Tarjeta</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Nombre_tarjeta</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Banco</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Tipo_Tarjeta</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Estatus_Pago</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>FechaModificacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <Pago_ID>
+                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:IdFormaPago"/>
+                        </Pago_ID>
+                        <Pedido_id>
+                            <xsl:value-of select="$Start/pfx11:Pedido/pfx11:Encabezado/pfx11:IdPedido"/>
+                        </Pedido_id>
+                        <xsl:choose>
+                            <xsl:when test="$JDBC-Query-Referencia/resultSet/Record/Referencia">
+                                <Nombre_Pago>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($JDBC-Query-Referencia/resultSet/Record[1]/Referencia)">
+                                            <xsl:value-of select="$JDBC-Query-Referencia/resultSet/Record[1]/Referencia"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Nombre_Pago>
+                            </xsl:when>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:NombreFormaPago!='null'">
+                                <Nombre_Pago>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:NombreFormaPago)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:NombreFormaPago"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Nombre_Pago>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Nombre_Pago xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:NumeroReferencia!='null'">
+                                <Numero_Referencia>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:NumeroReferencia)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:NumeroReferencia"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Numero_Referencia>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Numero_Referencia xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <Monto_autorizado>
+                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:MontoAutorizado"/>
+                        </Monto_autorizado>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:MontoFinalAplicado !='null'">
+                                <Monto_final>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:MontoFinalAplicado)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:MontoFinalAplicado"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Monto_final>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Monto_final>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:MontoFinalAplicado)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:MontoFinalAplicado"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Monto_final>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:NumeroAprobacion !='null'">
+                                <Numero_aprobacion>
+                                    <xsl:value-of select="$pago/pfx11:Pago/pfx11:NumeroAprobacion"/>
+                                </Numero_aprobacion>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Numero_aprobacion>
+                                    <xsl:value-of select="$pago/pfx11:Pago/pfx11:NumeroAprobacion"/>
+                                </Numero_aprobacion>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:FechaAprobacion !='null'">
+                                <Fecha_aprobacion>
+                                    <xsl:value-of select="$pago/pfx11:Pago/pfx11:FechaAprobacion"/>
+                                </Fecha_aprobacion>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Fecha_aprobacion xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:NumeroTarjeta !='null'">
+                                <Num_Tarjeta>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:NumeroTarjeta)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:NumeroTarjeta"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Num_Tarjeta>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Num_Tarjeta xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:NombrePropietarioTarjeta !='null'">
+                                <Nombre_tarjeta>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:NombrePropietarioTarjeta)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:NombrePropietarioTarjeta"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Nombre_tarjeta>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Nombre_tarjeta xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:BancoTarjeta !='null'">
+                                <Banco>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:BancoTarjeta)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:BancoTarjeta"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Banco>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Banco xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="$pago/pfx11:Pago/pfx11:TipoTarjeta !='null'">
+                                <Tipo_Tarjeta>
+                                    <xsl:choose>
+                                        <xsl:when test="exists($pago/pfx11:Pago/pfx11:TipoTarjeta)">
+                                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:TipoTarjeta"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </Tipo_Tarjeta>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <Tipo_Tarjeta xsi:nil="true"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <Estatus_Pago>
+                            <xsl:value-of select="$pago/pfx11:Pago/pfx11:EstatusPago"/>
+                        </Estatus_Pago>
+                        <FechaModificacion>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </FechaModificacion>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>808</pd:x>
+        <pd:y>476</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>841</pd:x>
+        <pd:y>381</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <Code>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </Code>
+                </xsl:if>
+                <Message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault-13">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>351</pd:x>
+        <pd:y>415</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <pfx:Code>
+                            <xsl:value-of select="'Fault 13'"/>
+                        </pfx:Code>
+                        <pfx:Reason>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/Mensajes/Fault_13"/>
+                        </pfx:Reason>
+                    </pfx:Fault>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault-11">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>587</pd:x>
+        <pd:y>428</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <pfx:Reason>
+                            <xsl:value-of select="'Fault 11'"/>
+                        </pfx:Reason>
+                        <pfx:Detail>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ExceptionHandling/Mensajes/Fault_11"/>
+                        </pfx:Detail>
+                    </pfx:Fault>
+                </data>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:xpathDescription>Errores Desconocidos</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Pago</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Pago</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:xpathDescription>Errores Registrados</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "Fault")</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Pago</pd:from>
+        <pd:to>Fault-13</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Pago</pd:from>
+        <pd:to>Fault-11</pd:to>
+        <pd:xpathDescription>No Insert</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JDBC-Insert-Pago/jdbcUpdateActivityOutput/noOfUpdates=0</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

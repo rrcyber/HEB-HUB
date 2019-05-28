@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns22="http://xmlns.heb.com/ei/OutVenta" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/Supertarjeta" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ResidueOut.xsd" xmlns:pfx3="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/SupertarjetaOut" xmlns:pfx6="http://xmlns.example.com/1418946732074">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Supertarjeta" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaIn.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SupertarjetaOut" schemaLocation="/Shared Resources/Schema Definitions/Custom/SupertarjetaOut.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/SupertarjetaService/Shared Resources/Schema Definitions/Custom/Schema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/ResidueIn.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ResidueOut.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ProviderFaultSchema" schemaLocation="/Shared Resources/Schema Definitions/Custom/ProviderSOAPFault.xsd"/>
+    <wsdl:import namespace="http://xmlns.example.com/1418946732074" location="/Shared Resources/WSDL/SuperTarjetaService.wsdl"/>
+    <pd:name>SupertarjetaService Processes/Main Process/Residue_Supertarjeta_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:ResidueIn"/>
+    <pd:startX>72</pd:startX>
+    <pd:startY>76</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Residue_Supertarjeta/ns3:ResidueOut"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx4:ResidueOut"/>
+    <pd:endX>455</pd:endX>
+    <pd:endY>79</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx6:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1412351440454</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>181</pd:x>
+        <pd:y>209</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=Fault namespace=http://xmlns.example.com/1418946732074</fault>
+            <catchAll>false</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>319</pd:x>
+        <pd:y>211</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns2:MSG_Container>
+                <ns2:Header>
+                    <ns2:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </ns2:ProjectName>
+                    <ns2:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </ns2:Source_Domain>
+                    <ns2:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </ns2:Destination_Domain>
+                    <ns2:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/TransactionType"/>
+                    </ns2:Transaction_Type>
+                    <ns2:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns2:TimeStamp>
+                </ns2:Header>
+                <ns2:Body>
+                    <ns2:ErrorManagementSchema>
+                        <ns2:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns2:inrtn_id>
+                        <ns2:inrtn_instn_nm>
+                            <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                        </ns2:inrtn_instn_nm>
+                        <ns2:inrtn_err_rtn_desc>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                        </ns2:inrtn_err_rtn_desc>
+                        <ns2:inrtn_msg_body>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                        </ns2:inrtn_msg_body>
+                        <ns2:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns2:cre8_ts>
+                        <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                            <ns2:u_code>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                            </ns2:u_code>
+                        </xsl:if>
+                        <ns2:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns2:sev_id>
+                    </ns2:ErrorManagementSchema>
+                </ns2:Body>
+            </ns2:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>329</pd:x>
+        <pd:y>80</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:AuditingSchema>
+                <ns12:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns12:inrtn_id>
+                <ns12:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns12:inrtn_nm>
+                <ns12:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns12:inrtn_instn_nm>
+                <ns12:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns12:inrtn_proc_id>
+                <ns12:inrtn_rec_cnt>
+                    <xsl:value-of select="1"/>
+                </ns12:inrtn_rec_cnt>
+                <ns12:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                </ns12:inrtn_cre8_ts>
+            </ns12:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Residue_Supertarjeta">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>201</pd:x>
+        <pd:y>78</pd:y>
+        <config>
+            <processName>/SupertarjetaService Processes/Sub Process/Residue_Supertarjeta.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx3:ResidueIn"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>469</pd:x>
+        <pd:y>209</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <data>
+                    <xsl:copy-of select="$Catch/pfx6:Fault"/>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Residue_Supertarjeta</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Residue_Supertarjeta</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Sub Process/Get_GroupProducts.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="IncentiveID" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>77</pd:startX>
+    <pd:startY>145</pd:startY>
+    <pd:returnBindings>
+        <resultSet>
+            <Auxilary>
+                <xsl:copy-of select="$Map-GroupProducts/resultSet/Auxilary/ProductGroup"/>
+            </Auxilary>
+        </resultSet>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx:resultSet"/>
+    <pd:endX>657</pd:endX>
+    <pd:endY>146</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1403886424161</pd:targetNamespace>
+    <pd:activity name="Get_Group_Products_Reward">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>335</pd:x>
+        <pd:y>88</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Get_GroupProductsReward.process</processName>
+        </config>
+        <pd:inputBindings>
+            <IncentiveID>
+                <xsl:value-of select="$Start/IncentiveID"/>
+            </IncentiveID>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Get_Group_Products_Condition">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>336</pd:x>
+        <pd:y>223</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Get_GroupProductsCondition.process</processName>
+        </config>
+        <pd:inputBindings>
+            <IncentiveID>
+                <xsl:value-of select="$Start/IncentiveID"/>
+            </IncentiveID>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Process">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>181</pd:x>
+        <pd:y>144</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Map GroupProducts">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>541</pd:x>
+        <pd:y>142</pd:y>
+        <config>
+            <element ref="pfx:resultSet"/>
+        </config>
+        <pd:inputBindings>
+            <resultSet>
+                <Auxilary>
+                    <xsl:for-each select="$Get_Group_Products_Condition/resultSet/Auxilary/ProductGroup|$Get_Group_Products_Reward/resultSet/Auxilary/ProductGroup">
+                        <ProductGroup>
+                            <Header>
+                                <xsl:if test="Header/ProductGroupID">
+                                    <ProductGroupID>
+                                        <xsl:value-of select="Header/ProductGroupID"/>
+                                    </ProductGroupID>
+                                </xsl:if>
+                                <xsl:if test="Header/Name">
+                                    <Name>
+                                        <xsl:value-of select="Header/Name"/>
+                                    </Name>
+                                </xsl:if>
+                                <xsl:if test="Header/AnyProduct">
+                                    <AnyProduct>
+                                        <xsl:value-of select="Header/AnyProduct"/>
+                                    </AnyProduct>
+                                </xsl:if>
+                            </Header>
+                            <Products>
+                                <xsl:value-of select="Products"/>
+                            </Products>
+                        </ProductGroup>
+                    </xsl:for-each>
+                </Auxilary>
+            </resultSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>286</pd:x>
+        <pd:y>323</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="tib:render-xml($_error/ns:ErrorReport, 0,0)"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>144</pd:x>
+        <pd:y>322</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=Exception</fault>
+            <catchAll>false</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>543</pd:x>
+        <pd:y>278</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="tib:render-xml($_error/ns:ErrorReport, 0,0)"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Process</pd:from>
+        <pd:to>Get_Group_Products_Reward</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Process</pd:from>
+        <pd:to>Get_Group_Products_Condition</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Group_Products_Reward</pd:from>
+        <pd:to>Map GroupProducts</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Group_Products_Condition</pd:from>
+        <pd:to>Map GroupProducts</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map GroupProducts</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map GroupProducts</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

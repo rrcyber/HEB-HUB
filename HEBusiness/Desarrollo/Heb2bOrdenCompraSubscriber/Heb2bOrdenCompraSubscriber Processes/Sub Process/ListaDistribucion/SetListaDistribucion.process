@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Sub Process/ListaDistribucion/SetListaDistribucion.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER_DISTRIBUTION"/>
+    <pd:startX>641</pd:startX>
+    <pd:startY>156</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>394</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1474563536965</pd:targetNamespace>
+    <pd:activity name="Insert_OCD_SXD201110">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>641</pd:x>
+        <pd:y>36</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <statement>insert into OrdenCompraDistribucion (IdOrdenCompra,IdArticulo,IdSucursal,FechaPedidoCAT,Cantidad) values (?,?,?,?,?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>IdOrdenCompra</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IdArticulo</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IdSucursal</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>FechaPedidoCAT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Cantidad</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <batchUpdate>true</batchUpdate>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <xsl:for-each select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM">
+                    <Record>
+                        <IdOrdenCompra>
+                            <xsl:copy-of select="pfx:ID_ORDEN_COMPRA/@xsi:nil"/>
+                            <xsl:value-of select="pfx:ID_ORDEN_COMPRA"/>
+                        </IdOrdenCompra>
+                        <IdArticulo>
+                            <xsl:copy-of select="pfx:ID_ARTICULO/@xsi:nil"/>
+                            <xsl:value-of select="pfx:ID_ARTICULO"/>
+                        </IdArticulo>
+                        <IdSucursal>
+                            <xsl:copy-of select="pfx:ID_SUCURSAL/@xsi:nil"/>
+                            <xsl:value-of select="pfx:ID_SUCURSAL"/>
+                        </IdSucursal>
+                        <FechaPedidoCAT>
+                            <xsl:copy-of select="pfx:FECHA_PEDIDO_CAT/@xsi:nil"/>
+                            <xsl:value-of select="pfx:FECHA_PEDIDO_CAT"/>
+                        </FechaPedidoCAT>
+                        <Cantidad>
+                            <xsl:copy-of select="pfx:CANTIDAD/@xsi:nil"/>
+                            <xsl:value-of select="pfx:CANTIDAD"/>
+                        </Cantidad>
+                    </Record>
+                </xsl:for-each>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>146</pd:x>
+        <pd:y>149</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>148</pd:x>
+        <pd:y>268</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update_OCD_SXD201110">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>395</pd:x>
+        <pd:y>152</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE OrdenCompraDistribucion SET FechaPedidoCAT = ? , Cantidad = ?
+WHERE IdOrdenCompra = ?
+AND IdArticulo = ?
+AND IDSucursal = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>FechaPedidoCAT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Cantidad</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IdOrdenCompra</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IdArticulo</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>IDSucursal</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <batchUpdate>true</batchUpdate>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <xsl:for-each select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM">
+                    <Record>
+                        <FechaPedidoCAT>
+                            <xsl:copy-of select="pfx:FECHA_PEDIDO_CAT/@xsi:nil"/>
+                            <xsl:value-of select="pfx:FECHA_PEDIDO_CAT"/>
+                        </FechaPedidoCAT>
+                        <Cantidad>
+                            <xsl:copy-of select="pfx:CANTIDAD/@xsi:nil"/>
+                            <xsl:value-of select="pfx:CANTIDAD"/>
+                        </Cantidad>
+                        <IdOrdenCompra>
+                            <xsl:copy-of select="pfx:ID_ORDEN_COMPRA/@xsi:nil"/>
+                            <xsl:value-of select="pfx:ID_ORDEN_COMPRA"/>
+                        </IdOrdenCompra>
+                        <IdArticulo>
+                            <xsl:copy-of select="pfx:ID_ARTICULO/@xsi:nil"/>
+                            <xsl:value-of select="pfx:ID_ARTICULO"/>
+                        </IdArticulo>
+                        <IDSucursal>
+                            <xsl:copy-of select="pfx:ID_SUCURSAL/@xsi:nil"/>
+                            <xsl:value-of select="pfx:ID_SUCURSAL"/>
+                        </IDSucursal>
+                    </Record>
+                </xsl:for-each>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Insert_OCD_SXD201110</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_OCD_SXD201110</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_OCD_SXD201110</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Update_OCD_SXD201110</pd:to>
+        <pd:xpathDescription>Llave duplicada</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$_error/ns1:ErrorReport/MsgCode = 'BW-JDBC-100014'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update_OCD_SXD201110</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

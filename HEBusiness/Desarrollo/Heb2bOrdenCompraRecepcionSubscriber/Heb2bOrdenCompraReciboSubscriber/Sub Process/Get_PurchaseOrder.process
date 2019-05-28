@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>Heb2bOrdenCompraReciboSubscriber/Sub Process/Get_PurchaseOrder.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>113</pd:startX>
+    <pd:startY>138</pd:startY>
+    <pd:returnBindings>
+        <resultSet>
+            <xsl:for-each select="$Query_Get_Recibo_PMM/resultSet/Record">
+                <Record>
+                    <PMG_PO_NUMBER>
+                        <xsl:value-of select="PMG_PO_NUMBER"/>
+                    </PMG_PO_NUMBER>
+                </Record>
+            </xsl:for-each>
+        </resultSet>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="resultSet">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Record" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="PMG_PO_NUMBER" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>477</pd:endX>
+    <pd:endY>139</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1445882523875</pd:targetNamespace>
+    <pd:activity name="Query_Get_Recibo_PMM">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>289</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEB2B/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/JDBC_HEB2B/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+            <statement>select distinct(pmg_po_number)
+from pmm.sditrfdte 
+where action_code='04'
+and download_date_1 is null
+and pmg_po_number is not null</statement>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>PMG_PO_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Query_Get_Recibo_PMM</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Query_Get_Recibo_PMM</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns5="http://xmlns.heb.com/ei/RECEIPT_NUMBER_RESPONSE" xmlns:ns6="http://xmlns.heb.com/ei/SHEET_DIFFERENCES_REQUEST" xmlns:ns7="http://xmlns.heb.com/ei/SHEET_DIFFERENCES_RESPONSE" xmlns:pfx="http://www.heb.com/ei/MexicoDigitalInvoiceService" xmlns:ns2="http://xmlns.heb.com/ei/GET_RECEIPT_NUMBER_RESPONSE" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://xmlns.heb.com/ei/RECEIPT_NUMBER" xmlns:ns4="http://xmlns.heb.com/ei/SPGFaultSchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://xmlns.heb.com/ei/TEST_RECEIPT_RESPONSE" xmlns:pfx3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://xmlns.heb.com/ei/RECEIPT_NUMBER_REQUEST" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/RECEIPT_NUMBER_REQUEST" schemaLocation="/Shared Resources/Schema Definitions/Custom/RECEIPT_NUMBER_REQUEST.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TEST_RECEIPT_RESPONSE" schemaLocation="/Shared Resources/Schema Definitions/Custom/RECEIPT_NUMBER.xsd"/>
+    <wsdl:import namespace="http://www.heb.com/ei/MexicoDigitalInvoiceService" location="/Shared Resources/WSDL/Abstract/MexicoDigitalInvoiceService.wsdl"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Main Process/Get_SheetDifferences_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="pfx:GET_SHEET_DIFFERENCES_REQUEST"/>
+    <pd:startX>196</pd:startX>
+    <pd:startY>75</pd:startY>
+    <pd:returnBindings>
+        <pfx:GET_SHEET_DIFFERENCES_RESPONSE>
+            <parameters>
+                <xsl:copy-of select="$Get_Sheet_Differences/ns7:GET_SHEET_DIFFERENCES_RESPONSE"/>
+            </parameters>
+        </pfx:GET_SHEET_DIFFERENCES_RESPONSE>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="pfx:GET_SHEET_DIFFERENCES_RESPONSE"/>
+    <pd:endX>510</pd:endX>
+    <pd:endY>75</pd:endY>
+    <pd:errorSchemas>
+        <WSDError wsMsgRef="pfx:FAULT"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <Variable0>
+            <xsd:element name="output" type="xsd:string"/>
+        </Variable0>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1302052602250</pd:targetNamespace>
+    <pd:activity name="Get_Sheet_Differences">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>361</pd:x>
+        <pd:y>75</pd:y>
+        <config>
+            <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Get_Sheet_Differences.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx:GET_SHEET_DIFFERENCES_REQUEST/parameters/ns6:GET_SHEET_DIFFERENCES_REQUEST"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>200</pd:x>
+        <pd:y>219</pd:y>
+        <config>
+            <faultName>WSDError</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns3:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns3:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <pfx:FAULT>
+                        <fault>
+                            <ns4:SPGSOAPFault>
+                                <ns4:FaultCode>
+                                    <xsl:value-of select="$_error/ns3:ErrorReport/MsgCode"/>
+                                </ns4:FaultCode>
+                                <ns4:FaultString>
+                                    <xsl:value-of select="$_error/ns3:ErrorReport/Msg"/>
+                                </ns4:FaultString>
+                            </ns4:SPGSOAPFault>
+                        </fault>
+                    </pfx:FAULT>
+                </data>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Get_Sheet_Differences</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Sheet_Differences</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Get_Sheet_Differences</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

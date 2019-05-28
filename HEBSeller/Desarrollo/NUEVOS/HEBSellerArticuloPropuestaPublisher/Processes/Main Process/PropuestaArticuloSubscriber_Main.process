@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:ns5="http://xmlns.heb.com/ei/Inventory" xmlns:pfx="http://xmlns.heb.com/ei/PO_NOTIFY" xmlns:ns2="www.tibco.com/plugin/Sleep" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://xmlns.heb.com/ei/Price" xmlns:ns3="http://xmlns.heb.com/ei/PlannerDepartmentList" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx5="http://xmlns.heb.com/ei/CatalogoPlanner" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx2="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3" xmlns:pfx9="http://xmlns.heb.com/ei/Products" xmlns:pfx8="http://xmlns.heb.com/ei/Bitacora" xmlns:pfx7="http://xmlns.heb.com/ei/PriceInventory" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx6="http://xmlns.heb.com/ei/CatalogoPlannerList">
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Common/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Custom/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/CatalogoPlanner" schemaLocation="/Shared Resources/Schema Definitions/Custom/CATALOGO_PLANNER_INFORMATION_DATA_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS_SOAP.xsd"/>
+    <pd:name>Processes/Main Process/PropuestaArticuloSubscriber_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Propuesta" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>122</pd:startX>
+    <pd:startY>109</pd:startY>
+    <pd:returnBindings>
+        <Out>
+            <xsl:if test="$Parse-XML/pfx9:MSG_CONTAINER/pfx9:Body/pfx9:BitacoraPropuestaArticulo[1]/IdPropuestaArticulo">
+                <IdPropuesta>
+                    <xsl:value-of select="$Parse-XML/pfx9:MSG_CONTAINER/pfx9:Body/pfx9:BitacoraPropuestaArticulo[1]/IdPropuestaArticulo"/>
+                </IdPropuesta>
+            </xsl:if>
+        </Out>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Out">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="IdPropuesta" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>576</pd:endX>
+    <pd:endY>111</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <Global>
+            <xsd:element name="Flag2" type="xsd:string"/>
+        </Global>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1406154803290</pd:targetNamespace>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>412</pd:x>
+        <pd:y>251</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE: Incident at Planner : ', tib:render-xml($_error/ns:ErrorReport ,0, 0))"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>289</pd:x>
+        <pd:y>251</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>237</pd:x>
+        <pd:y>109</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx9:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/Propuesta"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Set_ArticuloPropuesta">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>353</pd:x>
+        <pd:y>110</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Set_ArticuloPropuesta.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Parse-XML/pfx9:MSG_CONTAINER/pfx9:Body/pfx9:mag_import_products"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="StatusEnviado">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>465</pd:x>
+        <pd:y>111</pd:y>
+        <config>
+            <processName>/Processes/Sub Process/Set_EstatusPropuesta.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:copy-of select="$Parse-XML/pfx9:MSG_CONTAINER/pfx9:Body/pfx9:BitacoraPropuestaArticulo"/>
+                <IdEstatus>
+                    <xsl:value-of select="11"/>
+                </IdEstatus>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Set_ArticuloPropuesta</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Set_ArticuloPropuesta</pd:from>
+        <pd:to>StatusEnviado</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>StatusEnviado</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

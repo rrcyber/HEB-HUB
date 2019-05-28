@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns14="http://xmlns.heb.com/ei/error" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns3="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Starter Process/PurchaseOrder_Received_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>157</pd:x>
+        <pd:y>171</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>%%Destinations/Queues/PMM_PO_QUEUE%%2%%Connections/JMS/EMSMexico/MIG_MAX_SESSIONS%%<destination>%%Destinations/Queues/PMM_PO_RECEPTION_QUEUE%%</destination>
+                <acknowledgeMode>2</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Properties/GLB_MAX_SESSIONS%%</maxSessions>
+                <selector>JMSCorrelationID='RCV'</selector>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1129</pd:endX>
+    <pd:endY>166</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1349470213176</pd:targetNamespace>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>919</pd:x>
+        <pd:y>166</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="PurchaseOrder_Serial">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>742</pd:x>
+        <pd:y>169</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/PurchaseOrder_Serial.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <StarterName>
+                    <xsl:value-of select="'PurchaseOrder_Received_Starter'"/>
+                </StarterName>
+                <XmlString>
+                    <xsl:value-of select="$Render-XML/xmlString"/>
+                </XmlString>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Render XML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>593</pd:x>
+        <pd:y>171</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>true</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term ref="pfx2:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Map-Data/pfx2:MSG_CONTAINER"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Audit Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1029</pd:x>
+        <pd:y>228</pd:y>
+        <config>
+            <processName>/Utility Services/AuditProcess/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns14:AuditingSchema>
+                <ns14:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns14:inrtn_id>
+                <ns14:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                </ns14:inrtn_nm>
+                <ns14:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                </ns14:inrtn_instn_nm>
+                <ns14:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns2:ProcessContext/ProcessId"/>
+                </ns14:inrtn_proc_id>
+                <ns14:inrtn_rec_cnt>
+                    <xsl:value-of select="$Map-Data/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx2:ITEM[1]/pfx2:PMG_PO_NUMBER"/>
+                </ns14:inrtn_rec_cnt>
+                <ns14:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                </ns14:inrtn_cre8_ts>
+            </ns14:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error-Process-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1017</pd:x>
+        <pd:y>296</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns3:MSG_Container>
+                <ns3:Header>
+                    <ns3:ProjectName>
+                        <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                    </ns3:ProjectName>
+                    <ns3:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectNameVariables/GLB_SOURCE_DOMAIN"/>
+                    </ns3:Source_Domain>
+                    <ns3:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectNameVariables/GLB_DESTINATION_DOMAIN"/>
+                    </ns3:Destination_Domain>
+                    <ns3:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectNameVariables/GLB_TRANSACTION_TYPE"/>
+                    </ns3:Transaction_Type>
+                    <ns3:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns3:TimeStamp>
+                </ns3:Header>
+                <ns3:Body>
+                    <ns3:ErrorManagementSchema>
+                        <ns3:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns3:inrtn_id>
+                        <ns3:inrtn_instn_nm>
+                            <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                        </ns3:inrtn_instn_nm>
+                        <ns3:inrtn_err_rtn_desc>
+                            <xsl:value-of select="concat(&#xA;'Message Code: ',$_error/ns2:ErrorReport/MsgCode,&quot;&#xA;&quot;,&#xA;'Error Message: ',$_error/ns2:ErrorReport/Msg,&quot;&#xA;&quot;,&#xA;'Error Class: ',$_error/ns2:ErrorReport/Class,&quot;&#xA;&quot;,&#xA;tib:render-xml($_error/ns2:ErrorReport/Data),&quot;&#xA;&quot;,&quot;&#xA;&quot;,&#xA;'STACKTRACE: ',$_error/ns2:ErrorReport/StackTrace,&quot;&#xA;&quot;&#xA;)"/>
+                        </ns3:inrtn_err_rtn_desc>
+                        <ns3:inrtn_msg_body>
+                            <xsl:value-of select="concat('Purchase_Order: ',$Map-Data/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx2:ITEM[1]/pfx2:PMG_PO_NUMBER)"/>
+                        </ns3:inrtn_msg_body>
+                        <ns3:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                        </ns3:cre8_ts>
+                        <ns3:u_code>
+                            <xsl:value-of select="if (contains($_error/ns2:ErrorReport/MsgCode, 'BW-JMS')) then&#xA;concat($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_TECHNICAL,'-', $_error/ns2:ErrorReport/MsgCode) &#xA;else if (contains($_error/ns2:ErrorReport/MsgCode, 'BW-ENGINE'))  then &#xA;concat($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL,'-', $_error/ns2:ErrorReport/MsgCode) &#xA;else &#xA;concat($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_DATA,'-', $_error/ns2:ErrorReport/MsgCode)"/>
+                        </ns3:u_code>
+                        <ns3:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_HIGH"/>
+                        </ns3:sev_id>
+                    </ns3:ErrorManagementSchema>
+                </ns3:Body>
+            </ns3:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>912</pd:x>
+        <pd:y>296</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Confirm-1">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>1132</pd:x>
+        <pd:y>298</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>307</pd:x>
+        <pd:y>170</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx2:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JMS-Queue-Receiver/ns13:ActivityOutput/Body"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>453</pd:x>
+        <pd:y>170</pd:y>
+        <config>
+            <element ref="pfx2:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$Parse-XML/pfx2:MSG_CONTAINER">
+                <pfx2:MSG_CONTAINER>
+                    <xsl:for-each select="pfx2:Header">
+                        <pfx2:Header>
+                            <pfx2:ProjectName>
+                                <xsl:value-of select="pfx2:ProjectName"/>
+                            </pfx2:ProjectName>
+                            <pfx2:Source_Domain>
+                                <xsl:value-of select="pfx2:Source_Domain"/>
+                            </pfx2:Source_Domain>
+                            <pfx2:Destination_Domain>
+                                <xsl:value-of select="pfx2:Destination_Domain"/>
+                            </pfx2:Destination_Domain>
+                            <pfx2:Transaction_Type>
+                                <xsl:value-of select="pfx2:Transaction_Type"/>
+                            </pfx2:Transaction_Type>
+                            <pfx2:TimeStamp>
+                                <xsl:value-of select="pfx2:TimeStamp"/>
+                            </pfx2:TimeStamp>
+                        </pfx2:Header>
+                    </xsl:for-each>
+                    <xsl:for-each select="pfx2:Body">
+                        <pfx2:Body>
+                            <xsl:for-each select="pfx2:PURCHASE_ORDER_RECEPTION_DETAIL">
+                                <pfx2:PURCHASE_ORDER_RECEPTION_DETAIL>
+                                    <xsl:for-each select="pfx2:ITEM">
+                                        <pfx2:ITEM>
+                                            <pfx2:RCV_SESSION_ID>
+                                                <xsl:value-of select="pfx2:RCV_SESSION_ID"/>
+                                            </pfx2:RCV_SESSION_ID>
+                                            <pfx2:ORG_LVL_NUMBER>
+                                                <xsl:value-of select="pfx2:ORG_LVL_NUMBER"/>
+                                            </pfx2:ORG_LVL_NUMBER>
+                                            <pfx2:PMG_PO_NUMBER>
+                                                <xsl:value-of select="pfx2:PMG_PO_NUMBER"/>
+                                            </pfx2:PMG_PO_NUMBER>
+                                            <pfx2:PRD_LVL_NUMBER>
+                                                <xsl:value-of select="pfx2:PRD_LVL_NUMBER"/>
+                                            </pfx2:PRD_LVL_NUMBER>
+                                            <pfx2:RCV_DATE>
+                                                <xsl:value-of select="pfx2:RCV_DATE"/>
+                                            </pfx2:RCV_DATE>
+                                            <pfx2:RCV_SELL_QTY>
+                                                <xsl:value-of select="pfx2:RCV_SELL_QTY"/>
+                                            </pfx2:RCV_SELL_QTY>
+                                            <pfx2:PMG_STATUS>
+                                                <xsl:value-of select="pfx2:PMG_STATUS"/>
+                                            </pfx2:PMG_STATUS>
+                                        </pfx2:ITEM>
+                                    </xsl:for-each>
+                                </pfx2:PURCHASE_ORDER_RECEPTION_DETAIL>
+                            </xsl:for-each>
+                            <xsl:for-each select="pfx2:Fault">
+                                <pfx2:Fault>
+                                    <pfx2:Code>
+                                        <xsl:value-of select="pfx2:Code"/>
+                                    </pfx2:Code>
+                                    <pfx2:Reason>
+                                        <xsl:value-of select="pfx2:Reason"/>
+                                    </pfx2:Reason>
+                                    <pfx2:Detail>
+                                        <xsl:value-of select="pfx2:Detail"/>
+                                    </pfx2:Detail>
+                                </pfx2:Fault>
+                            </xsl:for-each>
+                        </pfx2:Body>
+                    </xsl:for-each>
+                </pfx2:MSG_CONTAINER>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Queue Reprocess">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>914</pd:x>
+        <pd:y>55</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/PMM_PO_REPROCESS_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection Mex.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <JMSCorrelationID>
+                    <xsl:value-of select="'RCV_80'"/>
+                </JMSCorrelationID>
+                <Body>
+                    <xsl:value-of select="$JMS-Queue-Receiver/ns13:ActivityOutput/Body"/>
+                </Body>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render XML</pd:from>
+        <pd:to>PurchaseOrder_Serial</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PurchaseOrder_Serial</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PurchaseOrder_Serial</pd:from>
+        <pd:to>JMS Queue Reprocess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$PurchaseOrder_Serial/root/noOfUpdates=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>Audit Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$PurchaseOrder_Serial/root/noOfUpdates&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Audit Process</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error-Process-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error-Process-1</pd:from>
+        <pd:to>Confirm-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Render XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Reprocess</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>El mensaje entra en forma de texto, se parsea sin validacion de salida como messageContainer y se hace un mapeo hacia messageContainer para eliminar todos los elementos del XML que no pertenecen a messageContainer.</pd:description>
+        <pd:x>226</pd:x>
+        <pd:y>68</pd:y>
+        <pd:width>396</pd:width>
+        <pd:height>78</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-1</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns3="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_TT_DISTRIBUCION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd"/>
+    <pd:name>Project Name Processes/Main Process/DistributionList_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER_DISTRIBUTION"/>
+    <pd:startX>120</pd:startX>
+    <pd:startY>106</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>666</pd:endX>
+    <pd:endY>167</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371621839180</pd:targetNamespace>
+    <pd:activity name="TT_ListaDistribucionPor_Insert">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>421</pd:x>
+        <pd:y>162</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/TT_ListaDistribucionPor_Insert.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Map-Data/ns:DISTRIBUCION_DATA"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>253</pd:x>
+        <pd:y>163</pd:y>
+        <config>
+            <element ref="ns:DISTRIBUCION_DATA"/>
+        </config>
+        <pd:inputBindings>
+            <ns:DISTRIBUCION_DATA>
+                <xsl:for-each select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM">
+                    <ns:ITEM>
+                        <ns:OrdenCompra>
+                            <xsl:copy-of select="pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx:PMG_PO_NUMBER"/>
+                        </ns:OrdenCompra>
+                        <ns:Articulo>
+                            <xsl:copy-of select="pfx:PRD_LVL_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx:PRD_LVL_NUMBER"/>
+                        </ns:Articulo>
+                        <ns:Departamento>
+                            <xsl:copy-of select="pfx:DEPARTAMENT_ID/@xsi:nil"/>
+                            <xsl:value-of select="pfx:DEPARTAMENT_ID"/>
+                        </ns:Departamento>
+                        <ns:Sucursal>
+                            <xsl:copy-of select="pfx:ORG_LVL_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx:ORG_LVL_NUMBER"/>
+                        </ns:Sucursal>
+                        <ns:Empaques>
+                            <xsl:value-of select="round(number(pfx:PMG_SELL_QTY) div number(pfx:SLL_UNITS_PER_INNER))"/>
+                        </ns:Empaques>
+                        <ns:PedidoID>
+                            <xsl:copy-of select="pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx:PMG_PO_NUMBER"/>
+                        </ns:PedidoID>
+                        <ns:FechaIngreso>
+                            <xsl:value-of select="if (string-length(pfx:PMG_RELEASE_DATE) = 0) then '' else substring(pfx:PMG_RELEASE_DATE, 1, 10)"/>
+                        </ns:FechaIngreso>
+                        <ns:TipoPedidoPOR>
+                            <xsl:value-of select="0"/>
+                        </ns:TipoPedidoPOR>
+                    </ns:ITEM>
+                </xsl:for-each>
+            </ns:DISTRIBUCION_DATA>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getDistributionList">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>124</pd:x>
+        <pd:y>306</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/getDistributionList.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:if test="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:PMG_PO_NUMBER">
+                    <orden>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                    </orden>
+                </xsl:if>
+                <articulo>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:PRD_LVL_NUMBER"/>
+                </articulo>
+                <departamento>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:DEPARTAMENT_ID"/>
+                </departamento>
+                <sucursal>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER"/>
+                </sucursal>
+                <pedidoId>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                </pedidoId>
+                <fechaingreso>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:PMG_RELEASE_DATE"/>
+                </fechaingreso>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>315</pd:x>
+        <pd:y>247</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>getDistributionList</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>TT_ListaDistribucionPor_Insert</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>TT_ListaDistribucionPor_Insert</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getDistributionList</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($getDistributionList/group/param)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getDistributionList</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getDistributionList</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>TT_ListaDistribucionPor_Insert</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

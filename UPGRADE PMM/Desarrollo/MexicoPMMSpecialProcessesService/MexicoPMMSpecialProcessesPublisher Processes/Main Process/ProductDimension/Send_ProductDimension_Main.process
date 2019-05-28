@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx12="http://xmlns.heb.com/ei/PRODUCT_DIMENSION_INFORMATION" xmlns:pfx11="http://xmlns.heb.com/ei/STYLE_AND_VARIATION_INFORMATION" xmlns:pfx10="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIDMHHDE_ADB_Adapter_Cfg" xmlns:pfx="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ADASDIConnection" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx5="http://xmlns.heb.com/ei/CARTON_MANIFEST_INFORMATION" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://xmlns.heb.com/ei/EXCHANGE_RATE_INFORMATION" xmlns:pfx3="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/ActiveDatabaseAdapterConfiguration" xmlns:pfx2="http://xmlns.heb.com/ei/PROVIDER_INFORMATION" xmlns:pfx9="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIVPCADR_ADB_Adapter_Cfg" xmlns:pfx8="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIVPCCON_ADB_Adapter_Cfg" xmlns:pfx7="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIVPCMST_ADB_Adapter_Cfg" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx6="http://www.tibco.com/xmlns/ae2xsd/2002/05/ae/ADB/PMMSDIRTVDTE_ADB_Adapter_Cfg">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/PRODUCT_DIMENSION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PRODUCT_DIMENSION_INFORMATION_SOAP.xsd"/>
+    <pd:name>MexicoPMMSpecialProcessesPublisher Processes/Main Process/ProductDimension/Send_ProductDimension_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx10:PMM.HEB__P__SDIDMHHDE"/>
+    <pd:startX>218</pd:startX>
+    <pd:startY>144</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>595</pd:endX>
+    <pd:endY>144</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1272992257379</pd:targetNamespace>
+    <pd:activity name="Publisher">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>345</pd:x>
+        <pd:y>144</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Topics/MIG_PRODUCTDIMENSION_TOPIC%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+            <ApplicationProperties/>
+            <InDataxsdString ref="pfx12:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <Body>
+                    <pfx12:MSG_CONTAINER>
+                        <pfx12:Header>
+                            <pfx12:ProjectName>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                            </pfx12:ProjectName>
+                            <pfx12:Source_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                            </pfx12:Source_Domain>
+                            <pfx12:Destination_Domain>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                            </pfx12:Destination_Domain>
+                            <pfx12:Transaction_Type>
+                                <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                            </pfx12:Transaction_Type>
+                            <pfx12:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx12:TimeStamp>
+                        </pfx12:Header>
+                        <pfx12:Body>
+                            <pfx12:PRODUCT_DIMENSION>
+                                <pfx12:TRAN_TYPE>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/TRAN__TYPE"/>
+                                </pfx12:TRAN_TYPE>
+                                <pfx12:ISS_TECH_KEY>
+                                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/ISS__TECH__KEY/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/ISS__TECH__KEY"/>
+                                </pfx12:ISS_TECH_KEY>
+                                <pfx12:AUDIT_NUMBER>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/AUDIT__NUMBER"/>
+                                </pfx12:AUDIT_NUMBER>
+                                <xsl:if test="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/DATE__CREATED/dateTime">
+                                    <pfx12:DATE_CREATED>
+                                        <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/DATE__CREATED/dateTime/@xsi:nil"/>
+                                        <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/DATE__CREATED/dateTime"/>
+                                    </pfx12:DATE_CREATED>
+                                </xsl:if>
+                                <pfx12:PRD_PDH_KEY>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDH__KEY"/>
+                                </pfx12:PRD_PDH_KEY>
+                                <pfx12:PRD_PDD_KEY>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__KEY"/>
+                                </pfx12:PRD_PDD_KEY>
+                                <pfx12:PRD_PDH_NAME>
+                                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDH__NAME/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDH__NAME"/>
+                                </pfx12:PRD_PDH_NAME>
+                                <pfx12:PRD_PDD_SEQ>
+                                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__SEQ/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__SEQ"/>
+                                </pfx12:PRD_PDD_SEQ>
+                                <pfx12:PRD_PDH_ORDER>
+                                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDH__ORDER/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDH__ORDER"/>
+                                </pfx12:PRD_PDH_ORDER>
+                                <pfx12:PRD_PDD_CODE>
+                                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__CODE/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__CODE"/>
+                                </pfx12:PRD_PDD_CODE>
+                                <pfx12:PRD_PDD_NAME>
+                                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__NAME/@xsi:nil"/>
+                                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__NAME"/>
+                                </pfx12:PRD_PDD_NAME>
+                            </pfx12:PRODUCT_DIMENSION>
+                        </pfx12:Body>
+                    </pfx12:MSG_CONTAINER>
+                </Body>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Update Record">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>468</pd:x>
+        <pd:y>144</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/PMM JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE PMM.SDIDMHHDE SET DOWNLOAD_DATE_1=SYSDATE
+WHERE AUDIT_NUMBER=? AND ISS_TECH_KEY=? AND PRD_PDH_KEY=? AND PRD_PDD_KEY=?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>AUDIT_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ISS_TECH_KEY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PRD_PDH_KEY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PRD_PDD_KEY</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <AUDIT_NUMBER>
+                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/AUDIT__NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/AUDIT__NUMBER"/>
+                </AUDIT_NUMBER>
+                <ISS_TECH_KEY>
+                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/ISS__TECH__KEY/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/ISS__TECH__KEY"/>
+                </ISS_TECH_KEY>
+                <PRD_PDH_KEY>
+                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDH__KEY/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDH__KEY"/>
+                </PRD_PDH_KEY>
+                <PRD_PDD_KEY>
+                    <xsl:copy-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__KEY/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx10:PMM.HEB__P__SDIDMHHDE/PRD__PDD__KEY"/>
+                </PRD_PDD_KEY>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Publisher</pd:from>
+        <pd:to>Update Record</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update Record</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Publisher</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

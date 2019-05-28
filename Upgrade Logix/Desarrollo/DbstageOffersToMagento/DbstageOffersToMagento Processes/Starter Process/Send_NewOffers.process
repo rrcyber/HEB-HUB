@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>DbstageOffersToMagento Processes/Starter Process/Send_NewOffers.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>78</pd:x>
+        <pd:y>83</pd:y>
+        <config>
+            <StartTime>1449209100000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%ProjectConfig/Run_frencuency%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>675</pd:endX>
+    <pd:endY>81</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1449251743205</pd:targetNamespace>
+    <pd:activity name="Call Check_RunningImports">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>195</pd:x>
+        <pd:y>83</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Check_RunningImports.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Call Send_NewOffers">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>416</pd:x>
+        <pd:y>84</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Send_NewOffers.process</processName>
+        </config>
+        <pd:inputBindings>
+            <run_id>
+                <xsl:value-of select="$Stored_run_id/run_id"/>
+            </run_id>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="invoce WS Offers">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>535</pd:x>
+        <pd:y>82</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/Invoce WebService Magento.process</processName>
+        </config>
+        <pd:inputBindings>
+            <InvoceData>
+                <interfaceName>
+                    <xsl:value-of select="'FLEX_PROMO'"/>
+                </interfaceName>
+                <runId>
+                    <xsl:value-of select="$Call-Send_NewOffers/run_id"/>
+                </runId>
+            </InvoceData>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Stored_run_id">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>305</pd:x>
+        <pd:y>83</pd:y>
+        <config>
+            <processName>/DbstageOffersToMagento Processes/Sub Process/storeruid.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>Call Check_RunningImports</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Send_NewOffers</pd:from>
+        <pd:to>invoce WS Offers</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>invoce WS Offers</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Check_RunningImports</pd:from>
+        <pd:to>Stored_run_id</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Stored_run_id</pd:from>
+        <pd:to>Call Send_NewOffers</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

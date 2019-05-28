@@ -1,0 +1,154 @@
+use INTERFASE
+go
+
+--Validar que existan
+select * from exe_sdipmgdte where pmg_po_number=13841739
+select * from po_close where purchase_order_number=13841739
+select * from po_receipt where purchase_order_number=13841739
+select * from dc_recibo where po_id=13841739
+
+--Actuializar fecha
+update po_close set load_date='20171106',eai_processflag='N' where purchase_order_number=13841739
+update po_receipt set load_date='20171106',eai_processflag='N' where purchase_order_number=13841739
+update dc_recibo set load_date='20171106',eai_processflag='N' where po_id=13841739
+
+--Validar que valida_recibo comunique el recibo
+select * from interfase..po_recibo_folio where purchase_order_number=13841739
+select * from  interfase..po_recibo where purchase_order_number=13841739
+select * from  interfase..exe_imp_sdircvhdi where rcv_session_id in (select rcv_session_id from interfase..exe_imp_sdircvdti where PMG_PO_NUMBER=13841739)
+select * from  interfase..exe_imp_sdircvdti where PMG_PO_NUMBER=13841739
+
+--Eliminar registros procesados y poder hacer pruebas
+delete interfase..po_recibo_folio where purchase_order_number=13841739
+delete interfase..po_recibo where purchase_order_number=13841739
+delete interfase..exe_imp_sdircvhdi where rcv_session_id in (select rcv_session_id from interfase..exe_imp_sdircvdti where PMG_PO_NUMBER=13841739)
+delete interfase..exe_imp_sdircvdti where PMG_PO_NUMBER=13841739
+
+--*************************************************Buscar recibos para pruebas****************************************
+select distinct top 10  a.pmg_po_number from interfase..exe_sdipmgdte a
+inner join interfase..po_receipt b on a.pmg_po_number=b.purchase_order_number and b.load_date>='20170101'
+inner join interfase..dc_recibo c on b.purchase_order_number=c.po_id and c.load_date>='20170101'
+inner join interfase..po_close d on c.po_id=d.purchase_order_number and b.load_date>='20170101'
+where a.load_date>='20170101'
+          --13841739
+          --13841819
+          --13841919
+          --13841980
+          --13841999
+          --13842000
+          --13842019
+          --13842020
+          --13842039
+          --13842199
+
+--************Selecciona*******************
+--interfase..po_close
+--interfase..po_receipt
+--interfase..dc_recibo
+--interfase..exe_sdipmgdte
+
+--*************inserta******************
+--interfase..po_recibo_folio
+--interfase..po_recibo
+--interfase..exe_imp_sdircvhdi
+--interfase..exe_imp_sdircvdti
+
+
+
+declare @sp				varchar(250),
+ @w_sucursalmexico	smallint
+exec spCreaCallPrimario 2160, 2, 'SpSelBodegaSecosDC', @sp OUT
+
+select @sp
+
+exec @sp @w_sucursalmexico OUT
+
+select @w_sucursalmexico
+
+
+
+SEGUNDO QUERY---------------
+
+
+
+
+--SOURCE
+
+select * from po_receipt where purchase_order_number = 50335303 
+select * from po_close where purchase_order_number = 50335303
+select * from dc_recibo where po_id like '%50335303%' 
+
+--Toma los datos en X Reintentos/ N Primer ejecucion  Y Se comunico exitosamente
+
+--TARGET
+
+select * from exe_imp_sdircvhdi where rcv_session_id = 2160887212
+select * from exe_imp_sdircvdti where pmg_po_number like '%50335303%' 
+select * from po_recibo_folio where purchase_order_number like '%50335303%'
+--select * from exevrerror where oc = 50335303
+select * from po_recibo where purchase_order_number like '%50335303%'
+
+
+--------------------------------------
+SELECT * FROM DC_RECIBO where  dc_id = 90 AND whse_id = 71 AND po_id = 13845857
+SELECT * FROM DC_RECIBO where  eai_processflag = 'N'
+
+--------------------------------------
+
+update dc_recibo set eai_processflag = 'N' where po_id like '%50335303%' 
+update po_close set eai_processflag = 'N' where purchase_order_number = 50335303 
+update po_receipt set eai_processflag = 'N' where purchase_order_number = 50335303
+
+delete exe_imp_sdircvhdi where rcv_session_id = 2160887212
+delete exe_imp_sdircvdti where pmg_po_number like '%50335303%'
+delete po_recibo_folio where purchase_order_number like '%50335303%'
+delete po_recibo where purchase_order_number like '%50335303%'
+
+---------------------------------------
+
+--1
+SELECT PO_RECIBO.EAI_PROCESSFLAG 
+FROM
+ PO_RECIBO
+WHERE EAI_PROCESSFLAG = 'N'
+GROUP BY EAI_PROCESSFLAG
+
+UPDATE PO_RECIBO SET EAI_PROCESSFLAG = 'W' WHERE  EAI_PROCESSFLAG = 'N'
+
+--2
+SELECT 
+DC_ID, 
+WHSE_ID, 
+PURCHASE_ORDER_NUMBER, 
+VENDOR, 
+RECEIPT_NUMBER, 
+PRODUCT, 
+UPC, 
+VPC_CASE_PACK_ID, 
+CATCH_WEIGHT, 
+QTY_RECEIVED, 
+PO_RECIBO.UNIT_SHIP_CASE, 
+PO_RECIBO.EAI_PROCESSFLAG, 
+PO_RECIBO.LOAD_DATE 
+FROM
+ PO_RECIBO
+WHERE EAI_PROCESSFLAG = 'N'
+
+--3
+
+SELECT PO_RECIBO.EAI_PROCESSFLAG 
+FROM
+ PO_RECIBO
+WHERE EAI_PROCESSFLAG = 'W'
+GROUP BY EAI_PROCESSFLAG
+
+UPDATE PO_RECIBO SET EAI_PROCESSFLAG = 'Y' 
+WHERE  EAI_PROCESSFLAG = 'N' 
+AND PURCHASE_ORDER_NUMBER = ? 
+AND VENDOR = ? 
+AND RECEIPT_NUMBER = ? 
+AND PRODUCT = ? 
+AND VPC_CASE_PACK_ID = ?
+
+select purchase_order_number, vendor, receipt_number, product, vpc_case_pack_id, * from po_recibo where purchase_order_number = 13841739
+

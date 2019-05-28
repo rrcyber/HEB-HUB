@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <pd:name>Mex_OfferExport_Subscriber Processes/Sub Process/Mex_HEB_A_Domicilio_Articulo.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:Offer"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1031</pd:endX>
+    <pd:endY>354</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1334065193357</pd:targetNamespace>
+    <pd:group name="GruposProductos">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>82</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>861</pd:width>
+        <pd:height>709</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Offer/Auxilary/ProductGroup</pd:over>
+            <pd:iterationElementSlot>currentGpoProd</pd:iterationElementSlot>
+            <pd:indexSlot>GpoProdIndex</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Grupos Producto</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Grupos Producto</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>No Identificado</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Gpo Prod Compra</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Gpo Prod Regalo</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Grupos Producto</pd:from>
+            <pd:to>Gpo Prod Compra</pd:to>
+            <pd:xpathDescription>Es Compra</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/Offer/Conditions/Product[ProductGroupID = $currentGpoProd/ProductGroup/Header/ProductGroupID]</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Grupos Producto</pd:from>
+            <pd:to>Gpo Prod Regalo</pd:to>
+            <pd:xpathDescription>Es Regalo</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/Offer/Rewards/Discount[DiscountedProductGroupID = $currentGpoProd/ProductGroup/Header/ProductGroupID]</pd:xpath>
+        </pd:transition>
+        <pd:group name="Gpo Prod Compra">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>457</pd:x>
+            <pd:y>388</pd:y>
+            <pd:width>425</pd:width>
+            <pd:height>283</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Grupos-Producto/Output/Rows/Product</pd:over>
+                <pd:iterationElementSlot>currentProdCompra</pd:iterationElementSlot>
+                <pd:indexSlot>ProdCompraIndex</pd:indexSlot>
+                <pd:outSlot>RegsProdsCompra</pd:outSlot>
+                <pd:activityOutputName>Get SKU Compra</pd:activityOutputName>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Get SKU Compra</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>CreaCompra</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Get SKU Compra</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>ActualizaCompra</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>VerificaCompra</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Get SKU Compra</pd:from>
+                <pd:to>VerificaCompra</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$Get-SKU-Compra/resultSet/Record/COD_ARTICULO &gt; 0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>VerificaCompra</pd:from>
+                <pd:to>CreaCompra</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$VerificaCompra/resultSet/Record/Existe = 0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>VerificaCompra</pd:from>
+                <pd:to>ActualizaCompra</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$VerificaCompra/resultSet/Record/Existe &gt; 0</pd:xpath>
+            </pd:transition>
+            <pd:activity name="CreaCompra">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>832</pd:x>
+                <pd:y>444</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <statement>insert into ComboArticulo (ComboLocoId, ArticuloId, Tipo, Estatus, FechaModificacion)
+values(?, ?, ?, ?,?)</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>ComboLocoId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ArticuloId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Tipo</parameterName>
+                            <dataType>SMALLINT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Estatus</parameterName>
+                            <dataType>BIT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>FechaModificacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <ComboLocoId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                    <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ComboLocoId>
+                        <ArticuloId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Get-SKU-Compra/resultSet/Record[1]/COD_ARTICULO)">
+                                    <xsl:value-of select="$Get-SKU-Compra/resultSet/Record[1]/COD_ARTICULO"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ArticuloId>
+                        <Tipo>
+                            <xsl:value-of select="0"/>
+                        </Tipo>
+                        <Estatus>
+                            <xsl:value-of select="1"/>
+                        </Estatus>
+                        <FechaModificacion>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;,current-dateTime())"/>
+                        </FechaModificacion>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Get SKU Compra">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>518</pd:x>
+                <pd:y>613</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/DB/HEBADom/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <statement>select COD_ARTICULO = isnull(COD_ARTICULO,0)
+from OCODP with (NOLOCK) 
+where (REPLICATE('0',16-LEN(COD_CODIGOPROD)-1+2) + LTRIM(RTRIM(SUBSTRING(COD_CODIGOPROD,1,12))))  = ?</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>PRODUCTO</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>COD_ARTICULO</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <PRODUCTO>
+                            <xsl:choose>
+                                <xsl:when test="exists($currentProdCompra/Product/strProduct[1])">
+                                    <xsl:value-of select="$currentProdCompra/Product/strProduct[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </PRODUCTO>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="VerificaCompra">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>507</pd:x>
+                <pd:y>437</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/DB/HEBADom/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <statement>select Existe=count(*) from ComboArticulo where ComboLocoId = ? and ArticuloId = ? and Tipo = 0</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>ComboLocoId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ArticuloId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>Existe</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <ComboLocoId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                    <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ComboLocoId>
+                        <ArticuloId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Get-SKU-Compra/resultSet/Record[1]/COD_ARTICULO)">
+                                    <xsl:value-of select="$Get-SKU-Compra/resultSet/Record[1]/COD_ARTICULO"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ArticuloId>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="ActualizaCompra">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>679</pd:x>
+                <pd:y>541</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <statement>update ComboArticulo
+set Tipo = ?,  FechaModificacion = ?, Estatus = 1
+where CombolocoId = ?
+and ArticuloId = ?
+and Tipo = 0</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>Tipo</parameterName>
+                            <dataType>SMALLINT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>FechaModificacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ComboLocoId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ArticuloId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <Tipo>
+                            <xsl:value-of select="0"/>
+                        </Tipo>
+                        <FechaModificacion>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;,current-dateTime())"/>
+                        </FechaModificacion>
+                        <ComboLocoId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                    <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ComboLocoId>
+                        <ArticuloId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Get-SKU-Compra/resultSet/Record[1]/COD_ARTICULO)">
+                                    <xsl:value-of select="$Get-SKU-Compra/resultSet/Record[1]/COD_ARTICULO"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ArticuloId>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:group name="Gpo Prod Regalo">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>105</pd:x>
+            <pd:y>36</pd:y>
+            <pd:width>420</pd:width>
+            <pd:height>292</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Grupos-Producto/Output/Rows/Product</pd:over>
+                <pd:iterationElementSlot>currentProdRegalo</pd:iterationElementSlot>
+                <pd:indexSlot>ProdRegaloIndex</pd:indexSlot>
+                <pd:outSlot>RegsProdsRegalo</pd:outSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Get-SKU Regalo</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>VerificaRegalo</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Get-SKU Regalo</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>One Bend</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>otherwise</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>CreaRegalo</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>ActualizaRegalo</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>VerificaRegalo</pd:from>
+                <pd:to>CreaRegalo</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$VerificaRegalo/resultSet/Record/Existe = 0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>VerificaRegalo</pd:from>
+                <pd:to>ActualizaRegalo</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$VerificaRegalo/resultSet/Record/Existe &gt; 0</pd:xpath>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Get-SKU Regalo</pd:from>
+                <pd:to>VerificaRegalo</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>xpath</pd:conditionType>
+                <pd:xpath>$Get-SKU-Regalo/resultSet/Record/COD_ARTICULO &gt; 0</pd:xpath>
+            </pd:transition>
+            <pd:activity name="CreaRegalo">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>478</pd:x>
+                <pd:y>91</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <statement>insert into ComboArticulo (ComboLocoId, ArticuloId, Tipo, Estatus, FechaModificacion)
+values(?, ?, ?, ?, ?)</statement>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>CombolocoId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ArticuloId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Tipo</parameterName>
+                            <dataType>SMALLINT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>Estatus</parameterName>
+                            <dataType>BIT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>FechaModificacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <CombolocoId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                    <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </CombolocoId>
+                        <ArticuloId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Get-SKU-Regalo/resultSet/Record[1]/COD_ARTICULO)">
+                                    <xsl:value-of select="$Get-SKU-Regalo/resultSet/Record[1]/COD_ARTICULO"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ArticuloId>
+                        <Tipo>
+                            <xsl:value-of select="1"/>
+                        </Tipo>
+                        <Estatus>
+                            <xsl:value-of select="1"/>
+                        </Estatus>
+                        <FechaModificacion>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;,current-dateTime())"/>
+                        </FechaModificacion>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="VerificaRegalo">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>158</pd:x>
+                <pd:y>91</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/DB/HEBADom/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <statement>select Existe=count(*) from ComboArticulo where ComboLocoId = ? and ArticuloId = ? and Tipo = 1</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>ComboLocoId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ArticuloId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>Existe</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <ComboLocoId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                    <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ComboLocoId>
+                        <ArticuloId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Get-SKU-Regalo/resultSet/Record[1]/COD_ARTICULO)">
+                                    <xsl:value-of select="$Get-SKU-Regalo/resultSet/Record[1]/COD_ARTICULO"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ArticuloId>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="ActualizaRegalo">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>334</pd:x>
+                <pd:y>195</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <statement>update ComboArticulo
+set Tipo = ?,  FechaModificacion = ?, Estatus = 1
+where CombolocoId = ?
+and ArticuloId = ?
+and Tipo = 1</statement>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>Tipo</parameterName>
+                            <dataType>SMALLINT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>FechaModificacion</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>CombolocoId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>ArticuloId</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <Tipo>
+                            <xsl:value-of select="1"/>
+                        </Tipo>
+                        <FechaModificacion>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;,current-dateTime())"/>
+                        </FechaModificacion>
+                        <CombolocoId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Start/Offer/Header/IncentiveID)">
+                                    <xsl:value-of select="$Start/Offer/Header/IncentiveID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </CombolocoId>
+                        <ArticuloId>
+                            <xsl:choose>
+                                <xsl:when test="exists($Get-SKU-Regalo/resultSet/Record[1]/COD_ARTICULO)">
+                                    <xsl:value-of select="$Get-SKU-Regalo/resultSet/Record[1]/COD_ARTICULO"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </ArticuloId>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Get-SKU Regalo">
+                <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                <pd:x>164</pd:x>
+                <pd:y>273</pd:y>
+                <config>
+                    <timeout>%%Connections/DB/HEBADom/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <maxRows>%%Connections/DB/HEBADom/GLB_MAX_ROWS%%</maxRows>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/HEBADom.sharedjdbc</jdbcSharedConfig>
+                    <statement>select COD_ARTICULO = isnull(COD_ARTICULO,0)
+from OCODP with (NOLOCK) 
+where (REPLICATE('0',16-LEN(COD_CODIGOPROD)-1+2) + LTRIM(RTRIM(SUBSTRING(COD_CODIGOPROD,1,12))))  = ?</statement>
+                    <processInSubsets>false</processInSubsets>
+                    <oraObjects/>
+                    <oraTables/>
+                    <QueryOutputCachedSchemaColumns>COD_ARTICULO</QueryOutputCachedSchemaColumns>
+                    <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                    <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                    <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>strProduct</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcQueryActivityInput>
+                        <strProduct>
+                            <xsl:choose>
+                                <xsl:when test="exists($currentProdRegalo/Product/strProduct[1])">
+                                    <xsl:value-of select="$currentProdRegalo/Product/strProduct[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </strProduct>
+                    </jdbcQueryActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="Grupos Producto">
+            <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+            <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+            <pd:x>309</pd:x>
+            <pd:y>366</pd:y>
+            <config>
+                <InputType>String</InputType>
+                <Encoding>ASCII</Encoding>
+                <ParseSharedConfig>/Shared Resources/Schema Definitions/Custom/Products-Data-Format.sharedparse</ParseSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <Input>
+                    <text>
+                        <xsl:value-of select="$currentGpoProd/ProductGroup/Products"/>
+                    </text>
+                    <noOfRecords>
+                        <xsl:value-of select="-1"/>
+                    </noOfRecords>
+                </Input>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GruposProductos</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GruposProductos</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

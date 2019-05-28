@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns14="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>HebcardCustomerGroupToLogix Processes/Sub Process/HEBNet/GetTargeta.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="EMPLID1" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <TarjetaId>
+                <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/tarjetaid"/>
+            </TarjetaId>
+            <FechaAsigna>
+                <xsl:value-of select="$JDBC-Query/resultSet/Record[1]/FECHA_ASIGNA"/>
+            </FechaAsigna>
+            <count>
+                <xsl:value-of select="count($JDBC-Query/resultSet/Record)"/>
+            </count>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="TarjetaId" type="xsd:string"/>
+                    <xsd:element name="FechaAsigna" type="xsd:string"/>
+                    <xsd:element name="count" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>443</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1487698526364</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>201</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <timeout>%%Connections/Database/HEBCARD/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/HEBCARD/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBCARD.sharedjdbc</jdbcSharedConfig>
+            <statement>select  a.tarjetaid,a.FECHA_ASIGNA
+from  SUSCRIPTOR(nolock) s 
+join tarjeta(nolock) a on (s.CUENTAID=a.cuentaid) 
+where s.EMPRESAID in (1,2) 
+and substring(a.TARJETAID,1,4) IN ('2601','2101')
+and s.REFERENCIA = ?</statement>
+            <optionalOrNillable>true</optionalOrNillable>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>REFERENCIA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>tarjetaid</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FECHA_ASIGNA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <REFERENCIA>
+                    <xsl:value-of select="$Start/EMPLID1"/>
+                </REFERENCIA>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

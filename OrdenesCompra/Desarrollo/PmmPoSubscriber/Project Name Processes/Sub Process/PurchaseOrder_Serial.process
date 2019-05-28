@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pfx="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/PurchaseOrder_Serial.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="StarterName" type="xsd:string"/>
+                    <xsd:element name="XmlString" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>91</pd:startX>
+    <pd:startY>187</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <noOfUpdates>
+                <xsl:value-of select="if(string-length($PurchaseOrder/root/noOfUpdates)!=0) then $PurchaseOrder/root/noOfUpdates else (if(string-length($PurchaseOrder_Received/root/noOfUpdates)!=0) then $PurchaseOrder_Received/root/noOfUpdates else '1')"/>
+            </noOfUpdates>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="noOfUpdates" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>856</pd:endX>
+    <pd:endY>184</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1351195269449</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.CriticalSectionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>256</pd:x>
+        <pd:y>14</pd:y>
+        <pd:width>456</pd:width>
+        <pd:height>341</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>criticalSection</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:scope>single</pd:scope>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Parse XML</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/root/StarterName='PurchaseOrder_Starter'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Parse XML 2</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/root/StarterName='PurchaseOrder_Received_Starter'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PurchaseOrder</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>PurchaseOrder_Received</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Parse XML 2</pd:from>
+            <pd:to>PurchaseOrder_Received</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Parse XML</pd:from>
+            <pd:to>PurchaseOrder</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Parse XML">
+            <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+            <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+            <pd:x>417</pd:x>
+            <pd:y>120</pd:y>
+            <config>
+                <inputStyle>text</inputStyle>
+                <xsdVersion>default</xsdVersion>
+                <validateOutput>true</validateOutput>
+                <term ref="pfx2:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <xmlString>
+                    <xsl:value-of select="$Start/root/XmlString"/>
+                </xmlString>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Parse XML 2">
+            <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+            <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+            <pd:x>424</pd:x>
+            <pd:y>260</pd:y>
+            <config>
+                <inputStyle>text</inputStyle>
+                <xsdVersion>default</xsdVersion>
+                <validateOutput>true</validateOutput>
+                <term ref="pfx:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <xmlString>
+                    <xsl:value-of select="$Start/root/XmlString"/>
+                </xmlString>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="PurchaseOrder_Received">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>535</pd:x>
+            <pd:y>260</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/PurchaseOrder_Received.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Parse-XML-2/pfx:MSG_CONTAINER"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="PurchaseOrder">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>542</pd:x>
+            <pd:y>120</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/PurchaseOrder.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Parse-XML/pfx2:MSG_CONTAINER"/>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

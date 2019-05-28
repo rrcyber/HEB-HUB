@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns14="www.tibco.com/plugin/Sleep" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns13="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CUSTOMERS_GROUP.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd" xmlns:pfx3="http://www.tibco.com/schemas/CopientOfferExportServer/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/INCENTIVE_PRODUCT_GROUPS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/OFFER.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/OFFER.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/PRODUCTS_GROUP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/CUSTOMERS_GROUP.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUSTOMERS_GROUP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Sub Process/Get_GroupCustomer.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="IncentiveID" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>54</pd:startX>
+    <pd:startY>201</pd:startY>
+    <pd:returnBindings>
+        <resultSet>
+            <xsl:copy-of select="$Map-Customers/resultSet/Auxilary"/>
+        </resultSet>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx5:resultSet"/>
+    <pd:endX>745</pd:endX>
+    <pd:endY>203</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx6:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <CustomerData>
+            <xsd:element name="CUSTOMERS" type="xsd:string"/>
+        </CustomerData>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1403558436899</pd:targetNamespace>
+    <pd:group name="Group Get Customer">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>236</pd:x>
+        <pd:y>36</pd:y>
+        <pd:width>440</pd:width>
+        <pd:height>315</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$JDBC-Query-Group-Customer/resultSet/Record</pd:over>
+            <pd:iterationElementSlot>IGroup</pd:iterationElementSlot>
+            <pd:indexSlot>contador</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>AnyCustomer-AnyCardholder</pd:to>
+            <pd:xpathDescription>No Customer</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$JDBC-Query-Group-Customer/resultSet/Record/CustomerGroupID = 1 or $JDBC-Query-Group-Customer/resultSet/Record/CustomerGroupID = 2</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Query Customer</pd:to>
+            <pd:xpathDescription>Other Customer</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Customers</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Query Customer</pd:from>
+            <pd:to>Group Concat Customers</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group Concat Customers</pd:from>
+            <pd:to>Map Customers</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>AnyCustomer-AnyCardholder</pd:from>
+            <pd:to>Map Customers</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Group Concat Customers">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>381</pd:x>
+            <pd:y>78</pd:y>
+            <pd:width>168</pd:width>
+            <pd:height>140</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-Query-Customer/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>iCustomer</pd:iterationElementSlot>
+                <pd:indexSlot>index</pd:indexSlot>
+                <pd:outSlot>Product</pd:outSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>BUILD_DATA</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>BUILD_DATA</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="BUILD_DATA">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:description/>
+                <pd:x>466</pd:x>
+                <pd:y>157</pd:y>
+                <config>
+                    <variableName>CustomerData</variableName>
+                </config>
+                <pd:inputBindings>
+                    <CUSTOMERS>
+                        <xsl:value-of select="if ($index = 1) then&#xA;concat($CustomerData/CUSTOMERS,concat($JDBC-Query-Customer/resultSet/Record[$index]/InitialCardID, ',1'))&#xA;else&#xA;concat($CustomerData/CUSTOMERS,concat(&quot;&#xA;&quot; ,concat($JDBC-Query-Customer/resultSet/Record[$index]/InitialCardID, ',1') ))"/>
+                    </CUSTOMERS>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC Query Customer">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>324</pd:x>
+            <pd:y>162</pd:y>
+            <config>
+                <timeout>%%Connections/Database/LOGIX/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/LOGIX/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/LOGIXS_CUSTOMER.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT C.InitialCardID 
+FROM LogixXS.dbo.customers C
+INNER JOIN LogixXS.dbo.GroupMembership GM ON C.CustomerPK = GM.CustomerPK
+WHERE GM.CustomerGroupID = ?
+and GM.Deleted != 1</statement>
+                <wizardData/>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>CUSTOMER_GROUP_ID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>InitialCardID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <CUSTOMER_GROUP_ID>
+                        <xsl:value-of select="$IGroup/Record/CustomerGroupID"/>
+                    </CUSTOMER_GROUP_ID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Customers">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>602</pd:x>
+            <pd:y>156</pd:y>
+            <config>
+                <element ref="pfx5:resultSet"/>
+            </config>
+            <pd:inputBindings>
+                <resultSet>
+                    <Auxilary>
+                        <CustomerGroup>
+                            <Header>
+                                <CustomerGroupID>
+                                    <xsl:value-of select="$IGroup/Record/CustomerGroupID"/>
+                                </CustomerGroupID>
+                                <xsl:if test="$IGroup/Record/Name">
+                                    <Name>
+                                        <xsl:value-of select="$IGroup/Record/Name"/>
+                                    </Name>
+                                </xsl:if>
+                                <NewCardholders>
+                                    <xsl:value-of select="$IGroup/Record/NewCardholders"/>
+                                </NewCardholders>
+                                <AnyCAMCardholder>
+                                    <xsl:value-of select="$IGroup/Record/AnyCAMCardholder"/>
+                                </AnyCAMCardholder>
+                            </Header>
+                            <Customers>
+                                <xsl:value-of select="$CustomerData/CUSTOMERS"/>
+                            </Customers>
+                        </CustomerGroup>
+                    </Auxilary>
+                </resultSet>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="AnyCustomer-AnyCardholder">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>325</pd:x>
+            <pd:y>272</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="JDBC Query Group Customer">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>165</pd:x>
+        <pd:y>208</pd:y>
+        <config>
+            <timeout>%%Connections/Database/LOGIX/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/LOGIX/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/LOGIXS_CUSTOMER.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>INCENTIVE_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <statement>SELECT 
+ CG.CustomerGroupID, 
+ CG.Name, 
+ CG.NewCardholders, 
+ CG.AnyCAMCardholder
+ FROM LogixRT.dbo.CPE_RewardOptions RO
+ INNER JOIN LogixRT.dbo.CPE_IncentiveCustomerGroups ICG ON  RO.RewardOptionID = ICG.RewardOptionID
+ INNER JOIN LogixRT.dbo.CustomerGroups CG ON ICG.CustomerGroupID = CG.CustomerGroupID
+ WHERE RO.IncentiveID = ?
+AND ICG.Deleted != 1</statement>
+            <wizardData/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>CustomerGroupID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Name</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NewCardholders</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AnyCAMCardholder</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-7</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bit</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <INCENTIVE_ID>
+                    <xsl:value-of select="$Start/IncentiveID"/>
+                </INCENTIVE_ID>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>253</pd:x>
+        <pd:y>429</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns13:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="tib:render-xml($_error/ns:ErrorReport, 0,0)"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns13:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>96</pd:x>
+        <pd:y>429</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=JDBCSQLException namespace=http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions</fault>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC Query Group Customer</pd:from>
+        <pd:to>Group Get Customer</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query Group Customer</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group Get Customer</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

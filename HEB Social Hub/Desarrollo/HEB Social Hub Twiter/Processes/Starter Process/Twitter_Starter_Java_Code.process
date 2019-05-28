@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="www.tibco.com/plugin/java/JavaToXmlActivityInput" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/TweetSchema.xsd">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/TweetSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/TweetSchema.xsd"/>
+    <pd:name>Processes/Starter Process/Twitter_Starter_Java_Code.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>85</pd:startX>
+    <pd:startY>96</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>332</pd:endX>
+    <pd:endY>95</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1415914307485</pd:targetNamespace>
+    <pd:activity name="Java Code">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>211</pd:x>
+        <pd:y>96</pd:y>
+        <config>
+            <javaArchive>/Utility Services/Library/AliasLibrary.aliaslib</javaArchive>
+            <fileName>Twitter_Starter_Java_CodeJavaCode</fileName>
+            <packageName>Processes.StarterProcess.Twitter_Starter_Java_Code</packageName>
+            <fullsource>package Processes.StarterProcess.Twitter_Starter_Java_Code;
+
+import java.util.List;
+import twitter4j.JSONException;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
+public class Twitter_Starter_Java_CodeJavaCode{
+
+static String ConsumerKey = new String("oRCEat5NkdPt3DpaoqDxckgYF");
+static String ConsumerSecret = new String("Ktq3l8QYDCNTTCCA6TGu0VNycBtahIBb8p1B3UtApX8Q2so20g");
+static String AccessToken = new String("112366881-RixdWhupu4pmHkfncbFqDWrtRbNNcAJI0D7wpXdp");
+static String AccessTokenSecret = new String("tQzfV3OYDvn3OKeD87r1ylxoUaX4JtZfJhX2aJlTl5wLP");
+
+
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected Object tweets = null;
+	public Object gettweets() {
+		return tweets;
+	}
+	public void settweets(Object val) {
+		tweets = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public Twitter_Starter_Java_CodeJavaCode(){}
+
+        public void invoke() throws Exception {
+	ConfigurationBuilder GenerateContext = GenerateContext();
+	settweets(getTweetPost(GenerateContext));
+	}
+/* Available Variables: DO NOT MODIFY
+	Out : Object tweets
+* Available Variables: DO NOT MODIFY *****/
+
+public ConfigurationBuilder GenerateContext(){
+    
+    ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+    configBuilder.setDebugEnabled(true)
+    .setOAuthConsumerKey(ConsumerKey)
+    .setOAuthConsumerSecret(ConsumerSecret)
+    .setOAuthAccessToken(AccessToken)
+    .setOAuthAccessTokenSecret(AccessTokenSecret);
+    return configBuilder;
+}
+
+public Status getTweetPost(ConfigurationBuilder configBuilder)  throws TwitterException, IOException {
+
+     Twitter twitter = new TwitterFactory(configBuilder.build()).getInstance();
+    /*Query query = new Query("H-E-B México");
+    query.setCount(380);
+    query.setLocale("es");    
+
+    QueryResult result;
+    result = twitter.search(query);
+    List&lt;Status&gt; tweets = result.getTweets();*/
+    
+    //List&lt;Status&gt; tweets = twitter.getUserTimeline();    
+    List&lt;Status&gt; tweets = twitter.getUserTimeline();       
+
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    XMLOutputter xmlOutput = new XMLOutputter();
+    Element root = new Element("root");    
+    Document doc = new Document(root);      
+    
+    for (int i = 0; i &lt; tweets.size(); i++) {
+        
+        Element Tweet = new Element("Tweet");
+        Element staff = new Element("user");
+        root.addContent(Tweet);
+                
+        staff.addContent(new Element("Name").setText(tweets.get(i).getUser().getName()));
+	staff.addContent(new Element("Description").setText(tweets.get(i).getUser().getDescription()));
+	staff.addContent(new Element("Screenname").setText(tweets.get(i).getUser().getScreenName()));
+	staff.addContent(new Element("Favouritiescount").setText(Integer.toString(tweets.get(i).getUser().getFavouritesCount())));
+	staff.addContent(new Element("Friendscount").setText(Integer.toString(tweets.get(i).getUser().getFriendsCount())));
+        staff.addContent(new Element("Followerscount").setText(Integer.toString(tweets.get(i).getUser().getFollowersCount())));
+        staff.addContent(new Element("StatusesCount").setText(Integer.toString(tweets.get(i).getUser().getStatusesCount())));
+        staff.addContent(new Element("Location").setText(tweets.get(i).getUser().getLocation()));
+  
+	Element staff2 = new Element("Post");
+	staff2.addContent(new Element("Retweetcount").setText(String.valueOf(tweets.get(i).getRetweetCount())));
+	staff2.addContent(new Element("Text").setText(tweets.get(i).getText()));
+	staff2.addContent(new Element("Source").setText(tweets.get(i).getSource()));
+	staff2.addContent(new Element("FavoritedCount").setText(Integer.toString(tweets.get(i).getFavoriteCount())));
+        staff2.addContent(new Element("Date").setText(formatter.format(tweets.get(i).getCreatedAt())));
+        staff2.addContent(new Element("Product").setText(tweets.get(i).getText()));
+                
+        Tweet.addContent(staff);
+        Tweet.addContent(staff2);                
+    
+    } 
+    
+        Format format = Format.getPrettyFormat();
+        format.setEncoding("UTF-8");
+        XMLOutputter xmlOutput2 = new XMLOutputter(format);
+        xmlOutput2.output(doc, new FileWriter("D:\\FacebookConfigFolder\\File\\" + "tweetPost" + ".xml"));
+
+    System.out.println("File Saved!");
+    return twitter.getUserTimeline().get(0);
+    
+    }
+
+}
+</fullsource>
+            <inputData/>
+            <outputData>
+                <row>
+                    <fieldName>tweets</fieldName>
+                    <fieldType>ObjectReference</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </outputData>
+            <byteCode>
+                <class>
+                    <name>Twitter_Starter_Java_CodeJavaCode</name>
+                    <byteCode>yv66vgAAADIBHgkAWQB/CgBaAIAKAFkAgQoAWQCCCgBZAIMHAIQKAAYAgAoABgCFCQBZAIYKAAYAhwkAWQCICgAGAIkJAFkAigoABgCLCQBZAIwKAAYAjQcAjgoABgCPCgARAJAKABEAkQsAkgCTBwCUCACVCgAWAJYHAJcKABkAgAcAmAgAmQoAGwCWBwCaCgAeAJsLAJwAnQgAnggAnwoAGwCgCAChCwCcAKIHAKMLACYApAsApQCmCgAbAKcIAKgLAKUAqQgAqgsApQCrCACsCwClAK0KAK4ArwgAsAsApQCxCACyCwClALMIALQLAKUAtQgAtgsApQC3CAC4CAC5CwAmALoKAFMAuwgAvAsAJgC9CAC+CwAmAL8IAMALACYAwQgAwgsAJgDDCgAWAMQIAMUKAMYAxwgAyAoAxgDJCgAZAMoHAMsIAMwKAEsAlgoAGQDNCQDOAM8IANAKANEA0gsA0wCiBwDUCADVCgBTAJYIANYIANcIANgHANkHANoBAAtDb25zdW1lcktleQEAEkxqYXZhL2xhbmcvU3RyaW5nOwEADkNvbnN1bWVyU2VjcmV0AQALQWNjZXNzVG9rZW4BABFBY2Nlc3NUb2tlblNlY3JldAEABnR3ZWV0cwEAEkxqYXZhL2xhbmcvT2JqZWN0OwEACWdldHR3ZWV0cwEAFCgpTGphdmEvbGFuZy9PYmplY3Q7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEACXNldHR3ZWV0cwEAFShMamF2YS9sYW5nL09iamVjdDspVgEABjxpbml0PgEAAygpVgEABmludm9rZQEACkV4Y2VwdGlvbnMHANsBAA9HZW5lcmF0ZUNvbnRleHQBACcoKUx0d2l0dGVyNGovY29uZi9Db25maWd1cmF0aW9uQnVpbGRlcjsBAAxnZXRUd2VldFBvc3QBADkoTHR3aXR0ZXI0ai9jb25mL0NvbmZpZ3VyYXRpb25CdWlsZGVyOylMdHdpdHRlcjRqL1N0YXR1czsBAA1TdGFja01hcFRhYmxlBwDZBwCEBwDcBwDdBwCUBwCXBwCYBwCaBwDeBwDfAQAIPGNsaW5pdD4BAApTb3VyY2VGaWxlAQAmVHdpdHRlcl9TdGFydGVyX0phdmFfQ29kZUphdmFDb2RlLmphdmEMAGAAYQwAaABpDABtAG4MAG8AcAwAZgBnAQAjdHdpdHRlcjRqL2NvbmYvQ29uZmlndXJhdGlvbkJ1aWxkZXIMAOAA4QwAWwBcDADiAOMMAF0AXAwA5ADjDABeAFwMAOUA4wwAXwBcDADmAOMBABh0d2l0dGVyNGovVHdpdHRlckZhY3RvcnkMAOcA6AwAaADpDADqAOsHANwMAOwA7QEAGmphdmEvdGV4dC9TaW1wbGVEYXRlRm9ybWF0AQATeXl5eS1NTS1kZCBISDptbTpzcwwAaADuAQAdb3JnL2pkb20yL291dHB1dC9YTUxPdXRwdXR0ZXIBABFvcmcvamRvbTIvRWxlbWVudAEABHJvb3QBABJvcmcvamRvbTIvRG9jdW1lbnQMAGgA7wcA3QwA8ADxAQAFVHdlZXQBAAR1c2VyDADyAPMBAAROYW1lDAD0APUBABB0d2l0dGVyNGovU3RhdHVzDAD2APcHAPgMAPkA+gwA+wD8AQALRGVzY3JpcHRpb24MAP0A+gEAClNjcmVlbm5hbWUMAP4A+gEAEEZhdm91cml0aWVzY291bnQMAP8A8QcBAAwBAQECAQAMRnJpZW5kc2NvdW50DAEDAPEBAA5Gb2xsb3dlcnNjb3VudAwBBADxAQANU3RhdHVzZXNDb3VudAwBBQDxAQAITG9jYXRpb24MAQYA+gEABFBvc3QBAAxSZXR3ZWV0Y291bnQMAQcA8QwBCAECAQAEVGV4dAwBCQD6AQAGU291cmNlDAEKAPoBAA5GYXZvcml0ZWRDb3VudAwBCwDxAQAERGF0ZQwBDAENDAEOAQ8BAAdQcm9kdWN0BwEQDAERARIBAAVVVEYtOAwBEwEUDABoARUBABJqYXZhL2lvL0ZpbGVXcml0ZXIBACpEOlxGYWNlYm9va0NvbmZpZ0ZvbGRlclxGaWxlXHR3ZWV0UG9zdC54bWwMARYBFwcBGAwBGQEaAQALRmlsZSBTYXZlZCEHARsMARwA7gcBHQEAEGphdmEvbGFuZy9TdHJpbmcBABlvUkNFYXQ1TmtkUHQzRHBhb3FEeGNrZ1lGAQAyS3RxM2w4UVlEQ05UVENDQTZUR3UwVk55Y0J0YWhJQmI4cDFCM1V0QXBYOFEyc28yMGcBADIxMTIzNjY4ODEtUml4ZFdodXB1NHBtSGtmbmNiRnFEV3J0UmJOTmNBSkkwRDd3cFhkcAEALXRRemZWM09ZRHZuM09LZUQ4N3IxeWx4b1VhWDRKdFpmSmhYMmFKbFRsNXdMUAEAVFByb2Nlc3Nlcy9TdGFydGVyUHJvY2Vzcy9Ud2l0dGVyX1N0YXJ0ZXJfSmF2YV9Db2RlL1R3aXR0ZXJfU3RhcnRlcl9KYXZhX0NvZGVKYXZhQ29kZQEAEGphdmEvbGFuZy9PYmplY3QBABNqYXZhL2xhbmcvRXhjZXB0aW9uAQARdHdpdHRlcjRqL1R3aXR0ZXIBAA5qYXZhL3V0aWwvTGlzdAEAGnR3aXR0ZXI0ai9Ud2l0dGVyRXhjZXB0aW9uAQATamF2YS9pby9JT0V4Y2VwdGlvbgEAD3NldERlYnVnRW5hYmxlZAEAKChaKUx0d2l0dGVyNGovY29uZi9Db25maWd1cmF0aW9uQnVpbGRlcjsBABNzZXRPQXV0aENvbnN1bWVyS2V5AQA5KExqYXZhL2xhbmcvU3RyaW5nOylMdHdpdHRlcjRqL2NvbmYvQ29uZmlndXJhdGlvbkJ1aWxkZXI7AQAWc2V0T0F1dGhDb25zdW1lclNlY3JldAEAE3NldE9BdXRoQWNjZXNzVG9rZW4BABlzZXRPQXV0aEFjY2Vzc1Rva2VuU2VjcmV0AQAFYnVpbGQBACAoKUx0d2l0dGVyNGovY29uZi9Db25maWd1cmF0aW9uOwEAIShMdHdpdHRlcjRqL2NvbmYvQ29uZmlndXJhdGlvbjspVgEAC2dldEluc3RhbmNlAQAVKClMdHdpdHRlcjRqL1R3aXR0ZXI7AQAPZ2V0VXNlclRpbWVsaW5lAQAaKClMdHdpdHRlcjRqL1Jlc3BvbnNlTGlzdDsBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBABYoTG9yZy9qZG9tMi9FbGVtZW50OylWAQAEc2l6ZQEAAygpSQEACmFkZENvbnRlbnQBACgoTG9yZy9qZG9tMi9Db250ZW50OylMb3JnL2pkb20yL0VsZW1lbnQ7AQADZ2V0AQAVKEkpTGphdmEvbGFuZy9PYmplY3Q7AQAHZ2V0VXNlcgEAEigpTHR3aXR0ZXI0ai9Vc2VyOwEADnR3aXR0ZXI0ai9Vc2VyAQAHZ2V0TmFtZQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAHc2V0VGV4dAEAJyhMamF2YS9sYW5nL1N0cmluZzspTG9yZy9qZG9tMi9FbGVtZW50OwEADmdldERlc2NyaXB0aW9uAQANZ2V0U2NyZWVuTmFtZQEAEmdldEZhdm91cml0ZXNDb3VudAEAEWphdmEvbGFuZy9JbnRlZ2VyAQAIdG9TdHJpbmcBABUoSSlMamF2YS9sYW5nL1N0cmluZzsBAA9nZXRGcmllbmRzQ291bnQBABFnZXRGb2xsb3dlcnNDb3VudAEAEGdldFN0YXR1c2VzQ291bnQBAAtnZXRMb2NhdGlvbgEAD2dldFJldHdlZXRDb3VudAEAB3ZhbHVlT2YBAAdnZXRUZXh0AQAJZ2V0U291cmNlAQAQZ2V0RmF2b3JpdGVDb3VudAEADGdldENyZWF0ZWRBdAEAEigpTGphdmEvdXRpbC9EYXRlOwEABmZvcm1hdAEAJChMamF2YS91dGlsL0RhdGU7KUxqYXZhL2xhbmcvU3RyaW5nOwEAF29yZy9qZG9tMi9vdXRwdXQvRm9ybWF0AQAPZ2V0UHJldHR5Rm9ybWF0AQAbKClMb3JnL2pkb20yL291dHB1dC9Gb3JtYXQ7AQALc2V0RW5jb2RpbmcBAC0oTGphdmEvbGFuZy9TdHJpbmc7KUxvcmcvamRvbTIvb3V0cHV0L0Zvcm1hdDsBABwoTG9yZy9qZG9tMi9vdXRwdXQvRm9ybWF0OylWAQAGb3V0cHV0AQAnKExvcmcvamRvbTIvRG9jdW1lbnQ7TGphdmEvaW8vV3JpdGVyOylWAQAQamF2YS9sYW5nL1N5c3RlbQEAA291dAEAFUxqYXZhL2lvL1ByaW50U3RyZWFtOwEAE2phdmEvaW8vUHJpbnRTdHJlYW0BAAdwcmludGxuAQAWdHdpdHRlcjRqL1Jlc3BvbnNlTGlzdAAhAFkAWgAAAAUACABbAFwAAAAIAF0AXAAAAAgAXgBcAAAACABfAFwAAAAEAGAAYQAAAAcAAQBiAGMAAQBkAAAAHQABAAEAAAAFKrQAAbAAAAABAGUAAAAGAAEAAAAeAAEAZgBnAAEAZAAAACIAAgACAAAABiortQABsQAAAAEAZQAAAAoAAgAAACEABQAiAAEAaABpAAEAZAAAACoAAgABAAAACiq3AAIqAbUAAbEAAAABAGUAAAAOAAMAAAAkAAQAHAAJACQAAQBqAGkAAgBkAAAALwADAAIAAAAPKrYAA0wqKiu2AAS2AAWxAAAAAQBlAAAADgADAAAAJwAFACgADgApAGsAAAAEAAEAbAABAG0AbgABAGQAAABIAAIAAgAAACi7AAZZtwAHTCsEtgAIsgAJtgAKsgALtgAMsgANtgAOsgAPtgAQVyuwAAAAAQBlAAAADgADAAAAMAAIADEAJgA2AAEAbwBwAAIAZAAAA68ABQAMAAAC6LsAEVkrtgAStwATtgAUTSy5ABUBAE67ABZZEhe3ABg6BLsAGVm3ABo6BbsAG1kSHLcAHToGuwAeWRkGtwAfOgcDNggVCC25ACABAKICXbsAG1kSIbcAHToJuwAbWRIitwAdOgoZBhkJtgAjVxkKuwAbWRIktwAdLRUIuQAlAgDAACa5ACcBALkAKAEAtgAptgAjVxkKuwAbWRIqtwAdLRUIuQAlAgDAACa5ACcBALkAKwEAtgAptgAjVxkKuwAbWRIstwAdLRUIuQAlAgDAACa5ACcBALkALQEAtgAptgAjVxkKuwAbWRIutwAdLRUIuQAlAgDAACa5ACcBALkALwEAuAAwtgAptgAjVxkKuwAbWRIxtwAdLRUIuQAlAgDAACa5ACcBALkAMgEAuAAwtgAptgAjVxkKuwAbWRIztwAdLRUIuQAlAgDAACa5ACcBALkANAEAuAAwtgAptgAjVxkKuwAbWRI1twAdLRUIuQAlAgDAACa5ACcBALkANgEAuAAwtgAptgAjVxkKuwAbWRI3twAdLRUIuQAlAgDAACa5ACcBALkAOAEAtgAptgAjV7sAG1kSObcAHToLGQu7ABtZEjq3AB0tFQi5ACUCAMAAJrkAOwEAuAA8tgAptgAjVxkLuwAbWRI9twAdLRUIuQAlAgDAACa5AD4BALYAKbYAI1cZC7sAG1kSP7cAHS0VCLkAJQIAwAAmuQBAAQC2ACm2ACNXGQu7ABtZEkG3AB0tFQi5ACUCAMAAJrkAQgEAuAAwtgAptgAjVxkLuwAbWRJDtwAdGQQtFQi5ACUCAMAAJrkARAEAtgBFtgAptgAjVxkLuwAbWRJGtwAdLRUIuQAlAgDAACa5AD4BALYAKbYAI1cZCRkKtgAjVxkJGQu2ACNXhAgBp/2euABHOggZCBJItgBJV7sAGVkZCLcASjoJGQkZB7sAS1kSTLcATbYATrIATxJQtgBRLLkAFQEAA7kAUgIAwAAmsAAAAAIAZQAAAIoAIgAAADsADwBFABYARwAhAEgAKgBJADUASgBAAEwATgBOAFkATwBkAFAAbABSAJMAUwC6AFQA4QBVAQsAVgE1AFcBXwBYAYkAWQGwAFsBuwBcAeAAXQICAF4CJABfAkkAYAJwAGECkgBjApoAZAKiAEwCqABoAq0AaQK1AGoCwABrAtAAbQLYAG4AcQAAACUAAv8AQwAJBwByBwBzBwB0BwB1BwB2BwB3BwB4BwB5AQAA+gJkAGsAAAAGAAIAegB7AAgAfABpAAEAZAAAAFUAAwAAAAAAMbsAU1kSVLcAVbMACbsAU1kSVrcAVbMAC7sAU1kSV7cAVbMADbsAU1kSWLcAVbMAD7EAAAABAGUAAAASAAQAAAAVAAwAFgAYABcAJAAYAAEAfQAAAAIAfg==</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings>
+            <javaCodeActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Java Code</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Java Code</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

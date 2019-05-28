@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://xmlns.heb.com/ei/TABLE_STOREORDER" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_TT_DISTRIBUCION.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/TABLE_STOREORDER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_STOREORDER.xsd"/>
+    <pd:name>Project Name Processes/Main Process/StoreOrder_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER_DISTRIBUTION"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>150</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>803</pd:endX>
+    <pd:endY>279</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371621839180</pd:targetNamespace>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>293</pd:x>
+        <pd:y>280</pd:y>
+        <config>
+            <element ref="pfx2:STOREORDER_DATA"/>
+        </config>
+        <pd:inputBindings>
+            <pfx2:STOREORDER_DATA>
+                <xsl:for-each select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM">
+                    <pfx2:ITEM>
+                        <pfx2:DIA>
+                            <xsl:value-of select="if(tib:format-dateTime(&quot;EE&quot;, current-dateTime())='dom') then 0 else (if(tib:format-dateTime(&quot;EE&quot;, current-dateTime())='lun') then 1 else (if(tib:format-dateTime(&quot;EE&quot;, current-dateTime())='mar') then 2 else (if(tib:format-dateTime(&quot;EE&quot;, current-dateTime())='mie') then 3 else (if(tib:format-dateTime(&quot;EE&quot;, current-dateTime())='jue') then 4 else (if(tib:format-dateTime(&quot;EE&quot;, current-dateTime())='vie') then 5 else 6)))))"/>
+                        </pfx2:DIA>
+                        <pfx2:CLASE>
+                            <xsl:value-of select="'001'"/>
+                        </pfx2:CLASE>
+                        <pfx2:TIPO_TRANSMISION>
+                            <xsl:value-of select="97"/>
+                        </pfx2:TIPO_TRANSMISION>
+                        <pfx2:ARTICULO>
+                            <xsl:copy-of select="pfx:PRD_LVL_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx:PRD_LVL_NUMBER"/>
+                        </pfx2:ARTICULO>
+                        <pfx2:TIENDA>
+                            <xsl:value-of select="substring(pfx:ORG_LVL_NUMBER,2,3)"/>
+                        </pfx2:TIENDA>
+                        <pfx2:CANTIDAD>
+                            <xsl:value-of select="round(number(pfx:PMG_SELL_QTY) div number(pfx:SLL_UNITS_PER_INNER))"/>
+                        </pfx2:CANTIDAD>
+                        <pfx2:FOLIO_PEDIDO>
+                            <xsl:copy-of select="pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx:PMG_PO_NUMBER"/>
+                        </pfx2:FOLIO_PEDIDO>
+                        <xsl:variable name="var" select="current()/pfx:ORG_LVL_NUMBER"/>
+                        <pfx2:CUSTOMER_PRIORITY>
+                            <xsl:choose>
+                                <xsl:when test="exists((for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array/customerpriority)[1])">
+                                    <xsl:value-of select="(for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array/customerpriority)[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </pfx2:CUSTOMER_PRIORITY>
+                        <pfx2:CUSTOMER_OVER_PRIORITY>
+                            <xsl:choose>
+                                <xsl:when test="exists((for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/CustomerOverPriority)[1])">
+                                    <xsl:value-of select="(for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/CustomerOverPriority)[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </pfx2:CUSTOMER_OVER_PRIORITY>
+                        <pfx2:CUSTOMER_UNDER_PRIORITY>
+                            <xsl:choose>
+                                <xsl:when test="exists((for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/CustomerUnderPriority)[1])">
+                                    <xsl:value-of select="(for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/CustomerUnderPriority)[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </pfx2:CUSTOMER_UNDER_PRIORITY>
+                        <pfx2:REQUIRE_ORDER_QUANTITY>
+                            <xsl:choose>
+                                <xsl:when test="exists((for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/RequireOrderQuantity)[1])">
+                                    <xsl:value-of select="(for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/RequireOrderQuantity)[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </pfx2:REQUIRE_ORDER_QUANTITY>
+                        <pfx2:ALLOW_OVER_ALLOCATE>
+                            <xsl:choose>
+                                <xsl:when test="exists((for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/AllowOverAllocate)[1])">
+                                    <xsl:value-of select="(for $array in $getPEMData/group/ITEM[sucursalID=$var] return $array[1]/AllowOverAllocate)[1]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </pfx2:ALLOW_OVER_ALLOCATE>
+                        <pfx2:TYPE_PROD_FLAG>
+                            <xsl:value-of select="1"/>
+                        </pfx2:TYPE_PROD_FLAG>
+                        <pfx2:PURCHASE_ORDER>
+                            <xsl:copy-of select="pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                            <xsl:value-of select="pfx:PMG_PO_NUMBER"/>
+                        </pfx2:PURCHASE_ORDER>
+                        <pfx2:FACT_CONV>
+                            <xsl:value-of select="tib:round-fraction(pfx:SLL_UNITS_PER_INNER * 100, 0)"/>
+                        </pfx2:FACT_CONV>
+                        <pfx2:EAI_PROCESSFLAG>
+                            <xsl:value-of select="'N'"/>
+                        </pfx2:EAI_PROCESSFLAG>
+                        <pfx2:LOAD_DATE>
+                            <xsl:value-of select="if (string-length(pfx:PMG_RELEASE_DATE) = 0) then '' else tib:format-date('yyyy-MM-dd', tib:parse-date('yyyy-MM-dd HH:mm:ss', pfx:PMG_RELEASE_DATE))"/>
+                        </pfx2:LOAD_DATE>
+                    </pfx2:ITEM>
+                </xsl:for-each>
+            </pfx2:STOREORDER_DATA>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>620</pd:x>
+        <pd:y>329</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getPEMData">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>173</pd:x>
+        <pd:y>280</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/getPEMData.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:for-each select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM">
+                    <ITEM>
+                        <sucursal>
+                            <xsl:value-of select="pfx:ORG_LVL_NUMBER"/>
+                        </sucursal>
+                    </ITEM>
+                </xsl:for-each>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>362</pd:x>
+        <pd:y>201</pd:y>
+        <pd:width>177</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>StoreOrder_Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>StoreOrder_Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="StoreOrder_Insert">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>451</pd:x>
+            <pd:y>273</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/StoreOrder_Insert.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <xsl:copy-of select="$Map-Data/pfx2:STOREORDER_DATA"/>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="getStoreOrder">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>172</pd:x>
+        <pd:y>152</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/getStoreOrder.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:if test="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:PMG_PO_NUMBER">
+                    <orden>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                    </orden>
+                </xsl:if>
+                <tienda>
+                    <xsl:value-of select="substring($Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER,2,3)"/>
+                </tienda>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>29</pd:x>
+        <pd:y>377</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>getStoreOrder</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Start/pfx:PURCHASE_ORDER_DISTRIBUTION/pfx:ITEM)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getPEMData</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getStoreOrder</pd:from>
+        <pd:to>getPEMData</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getStoreOrder</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($getStoreOrder/group/param)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

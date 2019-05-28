@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx4="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/TRANSFER_PARTHNER_FINGER" xmlns:pfx2="http://xmlns.heb.com/ei/TRANSFER_PARTHNER" xmlns:pfx="http://xmlns.heb.com/ei/ReplicaHuellas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ReplicaHuellas" schemaLocation="/Shared Resources/Schema Definitions/Custom/ReplicaHuellas.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TRANSFER_PARTHNER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TRANSFER_PARTHNER_SOCIOS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TRANSFER_PARTHNER_FINGER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TRANSFER_PARTHNER_FINGER.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/INSERT_TransferPartner_FINGER.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:TRANSFER_PARTHNER_FINGER"/>
+    <pd:startX>28</pd:startX>
+    <pd:startY>170</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>586</pd:endX>
+    <pd:endY>171</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1456234251419</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>103</pd:x>
+        <pd:y>39</pd:y>
+        <pd:width>370</pd:width>
+        <pd:height>252</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC INSERT_FINGER</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Update_FINGER</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC INSERT_FINGER</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC INSERT_FINGER</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>JDBC Update_FINGER</pd:to>
+            <pd:xpathDescription>UPDATE</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$_error_JDBC-INSERT_FINGER/ActivityErrors/pfx4:JDBCSQLException/sqlState=23000</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>Generate Error</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC INSERT_FINGER">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>190</pd:x>
+            <pd:y>103</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-Connection-WFCDB.sharedjdbc</jdbcSharedConfig>
+                <statement> INSERT INTO FINGER_TEMPLATE
+           (SCAN_SOCIOID
+           ,SCAN_DEDOTIPO
+           ,SCAN_TEMPLATEDEDO
+           ,SCAN_FECHAREG
+           ,SCAN_USUARIOREG
+           ,SCAN_FECHAMOD
+           ,SCAN_USUARIOMOD
+		   )
+ VALUES (?, ?, ?, ?, ?, ?, ?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>SCAN_SOCIOID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_DEDOTIPO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_TEMPLATEDEDO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_FECHAREG</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_USUARIOREG</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_FECHAMOD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_USUARIOMOD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <batchUpdate>true</batchUpdate>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:for-each select="$Start/pfx3:TRANSFER_PARTHNER_FINGER/pfx3:ITEM">
+                        <Record>
+                            <SCAN_SOCIOID>
+                                <xsl:copy-of select="pfx3:SCAN_SOCIOID/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_SOCIOID"/>
+                            </SCAN_SOCIOID>
+                            <SCAN_DEDOTIPO>
+                                <xsl:copy-of select="pfx3:SCAN_DEDOTIPO/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_DEDOTIPO"/>
+                            </SCAN_DEDOTIPO>
+                            <SCAN_TEMPLATEDEDO>
+                                <xsl:copy-of select="pfx3:SCAN_TEMPLATEDEDO/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_TEMPLATEDEDO"/>
+                            </SCAN_TEMPLATEDEDO>
+                            <SCAN_FECHAREG>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', pfx3:SCAN_FECHAREG)"/>
+                            </SCAN_FECHAREG>
+                            <SCAN_USUARIOREG>
+                                <xsl:copy-of select="pfx3:SCAN_USUARIOREG/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_USUARIOREG"/>
+                            </SCAN_USUARIOREG>
+                            <SCAN_FECHAMOD>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss',pfx3:SCAN_FECHAMOD)"/>
+                            </SCAN_FECHAMOD>
+                            <SCAN_USUARIOMOD>
+                                <xsl:copy-of select="pfx3:SCAN_USUARIOMOD/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_USUARIOMOD"/>
+                            </SCAN_USUARIOMOD>
+                        </Record>
+                    </xsl:for-each>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Update_FINGER">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>368</pd:x>
+            <pd:y>224</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-Connection-WFCDB.sharedjdbc</jdbcSharedConfig>
+                <statement>UPDATE FINGER_TEMPLATE SET SCAN_DEDOTIPO=?
+,SCAN_TEMPLATEDEDO=?
+,SCAN_FECHAMOD=?
+,SCAN_USUARIOMOD=?
+where SCAN_SOCIOID=?
+AND SCAN_DEDOTIPO=?</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>SCAN_DEDOTIPO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_TEMPLATEDEDO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_FECHAMOD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_USUARIOMOD</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_SOCIOID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SCAN_DEDOTIPO</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <batchUpdate>true</batchUpdate>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:for-each select="$Start/pfx3:TRANSFER_PARTHNER_FINGER/pfx3:ITEM">
+                        <Record>
+                            <SCAN_DEDOTIPO>
+                                <xsl:copy-of select="pfx3:SCAN_DEDOTIPO/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_DEDOTIPO"/>
+                            </SCAN_DEDOTIPO>
+                            <SCAN_TEMPLATEDEDO>
+                                <xsl:copy-of select="pfx3:SCAN_TEMPLATEDEDO/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_TEMPLATEDEDO"/>
+                            </SCAN_TEMPLATEDEDO>
+                            <SCAN_FECHAMOD>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', pfx3:SCAN_FECHAMOD)"/>
+                            </SCAN_FECHAMOD>
+                            <SCAN_USUARIOMOD>
+                                <xsl:copy-of select="pfx3:SCAN_USUARIOMOD/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_USUARIOMOD"/>
+                            </SCAN_USUARIOMOD>
+                            <SCAN_SOCIOID>
+                                <xsl:copy-of select="pfx3:SCAN_SOCIOID/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_SOCIOID"/>
+                            </SCAN_SOCIOID>
+                            <SCAN_DEDOTIPO>
+                                <xsl:copy-of select="pfx3:SCAN_DEDOTIPO/@xsi:nil"/>
+                                <xsl:value-of select="pfx3:SCAN_DEDOTIPO"/>
+                            </SCAN_DEDOTIPO>
+                        </Record>
+                    </xsl:for-each>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>192</pd:x>
+            <pd:y>222</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Generate Error">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>345</pd:x>
+            <pd:y>142</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns0:ActivityInput xmlns:ns0="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+                    <message>
+                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                    </message>
+                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </xsl:if>
+                </ns0:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

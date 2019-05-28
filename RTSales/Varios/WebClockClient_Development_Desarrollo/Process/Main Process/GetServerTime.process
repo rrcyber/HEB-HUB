@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/WebClock4Kronos" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://xmlns.heb.com/ei/WebClock4Kronos/GetServerTime_Reply" xmlns:pfx2="http://xmlns.example.com/1369927720082" xmlns:pfx3="http://xmlns.heb.com.mx/1369930841350" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://xmlns.heb.com/ei/WebClock4Kronos/GetServerTime_Request" xmlns:ns4="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:ns5="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns12="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx5="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions">
+    <wsdl:import namespace="http://xmlns.heb.com/WebClock4Kronos"/>
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Main Process/GetServerTime.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType wsMsgRef="pfx3:GetServerTime_Request"/>
+    <pd:startX>55</pd:startX>
+    <pd:startY>116</pd:startY>
+    <pd:returnBindings>
+        <pfx3:GetServerTime_Reply>
+            <Reply>
+                <ns:GetServerTime_Reply>
+                    <ns:GetServerTime_Reply>
+                        <xsl:value-of select="tib:format-dateTime('yyyy/MM/dd HH:mm:ss', $JDBC-Query/resultSet/Record[1]/CurrentDateTime )"/>
+                    </ns:GetServerTime_Reply>
+                </ns:GetServerTime_Reply>
+            </Reply>
+        </pfx3:GetServerTime_Reply>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType wsMsgRef="pfx3:GetServerTime_Reply"/>
+    <pd:endX>449</pd:endX>
+    <pd:endY>114</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx3:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1369843355494</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>254</pd:x>
+        <pd:y>114</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>select	top 1 getdate() as CurrentDateTime
+from	master.dbo.spt_values</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>CurrentDateTime</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>493</pd:x>
+        <pd:y>214</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>736</pd:x>
+        <pd:y>214</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>445</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <data>
+                    <pfx3:Fault>
+                        <Fault>
+                            <ns4:ProviderSOAPFault>
+                                <ns4:FaultCode>
+                                    <xsl:value-of select="10"/>
+                                </ns4:FaultCode>
+                                <ns4:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/Mensajes/Fault_10"/>
+                                </ns4:FaultString>
+                                <ns4:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </ns4:FaultActor>
+                                <ns4:ProviderSOAPErrorMsg>
+                                    <ns4:Message>
+                                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                    </ns4:Message>
+                                    <ns4:MessageId>
+                                        <xsl:value-of select="tib:render-xml($Start/pfx3:GetServerTime_Request/Request/ns3:GetServerTime_Request)"/>
+                                    </ns4:MessageId>
+                                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                        <ns4:ErrorCode>
+                                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                        </ns4:ErrorCode>
+                                    </xsl:if>
+                                </ns4:ProviderSOAPErrorMsg>
+                            </ns4:ProviderSOAPFault>
+                        </Fault>
+                    </pfx3:Fault>
+                </data>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>58</pd:x>
+        <pd:y>224</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <data>
+                    <pfx3:Fault>
+                        <Fault>
+                            <xsl:choose>
+                                <xsl:when test="string-length($_error)!=0">
+                                    <ns4:ProviderSOAPFault>
+                                        <ns4:FaultCode>
+                                            <xsl:value-of select="10"/>
+                                        </ns4:FaultCode>
+                                        <ns4:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/Mensajes/Fault_10"/>
+                                        </ns4:FaultString>
+                                        <ns4:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns4:FaultActor>
+                                        <ns4:ProviderSOAPErrorMsg>
+                                            <xsl:if test="$_error/ns1:ErrorReport/Msg">
+                                                <ns4:Message>
+                                                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                                </ns4:Message>
+                                            </xsl:if>
+                                            <ns4:MessageId>
+                                                <xsl:value-of select="tib:render-xml($Start/pfx3:GetServerTime_Request/Request/ns3:GetServerTime_Request)"/>
+                                            </ns4:MessageId>
+                                            <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                                <ns4:ErrorCode>
+                                                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                                </ns4:ErrorCode>
+                                            </xsl:if>
+                                        </ns4:ProviderSOAPErrorMsg>
+                                    </ns4:ProviderSOAPFault>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <ns4:ProviderSOAPFault>
+                                        <ns4:FaultCode>
+                                            <xsl:value-of select="34"/>
+                                        </ns4:FaultCode>
+                                        <ns4:FaultString>
+                                            <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/Mensajes/Fault_34"/>
+                                        </ns4:FaultString>
+                                        <ns4:FaultActor>
+                                            <xsl:value-of select="&quot;Cliente&quot;"/>
+                                        </ns4:FaultActor>
+                                        <ns4:ProviderSOAPErrorMsg>
+                                            <xsl:if test="$_error/ns1:ErrorReport/Msg">
+                                                <ns4:Message>
+                                                    <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                                </ns4:Message>
+                                            </xsl:if>
+                                            <ns4:MessageId>
+                                                <xsl:value-of select="tib:render-xml($Start/pfx3:GetServerTime_Request/Request/ns3:GetServerTime_Request)"/>
+                                            </ns4:MessageId>
+                                            <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                                <ns4:ErrorCode>
+                                                    <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                                </ns4:ErrorCode>
+                                            </xsl:if>
+                                        </ns4:ProviderSOAPErrorMsg>
+                                    </ns4:ProviderSOAPFault>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </Fault>
+                    </pfx3:Fault>
+                </data>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>163</pd:x>
+        <pd:y>223</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>624</pd:x>
+        <pd:y>213</pd:y>
+        <config>
+            <processName>/Utility Service/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:MSG_Container>
+                <ns12:Header>
+                    <ns12:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </ns12:ProjectName>
+                    <ns12:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/ExceptionHandling/GLB_SOURCE_DOMAIN"/>
+                    </ns12:Source_Domain>
+                    <ns12:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/ExceptionHandling/GLB_DESTINATION_DOMAIN"/>
+                    </ns12:Destination_Domain>
+                    <ns12:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/ExceptionHandling/GLB_TRANSACTION_TYPE"/>
+                    </ns12:Transaction_Type>
+                    <ns12:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                    </ns12:TimeStamp>
+                </ns12:Header>
+                <ns12:Body>
+                    <ns12:ErrorManagementSchema>
+                        <ns12:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns12:inrtn_id>
+                        <ns12:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns12:inrtn_instn_nm>
+                        <ns12:inrtn_err_rtn_desc>
+                            <xsl:value-of select="string($_error)"/>
+                        </ns12:inrtn_err_rtn_desc>
+                        <ns12:inrtn_msg_body>
+                            <xsl:value-of select="tib:render-xml($Start/pfx3:GetServerTime_Request/Request/ns3:GetServerTime_Request)"/>
+                        </ns12:inrtn_msg_body>
+                        <ns12:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm;ss', current-dateTime())"/>
+                        </ns12:cre8_ts>
+                        <ns12:u_code>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </ns12:u_code>
+                        <ns12:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns5:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns12:sev_id>
+                    </ns12:ErrorManagementSchema>
+                </ns12:Body>
+            </ns12:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>626</pd:x>
+        <pd:y>315</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16776961</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:xpathDescription>Client Fault</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>contains(tib:render-xml($Catch/exceptiondata/*), "ProviderSOAPFault")</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

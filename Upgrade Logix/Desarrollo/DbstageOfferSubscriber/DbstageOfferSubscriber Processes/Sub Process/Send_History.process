@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <pd:name>DbstageOfferSubscriber Processes/Sub Process/Send_History.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="promo_id" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="group_id" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>112</pd:startX>
+    <pd:startY>265</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>952</pd:endX>
+    <pd:endY>262</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Promos>
+            <xsd:element name="promos" type="xsd:string"/>
+        </Promos>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1415374971838</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>217</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>663</pd:width>
+        <pd:height>503</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC Delete</pd:to>
+            <pd:xpathDescription/>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (1)</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Update Status</pd:from>
+            <pd:to>JDBC Summary</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Delete</pd:from>
+            <pd:to>JDBC Update Status</pd:to>
+            <pd:xpathDescription>promo</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Start/group/promo_id !=''</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Delete</pd:from>
+            <pd:to>JDBC Promos</pd:to>
+            <pd:xpathDescription>grupo</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Promos</pd:from>
+            <pd:to>Group (3)</pd:to>
+            <pd:xpathDescription>promos</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($JDBC-Promos/resultSet/Record)&gt;0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (3)</pd:from>
+            <pd:to>JDBC Update Status</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Summary</pd:from>
+            <pd:to>Group (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Promos</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Update Status">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>441</pd:x>
+            <pd:y>127</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>UPDATE mag_import_HistorialPromociones SET STATUS = 'B'
+WHERE PROMO_ID IN ( ?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>promo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:choose>
+                        <xsl:when test="$Start/group/promo_id !=''">
+                            <promo>
+                                <xsl:choose>
+                                    <xsl:when test="exists($Start/group/promo_id)">
+                                        <xsl:value-of select="$Start/group/promo_id"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </promo>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <promo>
+                                <xsl:choose>
+                                    <xsl:when test="exists($Promos/promos)">
+                                        <xsl:value-of select="$Promos/promos"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </promo>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Group (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>632</pd:x>
+            <pd:y>50</pd:y>
+            <pd:width>170</pd:width>
+            <pd:height>151</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-Summary/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>sku</pd:iterationElementSlot>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>JDBC Insert</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JDBC Insert</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="JDBC Insert">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>714</pd:x>
+                <pd:y>116</pd:y>
+                <config>
+                    <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>true</emptyStrAsNil>
+                    <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                    <statement>INSERT INTO mag_import_HistorialPromociones (sku, promo_id, grupo_id, start_date, end_date, website, hierarchy, promo_type, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?,  'A')</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>sku</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>promo_id</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>group_id</parameterName>
+                            <dataType>BIGINT</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>start_date</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>end_date</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>website</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>hierarchy</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>promo_type</parameterName>
+                            <dataType>VARCHAR</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <sku>
+                            <xsl:value-of select="$sku/Record/product_sku"/>
+                        </sku>
+                        <promo_id>
+                            <xsl:copy-of select="$sku/Record/source_promo_id/@xsi:nil"/>
+                            <xsl:value-of select="$sku/Record/source_promo_id"/>
+                        </promo_id>
+                        <group_id>
+                            <xsl:value-of select="$sku/Record/group_id"/>
+                        </group_id>
+                        <start_date>
+                            <xsl:copy-of select="$sku/Record/start_date/@xsi:nil"/>
+                            <xsl:value-of select="$sku/Record/start_date"/>
+                        </start_date>
+                        <end_date>
+                            <xsl:copy-of select="$sku/Record/end_date/@xsi:nil"/>
+                            <xsl:value-of select="$sku/Record/end_date"/>
+                        </end_date>
+                        <website>
+                            <xsl:value-of select="$sku/Record/website"/>
+                        </website>
+                        <hierarchy>
+                            <xsl:copy-of select="$sku/Record/jerarquia/@xsi:nil"/>
+                            <xsl:value-of select="$sku/Record/jerarquia"/>
+                        </hierarchy>
+                        <promo_type>
+                            <xsl:copy-of select="$sku/Record/promo_type/@xsi:nil"/>
+                            <xsl:value-of select="$sku/Record/promo_type"/>
+                        </promo_type>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC Delete">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>328</pd:x>
+            <pd:y>128</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>DELETE FROM mag_import_HistorialPromociones 
+WHERE end_date &lt; getdate()</statement>
+                <Prepared_Param_DataType/>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Promos">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>329</pd:x>
+            <pd:y>283</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <statement>SELECT DISTINCT p.source_promo_id
+FROM mag_import_flex_promo p
+JOIN mag_import_flex_promo_cond c ON (p.promo_id = c.promo_id)
+WHERE c.group_id = ?
+AND p.end_date + ' ' + p.end_hour &gt; getdate()
+UNION
+SELECT DISTINCT p.source_promo_id
+FROM mag_import_flex_promo p
+JOIN mag_import_flex_promo_reward r ON (p.promo_id = r.promo_id)
+WHERE r.group_id = ?
+AND p.end_date + ' ' + p.end_hour &gt; getdate()</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <optionalOrNillable>true</optionalOrNillable>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>source_promo_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>group_id</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>group_id_1</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <group_id>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/group/group_id)">
+                                <xsl:value-of select="$Start/group/group_id"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </group_id>
+                    <group_id_1>
+                        <xsl:value-of select="$Start/group/group_id"/>
+                    </group_id_1>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="Group (3)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>413</pd:x>
+            <pd:y>208</pd:y>
+            <pd:width>157</pd:width>
+            <pd:height>140</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$JDBC-Promos/resultSet/Record</pd:over>
+                <pd:iterationElementSlot>promo</pd:iterationElementSlot>
+                <pd:indexSlot>j</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Assign</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Assign</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Assign">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:x>490</pd:x>
+                <pd:y>280</pd:y>
+                <config>
+                    <variableName>Promos</variableName>
+                </config>
+                <pd:inputBindings>
+                    <promos>
+                        <xsl:value-of select="if ($j = count($JDBC-Promos/resultSet/Record)) then&#xA;concat($Promos/promos, $promo/Record/source_promo_id)&#xA;else&#xA;concat($Promos/promos, $promo/Record/source_promo_id, &quot;, &quot;)"/>
+                    </promos>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="JDBC Summary">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>554</pd:x>
+            <pd:y>128</pd:y>
+            <config>
+                <timeout>%%Connections/Database/DBSTAGE/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/DBSTAGE/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <statement>SELECT DISTINCT g.product_sku, p.source_promo_id, g.group_id, p.start_date + ' ' + p.start_hour AS start_date, p.end_date + ' ' + p.end_hour AS end_date, j.jerarquia, w.website, p.promo_type
+FROM mag_import_flex_promo p
+JOIN mag_import_flex_promo_cond c ON (p.promo_id = c.promo_id)
+JOIN mag_import_promo_jerarquia j ON (p.promo_type = j.promo_type)
+JOIN mag_import_promo_prod_group g ON (c.group_id = g.group_id)
+JOIN mag_import_flex_promo_hub w ON (p.source_promo_id = w.source_promo_id AND p.promo_type = w.promo_type)
+JOIN RelacionSucursalWebSite s ON (w.website = s.WebsiteId)
+WHERE p.source_promo_id IN (?)
+AND j.jerarquia &lt;&gt; 0
+UNION
+SELECT DISTINCT g.product_sku, p.source_promo_id, g.group_id, p.start_date + ' ' + p.start_hour AS start_date, p.end_date + ' ' + p.end_hour AS end_date, j.jerarquia, w.website, p.promo_type
+FROM mag_import_flex_promo p
+JOIN mag_import_flex_promo_reward r ON (p.promo_id = r.promo_id)
+JOIN mag_import_promo_jerarquia j ON (p.promo_type = j.promo_type)
+JOIN mag_import_promo_prod_group g ON (r.group_id = g.group_id)
+JOIN mag_import_flex_promo_hub w ON (p.source_promo_id = w.source_promo_id AND p.promo_type = w.promo_type)
+JOIN RelacionSucursalWebSite s ON (w.website = s.WebsiteId)
+WHERE p.source_promo_id IN (?)
+AND j.jerarquia &lt;&gt; 0</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC DBSTAGE Connection.sharedjdbc</jdbcSharedConfig>
+                <optionalOrNillable>true</optionalOrNillable>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>promo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>promo_1</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>product_sku</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>source_promo_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>group_id</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>start_date</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>end_date</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>jerarquia</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>website</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>promo_type</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                        <xsl:when test="$Start/group/promo_id !=''">
+                            <promo>
+                                <xsl:choose>
+                                    <xsl:when test="exists($Start/group/promo_id)">
+                                        <xsl:value-of select="$Start/group/promo_id"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </promo>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <promo>
+                                <xsl:choose>
+                                    <xsl:when test="exists($Promos/promos)">
+                                        <xsl:value-of select="$Promos/promos"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </promo>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="$Start/group/promo_id !=''">
+                            <promo_1>
+                                <xsl:value-of select="$Start/group/promo_id"/>
+                            </promo_1>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <promo_1>
+                                <xsl:value-of select="$Promos/promos"/>
+                            </promo_1>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>325</pd:x>
+            <pd:y>444</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

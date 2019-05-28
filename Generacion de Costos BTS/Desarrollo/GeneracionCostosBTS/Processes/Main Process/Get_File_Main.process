@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:pfx="http://xmlns.heb.com/ei/MANUCOSTOBTS_INFORMATION" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns5="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/MANUCOSTOBTS_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/MANUCOSTOBTS_INFORMATION_SOAP.xsd"/>
+    <pd:name>Processes/Main Process/Get_File_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>29</pd:startX>
+    <pd:startY>43</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>725</pd:endX>
+    <pd:endY>50</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1413307486618</pd:targetNamespace>
+    <pd:activity name="FTP Get">
+        <pd:type>com.tibco.plugin.ftp.FTPGetActivity</pd:type>
+        <pd:resourceType>ae.activities.FTPGetActivityUI</pd:resourceType>
+        <pd:x>214</pd:x>
+        <pd:y>44</pd:y>
+        <config>
+            <Timeout>120000</Timeout>
+            <isBinary>false</isBinary>
+            <Overwrite>true</Overwrite>
+            <useProcessData>false</useProcessData>
+            <SharedUserData>/Shared Resources/Connections/FTP/FTP Connection.sharedftp</SharedUserData>
+        </config>
+        <pd:inputBindings>
+            <FTPGetInputDataFile>
+                <RemoteFileName>
+                    <xsl:value-of select="'20150405.txt'"/>
+                </RemoteFileName>
+                <LocalFileName>
+                    <xsl:value-of select="'C:\TIBCOFiles\BTS\Costos.txt'"/>
+                </LocalFileName>
+            </FTPGetInputDataFile>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Topic Publisher">
+        <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+        <pd:x>573</pd:x>
+        <pd:y>55</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>HEB.STG.GENERACIONCOSTOSBTS.TOPIC</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS_Connection_EMS.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <Body>
+                    <pfx:MSG_CONTAINER>
+                        <pfx:Header>
+                            <pfx:ProjectName>
+                                <xsl:value-of select="$_processContext/ns4:ProcessContext/ProjectName"/>
+                            </pfx:ProjectName>
+                            <pfx:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                            </pfx:TimeStamp>
+                        </pfx:Header>
+                        <pfx:Body>
+                            <xsl:copy-of select="$Parse-Data/Output/Rows/pfx:MANUCOSTOBTS"/>
+                        </pfx:Body>
+                    </pfx:MSG_CONTAINER>
+                </Body>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse Data">
+        <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+        <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+        <pd:x>444</pd:x>
+        <pd:y>47</pd:y>
+        <config>
+            <InputType>String</InputType>
+            <Encoding>ASCII</Encoding>
+            <ParseSharedConfig>/Shared Resources/Schema Definitions/Custom/Data Format.sharedparse</ParseSharedConfig>
+            <SkipBlankLines>true</SkipBlankLines>
+        </config>
+        <pd:inputBindings>
+            <Input>
+                <text>
+                    <xsl:value-of select="$Read-File/ns1:ReadActivityOutputTextClass/fileContent/textContent"/>
+                </text>
+                <noOfRecords>
+                    <xsl:value-of select="-1"/>
+                </noOfRecords>
+                <SkipHeaderCharacters>
+                    <xsl:value-of select="1090"/>
+                </SkipHeaderCharacters>
+            </Input>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Read File">
+        <pd:type>com.tibco.plugin.file.FileReadActivity</pd:type>
+        <pd:resourceType>ae.activities.FileReadActivity</pd:resourceType>
+        <pd:x>329</pd:x>
+        <pd:y>47</pd:y>
+        <config>
+            <encoding>text</encoding>
+        </config>
+        <pd:inputBindings>
+            <ns2:ReadActivityInputClass>
+                <fileName>
+                    <xsl:value-of select="'C:\TIBCOFiles\BTS\Costos.txt'"/>
+                </fileName>
+            </ns2:ReadActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>215</pd:x>
+        <pd:y>183</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>48</pd:x>
+        <pd:y>185</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns5:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns4:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns5:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>FTP Get</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>FTP Get</pd:from>
+        <pd:to>Read File</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Read File</pd:from>
+        <pd:to>Parse Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Data</pd:from>
+        <pd:to>JMS Topic Publisher</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Topic Publisher</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>FTP Get</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$_error_FTP-Get/ActivityErrors/GetFilesException/SuccessfulFiles = 'None'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

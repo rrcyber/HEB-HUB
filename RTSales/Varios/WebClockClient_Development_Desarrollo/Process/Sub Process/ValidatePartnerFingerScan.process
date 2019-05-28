@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://xmlns.heb.com/ei/WebClock4Kronos/CheckFingerPrintTemplate" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:pfx="http://xmlns.heb.com.mx/1369930841350" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns3="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx2="http://xmlns.heb.com/ei/ProviderFaultSchema" xmlns:ns4="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions">
+    <wsdl:import namespace="http://xmlns.heb.com.mx/1369930841350" location="/Shared Resources/WSDL/WSDL.wsdl"/>
+    <pd:name>Process/Sub Process/ValidatePartnerFingerScan.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="FingerScan" type="xsd:base64Binary"/>
+                    <xsd:element name="PartnerId" type="xsd:string"/>
+                    <xsd:element name="originalStoreId" type="xsd:string"/>
+                    <xsd:element name="DeviceId" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>87</pd:startX>
+    <pd:startY>137</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <AssociateFound>
+                <xsl:value-of select="if($Call_CheckFingerPrint/result/ValidationResult=&quot;true&quot;)&#xA;then $Call_CheckFingerPrint/result/AssotiateId&#xA;else &quot;0&quot;"/>
+            </AssociateFound>
+            <storeId>
+                <xsl:value-of select="if($Call_CheckFingerPrint/result/ValidationResult=&quot;true&quot;)&#xA;then $JDBC_GetAssotiatesFromStore/resultSet/Record[1]/socio_sucursalid&#xA;else $Start/root/originalStoreId"/>
+            </storeId>
+            <AssociateName>
+                <xsl:value-of select="if($Call_CheckFingerPrint/result/ValidationResult=&quot;true&quot;)&#xA;then $JDBC_GetAssotiatesFromStore/resultSet/Record[1]/SOCIO_NOMBRE &#xA;else &quot;&quot;"/>
+            </AssociateName>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="AssociateFound" type="xsd:string"/>
+                    <xsd:element name="storeId" type="xsd:string"/>
+                    <xsd:element name="AssociateName" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>785</pd:endX>
+    <pd:endY>141</pd:endY>
+    <pd:errorSchemas>
+        <Fault wsMsgRef="pfx:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1371590755535</pd:targetNamespace>
+    <pd:activity name="JDBC_GetAssotiatesFromStore">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>219</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select	FINGER_TEMPLATE.scan_SocioId,
+		FINGER_TEMPLATE.scan_templatededo,
+		socios.socio_sucursalid,
+		SOCIO_NOMBRE
+from	socios  inner join
+		FINGER_TEMPLATE  on socios.socio_id= FINGER_TEMPLATE.scan_socioId
+where	socios.socio_estatus=5 and
+		socios.socio_id =?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PartnerId</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>scan_SocioId</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>scan_templatededo</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>text</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>socio_sucursalid</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SOCIO_NOMBRE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <PartnerId>
+                    <xsl:value-of select="$Start/root/PartnerId"/>
+                </PartnerId>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>322</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>327</pd:width>
+        <pd:height>261</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>$Call_CheckFingerPrint/result/ValidationResult="true" or
+$i &gt;= count($JDBC_GetAssotiatesFromStore/resultSet/Record)</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Call_CheckFingerPrint</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Call_CheckFingerPrint</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Call_CheckFingerPrint">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>427</pd:x>
+            <pd:y>141</pd:y>
+            <config>
+                <processName>/Process/Sub Process/CheckFingerPrint.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns:CheckFingerPrintTemplate>
+                    <ns:FingerprintTemplateBLB>
+                        <xsl:value-of select="$JDBC_GetAssotiatesFromStore/resultSet/Record[$i]/scan_templatededo"/>
+                    </ns:FingerprintTemplateBLB>
+                    <ns:FingerprintFeatures>
+                        <xsl:value-of select="$Start/root/FingerScan"/>
+                    </ns:FingerprintFeatures>
+                    <ns:AssotiateId>
+                        <xsl:value-of select="$JDBC_GetAssotiatesFromStore/resultSet/Record[$i]/scan_SocioId"/>
+                    </ns:AssotiateId>
+                </ns:CheckFingerPrintTemplate>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>556</pd:x>
+            <pd:y>142</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="Result">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ValidationResult" type="xsd:boolean"/>
+                                <xsd:element name="AssociateId" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <Result>
+                    <ValidationResult>
+                        <xsl:value-of select="$Call_CheckFingerPrint/result/ValidationResult"/>
+                    </ValidationResult>
+                    <AssociateId>
+                        <xsl:value-of select="$Call_CheckFingerPrint/result/AssotiateId"/>
+                    </AssociateId>
+                </Result>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>60</pd:x>
+        <pd:y>257</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <pfx2:ProviderSOAPFault>
+                                <pfx2:FaultCode>
+                                    <xsl:value-of select="1001"/>
+                                </pfx2:FaultCode>
+                                <pfx2:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_10"/>
+                                </pfx2:FaultString>
+                                <pfx2:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </pfx2:FaultActor>
+                                <pfx2:ProviderSOAPErrorMsg>
+                                    <pfx2:Message>
+                                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                    </pfx2:Message>
+                                    <pfx2:MessageId>
+                                        <xsl:value-of select="$Start/root/originalStoreId"/>
+                                    </pfx2:MessageId>
+                                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                        <pfx2:ErrorCode>
+                                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                        </pfx2:ErrorCode>
+                                    </xsl:if>
+                                </pfx2:ProviderSOAPErrorMsg>
+                            </pfx2:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC_GetAssotiatesFromStore-1">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>219</pd:x>
+        <pd:y>337</pd:y>
+        <config>
+            <timeout>%%Connections/Database/KronosDB/QueryTimeOut%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/KronosDB/MaxRows%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_Kronos.sharedjdbc</jdbcSharedConfig>
+            <statement>select	FINGER_TEMPLATE.scan_SocioId,
+		FINGER_TEMPLATE.scan_templatededo
+from	socios  inner join
+		FINGER_TEMPLATE  on socios.socio_id= FINGER_TEMPLATE.scan_socioId
+where	socios.socio_estatus=5 and
+		socios.socio_sucursalid=? and
+		socios.socio_deptoid in (select depto_id from dbo.LECTOR_DEPTO_SUC where lector_id =? and sucursal_id = ?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Sucursalid</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Lector_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Sucursal_id</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>scan_SocioId</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>scan_templatededo</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>text</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <Sucursalid>
+                    <xsl:value-of select="$Start/root/originalStoreId"/>
+                </Sucursalid>
+                <Lector_ID>
+                    <xsl:value-of select="$Start/root/DeviceId"/>
+                </Lector_ID>
+                <Sucursal_id>
+                    <xsl:value-of select="$Start/root/originalStoreId"/>
+                </Sucursal_id>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>646</pd:x>
+        <pd:y>262</pd:y>
+        <pd:width>286</pd:width>
+        <pd:height>141</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>j</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>$Call_CheckFingerPrint-1/result/ValidationResult="true" or
+$j &gt;= count($JDBC_GetAssotiatesFromStore-1/resultSet/Record)</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Call_CheckFingerPrint-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map-Data-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Call_CheckFingerPrint-1</pd:from>
+            <pd:to>Map-Data-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Call_CheckFingerPrint-1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>722</pd:x>
+            <pd:y>321</pd:y>
+            <config>
+                <processName>/Process/Sub Process/CheckFingerPrint.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns:CheckFingerPrintTemplate>
+                    <ns:FingerprintTemplateBLB>
+                        <xsl:value-of select="$JDBC_GetAssotiatesFromStore-1/resultSet/Record[$j]/scan_templatededo"/>
+                    </ns:FingerprintTemplateBLB>
+                    <ns:FingerprintFeatures>
+                        <xsl:value-of select="$Start/root/FingerScan"/>
+                    </ns:FingerprintFeatures>
+                    <ns:AssotiateId>
+                        <xsl:value-of select="$JDBC_GetAssotiatesFromStore-1/resultSet/Record[$j]/scan_SocioId"/>
+                    </ns:AssotiateId>
+                </ns:CheckFingerPrintTemplate>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map-Data-1">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>852</pd:x>
+            <pd:y>322</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="Result">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ValidationResult" type="xsd:boolean"/>
+                                <xsd:element name="AssociateId" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <Result>
+                    <ValidationResult>
+                        <xsl:value-of select="$Call_CheckFingerPrint-1/result/ValidationResult"/>
+                    </ValidationResult>
+                    <AssociateId>
+                        <xsl:value-of select="$Call_CheckFingerPrint-1/result/AssotiateId"/>
+                    </AssociateId>
+                </Result>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Fault 27">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>1035</pd:x>
+        <pd:y>271</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <pfx2:ProviderSOAPFault>
+                                <pfx2:FaultCode>
+                                    <xsl:value-of select="27"/>
+                                </pfx2:FaultCode>
+                                <pfx2:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_27"/>
+                                </pfx2:FaultString>
+                                <pfx2:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </pfx2:FaultActor>
+                                <pfx2:ProviderSOAPErrorMsg>
+                                    <pfx2:Message>
+                                        <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                                    </pfx2:Message>
+                                    <pfx2:MessageId>
+                                        <xsl:value-of select="$Start/root/originalStoreId"/>
+                                    </pfx2:MessageId>
+                                    <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                                        <pfx2:ErrorCode>
+                                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                                        </pfx2:ErrorCode>
+                                    </xsl:if>
+                                </pfx2:ProviderSOAPErrorMsg>
+                            </pfx2:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 20">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>220</pd:x>
+        <pd:y>463</pd:y>
+        <config>
+            <faultName>Fault</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInput>
+                <data>
+                    <pfx:Fault>
+                        <Fault>
+                            <pfx2:ProviderSOAPFault>
+                                <pfx2:FaultCode>
+                                    <xsl:value-of select="20"/>
+                                </pfx2:FaultCode>
+                                <pfx2:FaultString>
+                                    <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_20"/>
+                                </pfx2:FaultString>
+                                <pfx2:FaultActor>
+                                    <xsl:value-of select="&quot;WebClock&quot;"/>
+                                </pfx2:FaultActor>
+                                <pfx2:ProviderSOAPErrorMsg>
+                                    <pfx2:Message>
+                                        <xsl:value-of select="$_globalVariables/ns4:GlobalVariables/Mensajes/Fault_20"/>
+                                    </pfx2:Message>
+                                    <pfx2:MessageId>
+                                        <xsl:value-of select="$Start/root/originalStoreId"/>
+                                    </pfx2:MessageId>
+                                    <pfx2:ErrorCode>
+                                        <xsl:value-of select="concat(&quot;Nombre: &quot;,$JDBC_GetAssotiatesFromStore/resultSet/Record[1]/SOCIO_NOMBRE,&quot;SocioId: &quot;,$JDBC_GetAssotiatesFromStore/resultSet/Record[1]/scan_SocioId)"/>
+                                    </pfx2:ErrorCode>
+                                </pfx2:ProviderSOAPErrorMsg>
+                            </pfx2:ProviderSOAPFault>
+                        </Fault>
+                    </pfx:Fault>
+                </data>
+            </ns3:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC_GetAssotiatesFromStore</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>JDBC_GetAssotiatesFromStore-1</pd:to>
+        <pd:xpathDescription>Huella False</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Map-Data/Result/ValidationResult='false'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore-1</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>Fault 27</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore</pd:from>
+        <pd:to>JDBC_GetAssotiatesFromStore-1</pd:to>
+        <pd:xpathDescription>No Record</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_GetAssotiatesFromStore/resultSet/Record)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore-1</pd:from>
+        <pd:to>Fault 20</pd:to>
+        <pd:xpathDescription>No record</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_GetAssotiatesFromStore-1/resultSet/Record)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetAssotiatesFromStore-1</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

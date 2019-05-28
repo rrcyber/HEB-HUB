@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Project Name Processes/Sub Process/getBatchNumber.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="counter_name" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>151</pd:startX>
+    <pd:startY>63</pd:startY>
+    <pd:returnBindings>
+        <result>
+            <batch_number>
+                <xsl:value-of select="if(string-length($JDBC-Call-Procedure/resultSet/outputSet/OUT_BAS_COUNTER_VALUE)=0) then '' else $JDBC-Call-Procedure/resultSet/outputSet/OUT_BAS_COUNTER_VALUE"/>
+            </batch_number>
+        </result>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="result">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="batch_number" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>465</pd:endX>
+    <pd:endY>64</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1355263227214</pd:targetNamespace>
+    <pd:activity name="JDBC Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>301</pd:x>
+        <pd:y>71</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DatabaseName/GLB_TIMEOUT%%</timeout>
+            <maxRows>1</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>PMM</schema>
+            <ProcedureName>BASTKEY</ProcedureName>
+            <parameterTypes>
+                <parameter>
+                    <colName>IN_BAS_COUNTER_NAME</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>NCHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_BAS_COUNTER_VALUE</colName>
+                    <colType>1</colType>
+                    <dataType>2</dataType>
+                    <typeName>NUMBER</typeName>
+                </parameter>
+                <parameter>
+                    <colName>OUT_BAS_COUNTER_VALUE</colName>
+                    <colType>4</colType>
+                    <dataType>2</dataType>
+                    <typeName>NUMBER</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_PROCESS_LUW</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>CHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_BATCH_COUNT</colName>
+                    <colType>1</colType>
+                    <dataType>2</dataType>
+                    <typeName>NUMBER</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <IN_BAS_COUNTER_NAME>
+                        <xsl:value-of select="$Start/root/counter_name"/>
+                    </IN_BAS_COUNTER_NAME>
+                    <IN_BAS_COUNTER_VALUE>
+                        <xsl:value-of select="0"/>
+                    </IN_BAS_COUNTER_VALUE>
+                    <IN_PROCESS_LUW>
+                        <xsl:value-of select="'T'"/>
+                    </IN_PROCESS_LUW>
+                    <IN_BATCH_COUNT>
+                        <xsl:value-of select="0"/>
+                    </IN_BATCH_COUNT>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

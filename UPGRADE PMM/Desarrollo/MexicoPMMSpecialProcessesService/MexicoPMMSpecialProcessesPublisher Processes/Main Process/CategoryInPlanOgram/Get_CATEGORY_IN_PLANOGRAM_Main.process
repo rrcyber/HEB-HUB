@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://xmlns.heb.com/ei/PRCPMOEE_INFORMATION" xmlns:pfx2="http://xmlns.heb.com/ei/PLANFAMILIA_INFORMATION" xmlns:pfx="http://xmlns.heb.com/ei/BARCODE_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/PLANFAMILIA_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PLANFAMILIA_INFORMATION_SOAP.xsd"/>
+    <pd:name>MexicoPMMSpecialProcessesPublisher Processes/Main Process/CategoryInPlanOgram/Get_CATEGORY_IN_PLANOGRAM_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>163</pd:startX>
+    <pd:startY>160</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>689</pd:endX>
+    <pd:endY>160</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1272907666833</pd:targetNamespace>
+    <pd:group name="Process In Subset">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>229</pd:x>
+        <pd:y>48</pd:y>
+        <pd:width>395</pd:width>
+        <pd:height>207</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>$Get-CATEGORY_IN_PLANOGRAM-Available-Records/resultSet/lastSubset="true"</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get CATEGORY_IN_PLANOGRAM Available Records</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Publisher</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get CATEGORY_IN_PLANOGRAM Available Records</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get CATEGORY_IN_PLANOGRAM Available Records</pd:from>
+            <pd:to>Publisher</pd:to>
+            <pd:xpathDescription>Records Found</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>count($Get-CATEGORY_IN_PLANOGRAM-Available-Records/resultSet/Record) &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>474</pd:x>
+            <pd:y>200</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Get CATEGORY_IN_PLANOGRAM Available Records">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>318</pd:x>
+            <pd:y>167</pd:y>
+            <config>
+                <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/PMM/GLB_MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>true</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/PMM JDBC Connection.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT
+F.prd_lvl_number, C.atr_code, C.atr_code_desc
+FROM pmm.basatyee A,  pmm.basahree B, pmm.basacdee C, pmm.basatpee D, pmm.prdmstee F 
+WHERE A.app_name='BAS' AND A.app_func = 'PRD' AND TRIM(A.atr_type_desc)='EXHIBICIÓN' AND 
+A.atr_typ_tech_key=B.atr_typ_tech_key AND TRIM(B.atr_header_desc)='PLANOGRAMABLE' AND 
+B.atr_hdr_tech_key=C.ATR_HDR_TECH_KEY AND C.ATR_COD_TECH_KEY=D.ATR_COD_TECH_KEY AND 
+C.ATR_HDR_TECH_KEY=D.ATR_HDR_TECH_KEY AND D.prd_lvl_id=4 AND D.prd_lvl_child=F.prd_lvl_child</statement>
+                <wizardData>#Fri Apr 23 08:37:51 CDT 2010&#xD;
+useSchemaInFQN=true&#xD;
+columncount=0&#xD;
+manualSQLText=SELECT * FROM PMM.PRDPCDEE&#xD;
+joincount=0&#xD;
+tablecount=0&#xD;
+</wizardData>
+                <optionalOrNillable>true</optionalOrNillable>
+                <processInSubsets>true</processInSubsets>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>ATR_CODE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>ATR_CODE_DESC</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>NillableElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <subsetSize>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/PMM/GBL_SUBSET_SIZE"/>
+                    </subsetSize>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Publisher">
+            <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+            <pd:x>474</pd:x>
+            <pd:y>104</pd:y>
+            <config>
+                <PermittedMessageType>XML Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Topics/MIG_PLANFAMILIA_TOPIC%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+                <ApplicationProperties>/Shared Resources/Connections/JMS/JMS Application Properties.sharedjmsapp</ApplicationProperties>
+                <InDataxsdString ref="pfx2:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <ns1:ActivityInput>
+                    <Body>
+                        <pfx2:MSG_CONTAINER>
+                            <pfx2:Header>
+                                <pfx2:ProjectName>
+                                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                                </pfx2:ProjectName>
+                                <pfx2:Source_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Source_Domain"/>
+                                </pfx2:Source_Domain>
+                                <pfx2:Destination_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                                </pfx2:Destination_Domain>
+                                <pfx2:Transaction_Type>
+                                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                                </pfx2:Transaction_Type>
+                                <pfx2:TimeStamp>
+                                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;,current-dateTime())"/>
+                                </pfx2:TimeStamp>
+                            </pfx2:Header>
+                            <pfx2:Body>
+                                <xsl:for-each select="$Get-CATEGORY_IN_PLANOGRAM-Available-Records/resultSet/Record">
+                                    <pfx2:PLAN_FAMILIA>
+                                        <pfx2:PRD_LVL_NUMBER>
+                                            <xsl:copy-of select="PRD_LVL_NUMBER/@xsi:nil"/>
+                                            <xsl:value-of select="PRD_LVL_NUMBER"/>
+                                        </pfx2:PRD_LVL_NUMBER>
+                                        <pfx2:ATR_CODE>
+                                            <xsl:copy-of select="ATR_CODE/@xsi:nil"/>
+                                            <xsl:value-of select="ATR_CODE"/>
+                                        </pfx2:ATR_CODE>
+                                        <pfx2:ATR_CODE_DESC>
+                                            <xsl:copy-of select="ATR_CODE_DESC/@xsi:nil"/>
+                                            <xsl:value-of select="ATR_CODE_DESC"/>
+                                        </pfx2:ATR_CODE_DESC>
+                                    </pfx2:PLAN_FAMILIA>
+                                </xsl:for-each>
+                                <xsl:if test="$i=1">
+                                    <pfx2:INIT>
+                                        <xsl:value-of select="&quot;true&quot;"/>
+                                    </pfx2:INIT>
+                                </xsl:if>
+                            </pfx2:Body>
+                        </pfx2:MSG_CONTAINER>
+                    </Body>
+                </ns1:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Process In Subset</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Process In Subset</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

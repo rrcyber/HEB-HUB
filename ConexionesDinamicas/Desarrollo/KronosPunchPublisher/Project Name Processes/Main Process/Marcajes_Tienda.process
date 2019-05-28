@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="www.tibco.com/plugin/Sleep" xmlns:pfx="http://xmlns.heb.com/ei/Marcajes_KRONOS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Marcajes_KRONOS" schemaLocation="/Shared Resources/Schema Definitions/Custom/Marcajes_KRONOS.xsd"/>
+    <pd:name>Project Name Processes/Main Process/Marcajes_Tienda.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>41</pd:startX>
+    <pd:startY>437</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1003</pd:endX>
+    <pd:endY>447</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1423276371908</pd:targetNamespace>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>413</pd:x>
+        <pd:y>447</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="DynamicConnectionQuery">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>151</pd:x>
+        <pd:y>329</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/DynamicConnectionQuery.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <DB_URL>
+                    <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$_processContext/ns:ProcessContext/CustomId]/URL"/>
+                </DB_URL>
+                <USER>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                </USER>
+                <QUERY>
+                    <xsl:value-of select="concat(&quot;SELECT PS_PUNCHSID,NUMERO,FECHAYHORA,ZONAHORARIO,SITIO,LECTOR,ESTATUS,TIMESTAMPS,HUELLA,REPROCESOS&quot;,&#xA;&quot; FROM DBWCK..PS_PUNCHS&quot;,&#xA;&quot; WHERE ESTATUS = 0&quot;,&#xA;&quot; AND ISNULL(NUMERO, 0) &lt;> 0&quot;)"/>
+                </QUERY>
+                <MAX_ROWS>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                </MAX_ROWS>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse Data">
+        <pd:type>com.tibco.plugin.parse.ParseActivity</pd:type>
+        <pd:resourceType>ae.activities.ParseActivity</pd:resourceType>
+        <pd:x>262</pd:x>
+        <pd:y>332</pd:y>
+        <config>
+            <InputType>String</InputType>
+            <Encoding>ASCII</Encoding>
+            <ParseSharedConfig>/Shared Resources/Schema Definitions/Data Format/PS_PUNCHS.sharedparse</ParseSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <Input>
+                <text>
+                    <xsl:value-of select="$DynamicConnectionQuery/group/result"/>
+                </text>
+                <noOfRecords>
+                    <xsl:value-of select="count(tib:tokenize($DynamicConnectionQuery/group/result, &quot;&#xA;&quot;))"/>
+                </noOfRecords>
+            </Input>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="DynamicConnectionUpdate">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>262</pd:x>
+        <pd:y>218</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/DynamicConnectionUpdate.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <DB_URL>
+                    <xsl:value-of select="$GetVariable/group/STOREID[STOREID=$_processContext/ns:ProcessContext/CustomId]/URL"/>
+                </DB_URL>
+                <USER>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/MIG_DBUSERNAME"/>
+                </USER>
+                <MAX_ROWS>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/Database/DatabaseName/GLB_MAX_ROWS"/>
+                </MAX_ROWS>
+                <xsl:for-each select="$Parse-Data/Output/Rows/PS_PUNCHS">
+                    <QUERY>
+                        <xsl:value-of select="concat(&quot;UPDATE DBWCK..PS_PUNCHS SET&quot;,&#xA;&quot; ESTATUS = '2'&quot;,&#xA;&quot; WHERE NUMERO = &quot;,./ITEM[1]/NUMERO,&#xA;&quot; AND PS_PUNCHSID = &quot;,./ITEM[1]/PS_PUNCHSID)"/>
+                    </QUERY>
+                </xsl:for-each>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetVariable">
+        <pd:type>com.tibco.pe.core.GetSharedVariableActivity</pd:type>
+        <pd:resourceType>ae.activities.getSharedVariable</pd:resourceType>
+        <pd:x>149</pd:x>
+        <pd:y>436</pd:y>
+        <config>
+            <variableConfig>/Shared Resources/Shared Variables/StoresVariables.sharedvariable</variableConfig>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Error GetVariable">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>152</pd:x>
+        <pd:y>537</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>380</pd:x>
+        <pd:y>45</pd:y>
+        <pd:width>579</pd:width>
+        <pd:height>361</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Parse-Data/Output/Rows/PS_PUNCHS/ITEM</pd:over>
+            <pd:iterationElementSlot>Iteracion</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Group (1)</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Group (1)</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="Group (1)">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>455</pd:x>
+            <pd:y>85</pd:y>
+            <pd:width>442</pd:width>
+            <pd:height>270</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>errorLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:indexSlot>count</pd:indexSlot>
+                <pd:errorCondition>$count &gt;=$_globalVariables/ns1:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+                <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Map-Data_KRONOS-1</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JMS Topic Publisher</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Multiple Bends</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Sleep</pd:from>
+                <pd:to>Generate Error</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>JMS Topic Publisher</pd:from>
+                <pd:to>Sleep</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-65536</pd:lineColor>
+                <pd:conditionType>error</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Map-Data_KRONOS-1</pd:from>
+                <pd:to>JMS Topic Publisher</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="Sleep">
+                <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+                <pd:resourceType>ae.activities.sleep</pd:resourceType>
+                <pd:x>689</pd:x>
+                <pd:y>266</pd:y>
+                <config/>
+                <pd:inputBindings>
+                    <ns12:SleepInputSchema>
+                        <IntervalInMillisec>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/RetryConfig/GLB_RETRY_MARCAJES_TIENDA"/>
+                        </IntervalInMillisec>
+                    </ns12:SleepInputSchema>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Generate Error">
+                <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+                <pd:resourceType>ae.activities.throw</pd:resourceType>
+                <pd:x>801</pd:x>
+                <pd:y>267</pd:y>
+                <config>
+                    <faultName/>
+                </config>
+                <pd:inputBindings>
+                    <ns2:ActivityInput>
+                        <message>
+                            <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                        </message>
+                        <messageCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </messageCode>
+                    </ns2:ActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="JMS Topic Publisher">
+                <pd:type>com.tibco.plugin.jms.JMSTopicPublishActivity</pd:type>
+                <pd:resourceType>ae.activities.JMSTopicPublishActivity</pd:resourceType>
+                <pd:x>684</pd:x>
+                <pd:y>161</pd:y>
+                <config>
+                    <PermittedMessageType>XML Text</PermittedMessageType>
+                    <SessionAttributes>
+                        <transacted>false</transacted>
+                        <acknowledgeMode>1</acknowledgeMode>
+                        <maxSessions>1</maxSessions>
+                        <destination>%%Destinations/Topics/GLB.STORE.MARCAJES.TOPIC%%</destination>
+                    </SessionAttributes>
+                    <ConfigurableHeaders>
+                        <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                        <JMSExpiration>0</JMSExpiration>
+                        <JMSPriority>4</JMSPriority>
+                        <JMSReplyTo/>
+                    </ConfigurableHeaders>
+                    <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+                    <InDataxsdString ref="pfx:Marcajes_KRONOS"/>
+                </config>
+                <pd:inputBindings>
+                    <ns3:ActivityInput>
+                        <Body>
+                            <pfx:Marcajes_KRONOS>
+                                <xsl:copy-of select="$Map-Data_KRONOS-1/pfx:Marcajes_KRONOS/pfx:ITEM"/>
+                            </pfx:Marcajes_KRONOS>
+                        </Body>
+                    </ns3:ActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Map-Data_KRONOS-1">
+                <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+                <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+                <pd:x>568</pd:x>
+                <pd:y>153</pd:y>
+                <config>
+                    <element ref="pfx:Marcajes_KRONOS"/>
+                </config>
+                <pd:inputBindings>
+                    <pfx:Marcajes_KRONOS>
+                        <pfx:ITEM>
+                            <pfx:PS_PUNCHSID>
+                                <xsl:value-of select="$Iteracion/ITEM/PS_PUNCHSID"/>
+                            </pfx:PS_PUNCHSID>
+                            <pfx:NUMERO>
+                                <xsl:value-of select="$Iteracion/ITEM/NUMERO"/>
+                            </pfx:NUMERO>
+                            <pfx:FECHAYHORA>
+                                <xsl:choose>
+                                    <xsl:when test="exists(tib:parse-dateTime('yyyy-MM-dd HH:mm:ss.SSS',$Iteracion/ITEM/FECHAYHORA))">
+                                        <xsl:value-of select="tib:parse-dateTime('yyyy-MM-dd HH:mm:ss.SSS',$Iteracion/ITEM/FECHAYHORA)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </pfx:FECHAYHORA>
+                            <pfx:ZONAHORARIO>
+                                <xsl:value-of select="$Iteracion/ITEM/ZONAHORARIO"/>
+                            </pfx:ZONAHORARIO>
+                            <pfx:SITIO>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/CustomId"/>
+                            </pfx:SITIO>
+                            <pfx:LECTOR>
+                                <xsl:value-of select="$Iteracion/ITEM/LECTOR"/>
+                            </pfx:LECTOR>
+                            <pfx:ESTATUS>
+                                <xsl:value-of select="$Iteracion/ITEM/ESTATUS"/>
+                            </pfx:ESTATUS>
+                            <pfx:TIMESTAMPS>
+                                <xsl:choose>
+                                    <xsl:when test="exists(tib:parse-dateTime('yyyy-MM-dd HH:mm:ss.SSS',$Iteracion/ITEM/TIMESTAMPS))">
+                                        <xsl:value-of select="tib:parse-dateTime('yyyy-MM-dd HH:mm:ss.SSS',$Iteracion/ITEM/TIMESTAMPS)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </pfx:TIMESTAMPS>
+                            <pfx:HUELLA>
+                                <xsl:value-of select="$Iteracion/ITEM/HUELLA"/>
+                            </pfx:HUELLA>
+                            <pfx:REPROCESOS>
+                                <xsl:value-of select="$Iteracion/ITEM/REPROCESOS"/>
+                            </pfx:REPROCESOS>
+                        </pfx:ITEM>
+                    </pfx:Marcajes_KRONOS>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>DynamicConnectionQuery</pd:from>
+        <pd:to>Parse Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Data</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:xpathDescription>SinDatos</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Parse-Data/Output/Rows/PS_PUNCHS)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse Data</pd:from>
+        <pd:to>DynamicConnectionUpdate</pd:to>
+        <pd:xpathDescription>Con Datos</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Parse-Data/Output/Rows/PS_PUNCHS)&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>DynamicConnectionQuery</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>GetVariable</pd:from>
+        <pd:to>Error GetVariable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error GetVariable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>DynamicConnectionUpdate</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

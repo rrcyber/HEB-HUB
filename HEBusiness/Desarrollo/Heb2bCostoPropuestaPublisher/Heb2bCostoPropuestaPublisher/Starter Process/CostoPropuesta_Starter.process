@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns3="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <pd:name>Heb2bCostoPropuestaPublisher/Starter Process/CostoPropuesta_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>27</pd:x>
+        <pd:y>132</pd:y>
+        <config>
+            <StartTime>1392264180000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%Heb2bCostoPropuestaPublisherVariables/GLB_FRECUENCY%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>326</pd:endX>
+    <pd:endY>133</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1387582276931</pd:targetNamespace>
+    <pd:activity name="Catch All">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>80</pd:x>
+        <pd:y>250</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>230</pd:x>
+        <pd:y>250</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns2:MSG_Container>
+                <ns2:Header>
+                    <ns2:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </ns2:ProjectName>
+                    <ns2:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </ns2:Source_Domain>
+                    <ns2:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </ns2:Destination_Domain>
+                    <ns2:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                    </ns2:Transaction_Type>
+                    <ns2:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                    </ns2:TimeStamp>
+                </ns2:Header>
+                <ns2:Body>
+                    <ns2:ErrorManagementSchema>
+                        <ns2:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns2:inrtn_id>
+                        <ns2:inrtn_instn_nm>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/GLB_ERR_INSTANCE_NAME"/>
+                        </ns2:inrtn_instn_nm>
+                        <ns2:inrtn_err_rtn_desc>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/StackTrace"/>
+                        </ns2:inrtn_err_rtn_desc>
+                        <ns2:inrtn_msg_body>
+                            <xsl:value-of select="&quot;There was a problem with the timer of Categoria&quot;"/>
+                        </ns2:inrtn_msg_body>
+                        <ns2:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns2:cre8_ts>
+                        <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                            <ns2:u_code>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                            </ns2:u_code>
+                        </xsl:if>
+                        <ns2:sev_id>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_LOW"/>
+                        </ns2:sev_id>
+                    </ns2:ErrorManagementSchema>
+                </ns2:Body>
+            </ns2:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Queue Sender">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>178</pd:x>
+        <pd:y>134</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_INICIOCOSTOPROPUESTAS_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>%%Connections/JMS/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                <JMSExpiration>%%Connections/JMS/Properties/GLB_JMS_EXPIRATION_TIMER%%</JMSExpiration>
+                <JMSPriority>%%Connections/JMS/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMSConnection.sharedjmscon</ConnectionReference>
+            <ApplicationProperties/>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <Body>
+                    <xsl:value-of select="&quot;Start process CategoriaScheduler_Starter&quot;"/>
+                </Body>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch All</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: CostoPropuestaStarter
+Fecha de creación: 05/02/2014
+Creado por: Liliana Garibay
+Variables globales: , RUN_FRECUENCY
+Descripción: Proceso utilizado para detonar el proceso GetChangesCostoPropuestaSubscriber_Starter</pd:description>
+        <pd:x>179</pd:x>
+        <pd:y>42</pd:y>
+        <pd:width>356</pd:width>
+        <pd:height>80</pd:height>
+        <pd:fontName>Dialog.bold-plain-9</pd:fontName>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>dash</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

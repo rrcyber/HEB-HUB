@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.sat.gob.mx/detallista" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.sat.gob.mx/psgecfd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.sat.gob.mx/cfd/2" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/CFD_SCHEMA">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/CFD_SCHEMA" schemaLocation="/Shared Resources/Schema Definitions/Custom/CFD_SCHEMA.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.sat.gob.mx/cfd/2" schemaLocation="/Shared Resources/Schema Definitions/Custom/cfdv2.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Custom/Save_CFD.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:CDF_CONTENT"/>
+    <pd:startX>290</pd:startX>
+    <pd:startY>158</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>657</pd:endX>
+    <pd:endY>161</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1303749934335</pd:targetNamespace>
+    <pd:activity name="Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>469</pd:x>
+        <pd:y>160</pd:y>
+        <config>
+            <timeout>%%Connections/Database/VISORFE/GBL_TIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/VISORFE/GBL_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/VISORFE JDBC Connection.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spIns_SetCFDType;1</ProcedureName>
+            <useSchema>true</useSchema>
+            <oraObjects/>
+            <oraTables/>
+            <ConfigurationError>output schema is null</ConfigurationError>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@XML</colName>
+                    <colType>1</colType>
+                    <dataType>-1</dataType>
+                    <typeName>xml</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <XML>
+                        <xsl:value-of select="tib:render-xml($Start/pfx:CDF_CONTENT/ns:Comprobante, true(), true())"/>
+                    </XML>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Procedure</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

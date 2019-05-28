@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx="http://xmlns.heb.com/ei/SDITRFDTI_DATA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/SDITRFDTI_DATA" schemaLocation="/Shared Resources/Schema Definitions/Custom/SDITRFDTI_DATA.xsd"/>
+    <pd:name>Project Name Processes/Main Process/TRF_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:SDITRFDTI"/>
+    <pd:startX>112</pd:startX>
+    <pd:startY>208</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>805</pd:endX>
+    <pd:endY>204</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1364857492162</pd:targetNamespace>
+    <pd:activity name="HEB_TRFDTLIM_Import-1">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>626</pd:x>
+        <pd:y>204</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/HEB_TRFDTLIM_Import.process</processName>
+        </config>
+        <pd:inputBindings>
+            <group>
+                <xsl:if test="$getBatchNumber/result/batch_number">
+                    <session_number>
+                        <xsl:value-of select="$getBatchNumber/result/batch_number"/>
+                    </session_number>
+                </xsl:if>
+                <xsl:if test="$Start/pfx:SDITRFDTI/pfx:ITEM[1]/pfx:ACTION_CODE">
+                    <action_code>
+                        <xsl:value-of select="$Start/pfx:SDITRFDTI/pfx:ITEM[1]/pfx:ACTION_CODE"/>
+                    </action_code>
+                </xsl:if>
+            </group>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>189</pd:x>
+        <pd:y>93</pd:y>
+        <pd:width>351</pd:width>
+        <pd:height>228</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>getBatchNumber</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SDITRFDTI_Insert</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getBatchNumber</pd:from>
+            <pd:to>getBatchNumber-1</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>getBatchNumber-1</pd:from>
+            <pd:to>SDITRFDTI_Insert</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="SDITRFDTI_Insert">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>446</pd:x>
+            <pd:y>178</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/SDITRFDTI_Insert.process</processName>
+            </config>
+            <pd:inputBindings>
+                <group>
+                    <xsl:for-each select="$Start/pfx:SDITRFDTI/pfx:ITEM">
+                        <ITEM>
+                            <xsl:if test="$getBatchNumber/result/batch_number">
+                                <SESSION_NUMBER>
+                                    <xsl:value-of select="$getBatchNumber/result/batch_number"/>
+                                </SESSION_NUMBER>
+                            </xsl:if>
+                            <xsl:if test="$getBatchNumber-1/result/batch_number">
+                                <TECH_KEY>
+                                    <xsl:value-of select="$getBatchNumber-1/result/batch_number"/>
+                                </TECH_KEY>
+                            </xsl:if>
+                            <TRF_NUMBER>
+                                <xsl:value-of select="pfx:TRF_NUMBER"/>
+                            </TRF_NUMBER>
+                            <CARRIER_NAME>
+                                <xsl:value-of select="pfx:CARRIER_NAME"/>
+                            </CARRIER_NAME>
+                            <MNFST_NUMBER>
+                                <xsl:value-of select="pfx:MNFST_NUMBER"/>
+                            </MNFST_NUMBER>
+                            <CARTON_NUMBER>
+                                <xsl:value-of select="pfx:CARTON_NUMBER"/>
+                            </CARTON_NUMBER>
+                            <PRD_LVL_NUMBER>
+                                <xsl:value-of select="pfx:PRD_LVL_NUMBER"/>
+                            </PRD_LVL_NUMBER>
+                            <PRD_MST_NUMBER>
+                                <xsl:value-of select="pfx:PRD_MST_NUMBER"/>
+                            </PRD_MST_NUMBER>
+                            <JDA_ORIGIN>
+                                <xsl:value-of select="pfx:JDA_ORIGIN"/>
+                            </JDA_ORIGIN>
+                            <TRF_TYPE_CODE>
+                                <xsl:value-of select="pfx:TRF_TYPE_CODE"/>
+                            </TRF_TYPE_CODE>
+                            <TRF_REASON_CODE>
+                                <xsl:value-of select="pfx:TRF_REASON_CODE"/>
+                            </TRF_REASON_CODE>
+                            <FROM_LOC>
+                                <xsl:value-of select="pfx:FROM_LOC"/>
+                            </FROM_LOC>
+                            <TO_LOC>
+                                <xsl:value-of select="pfx:TO_LOC"/>
+                            </TO_LOC>
+                            <QUANTITY>
+                                <xsl:value-of select="pfx:QUANTITY"/>
+                            </QUANTITY>
+                            <ACTION_CODE>
+                                <xsl:value-of select="pfx:ACTION_CODE"/>
+                            </ACTION_CODE>
+                            <RECEIPT_DATE>
+                                <xsl:value-of select="pfx:RECEIPT_DATE"/>
+                            </RECEIPT_DATE>
+                            <REFERENCE>
+                                <xsl:value-of select="pfx:REFERENCE"/>
+                            </REFERENCE>
+                            <TRF_TRACK_NUM>
+                                <xsl:value-of select="pfx:TRF_TRACK_NUM"/>
+                            </TRF_TRACK_NUM>
+                            <TRF_CARTON_WGT>
+                                <xsl:value-of select="pfx:TRF_CARTON_WGT"/>
+                            </TRF_CARTON_WGT>
+                            <DATE_CREATED>
+                                <xsl:value-of select="pfx:DATE_CREATED"/>
+                            </DATE_CREATED>
+                            <NO_PROCESSED>
+                                <xsl:value-of select="pfx:NO_PROCESSED"/>
+                            </NO_PROCESSED>
+                            <NOTES>
+                                <xsl:value-of select="pfx:NOTES"/>
+                            </NOTES>
+                            <TDRC_CODE>
+                                <xsl:value-of select="pfx:TDRC_CODE"/>
+                            </TDRC_CODE>
+                            <TRF_DISCREPANCY_REF>
+                                <xsl:value-of select="pfx:TRF_DISCREPANCY_REF"/>
+                            </TRF_DISCREPANCY_REF>
+                            <PRD_UPC>
+                                <xsl:value-of select="pfx:PRD_UPC"/>
+                            </PRD_UPC>
+                            <REQUESTED_BY>
+                                <xsl:value-of select="pfx:REQUESTED_BY"/>
+                            </REQUESTED_BY>
+                            <EXPT_RECEIPT_DATE>
+                                <xsl:value-of select="pfx:EXPT_RECEIPT_DATE"/>
+                            </EXPT_RECEIPT_DATE>
+                            <RECEIVED_BY>
+                                <xsl:value-of select="pfx:RECEIVED_BY"/>
+                            </RECEIVED_BY>
+                            <CROSS_DOCK_LOC>
+                                <xsl:value-of select="pfx:CROSS_DOCK_LOC"/>
+                            </CROSS_DOCK_LOC>
+                            <PMG_PO_NUMBER>
+                                <xsl:value-of select="pfx:PMG_PO_NUMBER"/>
+                            </PMG_PO_NUMBER>
+                            <INNER_PACK_ID>
+                                <xsl:value-of select="pfx:INNER_PACK_ID"/>
+                            </INNER_PACK_ID>
+                            <VPC_CASE_PACK_ID>
+                                <xsl:value-of select="pfx:VPC_CASE_PACK_ID"/>
+                            </VPC_CASE_PACK_ID>
+                            <TRF_IPID_CONV>
+                                <xsl:value-of select="pfx:TRF_IPID_CONV"/>
+                            </TRF_IPID_CONV>
+                            <TRF_CP_CONV>
+                                <xsl:value-of select="pfx:TRF_CP_CONV"/>
+                            </TRF_CP_CONV>
+                            <TRF_QTY_FLAG>
+                                <xsl:value-of select="pfx:TRF_QTY_FLAG"/>
+                            </TRF_QTY_FLAG>
+                            <TRF_WEIGHT_UOM>
+                                <xsl:value-of select="pfx:TRF_WEIGHT_UOM"/>
+                            </TRF_WEIGHT_UOM>
+                            <TRF_WEIGHT>
+                                <xsl:value-of select="pfx:TRF_WEIGHT"/>
+                            </TRF_WEIGHT>
+                            <TRF_SOURCE_ID>
+                                <xsl:value-of select="pfx:TRF_SOURCE_ID"/>
+                            </TRF_SOURCE_ID>
+                        </ITEM>
+                    </xsl:for-each>
+                </group>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="getBatchNumber">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>275</pd:x>
+            <pd:y>177</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/getBatchNumber.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <counter_name>
+                        <xsl:value-of select="'SESSION_NUMBER'"/>
+                    </counter_name>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="getBatchNumber-1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>364</pd:x>
+            <pd:y>265</pd:y>
+            <config>
+                <processName>/Project Name Processes/Sub Process/getBatchNumber.process</processName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <counter_name>
+                        <xsl:value-of select="'TECH_KEY'"/>
+                    </counter_name>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>629</pd:x>
+        <pd:y>351</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                </message>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>HEB_TRFDTLIM_Import-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>HEB_TRFDTLIM_Import-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>HEB_TRFDTLIM_Import-1</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

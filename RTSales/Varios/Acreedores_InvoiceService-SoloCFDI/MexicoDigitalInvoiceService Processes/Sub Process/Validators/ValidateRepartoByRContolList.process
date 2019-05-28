@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://www.tibco.com/schemas/Acreedores_InvoiceService/Shared Resources/Schema Definitions/Custom/Schema.xsd" xmlns:pfx2="http://www.tibco.com/schemas/Acreedores_InvoiceService/Shared Resources/Schema Definitions/Custom/RepartoCR.xsd">
+    <xsd:import namespace="http://www.tibco.com/schemas/Acreedores_InvoiceService/Shared Resources/Schema Definitions/Custom/Schema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Reparto.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/Acreedores_InvoiceService/Shared Resources/Schema Definitions/Custom/RepartoCR.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/RepartoCR.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Validators/ValidateRepartoByRContolList.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx:Reparto"/>
+                    <xsd:element name="RepartosRControl">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element ref="pfx2:RepartoCR" minOccurs="0" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="IndexFactura" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>183</pd:startX>
+    <pd:startY>158</pd:startY>
+    <pd:returnBindings>
+        <ValidationResume>
+            <IsValid>
+                <xsl:value-of select="sum($validationResult/AccumulatedOutput/ValidationResult/IsValid)"/>
+            </IsValid>
+            <Messages>
+                <xsl:value-of select="''"/>
+            </Messages>
+        </ValidationResume>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="ValidationResume">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="IsValid" type="xsd:int"/>
+                    <xsd:element name="Messages" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>596</pd:endX>
+    <pd:endY>159</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1382983526677</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>278</pd:x>
+        <pd:y>67</pd:y>
+        <pd:width>211</pd:width>
+        <pd:height>173</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/root/RepartosRControl/pfx2:RepartoCR</pd:over>
+            <pd:iterationElementSlot>currentReparto</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:outSlot>validationResult</pd:outSlot>
+            <pd:activityOutputName>CallValidateReparto</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>CallValidateReparto</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>CallValidateReparto</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="CallValidateReparto">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>385</pd:x>
+            <pd:y>162</pd:y>
+            <config>
+                <processName>/MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_Reparto.process</processName>
+            </config>
+            <pd:inputBindings>
+                <Repartos>
+                    <Factura>
+                        <xsl:copy-of select="$Start/root/pfx:Reparto"/>
+                    </Factura>
+                    <ControlR>
+                        <xsl:copy-of select="$currentReparto/pfx2:RepartoCR"/>
+                    </ControlR>
+                    <IndexRControl>
+                        <xsl:value-of select="$index"/>
+                    </IndexRControl>
+                    <IndexFactura>
+                        <xsl:value-of select="$Start/root/IndexFactura"/>
+                    </IndexFactura>
+                </Repartos>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

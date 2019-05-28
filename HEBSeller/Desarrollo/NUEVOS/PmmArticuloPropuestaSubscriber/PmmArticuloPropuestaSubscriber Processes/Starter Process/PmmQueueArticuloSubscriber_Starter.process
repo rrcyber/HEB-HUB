@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx5="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Division.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Jerarquia.xsd" xmlns:pfx2="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd" xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulo.xsd">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaArticulos/Division/Articulos.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaArticulos/Jerarquia.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaArticulos/Jerarquia.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Division.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Division.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulo.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Articulo.xsd"/>
+    <pd:name>PmmArticuloPropuestaSubscriber Processes/Starter Process/PmmQueueArticuloSubscriber_Starter.process</pd:name>
+    <pd:startName>JMS Queue Receiver</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="JMS Queue Receiver">
+        <pd:type>com.tibco.plugin.jms.JMSQueueEventSource</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueEventSource</pd:resourceType>
+        <pd:x>65</pd:x>
+        <pd:y>163</pd:y>
+        <config>
+            <PermittedMessageType>Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>%%Connections/JMS/Properties/GLB_ACK_MOD%%</acknowledgeMode>
+                <maxSessions>%%Connections/JMS/Properties/GLB_MAX_SESSIONS%%</maxSessions>
+                <destination>%%Destinations/Queues/GLB_ARTICULO_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Connection.sharedjmscon</ConnectionReference>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>635</pd:endX>
+    <pd:endY>169</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1387380424680</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>190</pd:x>
+        <pd:y>304</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>false</catchAll>
+            <fault>localname=XMLParseException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Confirm">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>490</pd:x>
+        <pd:y>170</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ConfirmOnError">
+        <pd:type>com.tibco.pe.core.ConfirmActivity</pd:type>
+        <pd:resourceType>activity.confirm</pd:resourceType>
+        <pd:x>445</pd:x>
+        <pd:y>304</pd:y>
+        <config>
+            <ConfirmEvent>JMS Queue Receiver</ConfirmEvent>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>205</pd:x>
+        <pd:y>166</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx6:Articulos"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JMS-Queue-Receiver/pfx2:ActivityOutput/Body"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Insert_Pmm_Articulo_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>350</pd:x>
+        <pd:y>167</pd:y>
+        <config>
+            <processName>/PmmArticuloPropuestaSubscriber Processes/Main Process/Insert_Pmm_Articulo_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Articulos>
+                <xsl:for-each select="$Parse-XML/Articulos/Articulo">
+                    <Articulo>
+                        <xsl:for-each select="SDIPRDMSI">
+                            <SDIPRDMSI>
+                                <IdPropuesta>
+                                    <xsl:value-of select="IdPropuesta"/>
+                                </IdPropuesta>
+                                <Segmento>
+                                    <xsl:value-of select="Segmento"/>
+                                </Segmento>
+                                <Descripcion>
+                                    <xsl:value-of select="Descripcion"/>
+                                </Descripcion>
+                                <EsEstilo>
+                                    <xsl:value-of select="EsEstilo"/>
+                                </EsEstilo>
+                                <CicloVida>
+                                    <xsl:value-of select="CicloVida"/>
+                                </CicloVida>
+                                <EsPlanogramable>
+                                    <xsl:value-of select="EsPlanogramable"/>
+                                </EsPlanogramable>
+                                <CapacidadPresentacion>
+                                    <xsl:value-of select="CapacidadPresentacion"/>
+                                </CapacidadPresentacion>
+                                <UnidadVenta>
+                                    <xsl:value-of select="UnidadVenta"/>
+                                </UnidadVenta>
+                                <Proveedor>
+                                    <xsl:value-of select="Proveedor"/>
+                                </Proveedor>
+                                <EsCatchWeight>
+                                    <xsl:value-of select="EsCatchWeight"/>
+                                </EsCatchWeight>
+                                <TipoCatchWeight>
+                                    <xsl:value-of select="TipoCatchWeight"/>
+                                </TipoCatchWeight>
+                                <TipoSku>
+                                    <xsl:value-of select="TipoSku"/>
+                                </TipoSku>
+                                <UnidadPresentacion>
+                                    <xsl:value-of select="UnidadPresentacion"/>
+                                </UnidadPresentacion>
+                                <Altura>
+                                    <xsl:value-of select="Altura"/>
+                                </Altura>
+                                <Anchura>
+                                    <xsl:value-of select="Anchura"/>
+                                </Anchura>
+                                <Profundidad>
+                                    <xsl:value-of select="Profundidad"/>
+                                </Profundidad>
+                                <DimensionUno>
+                                    <xsl:value-of select="DimensionUno"/>
+                                </DimensionUno>
+                                <DimensionDos>
+                                    <xsl:value-of select="DimensionDos"/>
+                                </DimensionDos>
+                                <DimensionTres>
+                                    <xsl:value-of select="DimensionTres"/>
+                                </DimensionTres>
+                            </SDIPRDMSI>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIPRDDSS">
+                            <SDIPRDDSS>
+                                <xsl:for-each select="DimensionUno">
+                                    <DimensionUno>
+                                        <Dimension>
+                                            <xsl:value-of select="Dimension"/>
+                                        </Dimension>
+                                        <xsl:for-each select="DimensionCodigo">
+                                            <DimensionCodigo>
+                                                <xsl:value-of select="."/>
+                                            </DimensionCodigo>
+                                        </xsl:for-each>
+                                    </DimensionUno>
+                                </xsl:for-each>
+                                <xsl:for-each select="DimensionDos">
+                                    <DimensionDos>
+                                        <Dimension>
+                                            <xsl:value-of select="Dimension"/>
+                                        </Dimension>
+                                        <xsl:for-each select="DimensionCodigo">
+                                            <DimensionCodigo>
+                                                <xsl:value-of select="."/>
+                                            </DimensionCodigo>
+                                        </xsl:for-each>
+                                    </DimensionDos>
+                                </xsl:for-each>
+                                <xsl:for-each select="DimensionTres">
+                                    <DimensionTres>
+                                        <Dimension>
+                                            <xsl:value-of select="Dimension"/>
+                                        </Dimension>
+                                        <xsl:for-each select="DimensionCodigo">
+                                            <DimensionCodigo>
+                                                <xsl:value-of select="."/>
+                                            </DimensionCodigo>
+                                        </xsl:for-each>
+                                    </DimensionTres>
+                                </xsl:for-each>
+                            </SDIPRDDSS>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIPRDATI">
+                            <SDIPRDATI>
+                                <xsl:if test="Temporada">
+                                    <Temporada>
+                                        <xsl:value-of select="Temporada"/>
+                                    </Temporada>
+                                </xsl:if>
+                                <TipoMarca>
+                                    <xsl:value-of select="TipoMarca"/>
+                                </TipoMarca>
+                                <CicloVida>
+                                    <xsl:value-of select="CicloVida"/>
+                                </CicloVida>
+                                <Marca>
+                                    <xsl:value-of select="Marca"/>
+                                </Marca>
+                                <PaisOrigen>
+                                    <xsl:value-of select="PaisOrigen"/>
+                                </PaisOrigen>
+                                <Importado>
+                                    <xsl:value-of select="Importado"/>
+                                </Importado>
+                                <TipoDistribucion>
+                                    <xsl:value-of select="TipoDistribucion"/>
+                                </TipoDistribucion>
+                                <TipoOrden>
+                                    <xsl:value-of select="TipoOrden"/>
+                                </TipoOrden>
+                                <FlujoCat>
+                                    <xsl:value-of select="FlujoCat"/>
+                                </FlujoCat>
+                                <BreakPack>
+                                    <xsl:value-of select="BreakPack"/>
+                                </BreakPack>
+                                <TipoSku>
+                                    <xsl:value-of select="TipoSku"/>
+                                </TipoSku>
+                                <Composicion>
+                                    <xsl:value-of select="Composicion"/>
+                                </Composicion>
+                            </SDIPRDATI>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIPRDATISucursal">
+                            <SDIPRDATISucursal>
+                                <xsl:for-each select="Sucursales">
+                                    <Sucursales>
+                                        <Sucursal>
+                                            <xsl:value-of select="Sucursal"/>
+                                        </Sucursal>
+                                        <Sinexcv>
+                                            <xsl:value-of select="Sinexcv"/>
+                                        </Sinexcv>
+                                    </Sucursales>
+                                </xsl:for-each>
+                            </SDIPRDATISucursal>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIVALMSI">
+                            <SDIVALMSI>
+                                <UnidadminimaRequerida>
+                                    <xsl:value-of select="UnidadminimaRequerida"/>
+                                </UnidadminimaRequerida>
+                                <TipoBodega>
+                                    <xsl:value-of select="TipoBodega"/>
+                                </TipoBodega>
+                                <Modelo>
+                                    <xsl:value-of select="Modelo"/>
+                                </Modelo>
+                                <CodigoBarras>
+                                    <xsl:value-of select="CodigoBarras"/>
+                                </CodigoBarras>
+                            </SDIVALMSI>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIVALMSIEstilo">
+                            <SDIVALMSIEstilo>
+                                <xsl:if test="IdPropiedad">
+                                    <IdPropiedad>
+                                        <xsl:value-of select="IdPropiedad"/>
+                                    </IdPropiedad>
+                                </xsl:if>
+                                <xsl:if test="IdTipoPrenda">
+                                    <IdTipoPrenda>
+                                        <xsl:value-of select="IdTipoPrenda"/>
+                                    </IdTipoPrenda>
+                                </xsl:if>
+                                <Licencia>
+                                    <xsl:value-of select="Licencia"/>
+                                </Licencia>
+                                <Aplicaciones>
+                                    <xsl:value-of select="Aplicaciones"/>
+                                </Aplicaciones>
+                                <TieneBordado>
+                                    <xsl:value-of select="TieneBordado"/>
+                                </TieneBordado>
+                                <EsEstampado>
+                                    <xsl:value-of select="EsEstampado"/>
+                                </EsEstampado>
+                                <AnioTemporada>
+                                    <xsl:value-of select="AnioTemporada"/>
+                                </AnioTemporada>
+                                <LongitudManga>
+                                    <xsl:value-of select="LongitudManga"/>
+                                </LongitudManga>
+                                <TipoCuello>
+                                    <xsl:value-of select="TipoCuello"/>
+                                </TipoCuello>
+                            </SDIVALMSIEstilo>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIPRDUPI">
+                            <SDIPRDUPI>
+                                <CodigoBarras>
+                                    <xsl:value-of select="CodigoBarras"/>
+                                </CodigoBarras>
+                                <Descripcion>
+                                    <xsl:value-of select="Descripcion"/>
+                                </Descripcion>
+                            </SDIPRDUPI>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIPRDUPIVariaciones">
+                            <SDIPRDUPIVariaciones>
+                                <xsl:for-each select="Variacion">
+                                    <Variacion>
+                                        <CodigoBarras>
+                                            <xsl:value-of select="CodigoBarras"/>
+                                        </CodigoBarras>
+                                        <Descripcion>
+                                            <xsl:value-of select="Descripcion"/>
+                                        </Descripcion>
+                                        <Casepack>
+                                            <xsl:value-of select="Casepack"/>
+                                        </Casepack>
+                                        <idVariacion>
+                                            <xsl:value-of select="idVariacion"/>
+                                        </idVariacion>
+                                        <DimensionUno>
+                                            <xsl:value-of select="DimensionUno"/>
+                                        </DimensionUno>
+                                        <DimensionCodigoUno>
+                                            <xsl:value-of select="DimensionCodigoUno"/>
+                                        </DimensionCodigoUno>
+                                        <DimensionDos>
+                                            <xsl:value-of select="DimensionDos"/>
+                                        </DimensionDos>
+                                        <DimensionCodigoDos>
+                                            <xsl:value-of select="DimensionCodigoDos"/>
+                                        </DimensionCodigoDos>
+                                        <DimensionTres>
+                                            <xsl:value-of select="DimensionTres"/>
+                                        </DimensionTres>
+                                        <DimensionCodigoTres>
+                                            <xsl:value-of select="DimensionCodigoTres"/>
+                                        </DimensionCodigoTres>
+                                    </Variacion>
+                                </xsl:for-each>
+                            </SDIPRDUPIVariaciones>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIVPCCSI">
+                            <SDIVPCCSI>
+                                <IdCasePack>
+                                    <xsl:value-of select="IdCasePack"/>
+                                </IdCasePack>
+                                <Proveedor>
+                                    <xsl:value-of select="Proveedor"/>
+                                </Proveedor>
+                                <UnidadesCasepack>
+                                    <xsl:value-of select="UnidadesCasepack"/>
+                                </UnidadesCasepack>
+                                <Descripcion>
+                                    <xsl:value-of select="Descripcion"/>
+                                </Descripcion>
+                                <UnidadVenta>
+                                    <xsl:value-of select="UnidadVenta"/>
+                                </UnidadVenta>
+                                <UnidadCompra>
+                                    <xsl:value-of select="UnidadCompra"/>
+                                </UnidadCompra>
+                                <UnidadesInnerPack>
+                                    <xsl:value-of select="UnidadesInnerPack"/>
+                                </UnidadesInnerPack>
+                                <PesoBruto>
+                                    <xsl:value-of select="PesoBruto"/>
+                                </PesoBruto>
+                                <Ancho>
+                                    <xsl:value-of select="Ancho"/>
+                                </Ancho>
+                                <Profundidad>
+                                    <xsl:value-of select="Profundidad"/>
+                                </Profundidad>
+                                <Altura>
+                                    <xsl:value-of select="Altura"/>
+                                </Altura>
+                                <Medidas>
+                                    <xsl:value-of select="Medidas"/>
+                                </Medidas>
+                                <EstibaPalet>
+                                    <xsl:value-of select="EstibaPalet"/>
+                                </EstibaPalet>
+                                <CamaPalet>
+                                    <xsl:value-of select="CamaPalet"/>
+                                </CamaPalet>
+                                <CodigoBarras>
+                                    <xsl:value-of select="CodigoBarras"/>
+                                </CodigoBarras>
+                                <CostoCasepack>
+                                    <xsl:value-of select="CostoCasepack"/>
+                                </CostoCasepack>
+                                <xsl:if test="CantidadInnerPacks">
+                                    <CantidadInnerPacks>
+                                        <xsl:value-of select="CantidadInnerPacks"/>
+                                    </CantidadInnerPacks>
+                                </xsl:if>
+                                <xsl:if test="DíasIncremento">
+                                    <DíasIncremento>
+                                        <xsl:value-of select="DíasIncremento"/>
+                                    </DíasIncremento>
+                                </xsl:if>
+                                <xsl:if test="DíasVarianza">
+                                    <DíasVarianza>
+                                        <xsl:value-of select="DíasVarianza"/>
+                                    </DíasVarianza>
+                                </xsl:if>
+                                <xsl:if test="DíasMáximo">
+                                    <DíasMáximo>
+                                        <xsl:value-of select="DíasMáximo"/>
+                                    </DíasMáximo>
+                                </xsl:if>
+                            </SDIVPCCSI>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIVPCCCI">
+                            <SDIVPCCCI>
+                                <xsl:for-each select="Costos">
+                                    <Costos>
+                                        <Sucursal>
+                                            <xsl:value-of select="Sucursal"/>
+                                        </Sucursal>
+                                        <Proveedor>
+                                            <xsl:value-of select="Proveedor"/>
+                                        </Proveedor>
+                                        <IdCasepack>
+                                            <xsl:value-of select="IdCasepack"/>
+                                        </IdCasepack>
+                                        <CostoCasepack>
+                                            <xsl:value-of select="CostoCasepack"/>
+                                        </CostoCasepack>
+                                    </Costos>
+                                </xsl:for-each>
+                            </SDIVPCCCI>
+                        </xsl:for-each>
+                        <xsl:for-each select="SDIVPCAWI">
+                            <SDIVPCAWI>
+                                <xsl:for-each select="Descuentos">
+                                    <Descuentos>
+                                        <Porcentaje>
+                                            <xsl:value-of select="Porcentaje"/>
+                                        </Porcentaje>
+                                        <FechaInicio>
+                                            <xsl:value-of select="FechaInicio"/>
+                                        </FechaInicio>
+                                        <FechaFin>
+                                            <xsl:value-of select="FechaFin"/>
+                                        </FechaFin>
+                                        <Proveedor>
+                                            <xsl:value-of select="Proveedor"/>
+                                        </Proveedor>
+                                        <TipoDescuentoPMM>
+                                            <xsl:value-of select="TipoDescuentoPMM"/>
+                                        </TipoDescuentoPMM>
+                                        <Descripcion>
+                                            <xsl:value-of select="Descripcion"/>
+                                        </Descripcion>
+                                    </Descuentos>
+                                </xsl:for-each>
+                            </SDIVPCAWI>
+                        </xsl:for-each>
+                        <xsl:for-each select="PRDPRCEE">
+                            <PRDPRCEE>
+                                <xsl:for-each select="Precios">
+                                    <Precios>
+                                        <UnidadVenta>
+                                            <xsl:value-of select="UnidadVenta"/>
+                                        </UnidadVenta>
+                                        <PrecioSugerido>
+                                            <xsl:value-of select="PrecioSugerido"/>
+                                        </PrecioSugerido>
+                                        <Formato>
+                                            <xsl:value-of select="Formato"/>
+                                        </Formato>
+                                        <Sucursal>
+                                            <xsl:value-of select="Sucursal"/>
+                                        </Sucursal>
+                                    </Precios>
+                                </xsl:for-each>
+                            </PRDPRCEE>
+                        </xsl:for-each>
+                        <xsl:for-each select="PRDAPDEE">
+                            <PRDAPDEE>
+                                <xsl:for-each select="Sucursales">
+                                    <Sucursales>
+                                        <Sucursal>
+                                            <xsl:value-of select="Sucursal"/>
+                                        </Sucursal>
+                                    </Sucursales>
+                                </xsl:for-each>
+                            </PRDAPDEE>
+                        </xsl:for-each>
+                        <SDIPRDDSI>
+                            <DescripcionEspecifica>
+                                <xsl:value-of select="SDIPRDDSI/DescripcionEspecifica"/>
+                            </DescripcionEspecifica>
+                        </SDIPRDDSI>
+                    </Articulo>
+                </xsl:for-each>
+            </Articulos>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>318</pd:x>
+        <pd:y>303</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns:MSG_Container>
+                <ns:Header>
+                    <ns:ProjectName>
+                        <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                    </ns:ProjectName>
+                    <ns:Source_Domain>
+                        <xsl:value-of select="$_globalVariables/pfx5:GlobalVariables/ProjectConfig/Source_Domain"/>
+                    </ns:Source_Domain>
+                    <ns:Destination_Domain>
+                        <xsl:value-of select="$_globalVariables/pfx5:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                    </ns:Destination_Domain>
+                    <ns:Transaction_Type>
+                        <xsl:value-of select="$_globalVariables/pfx5:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                    </ns:Transaction_Type>
+                    <ns:TimeStamp>
+                        <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                    </ns:TimeStamp>
+                </ns:Header>
+                <ns:Body>
+                    <ns:ErrorManagementSchema>
+                        <ns:inrtn_id>
+                            <xsl:value-of select="$_globalVariables/pfx5:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                        </ns:inrtn_id>
+                        <ns:inrtn_instn_nm>
+                            <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                        </ns:inrtn_instn_nm>
+                        <ns:inrtn_err_rtn_desc>
+                            <xsl:value-of select="$Catch/ns2:XMLParseException/msg"/>
+                        </ns:inrtn_err_rtn_desc>
+                        <ns:inrtn_msg_body>
+                            <xsl:value-of select="$JMS-Queue-Receiver/pfx2:ActivityOutput/Body"/>
+                        </ns:inrtn_msg_body>
+                        <ns:cre8_ts>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                        </ns:cre8_ts>
+                        <ns:u_code>
+                            <xsl:value-of select="concat( $_globalVariables/pfx5:GlobalVariables/ExceptionHandling/GLB_ERROR_CODE_FUNCTIONAL , ' : '  , $_error/ns1:ErrorReport/MsgCode)"/>
+                        </ns:u_code>
+                        <ns:sev_id>
+                            <xsl:value-of select="$_globalVariables/pfx5:GlobalVariables/ExceptionHandling/GLB_ERR_SEV_MED"/>
+                        </ns:sev_id>
+                    </ns:ErrorManagementSchema>
+                </ns:Body>
+            </ns:MSG_Container>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Receiver</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Confirm</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Insert_Pmm_Articulo_Main</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert_Pmm_Articulo_Main</pd:from>
+        <pd:to>Confirm</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ConfirmOnError</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>ConfirmOnError</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto: PmmQueueArticuloSubscriber_Starter
+Fecha de creación: 12/02/2014
+Creado por: Victor Sanchez
+Variables globales: GLB_ARTICULO_QUEUE
+Descripción: Proceso suscrito a GLB_ARTICULO_QUEUE, al detectar un nuevo mensaje llama a Insert_Pmm_Articulo_Main</pd:description>
+        <pd:x>191</pd:x>
+        <pd:y>45</pd:y>
+        <pd:width>376</pd:width>
+        <pd:height>89</pd:height>
+        <pd:fontName>Dialog.bold-plain-9</pd:fontName>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>dash</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

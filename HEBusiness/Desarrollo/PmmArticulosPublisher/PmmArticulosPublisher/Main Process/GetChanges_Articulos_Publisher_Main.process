@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://xmlns.heb.com/ei/error" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulos.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd" schemaLocation="/Resources/EIM/Services/JerarquiaSucursales/JerarquiaSucursales.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Articulos.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Articulos.xsd"/>
+    <pd:name>PmmArticulosPublisher/Main Process/GetChanges_Articulos_Publisher_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:lvlchild"/>
+    <pd:startX>44</pd:startX>
+    <pd:startY>186</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>389</pd:endX>
+    <pd:endY>187</pd:endY>
+    <pd:errorSchemas>
+        <error ref="ns1:MSG_Container"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1389371115171</pd:targetNamespace>
+    <pd:activity name="AuditProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>274</pd:x>
+        <pd:y>187</pd:y>
+        <config>
+            <processName>/Utility Services/AuditProcess/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns3:AuditingSchema>
+                <ns3:inrtn_id>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ExceptionHandling/MIG_ERR_INTEGRATION_ID"/>
+                </ns3:inrtn_id>
+                <ns3:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                </ns3:inrtn_nm>
+                <ns3:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                </ns3:inrtn_instn_nm>
+                <ns3:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns:ProcessContext/ProcessId"/>
+                </ns3:inrtn_proc_id>
+                <ns3:inrtn_rec_cnt>
+                    <xsl:value-of select="$GetPMMDataChangeArticulosPublisher/records"/>
+                </ns3:inrtn_rec_cnt>
+                <ns3:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                </ns3:inrtn_cre8_ts>
+            </ns3:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch-1">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>262</pd:x>
+        <pd:y>298</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=MSG_Container namespace=http://xmlns.heb.com/ei/ErrorManagementSchema</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>391</pd:x>
+        <pd:y>298</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            <spawn>true</spawn>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$_error_GetPMMDataChangeArticulosPublisher/ns1:MSG_Container"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="GetPMMDataChangeArticulosPublisher">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>162</pd:x>
+        <pd:y>185</pd:y>
+        <config>
+            <processName>/PmmArticulosPublisher/Sub Process/GetPMMDataChangeArticulosPublisher.process</processName>
+        </config>
+        <pd:inputBindings>
+            <lvlchild>
+                <xsl:for-each select="$Start/lvlchild/Record">
+                    <Record>
+                        <PRD_LVL_CHILD>
+                            <xsl:value-of select="PRD_LVL_CHILD"/>
+                        </PRD_LVL_CHILD>
+                        <AUDIT_TYPE>
+                            <xsl:value-of select="AUDIT_TYPE"/>
+                        </AUDIT_TYPE>
+                        <AUDIT_DATE>
+                            <xsl:value-of select="AUDIT_DATE"/>
+                        </AUDIT_DATE>
+                    </Record>
+                </xsl:for-each>
+            </lvlchild>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>GetPMMDataChangeArticulosPublisher</pd:from>
+        <pd:to>AuditProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>GetPMMDataChangeArticulosPublisher</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch-1</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Nombre del objeto:GetChanges_Articulos_Publisher_Main
+Fecha de creación: 22/01/2014
+Creado por: Juan Alberto Gonzalez Aguilar
+Variables globales: N/A
+Descripción: Proceso utilizado para importar Articulos de PMM</pd:description>
+        <pd:x>296</pd:x>
+        <pd:y>66</pd:y>
+        <pd:width>562</pd:width>
+        <pd:height>112</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-3355393</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>true</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

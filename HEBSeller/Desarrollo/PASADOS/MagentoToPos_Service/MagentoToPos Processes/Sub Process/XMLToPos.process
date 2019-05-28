@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://www.heb.com/web_order">
+    <xsd:import namespace="http://www.heb.com/web_order" schemaLocation="/Shared Resources/Schema Definitions/Custom/Send_POS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema" schemaLocation="/Shared Resources/Schema Definitions/Common/ErrorManagementSchema_SOAP.xsd"/>
+    <xsd:import namespace="http://www.heb.com/web_order" schemaLocation="/Shared Resources/Schema Definitions/Custom/Web_Order.xsd"/>
+    <pd:name>MagentoToPos Processes/Sub Process/XMLToPos.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:WebOrder"/>
+    <pd:startX>150</pd:startX>
+    <pd:startY>63</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xmlstring>
+                <xsl:value-of select="$SendXML/xmlString"/>
+            </xmlstring>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="xmlstring" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>445</pd:endX>
+    <pd:endY>64</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="ns2:Fault"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1428610978143</pd:targetNamespace>
+    <pd:activity name="SendXML">
+        <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+        <pd:x>300</pd:x>
+        <pd:y>62</pd:y>
+        <config>
+            <renderAsText>text</renderAsText>
+            <validateInput>false</validateInput>
+            <textEncoding>UTF-8</textEncoding>
+            <term ref="pfx:WebOrder"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx:WebOrder"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Fault 10">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>299</pd:x>
+        <pd:y>193</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns1:ActivityInput>
+                <message/>
+                <data>
+                    <ns2:Fault>
+                        <ns2:Code>
+                            <xsl:value-of select="'Fault 10'"/>
+                        </ns2:Code>
+                        <ns2:Reason>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/MagentoToPos_Error/Fault_10"/>
+                        </ns2:Reason>
+                    </ns2:Fault>
+                </data>
+            </ns1:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SendXML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendXML</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SendXML</pd:from>
+        <pd:to>Fault 10</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

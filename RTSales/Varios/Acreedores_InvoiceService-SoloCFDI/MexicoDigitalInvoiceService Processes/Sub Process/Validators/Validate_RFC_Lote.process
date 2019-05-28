@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pfx="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" xmlns:ns="http://www.sat.gob.mx/cfd/2" xmlns:ns1="http://www.sat.gob.mx/cfd/3" xmlns:ns2="http://xmlns.heb.com/ei/Addenda">
+    <xsd:import namespace="http://xmlns.heb.com/ei/DIGITAL_INVOICE_REQUEST" schemaLocation="/Shared Resources/Schema Definitions/Custom/DIGITAL_INVOICE_REQUEST.xsd"/>
+    <pd:name>MexicoDigitalInvoiceService Processes/Sub Process/Validators/Validate_RFC_Lote.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="PARAM_INPUT">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx:SET_DIGITAL_INVOICE_REQUEST"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>150</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="$Map-Data/root/COUNT_CFDI = $Map-Data-1/root/Count-CFDI">
+                <MESSAGE>
+                    <CODE>
+                        <xsl:value-of select="''"/>
+                    </CODE>
+                    <DESCRIPTION>
+                        <xsl:value-of select="''"/>
+                    </DESCRIPTION>
+                </MESSAGE>
+            </xsl:when>
+            <xsl:otherwise>
+                <MESSAGE>
+                    <CODE>
+                        <xsl:value-of select="'ERR0400'"/>
+                    </CODE>
+                    <DESCRIPTION>
+                        <xsl:value-of select="&quot;MENSAJE CONTIENE RFC'S DISTINTOS&quot;"/>
+                    </DESCRIPTION>
+                </MESSAGE>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="MESSAGE">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="CODE" type="xsd:string"/>
+                    <xsd:element name="DESCRIPTION" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>611</pd:endX>
+    <pd:endY>61</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1312316252288</pd:targetNamespace>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>280</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="CFDI" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="RFC_CFDI" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="COUNT_CFDI" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ns1:Comprobante">
+                    <CFDI>
+                        <RFC_CFDI>
+                            <xsl:value-of select="ns1:Emisor/@rfc"/>
+                        </RFC_CFDI>
+                    </CFDI>
+                </xsl:for-each>
+                <COUNT_CFDI>
+                    <xsl:value-of select="count($Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ns1:Comprobante/ns1:Emisor/@rfc)"/>
+                </COUNT_CFDI>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map-Data-1">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>408</pd:x>
+        <pd:y>62</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Count-CFDI" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:variable name="var" select="$Start/PARAM_INPUT/pfx:SET_DIGITAL_INVOICE_REQUEST/ns1:Comprobante[1]/ns1:Emisor/@rfc"/>
+                <Count-CFDI>
+                    <xsl:value-of select="count($Map-Data/root/CFDI[RFC_CFDI=$var])"/>
+                </Count-CFDI>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Map-Data-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map-Data-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://xmlns.heb.com/ei/error" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <pd:name>Project Name Processes/Starter Process/SuperTajetaConciliacion_Starter.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>27</pd:x>
+        <pd:y>106</pd:y>
+        <config>
+            <StartTime>1435125600000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>%%RetryConfig/GLB_STAR_PROCESS%%</TimeInterval>
+            <FrequencyIndex>Millisecond</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>503</pd:endX>
+    <pd:endY>107</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1435098353644</pd:targetNamespace>
+    <pd:activity name="SuperTarjetaConciliacion Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>177</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <processName>/Project Name Processes/Main Process/Conciliacion_Main.process</processName>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Audit Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>369</pd:x>
+        <pd:y>106</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns:AuditingSchema>
+                <ns:inrtn_id>
+                    <xsl:value-of select="$_processContext/ns2:ProcessContext/ProcessId"/>
+                </ns:inrtn_id>
+                <ns:inrtn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns2:ProcessContext/ProcessId)"/>
+                </ns:inrtn_nm>
+                <ns:inrtn_instn_nm>
+                    <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                </ns:inrtn_instn_nm>
+                <ns:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns2:ProcessContext/ProcessId"/>
+                </ns:inrtn_proc_id>
+                <ns:inrtn_rec_cnt>
+                    <xsl:value-of select="if(string-length($SuperTarjetaConciliacion-Process/resultSet/Transaction_id)!=0)&#xA;then&#xA;$SuperTarjetaConciliacion-Process/resultSet/Transaction_id&#xA;else&#xA;0"/>
+                </ns:inrtn_rec_cnt>
+                <ns:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime('yyyy-MM-dd HH:mm:ss', current-dateTime())"/>
+                </ns:inrtn_cre8_ts>
+            </ns:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Error Process">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>311</pd:x>
+        <pd:y>251</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$_error_SuperTarjetaConciliacion-Process/pfx:MSG_Container"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>SuperTarjetaConciliacion Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SuperTarjetaConciliacion Process</pd:from>
+        <pd:to>Audit Process</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Audit Process</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SuperTarjetaConciliacion Process</pd:from>
+        <pd:to>Error Process</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Error Process</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
