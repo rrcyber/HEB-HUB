@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/HebCardDispersionList.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/HebCardDispersion.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/HebCardDispersion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/HebCardDispersion.xsd"/>
+    <pd:name>PsDispersionsToHebCard Processes/Sub Process/Write_LocalFile.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="FileName" type="xsd:string"/>
+                    <xsd:element name="Encoding" type="xsd:string"/>
+                    <xsd:element ref="pfx2:DispersionFile" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>93</pd:startX>
+    <pd:startY>222</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>496</pd:endX>
+    <pd:endY>222</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1539009667000</pd:targetNamespace>
+    <pd:activity name="Render Data">
+        <pd:type>com.tibco.plugin.parse.RenderActivity</pd:type>
+        <pd:resourceType>ae.activities.RenderActivity</pd:resourceType>
+        <pd:x>220</pd:x>
+        <pd:y>222</pd:y>
+        <config>
+            <ParseSharedConfig>/Shared Resources/Data Formats/Data Format.sharedparse</ParseSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <Rows>
+                <xsl:copy-of select="$Start/root/DispersionFile"/>
+            </Rows>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Write File">
+        <pd:type>com.tibco.plugin.file.FileWriteActivity</pd:type>
+        <pd:resourceType>ae.activities.FileWriteActivity</pd:resourceType>
+        <pd:x>361</pd:x>
+        <pd:y>222</pd:y>
+        <config>
+            <encoding>text</encoding>
+            <compressFile>None</compressFile>
+            <append>true</append>
+        </config>
+        <pd:inputBindings>
+            <ns2:WriteActivityInputTextClass>
+                <fileName>
+                    <xsl:value-of select="$Start/root/FileName"/>
+                </fileName>
+                <textContent>
+                    <xsl:value-of select="$Render-Data/Text"/>
+                </textContent>
+                <encoding>
+                    <xsl:value-of select="$Start/root/Encoding"/>
+                </encoding>
+            </ns2:WriteActivityInputTextClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Write File</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Render Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Render Data</pd:from>
+        <pd:to>Write File</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

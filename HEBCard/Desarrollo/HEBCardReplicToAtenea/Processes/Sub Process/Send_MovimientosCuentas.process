@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/MovimientoCuentas" xmlns:pfx="http://xmlns.heb.com/ei/Products" xmlns:pfx2="http://xmlns.heb.com/ei/Socio" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx4="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx5="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/MovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/MOVIMIENTO_CUENTAS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/MovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/MOVIMIENTO_CUENTAS_SOAP.xsd"/>
+    <pd:name>Processes/Sub Process/Send_MovimientosCuentas.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Data">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx6:MOVIMIENTO_CUENTAS" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>89</pd:startX>
+    <pd:startY>200</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>668</pd:endX>
+    <pd:endY>197</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1519150346049</pd:targetNamespace>
+    <pd:group name="Group SendMovimientoCuentas">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>177</pd:x>
+        <pd:y>61</pd:y>
+        <pd:width>414</pd:width>
+        <pd:height>258</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Data/pfx6:MOVIMIENTO_CUENTAS</pd:over>
+            <pd:iterationElementSlot>Record</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Update_MovimientosCuentas</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>Render XML</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Render XML</pd:from>
+            <pd:to>JMS Queue</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JMS Queue</pd:from>
+            <pd:to>Update_MovimientosCuentas</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Render XML">
+            <pd:type>com.tibco.plugin.xml.XMLRendererActivity</pd:type>
+            <pd:resourceType>ae.activities.XMLRendererActivity</pd:resourceType>
+            <pd:x>269</pd:x>
+            <pd:y>241</pd:y>
+            <config>
+                <renderAsText>text</renderAsText>
+                <validateInput>true</validateInput>
+                <term ref="pfx6:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Map-Data/pfx6:MSG_CONTAINER"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>267</pd:x>
+            <pd:y>125</pd:y>
+            <config>
+                <element ref="pfx6:MSG_CONTAINER"/>
+            </config>
+            <pd:inputBindings>
+                <pfx6:MSG_CONTAINER>
+                    <pfx6:Header>
+                        <pfx6:ProjectName>
+                            <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                        </pfx6:ProjectName>
+                        <pfx6:Source_Domain>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Source_Domain"/>
+                        </pfx6:Source_Domain>
+                        <pfx6:Destination_Domain>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                        </pfx6:Destination_Domain>
+                        <pfx6:Transaction_Type>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/TransactionType"/>
+                        </pfx6:Transaction_Type>
+                        <pfx6:TimeStamp>
+                            <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;,   current-dateTime())"/>
+                        </pfx6:TimeStamp>
+                    </pfx6:Header>
+                    <pfx6:Body>
+                        <xsl:for-each select="$Record/pfx6:MOVIMIENTO_CUENTAS">
+                            <pfx6:MOVIMIENTO_CUENTAS>
+                                <xsl:if test="MOVCXC_ID">
+                                    <MOVCXC_ID>
+                                        <xsl:value-of select="MOVCXC_ID"/>
+                                    </MOVCXC_ID>
+                                </xsl:if>
+                                <xsl:if test="MOVTYPE_ID">
+                                    <MOVTYPE_ID>
+                                        <xsl:value-of select="MOVTYPE_ID"/>
+                                    </MOVTYPE_ID>
+                                </xsl:if>
+                                <xsl:if test="ACCOUNTDETAIL_ID">
+                                    <ACCOUNTDETAIL_ID>
+                                        <xsl:value-of select="ACCOUNTDETAIL_ID"/>
+                                    </ACCOUNTDETAIL_ID>
+                                </xsl:if>
+                                <xsl:if test="AMOUNT_AMT">
+                                    <AMOUNT_AMT>
+                                        <xsl:value-of select="AMOUNT_AMT"/>
+                                    </AMOUNT_AMT>
+                                </xsl:if>
+                                <xsl:if test="RECORDDATE_DT">
+                                    <RECORDDATE_DT>
+                                        <xsl:value-of select="RECORDDATE_DT"/>
+                                    </RECORDDATE_DT>
+                                </xsl:if>
+                                <xsl:if test="RECORDUSER_UID">
+                                    <RECORDUSER_UID>
+                                        <xsl:value-of select="RECORDUSER_UID"/>
+                                    </RECORDUSER_UID>
+                                </xsl:if>
+                                <xsl:if test="UPDATEDATE_DT">
+                                    <UPDATEDATE_DT>
+                                        <xsl:value-of select="UPDATEDATE_DT"/>
+                                    </UPDATEDATE_DT>
+                                </xsl:if>
+                                <xsl:if test="UPDATEUSER_UID">
+                                    <UPDATEUSER_UID>
+                                        <xsl:value-of select="UPDATEUSER_UID"/>
+                                    </UPDATEUSER_UID>
+                                </xsl:if>
+                                <xsl:if test="CLIENT_ID">
+                                    <CLIENT_ID>
+                                        <xsl:value-of select="CLIENT_ID"/>
+                                    </CLIENT_ID>
+                                </xsl:if>
+                                <xsl:if test="DISPERSION_NUMBER">
+                                    <DISPERSION_NUMBER>
+                                        <xsl:value-of select="DISPERSION_NUMBER"/>
+                                    </DISPERSION_NUMBER>
+                                </xsl:if>
+                                <xsl:if test="CLIENT_DEPOSIT_ID">
+                                    <CLIENT_DEPOSIT_ID>
+                                        <xsl:value-of select="CLIENT_DEPOSIT_ID"/>
+                                    </CLIENT_DEPOSIT_ID>
+                                </xsl:if>
+                                <xsl:if test="STORE_ID">
+                                    <STORE_ID>
+                                        <xsl:value-of select="STORE_ID"/>
+                                    </STORE_ID>
+                                </xsl:if>
+                                <xsl:if test="TAKEDATE_DT">
+                                    <TAKEDATE_DT>
+                                        <xsl:value-of select="TAKEDATE_DT"/>
+                                    </TAKEDATE_DT>
+                                </xsl:if>
+                                <xsl:if test="ASIGNEE_DEPOSIT_ID">
+                                    <ASIGNEE_DEPOSIT_ID>
+                                        <xsl:value-of select="ASIGNEE_DEPOSIT_ID"/>
+                                    </ASIGNEE_DEPOSIT_ID>
+                                </xsl:if>
+                                <xsl:if test="INTEGRATION_UPDATEDATE_DT">
+                                    <INTEGRATION_UPDATEDATE_DT>
+                                        <xsl:value-of select="INTEGRATION_UPDATEDATE_DT"/>
+                                    </INTEGRATION_UPDATEDATE_DT>
+                                </xsl:if>
+                                <OPERATION>
+                                    <xsl:value-of select="if (string-length($Record/pfx6:MOVIMIENTO_CUENTAS/TAKEDATE_DT) !=0 ) then&#xA;'Update'&#xA;else&#xA;'Insert'"/>
+                                </OPERATION>
+                            </pfx6:MOVIMIENTO_CUENTAS>
+                        </xsl:for-each>
+                    </pfx6:Body>
+                </pfx6:MSG_CONTAINER>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JMS Queue">
+            <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+            <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+            <pd:x>377</pd:x>
+            <pd:y>200</pd:y>
+            <config>
+                <PermittedMessageType>Text</PermittedMessageType>
+                <SessionAttributes>
+                    <transacted>false</transacted>
+                    <acknowledgeMode>1</acknowledgeMode>
+                    <maxSessions>1</maxSessions>
+                    <destination>%%Destinations/Queues/GLB_MOVIMIENTO_CUENTAS_QUEUE%%</destination>
+                </SessionAttributes>
+                <ConfigurableHeaders>
+                    <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                    <JMSExpiration>0</JMSExpiration>
+                    <JMSPriority>4</JMSPriority>
+                </ConfigurableHeaders>
+                <ConnectionReference>/Shared Resources/Connections/JMS/EMS_Mexico.sharedjmscon</ConnectionReference>
+            </config>
+            <pd:inputBindings>
+                <ns:ActivityInput>
+                    <Body>
+                        <xsl:value-of select="$Render-XML/xmlString"/>
+                    </Body>
+                </ns:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Update_MovimientosCuentas">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>491</pd:x>
+            <pd:y>199</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Update_MovimientosCuentas.process</processName>
+            </config>
+            <pd:inputBindings>
+                <InPut>
+                    <ID>
+                        <xsl:value-of select="$Map-Data/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:MOVIMIENTO_CUENTAS[1]/MOVCXC_ID"/>
+                    </ID>
+                    <Operation>
+                        <xsl:value-of select="$Map-Data/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:MOVIMIENTO_CUENTAS[1]/OPERATION"/>
+                    </Operation>
+                </InPut>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group SendMovimientoCuentas</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group SendMovimientoCuentas</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Dispersion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Socio" schemaLocation="/Shared Resources/Schema Definitions/Custom/SOCIO_PEOPLE_SOFT_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Sub Process/Generate_AltaSocio.process</pd:name>
+    <pd:description>Process that send a dispersion</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="AltaSocio" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>115</pd:startX>
+    <pd:startY>139</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$API-Msg/AltaSocioRequest"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx2:AltaSocioRequest"/>
+    <pd:endX>548</pd:endX>
+    <pd:endY>137</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1535725694804</pd:targetNamespace>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>227</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx3:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/AltaSocio"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC GetTranNumber">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>335</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBTIB/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBTIB/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <statement>SELECT NEXT VALUE FOR HebCardTransaccion as transactionNumber</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBTIB.sharedjdbc</jdbcSharedConfig>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>transactionNumber</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="API Msg">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>440</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <element ref="pfx2:AltaSocioRequest"/>
+        </config>
+        <pd:inputBindings>
+            <AltaSocioRequest>
+                <body>
+                    <rfc>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/rfc"/>
+                    </rfc>
+                    <nss>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/nss"/>
+                    </nss>
+                    <curp>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/curp"/>
+                    </curp>
+                    <name>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/name"/>
+                    </name>
+                    <firstLastName>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/firstLastName"/>
+                    </firstLastName>
+                    <secondLastName>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/secondLastName"/>
+                    </secondLastName>
+                    <company>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/company"/>
+                    </company>
+                    <email>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/email"/>
+                    </email>
+                    <employeeNumber>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/employeeNumber"/>
+                    </employeeNumber>
+                    <status>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/status"/>
+                    </status>
+                    <subdivision>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/subdivision"/>
+                    </subdivision>
+                    <street>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/street"/>
+                    </street>
+                    <district>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/district"/>
+                    </district>
+                    <zipCode>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/zipCode"/>
+                    </zipCode>
+                    <city>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/city"/>
+                    </city>
+                    <state>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/state"/>
+                    </state>
+                    <country>
+                        <xsl:value-of select="$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft[1]/country"/>
+                    </country>
+                </body>
+            </AltaSocioRequest>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>JDBC GetTranNumber</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC GetTranNumber</pd:from>
+        <pd:to>API Msg</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>API Msg</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/STORE_PMM_API.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Dispersion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Socio" schemaLocation="/Shared Resources/Schema Definitions/Custom/PMM_CUSTOMER_DATA.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/STORE_PMM_API.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/STORE_PMM_API.xsd"/>
+    <pd:name>Processes/Sub Process/Get_Store_Inf.process</pd:name>
+    <pd:description>Process that send a dispersion</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Store" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>102</pd:startX>
+    <pd:startY>136</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$API-Msg/StoreRequest"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx5:StoreRequest"/>
+    <pd:endX>444</pd:endX>
+    <pd:endY>137</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1535725694804</pd:targetNamespace>
+    <pd:activity name="JDBC GetStoreInformation">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>231</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/PMM/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <statement>SELECT 
+ORG.ORG_LVL_NUMBER,
+CAP.CAP_CHAIN_ID,
+trim (ORG.ORG_NAME_FULL) ORG_NAME_FULL,
+BAS.VALUE,
+to_char(DTL.ORG_DATE_OPENED, 'dd/mm/yyyy') ORG_DATE_OPENED,
+trim (SDI.BAS_ADDR_1) BAS_ADDR_1,
+trim (SDI.BAS_ADDR_2) BAS_ADDR_2,
+trim (SDI.BAS_ADDR_3) BAS_ADDR_3,
+trim (SDI.BAS_CITY) BAS_CITY,
+trim (SDI.BAS_STATE) BAS_STATE,
+trim (SDI.BAS_ZIP) BAS_ZIP,
+trim (SDI.CNTRY_CODE) CNTRY_CODE
+FROM PMM.SDIORGMST SDI
+JOIN PMM.ORGMSTEE ORG ON SDI.ORG_LVL_NUMBER_S = ORG.ORG_LVL_NUMBER
+JOIN PMM.CAPSTREE CAP ON SDI.ORG_LVL_CHILD_S = CAP.ORG_LVL_CHILD
+JOIN PMM.ORGDTLEE DTL ON SDI.ORG_LVL_CHILD_S = DTL.ORG_LVL_CHILD
+LEFT JOIN PMM.BASVALEE BAS ON SDI.ORG_LVL_CHILD_S = BAS.TECH_KEY1 AND BAS.ENTITY_NAME = 'ORGMSTEE' AND BAS.FIELD_CODE = 'ST'
+WHERE SDI.ORG_LVL_NUMBER_S = ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PMM.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Store</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>ORG_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CAP_CHAIN_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ORG_NAME_FULL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VALUE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ORG_DATE_OPENED</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BAS_ADDR_1</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BAS_ADDR_2</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BAS_ADDR_3</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BAS_CITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BAS_STATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BAS_ZIP</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CNTRY_CODE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <Store>
+                    <xsl:value-of select="$Start/Store"/>
+                </Store>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="API Msg">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>336</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <element ref="pfx5:StoreRequest"/>
+        </config>
+        <pd:inputBindings>
+            <StoreRequest>
+                <number>
+                    <xsl:value-of select="round($JDBC-GetStoreInformation/resultSet/Record[1]/ORG_LVL_NUMBER)"/>
+                </number>
+                <format>
+                    <xsl:value-of select="round($JDBC-GetStoreInformation/resultSet/Record[1]/CAP_CHAIN_ID)"/>
+                </format>
+                <xsl:if test="$JDBC-GetStoreInformation/resultSet/Record[1]/ORG_NAME_FULL">
+                    <name>
+                        <xsl:value-of select="$JDBC-GetStoreInformation/resultSet/Record[1]/ORG_NAME_FULL"/>
+                    </name>
+                </xsl:if>
+                <xsl:if test="$JDBC-GetStoreInformation/resultSet/Record[1]/VALUE">
+                    <status>
+                        <xsl:value-of select="$JDBC-GetStoreInformation/resultSet/Record[1]/VALUE"/>
+                    </status>
+                </xsl:if>
+                <openingDate>
+                    <xsl:value-of select="$JDBC-GetStoreInformation/resultSet/Record[1]/ORG_DATE_OPENED"/>
+                </openingDate>
+                <address>
+                    <xsl:value-of select="tib:trim (concat( $JDBC-GetStoreInformation/resultSet/Record[1]/BAS_ADDR_1,' ', $JDBC-GetStoreInformation/resultSet/Record[1]/BAS_ADDR_2,' ', $JDBC-GetStoreInformation/resultSet/Record[1]/BAS_ADDR_3))"/>
+                </address>
+                <xsl:if test="$JDBC-GetStoreInformation/resultSet/Record[1]/BAS_CITY">
+                    <city>
+                        <xsl:value-of select="$JDBC-GetStoreInformation/resultSet/Record[1]/BAS_CITY"/>
+                    </city>
+                </xsl:if>
+                <xsl:if test="$JDBC-GetStoreInformation/resultSet/Record[1]/BAS_STATE">
+                    <state>
+                        <xsl:value-of select="$JDBC-GetStoreInformation/resultSet/Record[1]/BAS_STATE"/>
+                    </state>
+                </xsl:if>
+                <xsl:if test="$JDBC-GetStoreInformation/resultSet/Record[1]/BAS_ZIP">
+                    <zipCode>
+                        <xsl:value-of select="$JDBC-GetStoreInformation/resultSet/Record[1]/BAS_ZIP"/>
+                    </zipCode>
+                </xsl:if>
+                <xsl:if test="$JDBC-GetStoreInformation/resultSet/Record[1]/CNTRY_CODE">
+                    <country>
+                        <xsl:value-of select="$JDBC-GetStoreInformation/resultSet/Record[1]/CNTRY_CODE"/>
+                    </country>
+                </xsl:if>
+            </StoreRequest>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JDBC GetStoreInformation</pd:from>
+        <pd:to>API Msg</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>API Msg</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC GetStoreInformation</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

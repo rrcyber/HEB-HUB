@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:pfx2="http://xmlns.heb.com/ei/error" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx3="http://schemas.tibco.com/bw/plugins/jms/5.0/jmsExceptions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://xmlns.tibco.com/body" xmlns:ns5="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns8="www.tibco.com/plugin/Sleep" xmlns:ns7="com/tibco/pe/commands" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns12="http://www.tibco.com/pe/WriteToLogActivitySchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/error" schemaLocation="/Shared Resources/Schema Definitions/Common/AuditingSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/ErrorManagementSchema"/>
+    <pd:name>Utility Services/Exception Handling/AuditProcess.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:AuditingSchema"/>
+    <pd:startX>177</pd:startX>
+    <pd:startY>59</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>618</pd:endX>
+    <pd:endY>168</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1448659562913</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>462</pd:x>
+        <pd:y>269</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>601</pd:x>
+        <pd:y>271</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns5:ActivityInput>
+                <message>
+                    <xsl:value-of select="$Catch/exceptiondata/*"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="&quot;GENERAL ERROR&quot;"/>
+                </messageCode>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns4:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns4:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <xsl:if test="$_error/ns4:ErrorReport/MsgCode">
+                            <Code>
+                                <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                            </Code>
+                        </xsl:if>
+                        <Message>
+                            <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns5:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JMS Queue Sender">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>407</pd:x>
+        <pd:y>170</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_AUDIT_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>%%Connections/Properties/GLB_DELIVERY_MODE%%</JMSDeliveryMode>
+                <JMSExpiration>%%Connections/Properties/GLB_JMS_EXPIRATION%%</JMSExpiration>
+                <JMSPriority>%%Connections/Properties/GLB_JMS_PRIORITY%%</JMSPriority>
+                <JMSReplyTo/>
+                <JMSType/>
+            </ConfigurableHeaders>
+            <ApplicationProperties/>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMS Mexico.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx2:AuditingSchema"/>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <Body>
+                    <xsl:copy-of select="$Map-Data/pfx2:AuditingSchema"/>
+                </Body>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>182</pd:x>
+        <pd:y>169</pd:y>
+        <config>
+            <element ref="pfx2:AuditingSchema"/>
+        </config>
+        <pd:inputBindings>
+            <pfx2:AuditingSchema>
+                <xsl:if test="$Start/pfx2:AuditingSchema/pfx2:inrtn_id">
+                    <pfx2:inrtn_id>
+                        <xsl:value-of select="$Start/pfx2:AuditingSchema/pfx2:inrtn_id"/>
+                    </pfx2:inrtn_id>
+                </xsl:if>
+                <xsl:if test="$Start/pfx2:AuditingSchema/pfx2:inrtn_nm">
+                    <pfx2:inrtn_nm>
+                        <xsl:value-of select="$Start/pfx2:AuditingSchema/pfx2:inrtn_nm"/>
+                    </pfx2:inrtn_nm>
+                </xsl:if>
+                <xsl:if test="$Start/pfx2:AuditingSchema/pfx2:inrtn_instn_nm">
+                    <pfx2:inrtn_instn_nm>
+                        <xsl:value-of select="$Start/pfx2:AuditingSchema/pfx2:inrtn_instn_nm"/>
+                    </pfx2:inrtn_instn_nm>
+                </xsl:if>
+                <xsl:if test="$Start/pfx2:AuditingSchema/pfx2:inrtn_proc_id">
+                    <pfx2:inrtn_proc_id>
+                        <xsl:value-of select="$Start/pfx2:AuditingSchema/pfx2:inrtn_proc_id"/>
+                    </pfx2:inrtn_proc_id>
+                </xsl:if>
+                <xsl:if test="$Start/pfx2:AuditingSchema/pfx2:inrtn_rec_cnt">
+                    <pfx2:inrtn_rec_cnt>
+                        <xsl:value-of select="$Start/pfx2:AuditingSchema/pfx2:inrtn_rec_cnt"/>
+                    </pfx2:inrtn_rec_cnt>
+                </xsl:if>
+                <xsl:if test="$Start/pfx2:AuditingSchema/pfx2:inrtn_cre8_ts">
+                    <pfx2:inrtn_cre8_ts>
+                        <xsl:value-of select="$Start/pfx2:AuditingSchema/pfx2:inrtn_cre8_ts"/>
+                    </pfx2:inrtn_cre8_ts>
+                </xsl:if>
+            </pfx2:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>string-length($Start/pfx2:AuditingSchema/pfx2:inrtn_rec_cnt )&gt;0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

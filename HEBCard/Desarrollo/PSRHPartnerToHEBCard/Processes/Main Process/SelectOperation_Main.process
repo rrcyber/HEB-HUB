@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx="http://xmlns.heb.com/ei/error" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Socio" schemaLocation="/Shared Resources/Schema Definitions/Custom/SOCIO_PEOPLE_SOFT_SOAP.xsd"/>
+    <pd:name>Processes/Main Process/SelectOperation_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="emsRecibed">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="movimientoSocio" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>181</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <Movimiento>
+                <xsl:value-of select="$OutPutVar/root/Movimiento"/>
+            </Movimiento>
+            <OutPut>
+                <xsl:value-of select="$OutPutVar/root/outPut"/>
+            </OutPut>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Movimiento" type="xsd:string"/>
+                    <xsd:element name="OutPut" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>723</pd:endX>
+    <pd:endY>177</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx2:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <OutPutVar>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="outPut" type="xsd:string"/>
+                        <xsd:element name="Movimiento" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </OutPutVar>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1448660298450</pd:targetNamespace>
+    <pd:activity name="AddPartner_Subscriber_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>355</pd:x>
+        <pd:y>79</pd:y>
+        <config>
+            <processName>/Processes/Main Process/AddPartner_Subscriber_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <AltaSocio>
+                <xsl:value-of select="$Start/emsRecibed/movimientoSocio"/>
+            </AltaSocio>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>149</pd:x>
+        <pd:y>180</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term ref="pfx3:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$Start/emsRecibed/movimientoSocio"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="DeletePartner_Subscriber_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>357</pd:x>
+        <pd:y>285</pd:y>
+        <config>
+            <processName>/Processes/Main Process/DeletePartner_Subscriber_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <BajaSocio>
+                <xsl:value-of select="$Start/emsRecibed/movimientoSocio"/>
+            </BajaSocio>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ModifyPartner_Subscriber_Main">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>360</pd:x>
+        <pd:y>179</pd:y>
+        <config>
+            <processName>/Processes/Main Process/ModifyPartner_Subscriber_Main.process</processName>
+        </config>
+        <pd:inputBindings>
+            <CambioSocio>
+                <xsl:value-of select="$Start/emsRecibed/movimientoSocio"/>
+            </CambioSocio>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name=".">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>629</pd:x>
+        <pd:y>177</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>328</pd:x>
+        <pd:y>403</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate-Error-1">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>501</pd:x>
+        <pd:y>405</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns2:ErrorReport/Msg"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                </messageCode>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns2:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE:  ', tib:render-xml($_error/ns2:ErrorReport ,0, 0))"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>487</pd:x>
+        <pd:y>79</pd:y>
+        <config>
+            <variableName>OutPutVar</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <outPut>
+                    <xsl:value-of select="$AddPartner_Subscriber_Main/Output"/>
+                </outPut>
+                <Movimiento>
+                    <xsl:value-of select="'AltaSocio'"/>
+                </Movimiento>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>490</pd:x>
+        <pd:y>178</pd:y>
+        <config>
+            <variableName>OutPutVar</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <outPut>
+                    <xsl:value-of select="$ModifyPartner_Subscriber_Main/Output"/>
+                </outPut>
+                <Movimiento>
+                    <xsl:value-of select="'CambioSocio'"/>
+                </Movimiento>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-1-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>486</pd:x>
+        <pd:y>284</pd:y>
+        <config>
+            <variableName>OutPutVar</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <outPut>
+                    <xsl:value-of select="$DeletePartner_Subscriber_Main/Output"/>
+                </outPut>
+                <Movimiento>
+                    <xsl:value-of select="'BajaSocio'"/>
+                </Movimiento>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>AddPartner_Subscriber_Main</pd:to>
+        <pd:xpathDescription>Alta</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft/operation=1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>DeletePartner_Subscriber_Main</pd:to>
+        <pd:xpathDescription>Baja</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft/operation=2</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AddPartner_Subscriber_Main</pd:from>
+        <pd:to>Assign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ModifyPartner_Subscriber_Main</pd:from>
+        <pd:to>Assign-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>DeletePartner_Subscriber_Main</pd:from>
+        <pd:to>Assign-1-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>ModifyPartner_Subscriber_Main</pd:to>
+        <pd:xpathDescription>Cambio</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Parse-XML/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:SocioPeopleSoft/operation=3</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate-Error-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>.</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1</pd:from>
+        <pd:to>.</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1-1</pd:from>
+        <pd:to>.</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

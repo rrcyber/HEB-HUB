@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_API.xsd" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx5="http://xmlns.heb.com/ei/Comisionista" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Dispersion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Comisionista" schemaLocation="/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_API.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_API.xsd"/>
+    <pd:name>Processes/Sub Process/Generate_Vendor.process</pd:name>
+    <pd:description>Process that send a dispersion</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx5:MSG_CONTAINER"/>
+    <pd:startX>115</pd:startX>
+    <pd:startY>139</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$API-Msg/VendorRequest"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx6:VendorRequest"/>
+    <pd:endX>335</pd:endX>
+    <pd:endY>143</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1535725694804</pd:targetNamespace>
+    <pd:activity name="API Msg">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>227</pd:x>
+        <pd:y>141</pd:y>
+        <config>
+            <element ref="pfx6:VendorRequest"/>
+        </config>
+        <pd:inputBindings>
+            <VendorRequest>
+                <xsl:if test="$Start/pfx5:MSG_CONTAINER/pfx5:Body/pfx5:ComisionistaPeopleSoft[1]/NAME">
+                    <name>
+                        <xsl:value-of select="$Start/pfx5:MSG_CONTAINER/pfx5:Body/pfx5:ComisionistaPeopleSoft[1]/NAME"/>
+                    </name>
+                </xsl:if>
+                <number>
+                    <xsl:value-of select="tib:substring-after-last($Start/pfx5:MSG_CONTAINER/pfx5:Body/pfx5:ComisionistaPeopleSoft[1]/VENDOR_ID, 0)"/>
+                </number>
+                <xsl:if test="$Start/pfx5:MSG_CONTAINER/pfx5:Body/pfx5:ComisionistaPeopleSoft[1]/VENDOR_STATUS">
+                    <status>
+                        <xsl:value-of select="$Start/pfx5:MSG_CONTAINER/pfx5:Body/pfx5:ComisionistaPeopleSoft[1]/VENDOR_STATUS"/>
+                    </status>
+                </xsl:if>
+            </VendorRequest>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>API Msg</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>API Msg</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

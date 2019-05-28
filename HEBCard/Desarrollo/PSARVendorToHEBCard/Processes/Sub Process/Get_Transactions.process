@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx6="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx="http://xmlns.heb.com/ei/PriceInventory" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/Bitacora" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Products" xmlns:pfx4="http://xmlns.heb.com/ei/Socio" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO_PRICEINVENTORY.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Socio" schemaLocation="/Shared Resources/Schema Definitions/Custom/SOCIO_PEOPLE_SOFT.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Comisionista" schemaLocation="/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR.xsd"/>
+    <pd:name>Processes/Sub Process/Get_Transactions.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>125</pd:startX>
+    <pd:startY>118</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Map-Transactions/Comisionistas"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Comisionistas">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx6:ComisionistaPeopleSoft" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>461</pd:endX>
+    <pd:endY>121</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1518634750295</pd:targetNamespace>
+    <pd:activity name="JDBC Get_Information">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>234</pd:x>
+        <pd:y>120</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PSAR/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/PSAR/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_PSAR.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT A.SETID, A.VENDOR_ID, A.NAME1 NAME, A.VENDOR_STATUS
+FROM SYSADM.PS_VENDOR A, SYSADM.PS_HEB_VNDR_RFC B
+WHERE A.SETID = B.SETID
+  AND A.VENDOR_ID = B.VENDOR_ID
+  AND B.EFFDT = (SELECT MAX(B_ED.EFFDT) FROM SYSADM.PS_HEB_VNDR_RFC B_ED
+                  WHERE B.SETID = B_ED.SETID
+                    AND B.VENDOR_ID = B_ED.VENDOR_ID
+                    AND B_ED.EFFDT &lt;= SYSDATE)
+                    AND A.VENDOR_STATUS IN ('A', 'I')
+                    AND A.SETID = 'HEBMX'
+                    AND B.HEB_COMISION_FLG = 'Y'</statement>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>SETID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VENDOR_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VENDOR_STATUS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Transactions">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>355</pd:x>
+        <pd:y>121</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Comisionistas">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="pfx6:ComisionistaPeopleSoft" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Comisionistas>
+                <xsl:for-each select="$JDBC-Get_Information/resultSet/Record">
+                    <pfx6:ComisionistaPeopleSoft>
+                        <NAME>
+                            <xsl:value-of select="NAME"/>
+                        </NAME>
+                        <VENDOR_ID>
+                            <xsl:value-of select="VENDOR_ID"/>
+                        </VENDOR_ID>
+                        <VENDOR_STATUS>
+                            <xsl:value-of select="VENDOR_STATUS"/>
+                        </VENDOR_STATUS>
+                    </pfx6:ComisionistaPeopleSoft>
+                </xsl:for-each>
+            </Comisionistas>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Map Transactions</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Get_Information</pd:from>
+        <pd:to>Map Transactions</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Get_Information</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd"/>
+    <pd:name>Utility Services/Custom Functions/HebSecurityService.process</pd:name>
+    <pd:description>Servicio que valida si el consumidor del servicio esta autorizado para ejecutar la API</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:HebSecurity"/>
+    <pd:startX>150</pd:startX>
+    <pd:startY>64</pd:startY>
+    <pd:returnBindings>
+        <root/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>717</pd:endX>
+    <pd:endY>66</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1534367106858</pd:targetNamespace>
+    <pd:activity name="AccessDenied">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>546</pd:x>
+        <pd:y>137</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput>
+                <message>
+                    <xsl:value-of select="&quot;Access denied&quot;"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="&quot;BW-100012&quot;"/>
+                </messageCode>
+            </pfx2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>545</pd:x>
+        <pd:y>241</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <pfx2:ActivityInput>
+                <message>
+                    <xsl:value-of select="$Parse-JSON-1/ns:ActivityOutputClass/root/message"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$Parse-JSON-1/ns:ActivityOutputClass/root/error"/>
+                </messageCode>
+            </pfx2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Invoke REST API">
+        <pd:type>com.tibco.plugin.json.activities.RestActivity</pd:type>
+        <pd:resourceType>ae.activities.RestActivity</pd:resourceType>
+        <pd:x>278</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <enableProtocolUI>None</enableProtocolUI>
+            <restMethodUI>GET</restMethodUI>
+            <restResponseType>JSON</restResponseType>
+            <authChoiceUI>No Authentication</authChoiceUI>
+            <WADLPaths/>
+            <WADLBaseURL/>
+            <restMethodIDUI/>
+            <trustAllHostUI>true</trustAllHostUI>
+            <restURI/>
+            <WADLReference/>
+            <WADLContent/>
+            <restInputReferNode>
+                <xsd:element name="Parameters">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Query" minOccurs="0">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="param" type="xsd:string" minOccurs="0"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="Header" minOccurs="0">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="Authorization" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="Body" minOccurs="0">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="Form" minOccurs="0">
+                                            <xsd:complexType>
+                                                <xsd:sequence>
+                                                    <xsd:element name="param" type="xsd:string" minOccurs="0"/>
+                                                </xsd:sequence>
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="Text" minOccurs="0">
+                                            <xsd:complexType>
+                                                <xsd:sequence>
+                                                    <xsd:element name="type" type="xsd:string" minOccurs="0"/>
+                                                    <xsd:element name="content" type="xsd:string" minOccurs="0"/>
+                                                </xsd:sequence>
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="Binary" minOccurs="0">
+                                            <xsd:complexType>
+                                                <xsd:sequence>
+                                                    <xsd:element name="type" type="xsd:string" minOccurs="0"/>
+                                                    <xsd:element name="content" type="xsd:base64Binary" minOccurs="0"/>
+                                                </xsd:sequence>
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="Multipart" minOccurs="0" maxOccurs="unbounded">
+                                            <xsd:complexType>
+                                                <xsd:sequence>
+                                                    <xsd:element name="content-disposition" type="xsd:string" minOccurs="0"/>
+                                                    <xsd:element name="name" type="xsd:string" minOccurs="0"/>
+                                                    <xsd:element name="filename" type="xsd:string" minOccurs="0"/>
+                                                    <xsd:element name="content-type" type="xsd:string" minOccurs="0"/>
+                                                    <xsd:element name="content-id" type="xsd:string" minOccurs="0"/>
+                                                    <xsd:element name="content" minOccurs="0">
+                                                        <xsd:complexType>
+                                                            <xsd:choice>
+                                                                <xsd:element name="binary" type="xsd:base64Binary"/>
+                                                                <xsd:element name="text" type="xsd:string"/>
+                                                                <xsd:element name="fileName" type="xsd:string"/>
+                                                            </xsd:choice>
+                                                        </xsd:complexType>
+                                                    </xsd:element>
+                                                </xsd:sequence>
+                                            </xsd:complexType>
+                                        </xsd:element>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </restInputReferNode>
+            <restOutputReferNode>
+                <xsd:element name="header">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Server" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Location" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Allow" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Date" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Set-Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Length" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Encoding" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Range" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Last-Modifie" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </restOutputReferNode>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <URI>
+                    <xsl:value-of select="concat(&quot;http://&quot;, $_globalVariables/ns1:GlobalVariables/Connections/HTTP/HebSecurity/MIG_URL, &quot;/api/application/&quot;, $Start/HebSecurity/Application, &quot;/login/&quot;, $Start/HebSecurity/User, &quot;/object/&quot;, $Start/HebSecurity/Object, &quot;/validate&quot;)"/>
+                </URI>
+                <Timeout>
+                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Connections/HTTP/HebSecurity/GLB_TIMEOUT"/>
+                </Timeout>
+                <ns:Parameters>
+                    <Header>
+                        <Authorization>
+                            <xsl:value-of select="concat(&quot;Bearer &quot;, $_globalVariables/ns1:GlobalVariables/Connections/HTTP/HebSecurity/CFG_JWT)"/>
+                        </Authorization>
+                    </Header>
+                </ns:Parameters>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>280</pd:x>
+        <pd:y>241</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Parse JSON">
+        <pd:type>com.tibco.plugin.json.activities.JSONParserActivity</pd:type>
+        <pd:resourceType>ae.activities.JSONParserActivity</pd:resourceType>
+        <pd:x>419</pd:x>
+        <pd:y>64</pd:y>
+        <config>
+            <SchemaType>xsdType</SchemaType>
+            <BadgerfishCheck>false</BadgerfishCheck>
+            <ValidateOutputEnable>true</ValidateOutputEnable>
+            <ActivityOutputEditor>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="content" type="xsd:string"/>
+                            <xsd:element name="statusCode" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </ActivityOutputEditor>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInputClass>
+                <jsonString>
+                    <xsl:value-of select="$Invoke-REST-API/ns:RESTOutput/msg"/>
+                </jsonString>
+            </ns:ActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse-JSON-1">
+        <pd:type>com.tibco.plugin.json.activities.JSONParserActivity</pd:type>
+        <pd:resourceType>ae.activities.JSONParserActivity</pd:resourceType>
+        <pd:x>424</pd:x>
+        <pd:y>241</pd:y>
+        <config>
+            <SchemaType>xsdType</SchemaType>
+            <BadgerfishCheck>false</BadgerfishCheck>
+            <ActivityOutputEditor>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="statusCode" type="xsd:string"/>
+                            <xsd:element name="error" type="xsd:string"/>
+                            <xsd:element name="message" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </ActivityOutputEditor>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInputClass>
+                <jsonString>
+                    <xsl:value-of select="$Invoke-REST-API/ns:RESTOutput/msg"/>
+                </jsonString>
+            </ns:ActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Invoke REST API</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Invoke REST API</pd:from>
+        <pd:to>Parse JSON</pd:to>
+        <pd:xpathDescription>Status 200</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Invoke-REST-API/ns:RESTOutput/StatusCode = 200</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse JSON</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>Access Granted</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Parse-JSON/ns:ActivityOutputClass/root/content = "true"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Invoke REST API</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Parse-JSON-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse-JSON-1</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse JSON</pd:from>
+        <pd:to>AccessDenied</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

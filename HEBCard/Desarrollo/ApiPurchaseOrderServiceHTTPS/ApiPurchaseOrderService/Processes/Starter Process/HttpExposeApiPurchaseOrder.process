@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx="http://xmlns.heb.com/ei/error" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns4="com/tibco/pe/commands" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>Processes/Starter Process/HttpExposeApiPurchaseOrder.process</pd:name>
+    <pd:startName>HTTP Receive</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="HTTP Receive">
+        <pd:type>com.tibco.plugin.http.HTTPEventSource</pd:type>
+        <pd:resourceType>httppalette.httpEventSource</pd:resourceType>
+        <pd:x>69</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <outputMode>String</outputMode>
+            <defaultEncoding>UTF8</defaultEncoding>
+            <inputOutputVersion>5.3.0</inputOutputVersion>
+            <newMimeSupport>true</newMimeSupport>
+            <useHTTPAuthentication>false</useHTTPAuthentication>
+            <exposeSecurityContext>false</exposeSecurityContext>
+            <parsePostData>false</parsePostData>
+            <sharedChannel>/Shared Resources/Connections/HTTPS/HTTPS Connection.sharedhttp</sharedChannel>
+            <customField/>
+            <Headers>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Accept" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Charset" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Accept-Encoding" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Content-Length" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Connection" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Cookie" type="xsd:string" minOccurs="0"/>
+                            <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </Headers>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>408</pd:endX>
+    <pd:endY>115</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1448660298450</pd:targetNamespace>
+    <pd:activity name="REST Dispatch and Reply">
+        <pd:type>com.tibco.plugin.json.rest.server.activities.RestAdapterActivity</pd:type>
+        <pd:resourceType>rest.activities.RestAdapter</pd:resourceType>
+        <pd:x>240</pd:x>
+        <pd:y>122</pd:y>
+        <config>
+            <eventSource>HTTP Receive</eventSource>
+            <EnableWADLReference>true</EnableWADLReference>
+            <WADLReference>/Shared Resources/WADL/ApiPurchaseOrderService.wadl</WADLReference>
+            <RestService>
+                <InnerService>
+                    <ns0:application xmlns:ns0="http://wadl.dev.java.net/2009/02" name="Application">
+                        <ns0:resources name="RestServicePurchaseOrder" base="%%Connections/HTTP/LocalHost/MIG_HOST%%">
+                            <ns0:resource id="ResourcePurchaseOrder" path="SetPurchaseOrder">
+                                <ns0:doc>Import Purchase Order</ns0:doc>
+                                <ns0:method id="PurchaseOrder" name="POST">
+                                    <ns0:doc/>
+                                    <ns0:request name="Request">
+                                        <ns0:param name="header" style="header" required="false"/>
+                                        <ns0:param name="body" style="query" required="false"/>
+                                        <ns0:representation mediaType="application/json"/>
+                                    </ns0:request>
+                                    <ns0:response name="Response" status="200">
+                                        <ns0:representation mediaType="application/json"/>
+                                    </ns0:response>
+                                    <Binding process="/Processes/Main Process/PurchaseOrder_Main.process"/>
+                                </ns0:method>
+                            </ns0:resource>
+                        </ns0:resources>
+                    </ns0:application>
+                </InnerService>
+                <OuterBinding>
+                    <Binding path="https://%%Connections/HTTPS/LocalHost/MIG_HOST%%:%%Connections/HTTPS/LocalHost/MIG_PORT%%/ApiPurchaseOrderService/PurchaseOrders/SetPurchaseOrder" process="/Processes/Main Process/PurchaseOrder_Main.process">
+                        <RESTResponseHeader>
+                            <xsd:element name="Headers">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="StatusLine" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="Content-Type" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="Location" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="Set-Cookie" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="Pragma" type="xsd:string" minOccurs="0"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </RESTResponseHeader>
+                        <Input-Binding xmlns:pfx="http://xmlns.heb.com/ei/error" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns4="com/tibco/pe/commands" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://xmlns.tibco.com/bw/plugin-api/messages/context" xmlns:ns5="http://xmlns.tibco.com/encodings/mime" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+                            <xsl:template xmlns:pfx="http://xmlns.heb.com/ei/error" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns4="com/tibco/pe/commands" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://xmlns.tibco.com/bw/plugin-api/messages/context" xmlns:ns5="http://xmlns.tibco.com/encodings/mime" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" match="/*">
+                                <MainRequest>
+                                    <HebSecurity>
+                                        <Application>
+                                            <xsl:value-of select="$Input-Binding/params/header/Application"/>
+                                        </Application>
+                                        <Object>
+                                            <xsl:value-of select="$Input-Binding/params/header/Object"/>
+                                        </Object>
+                                        <User>
+                                            <xsl:value-of select="$Input-Binding/params/header/User"/>
+                                        </User>
+                                    </HebSecurity>
+                                    <IPAddress>
+                                        <xsl:value-of select="$HTTP-Receive/ProcessStarterOutput/ns6:Context/RemoteAddress"/>
+                                    </IPAddress>
+                                    <JsonString>
+                                        <xsl:value-of select="$Input-Binding/params/Body/Text/content"/>
+                                    </JsonString>
+                                </MainRequest>
+                            </xsl:template>
+                        </Input-Binding>
+                        <Output-Binding xmlns:pfx6="http://xmlns.heb.com/ei/CatalogoPlannerList" xmlns:pfx7="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx8="http://xmlns.heb.com/ei/Bitacora" xmlns:pfx="http://xmlns.heb.com/ei/PO_NOTIFY" xmlns:pfx9="http://xmlns.heb.com/ei/Products" xmlns:pfx2="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx5="http://xmlns.heb.com/ei/CatalogoPlanner" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns2="www.tibco.com/plugin/Sleep" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://xmlns.heb.com/ei/Price" xmlns:ns3="http://xmlns.heb.com/ei/PlannerDepartmentList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:ns5="http://xmlns.heb.com/ei/Inventory" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx11="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd" xmlns:pfx12="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd" xmlns:pfx10="http://xmlns.heb.com/ei/Socio">
+                            <xsl:template xmlns:pfx6="http://xmlns.heb.com/ei/CatalogoPlannerList" xmlns:pfx7="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx8="http://xmlns.heb.com/ei/Bitacora" xmlns:pfx="http://xmlns.heb.com/ei/PO_NOTIFY" xmlns:pfx9="http://xmlns.heb.com/ei/Products" xmlns:pfx2="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx5="http://xmlns.heb.com/ei/CatalogoPlanner" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns2="www.tibco.com/plugin/Sleep" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://xmlns.heb.com/ei/Price" xmlns:ns3="http://xmlns.heb.com/ei/PlannerDepartmentList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:ns5="http://xmlns.heb.com/ei/Inventory" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx11="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd" xmlns:pfx12="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd" xmlns:pfx10="http://xmlns.heb.com/ei/Socio" match="/*">
+                                <RESTResponse>
+                                    <xsl:if test="$End/MainResponse/JsonString">
+                                        <asciiContent>
+                                            <xsl:value-of select="$End/MainResponse/JsonString"/>
+                                        </asciiContent>
+                                    </xsl:if>
+                                    <Headers>
+                                        <Content-Type>
+                                            <xsl:value-of select="'application/json'"/>
+                                        </Content-Type>
+                                    </Headers>
+                                </RESTResponse>
+                            </xsl:template>
+                        </Output-Binding>
+                    </Binding>
+                </OuterBinding>
+            </RestService>
+        </config>
+        <pd:inputBindings>
+            <ns0:ActivityInputClass xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/json">
+                <tmp>
+                    <xsl:value-of select="$HTTP-Receive/ProcessStarterOutput/Method"/>
+                </tmp>
+            </ns0:ActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>405</pd:x>
+        <pd:y>235</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>HTTP Receive</pd:from>
+        <pd:to>REST Dispatch and Reply</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>REST Dispatch and Reply</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

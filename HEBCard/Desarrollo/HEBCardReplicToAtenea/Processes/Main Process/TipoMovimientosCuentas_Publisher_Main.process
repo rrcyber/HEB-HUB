@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/CatalogoPlannerList" xmlns:pfx7="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx8="http://xmlns.heb.com/ei/Bitacora" xmlns:pfx="http://xmlns.heb.com/ei/PO_NOTIFY" xmlns:pfx9="http://xmlns.heb.com/ei/Products" xmlns:pfx2="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx5="http://xmlns.heb.com/ei/CatalogoPlanner" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns2="www.tibco.com/plugin/Sleep" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://xmlns.heb.com/ei/Price" xmlns:ns3="http://xmlns.heb.com/ei/PlannerDepartmentList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns5="http://xmlns.heb.com/ei/Inventory" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://xmlns.heb.com/ei/error" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx11="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx12="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:pfx10="http://xmlns.heb.com/ei/Socio" xmlns:pfx13="http://xmlns.heb.com/ei/CuentasHEBCard" xmlns:pfx14="http://xmlns.heb.com/ei/Beneficiarios">
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmPoPendingPublisher/Shared Resources/Schema Definitions/Common/Schema.xsd3"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Common/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PO_NOTIFY" schemaLocation="/Shared Resources/Schema Definitions/Custom/PO_NOTIFY_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/CatalogoPlanner" schemaLocation="/Shared Resources/Schema Definitions/Custom/CATALOGO_PLANNER_INFORMATION_DATA_SOAP.xsd"/>
+    <pd:name>Processes/Main Process/TipoMovimientosCuentas_Publisher_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>144</pd:startX>
+    <pd:startY>152</pd:startY>
+    <pd:returnBindings>
+        <Cont>
+            <xsl:value-of select="$Index"/>
+        </Cont>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>629</pd:endX>
+    <pd:endY>152</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx3:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables>
+        <Global>
+            <xsd:element name="Flag2" type="xsd:string"/>
+        </Global>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1406154803290</pd:targetNamespace>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>463</pd:x>
+        <pd:y>313</pd:y>
+        <config>
+            <faultName>Exception</faultName>
+        </config>
+        <pd:inputBindings>
+            <pfx4:ActivityInput>
+                <xsl:if test="$_error/ns:ErrorReport/Msg">
+                    <message>
+                        <xsl:value-of select="$_error/ns:ErrorReport/Msg"/>
+                    </message>
+                </xsl:if>
+                <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </xsl:if>
+                <data>
+                    <Exception>
+                        <Domain>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Domain"/>
+                        </Domain>
+                        <Deployment>
+                            <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/Deployment"/>
+                        </Deployment>
+                        <Project>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                        </Project>
+                        <EngineName>
+                            <xsl:value-of select="$_processContext/ns:ProcessContext/EngineName"/>
+                        </EngineName>
+                        <TimeStamp>
+                            <xsl:value-of select="current-dateTime()"/>
+                        </TimeStamp>
+                        <Code>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </Code>
+                        <Message>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE: ', tib:render-xml($_error/ns:ErrorReport ,0, 0))"/>
+                        </Message>
+                    </Exception>
+                </data>
+            </pfx4:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>326</pd:x>
+        <pd:y>313</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group TipoMovimientosCuentas">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>237</pd:x>
+        <pd:y>51</pd:y>
+        <pd:width>316</pd:width>
+        <pd:height>188</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>Index</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>count($Get_TipoMovimientosCuentas/Data/pfx12:TIPO_MOVIMIENTO_CUENTAS)=0</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_TipoMovimientosCuentas</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Send_TipoMovimientosCuentas</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_TipoMovimientosCuentas</pd:from>
+            <pd:to>Send_TipoMovimientosCuentas</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Send_TipoMovimientosCuentas">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>457</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Send_TipoMovimientosCuentas.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$Get_TipoMovimientosCuentas/Data"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Get_TipoMovimientosCuentas">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>333</pd:x>
+            <pd:y>154</pd:y>
+            <config>
+                <processName>/Processes/Sub Process/Get_TipoMovimientosCuentas.process</processName>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group TipoMovimientosCuentas</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group TipoMovimientosCuentas</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

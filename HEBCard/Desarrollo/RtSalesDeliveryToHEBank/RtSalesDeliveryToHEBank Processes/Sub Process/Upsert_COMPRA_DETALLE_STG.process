@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/HebBankTablesList.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/HebBankTablesList.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/HebBankTablesList.xsd"/>
+    <pd:name>RtSalesDeliveryToHebBank Processes/Sub Process/Upsert_COMPRA_DETALLE_STG.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx:HB_SUPERTARJETA_COMPRA_DETALLE_STG" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>79</pd:startX>
+    <pd:startY>135</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <NoOfUpserts>
+                <xsl:value-of select="if ($JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates > 0)&#xA;then $JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates&#xA;else $JDBC-Insert/jdbcUpdateActivityOutput/noOfUpdates"/>
+            </NoOfUpserts>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="NoOfUpserts" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>512</pd:endX>
+    <pd:endY>135</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1545936251022</pd:targetNamespace>
+    <pd:activity name="JDBC Insert">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>346</pd:x>
+        <pd:y>50</pd:y>
+        <config>
+            <timeout>%%Connections/Database/HEBANCO/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBANCO.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO HB_SUPERTARJETA_COMPRA_DETALLE_STG
+    (Sucursal, TarjetaId, NumeroTicket, Articulo, ArticuloDescripcion, Departamento, Costo, AplicaMSI, PartnerId)
+VALUES
+    (?,?,?,?,?,?,?,?,?);</statement>
+            <batchUpdate>true</batchUpdate>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SUCURSAL</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TARJETAID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>NUMEROTICKET</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ARTICULO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ARTICULODESCRIPCION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>DEPARTAMENTO</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>COSTO</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>APLICAMSI</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PARTNERID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <xsl:for-each select="$Start/root/HB_SUPERTARJETA_COMPRA_DETALLE_STG">
+                    <Record>
+                        <SUCURSAL>
+                            <xsl:value-of select="SUCURSAL"/>
+                        </SUCURSAL>
+                        <TARJETAID>
+                            <xsl:value-of select="TARJETAID"/>
+                        </TARJETAID>
+                        <NUMEROTICKET>
+                            <xsl:value-of select="NUMEROTICKET"/>
+                        </NUMEROTICKET>
+                        <ARTICULO>
+                            <xsl:value-of select="ARTICULO"/>
+                        </ARTICULO>
+                        <ARTICULODESCRIPCION>
+                            <xsl:value-of select="ARTICULODESCRIPCION"/>
+                        </ARTICULODESCRIPCION>
+                        <DEPARTAMENTO>
+                            <xsl:value-of select="DEPARTAMENTO"/>
+                        </DEPARTAMENTO>
+                        <COSTO>
+                            <xsl:value-of select="COSTO"/>
+                        </COSTO>
+                        <APLICAMSI>
+                            <xsl:value-of select="APLICAMSI"/>
+                        </APLICAMSI>
+                        <PARTNERID>
+                            <xsl:value-of select="PARTNERID"/>
+                        </PARTNERID>
+                    </Record>
+                </xsl:for-each>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>208</pd:x>
+        <pd:y>135</pd:y>
+        <config>
+            <timeout>%%Connections/Database/HEBANCO/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>UPDATE HB_SUPERTARJETA_COMPRA_DETALLE_STG
+SET SUCURSAL = ?
+	,TARJETAID = ?
+	,NUMEROTICKET = ?
+	,ARTICULO = ?
+	,ARTICULODESCRIPCION = ?
+	,DEPARTAMENTO = ?
+	,COSTO = ?
+	,APLICAMSI = ?
+	,PARTNERID = ?
+ WHERE
+    SUCURSAL = ?
+	AND NUMEROTICKET = ?
+	AND PARTNERID = ?
+	AND TARJETAID = ?;</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBANCO.sharedjdbc</jdbcSharedConfig>
+            <batchUpdate>true</batchUpdate>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>SET_SUCURSAL</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_TARJETAID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_NUMEROTICKET</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_ARTICULO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_ARTICULODESCRIPCION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_DEPARTAMENTO</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_COSTO</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_APLICAMSI</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SET_PARTNERID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SUCURSAL_IN</parameterName>
+                    <dataType>DECIMAL</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>NUMEROTICKET_IN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PARTNERID_IN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TARJETAID_IN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <xsl:for-each select="$Start/root/HB_SUPERTARJETA_COMPRA_DETALLE_STG">
+                    <Record>
+                        <SET_SUCURSAL>
+                            <xsl:value-of select="SUCURSAL"/>
+                        </SET_SUCURSAL>
+                        <SET_TARJETAID>
+                            <xsl:value-of select="TARJETAID"/>
+                        </SET_TARJETAID>
+                        <SET_NUMEROTICKET>
+                            <xsl:value-of select="NUMEROTICKET"/>
+                        </SET_NUMEROTICKET>
+                        <SET_ARTICULO>
+                            <xsl:value-of select="ARTICULO"/>
+                        </SET_ARTICULO>
+                        <SET_ARTICULODESCRIPCION>
+                            <xsl:value-of select="ARTICULODESCRIPCION"/>
+                        </SET_ARTICULODESCRIPCION>
+                        <SET_DEPARTAMENTO>
+                            <xsl:value-of select="DEPARTAMENTO"/>
+                        </SET_DEPARTAMENTO>
+                        <SET_COSTO>
+                            <xsl:value-of select="COSTO"/>
+                        </SET_COSTO>
+                        <SET_APLICAMSI>
+                            <xsl:value-of select="APLICAMSI"/>
+                        </SET_APLICAMSI>
+                        <SET_PARTNERID>
+                            <xsl:value-of select="PARTNERID"/>
+                        </SET_PARTNERID>
+                        <SUCURSAL_IN>
+                            <xsl:value-of select="SUCURSAL"/>
+                        </SUCURSAL_IN>
+                        <NUMEROTICKET_IN>
+                            <xsl:value-of select="NUMEROTICKET"/>
+                        </NUMEROTICKET_IN>
+                        <PARTNERID_IN>
+                            <xsl:value-of select="PARTNERID"/>
+                        </PARTNERID_IN>
+                        <TARJETAID_IN>
+                            <xsl:value-of select="TARJETAID"/>
+                        </TARJETAID_IN>
+                    </Record>
+                </xsl:for-each>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>JDBC Insert</pd:to>
+        <pd:xpathDescription>NoOfUpdates = 0</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>NoOfUpdates &gt; 0</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates &gt; 0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Insert</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

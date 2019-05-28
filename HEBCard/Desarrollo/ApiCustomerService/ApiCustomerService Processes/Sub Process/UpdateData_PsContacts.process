@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Customer.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://schemas.tibco.com/bw/pe/plugin/5.0/exceptions" xmlns:ns3="http://schemas.tibco.com/bw/plugins/http/5.0/httpExceptions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://xmlns.oracle.com/Enterprise/Tools/schemas/CI_CONTCINFO_UPDATA_FAIL.V1" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx11="http://xmlns.oracle.com/Enterprise/Tools/schemas/CI_CONTCINFO_UPDATA_RQS.V1" xmlns:pfx10="http://xmlns.oracle.com/Enterprise/Tools/services/Contacto HEB Card.1">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Customer.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Customer.xsd"/>
+    <xsd:import namespace="http://xmlns.oracle.com/Enterprise/Tools/schemas/CI_CONTCINFO_UPDATA_RQS.V1" schemaLocation="/Shared Resources/Schema Definitions/Custom/PsContactsService/CI_CONTCINFO_UPDATA_RQS.V1.xsd"/>
+    <wsdl:import namespace="http://xmlns.oracle.com/Enterprise/Tools/services/Contacto HEB Card.1" location="/Shared Resources/WSDL/PsContactsService.wsdl"/>
+    <pd:name>ApiCustomerService Processes/Sub Process/UpdateData_PsContacts.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:Request"/>
+    <pd:startX>73</pd:startX>
+    <pd:startY>123</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>564</pd:endX>
+    <pd:endY>124</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1543254943024</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>144</pd:x>
+        <pd:y>47</pd:y>
+        <pd:width>322</pd:width>
+        <pd:height>140</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/Request/Customer/Contacts</pd:over>
+            <pd:iterationElementSlot>Contact</pd:iterationElementSlot>
+            <pd:indexSlot>i</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>UpdateDataRequest</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SOAPRequestReply</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>UpdateDataRequest</pd:from>
+            <pd:to>SOAPRequestReply</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="SOAPRequestReply">
+            <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+            <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+            <pd:x>366</pd:x>
+            <pd:y>117</pd:y>
+            <config>
+                <timeout>%%Destinations/WebServices/PsContactsService/CFG_TIME_OUT%%</timeout>
+                <soapAttachmentStyle>SwA</soapAttachmentStyle>
+                <timeoutType>Seconds</timeoutType>
+                <service>pfx10:ContactoHEBCard</service>
+                <servicePort>CI_CONTACT_INFO_Port</servicePort>
+                <operation>CI_CONTACT_INFO_UD</operation>
+                <soapAction>CI_CONTACT_INFO_UD.V1</soapAction>
+                <endpointURL>%%Destinations/WebServices/PsContactsService/CFG_ENDPOINT_URL%%</endpointURL>
+                <authScheme>NONE</authScheme>
+            </config>
+            <pd:inputBindings>
+                <inputMessage>
+                    <xsl:copy-of select="$UpdateDataRequest/pfx11:Updatedata__CompIntfc__CONTACT_INFO"/>
+                </inputMessage>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="UpdateDataRequest">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>227</pd:x>
+            <pd:y>117</pd:y>
+            <config>
+                <element ref="pfx11:Updatedata__CompIntfc__CONTACT_INFO"/>
+            </config>
+            <pd:inputBindings>
+                <pfx11:Updatedata__CompIntfc__CONTACT_INFO>
+                    <xsl:if test="$Start/Request/Customer/SetID">
+                        <pfx11:SETID>
+                            <xsl:value-of select="$Start/Request/Customer/SetID"/>
+                        </pfx11:SETID>
+                    </xsl:if>
+                    <xsl:if test="$Contact/Contacts/ID">
+                        <pfx11:CONTACT_ID>
+                            <xsl:value-of select="$Contact/Contacts/ID"/>
+                        </pfx11:CONTACT_ID>
+                    </xsl:if>
+                    <pfx11:CONTACT>
+                        <xsl:if test="$Start/Request/Customer/SetID">
+                            <pfx11:SETID>
+                                <xsl:value-of select="$Start/Request/Customer/SetID"/>
+                            </pfx11:SETID>
+                        </xsl:if>
+                        <xsl:if test="$Contact/Contacts/ID">
+                            <pfx11:CONTACT_ID>
+                                <xsl:value-of select="$Contact/Contacts/ID"/>
+                            </pfx11:CONTACT_ID>
+                        </xsl:if>
+                        <xsl:if test="$Contact/Contacts/Status">
+                            <pfx11:EFF_STATUS>
+                                <xsl:value-of select="$Contact/Contacts/Status"/>
+                            </pfx11:EFF_STATUS>
+                        </xsl:if>
+                        <xsl:if test="$Contact/Contacts/Type">
+                            <pfx11:CONTACT_FLAG>
+                                <xsl:value-of select="$Contact/Contacts/Type"/>
+                            </pfx11:CONTACT_FLAG>
+                        </xsl:if>
+                        <xsl:if test="$Contact/Contacts/Name">
+                            <pfx11:NAME1>
+                                <xsl:value-of select="$Contact/Contacts/Name"/>
+                            </pfx11:NAME1>
+                        </xsl:if>
+                        <xsl:if test="$Contact/Contacts/Email">
+                            <pfx11:EMAILID>
+                                <xsl:value-of select="$Contact/Contacts/Email"/>
+                            </pfx11:EMAILID>
+                        </xsl:if>
+                        <xsl:if test="$Contact/Contacts/PrefCtMethod">
+                            <pfx11:COMM_METHOD>
+                                <xsl:value-of select="$Contact/Contacts/PrefCtMethod"/>
+                            </pfx11:COMM_METHOD>
+                        </xsl:if>
+                        <pfx11:CONTACT_CUST>
+                            <xsl:if test="$Start/Request/Customer/SetID">
+                                <pfx11:SETID>
+                                    <xsl:value-of select="$Start/Request/Customer/SetID"/>
+                                </pfx11:SETID>
+                            </xsl:if>
+                            <xsl:if test="$Start/Request/Customer/ID">
+                                <pfx11:CUST_ID>
+                                    <xsl:value-of select="$Start/Request/Customer/ID"/>
+                                </pfx11:CUST_ID>
+                            </xsl:if>
+                            <xsl:if test="$Contact/Contacts/AddressIdRef">
+                                <pfx11:ADDRESS_SEQ_NUM>
+                                    <xsl:value-of select="$Contact/Contacts/AddressIdRef"/>
+                                </pfx11:ADDRESS_SEQ_NUM>
+                            </xsl:if>
+                            <pfx11:ADDRESS_MAINT>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/UPDATEDATA_CONTACTS/CFG_ADDRESS_MAINT"/>
+                            </pfx11:ADDRESS_MAINT>
+                            <pfx11:ORDER_SAVE>
+                                <xsl:value-of select="$_globalVariables/ns:GlobalVariables/ProjectConfig/UPDATEDATA_CONTACTS/CFG_ORDER_SAVE"/>
+                            </pfx11:ORDER_SAVE>
+                        </pfx11:CONTACT_CUST>
+                        <xsl:for-each select="$Contact/Contacts/Phones">
+                            <pfx11:CONTACT_PHN>
+                                <xsl:if test="$Start/Request/Customer/SetID">
+                                    <pfx11:SETID>
+                                        <xsl:value-of select="$Start/Request/Customer/SetID"/>
+                                    </pfx11:SETID>
+                                </xsl:if>
+                                <xsl:if test="../ID">
+                                    <pfx11:CONTACT_ID>
+                                        <xsl:value-of select="../ID"/>
+                                    </pfx11:CONTACT_ID>
+                                </xsl:if>
+                                <xsl:if test="Type">
+                                    <pfx11:PHONE_TYPE>
+                                        <xsl:value-of select="Type"/>
+                                    </pfx11:PHONE_TYPE>
+                                </xsl:if>
+                                <xsl:if test="CountryCode">
+                                    <pfx11:COUNTRY_CODE>
+                                        <xsl:value-of select="CountryCode"/>
+                                    </pfx11:COUNTRY_CODE>
+                                </xsl:if>
+                                <xsl:if test="Number">
+                                    <pfx11:PHONE>
+                                        <xsl:value-of select="Number"/>
+                                    </pfx11:PHONE>
+                                </xsl:if>
+                                <xsl:if test="Extension">
+                                    <pfx11:EXTENSION>
+                                        <xsl:value-of select="Extension"/>
+                                    </pfx11:EXTENSION>
+                                </xsl:if>
+                                <xsl:if test="current()/IsPrimary = &quot;Y&quot;">
+                                    <xsl:if test="IsPrimary">
+                                        <pfx11:PRIMARY_PHONE>
+                                            <xsl:value-of select="IsPrimary"/>
+                                        </pfx11:PRIMARY_PHONE>
+                                    </xsl:if>
+                                </xsl:if>
+                            </pfx11:CONTACT_PHN>
+                        </xsl:for-each>
+                    </pfx11:CONTACT>
+                </pfx11:Updatedata__CompIntfc__CONTACT_INFO>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>447</pd:x>
+        <pd:y>237</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=HttpClientException namespace=http://schemas.tibco.com/bw/plugins/http/5.0/httpExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>564</pd:x>
+        <pd:y>237</pd:y>
+        <config>
+            <faultName/>
+        </config>
+        <pd:inputBindings>
+            <ns2:ActivityInput>
+                <xsl:choose>
+                    <xsl:when test="exists($_error_SOAPRequestReply/ActivityErrors/CI_CONTCINFO_UPDATA_FAIL.V1)">
+                        <xsl:if test="$_error_SOAPRequestReply/ActivityErrors/CI_CONTCINFO_UPDATA_FAIL.V1/detail/ns6:CIFault/ns6:IBResponse[1]/ns6:DefaultMessage">
+                            <message>
+                                <xsl:value-of select="$_error_SOAPRequestReply/ActivityErrors/CI_CONTCINFO_UPDATA_FAIL.V1/detail/ns6:CIFault/ns6:IBResponse[1]/ns6:DefaultMessage"/>
+                            </message>
+                        </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="$_error/ns1:ErrorReport/Msg">
+                            <message>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                            </message>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:choose>
+                    <xsl:when test="exists($_error_SOAPRequestReply/ActivityErrors/CI_CONTCINFO_UPDATA_FAIL.V1)">
+                        <xsl:if test="$_error_SOAPRequestReply/ActivityErrors/CI_CONTCINFO_UPDATA_FAIL.V1/detail/ns6:CIFault/ns6:IBResponse[1]/ns6:MessageID">
+                            <messageCode>
+                                <xsl:value-of select="$_error_SOAPRequestReply/ActivityErrors/CI_CONTCINFO_UPDATA_FAIL.V1/detail/ns6:CIFault/ns6:IBResponse[1]/ns6:MessageID"/>
+                            </messageCode>
+                        </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="$_error/ns1:ErrorReport/MsgCode">
+                            <messageCode>
+                                <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                            </messageCode>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </ns2:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

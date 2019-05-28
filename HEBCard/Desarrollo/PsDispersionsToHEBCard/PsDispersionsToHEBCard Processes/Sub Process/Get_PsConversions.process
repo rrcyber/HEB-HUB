@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>PsDispersionsToHebCard Processes/Sub Process/Get_PsConversions.process</pd:name>
+    <pd:description>Obtiene el catalogo de conversion de beneficios</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>145</pd:startX>
+    <pd:startY>164</pd:startY>
+    <pd:returnBindings>
+        <Benefits>
+            <xsl:for-each select="$JDBC-Query/resultSet/Record">
+                <Benefit>
+                    <PeopleSoftBenefit>
+                        <xsl:value-of select="PS_BENEFIT_NM"/>
+                    </PeopleSoftBenefit>
+                    <HebCardBenefit>
+                        <xsl:value-of select="HC_BENEFIT_CD"/>
+                    </HebCardBenefit>
+                </Benefit>
+            </xsl:for-each>
+        </Benefits>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Benefits">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Benefit" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="PeopleSoftBenefit" type="xsd:string"/>
+                                <xsd:element name="HebCardBenefit" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>445</pd:endX>
+    <pd:endY>164</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1539355386248</pd:targetNamespace>
+    <pd:activity name="JDBC Query">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>295</pd:x>
+        <pd:y>164</pd:y>
+        <config>
+            <timeout>%%Connections/Database/DBDWH/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/DBDWH/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBDWH.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT
+	PS_BENEFIT_NM,
+	HC_BENEFIT_CD
+ FROM
+	PS_BENEFIT_CNV</statement>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>PS_BENEFIT_NM</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>HC_BENEFIT_CD</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Query</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Query</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

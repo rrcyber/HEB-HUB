@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx="http://xmlns.heb.com/ei/SCSugeridoTienda" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/HebSecuritySchema.xsd" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Customer.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://xmlns.heb.com/ei/error" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions">
+    <xsd:import namespace="http://xmlns.heb.com/ei/SCSugeridoTienda" schemaLocation="/Shared Resources/Schema Definitions/Custom/SC_SUGERIDOCAO_TIENDA_DATA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SCSugeridoTienda" schemaLocation="/Shared Resources/Schema Definitions/Custom/SC_SUGERIDOCAO_TIENDA_DATA_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/MainProcessSchema.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Customer.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Customer.xsd"/>
+    <pd:name>ApiCustomerService Processes/Main Process/Post_Addresses_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx4:MainRequest"/>
+    <pd:startX>59</pd:startX>
+    <pd:startY>113</pd:startY>
+    <pd:returnBindings>
+        <MainResponse>
+            <xsl:choose>
+                <xsl:when test="not($_error/ns1:ErrorReport)">
+                    <JsonString>
+                        <xsl:value-of select="$XML-End/ns3:ActivityOutputClass/jsonString"/>
+                    </JsonString>
+                </xsl:when>
+                <xsl:otherwise>
+                    <JsonString>
+                        <xsl:value-of select="$ErrorHandler/root/JsonString"/>
+                    </JsonString>
+                </xsl:otherwise>
+            </xsl:choose>
+        </MainResponse>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx4:MainResponse"/>
+    <pd:endX>861</pd:endX>
+    <pd:endY>113</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1448662549420</pd:targetNamespace>
+    <pd:activity name="Call HebSecurityService">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>187</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <processName>/Utility Services/Custom Functions/HebSecurityService.process</processName>
+        </config>
+        <pd:inputBindings>
+            <HebSecurity>
+                <Application>
+                    <xsl:value-of select="$Start/MainRequest/HebSecurity/Application"/>
+                </Application>
+                <Object>
+                    <xsl:value-of select="$Start/MainRequest/HebSecurity/Object"/>
+                </Object>
+                <User>
+                    <xsl:value-of select="$Start/MainRequest/HebSecurity/User"/>
+                </User>
+            </HebSecurity>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call UpdateCustomer">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>410</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <processName>/ApiCustomerService Processes/Sub Process/Update_PsCustomer.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Request>
+                <Header>
+                    <TransactionID>
+                        <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/TransactionID"/>
+                    </TransactionID>
+                    <Origin>
+                        <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/Origin"/>
+                    </Origin>
+                </Header>
+                <Customer>
+                    <xsl:if test="$Start/MainRequest/DynamicParameters/Parameter[Name = &quot;Customer&quot;]/Value">
+                        <ID>
+                            <xsl:value-of select="$Start/MainRequest/DynamicParameters/Parameter[Name = &quot;Customer&quot;]/Value"/>
+                        </ID>
+                    </xsl:if>
+                    <xsl:if test="$XML-Start/ns3:ActivityOutputClass/Request/Customer/SetID">
+                        <SetID>
+                            <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Customer/SetID"/>
+                        </SetID>
+                    </xsl:if>
+                    <xsl:for-each select="$XML-Start/ns3:ActivityOutputClass/Request/Customer/Addresses">
+                        <Addresses>
+                            <xsl:if test="ID">
+                                <ID>
+                                    <xsl:value-of select="ID"/>
+                                </ID>
+                            </xsl:if>
+                            <xsl:if test="IsPrimary">
+                                <IsPrimary>
+                                    <xsl:value-of select="IsPrimary"/>
+                                </IsPrimary>
+                            </xsl:if>
+                            <xsl:if test="Country">
+                                <Country>
+                                    <xsl:value-of select="Country"/>
+                                </Country>
+                            </xsl:if>
+                            <xsl:if test="State">
+                                <State>
+                                    <xsl:value-of select="State"/>
+                                </State>
+                            </xsl:if>
+                            <xsl:if test="County">
+                                <County>
+                                    <xsl:value-of select="County"/>
+                                </County>
+                            </xsl:if>
+                            <xsl:if test="City">
+                                <City>
+                                    <xsl:value-of select="City"/>
+                                </City>
+                            </xsl:if>
+                            <xsl:if test="Colony">
+                                <Colony>
+                                    <xsl:value-of select="Colony"/>
+                                </Colony>
+                            </xsl:if>
+                            <xsl:if test="Street">
+                                <Street>
+                                    <xsl:value-of select="Street"/>
+                                </Street>
+                            </xsl:if>
+                            <xsl:if test="ExternalNumber">
+                                <ExternalNumber>
+                                    <xsl:value-of select="ExternalNumber"/>
+                                </ExternalNumber>
+                            </xsl:if>
+                            <xsl:if test="ZipCode">
+                                <ZipCode>
+                                    <xsl:value-of select="ZipCode"/>
+                                </ZipCode>
+                            </xsl:if>
+                            <xsl:if test="EffectiveDate">
+                                <EffectiveDate>
+                                    <xsl:value-of select="EffectiveDate"/>
+                                </EffectiveDate>
+                            </xsl:if>
+                        </Addresses>
+                    </xsl:for-each>
+                </Customer>
+            </Request>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>1130</pd:x>
+        <pd:y>239</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ErrorHandler">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>861</pd:x>
+        <pd:y>239</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorHandler.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Response>
+                    <Header>
+                        <TransactionID>
+                            <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/TransactionID"/>
+                        </TransactionID>
+                        <Code>
+                            <xsl:value-of select="&quot;ERROR&quot;"/>
+                        </Code>
+                        <ErrorCode>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/MsgCode"/>
+                        </ErrorCode>
+                        <Description>
+                            <xsl:value-of select="$_error/ns1:ErrorReport/Msg"/>
+                        </Description>
+                    </Header>
+                </Response>
+                <ErrorTrack>
+                    <xsl:value-of select="tib:render-xml($_error/ns1:ErrorReport, true(), true())"/>
+                </ErrorTrack>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditErrorResponse">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1002</pd:x>
+        <pd:y>239</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:AuditingSchema>
+                <ns4:inrtn_id>
+                    <xsl:value-of select="0"/>
+                </ns4:inrtn_id>
+                <ns4:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns4:inrtn_nm>
+                <ns4:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns4:inrtn_instn_nm>
+                <ns4:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns4:inrtn_proc_id>
+                <ns4:inrtn_rec_cnt>
+                    <xsl:value-of select="0"/>
+                </ns4:inrtn_rec_cnt>
+                <ns4:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </ns4:inrtn_cre8_ts>
+                <ns4:inrtn_ip_id>
+                    <xsl:value-of select="$Start/MainRequest/IPAddress"/>
+                </ns4:inrtn_ip_id>
+                <ns4:inrtn_org_nm>
+                    <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/Origin"/>
+                </ns4:inrtn_org_nm>
+                <ns4:inrtn_trans_nm>
+                    <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/TransactionID"/>
+                </ns4:inrtn_trans_nm>
+                <ns4:inrtn_messtyp_nm>
+                    <xsl:value-of select="&quot;OUT ERROR&quot;"/>
+                </ns4:inrtn_messtyp_nm>
+                <ns4:inrtn_messcont_nm>
+                    <xsl:value-of select="tib:render-xml($_error/ns1:ErrorReport, true(), true())"/>
+                </ns4:inrtn_messcont_nm>
+                <ns4:inrtn_engine_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </ns4:inrtn_engine_nm>
+                <ns4:inrtn_on-off_nm>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                </ns4:inrtn_on-off_nm>
+            </ns4:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditRequest">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>187</pd:x>
+        <pd:y>229</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:AuditingSchema>
+                <ns4:inrtn_id>
+                    <xsl:value-of select="0"/>
+                </ns4:inrtn_id>
+                <ns4:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns4:inrtn_nm>
+                <ns4:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns4:inrtn_instn_nm>
+                <ns4:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns4:inrtn_proc_id>
+                <ns4:inrtn_rec_cnt>
+                    <xsl:value-of select="0"/>
+                </ns4:inrtn_rec_cnt>
+                <ns4:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </ns4:inrtn_cre8_ts>
+                <ns4:inrtn_ip_id>
+                    <xsl:value-of select="$Start/MainRequest/IPAddress"/>
+                </ns4:inrtn_ip_id>
+                <ns4:inrtn_org_nm>
+                    <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/Origin"/>
+                </ns4:inrtn_org_nm>
+                <ns4:inrtn_trans_nm>
+                    <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/TransactionID"/>
+                </ns4:inrtn_trans_nm>
+                <ns4:inrtn_messtyp_nm>
+                    <xsl:value-of select="&quot;IN&quot;"/>
+                </ns4:inrtn_messtyp_nm>
+                <ns4:inrtn_messcont_nm>
+                    <xsl:value-of select="$Start/MainRequest/JsonString"/>
+                </ns4:inrtn_messcont_nm>
+                <ns4:inrtn_engine_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </ns4:inrtn_engine_nm>
+                <ns4:inrtn_on-off_nm>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                </ns4:inrtn_on-off_nm>
+            </ns4:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="AuditResponse">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>741</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:AuditingSchema>
+                <ns4:inrtn_id>
+                    <xsl:value-of select="0"/>
+                </ns4:inrtn_id>
+                <ns4:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns4:inrtn_nm>
+                <ns4:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns4:inrtn_instn_nm>
+                <ns4:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns4:inrtn_proc_id>
+                <ns4:inrtn_rec_cnt>
+                    <xsl:value-of select="0"/>
+                </ns4:inrtn_rec_cnt>
+                <ns4:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </ns4:inrtn_cre8_ts>
+                <ns4:inrtn_ip_id>
+                    <xsl:value-of select="$Start/MainRequest/IPAddress"/>
+                </ns4:inrtn_ip_id>
+                <ns4:inrtn_org_nm>
+                    <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/Origin"/>
+                </ns4:inrtn_org_nm>
+                <ns4:inrtn_trans_nm>
+                    <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/TransactionID"/>
+                </ns4:inrtn_trans_nm>
+                <ns4:inrtn_messtyp_nm>
+                    <xsl:value-of select="&quot;OUT&quot;"/>
+                </ns4:inrtn_messtyp_nm>
+                <ns4:inrtn_messcont_nm>
+                    <xsl:value-of select="$XML-End/ns3:ActivityOutputClass/jsonString"/>
+                </ns4:inrtn_messcont_nm>
+                <ns4:inrtn_engine_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </ns4:inrtn_engine_nm>
+                <ns4:inrtn_on-off_nm>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                </ns4:inrtn_on-off_nm>
+            </ns4:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="XML End">
+        <pd:type>com.tibco.plugin.json.activities.JSONRenderActivity</pd:type>
+        <pd:resourceType>ae.activities.JSONRenderActivity</pd:resourceType>
+        <pd:x>610</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <SchemaType>xsdType</SchemaType>
+            <BadgerfishCheck>false</BadgerfishCheck>
+            <ActivityInputEditor ref="pfx5:Response"/>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInputClass>
+                <Response>
+                    <Header>
+                        <TransactionID>
+                            <xsl:value-of select="$XML-Start/ns3:ActivityOutputClass/Request/Header/TransactionID"/>
+                        </TransactionID>
+                        <Code>
+                            <xsl:value-of select="&quot;OK&quot;"/>
+                        </Code>
+                        <ErrorCode>
+                            <xsl:value-of select="&quot;&quot;"/>
+                        </ErrorCode>
+                        <Description>
+                            <xsl:value-of select="&quot;Success&quot;"/>
+                        </Description>
+                    </Header>
+                </Response>
+            </ns3:ActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="XML Start">
+        <pd:type>com.tibco.plugin.json.activities.JSONParserActivity</pd:type>
+        <pd:resourceType>ae.activities.JSONParserActivity</pd:resourceType>
+        <pd:x>59</pd:x>
+        <pd:y>229</pd:y>
+        <config>
+            <SchemaType>xsdType</SchemaType>
+            <BadgerfishCheck>false</BadgerfishCheck>
+            <ActivityOutputEditor ref="pfx5:Request"/>
+        </config>
+        <pd:inputBindings>
+            <ns3:ActivityInputClass>
+                <jsonString>
+                    <xsl:value-of select="$Start/MainRequest/JsonString"/>
+                </jsonString>
+            </ns3:ActivityInputClass>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>ErrorHandler</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>XML Start</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>XML Start</pd:from>
+        <pd:to>AuditRequest</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>XML End</pd:from>
+        <pd:to>AuditResponse</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditResponse</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditRequest</pd:from>
+        <pd:to>Call HebSecurityService</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>AuditErrorResponse</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>AuditErrorResponse</pd:from>
+        <pd:to>ErrorHandler</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call HebSecurityService</pd:from>
+        <pd:to>Call UpdateCustomer</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call UpdateCustomer</pd:from>
+        <pd:to>XML End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

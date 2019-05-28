@@ -1,0 +1,1123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx="http://xmlns.heb.com/ei/SCSugeridoTienda" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/HebBankTablesList.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns3="http://xmlns.heb.com/ei/error" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions">
+    <xsd:import namespace="http://xmlns.heb.com/ei/SCSugeridoTienda" schemaLocation="/Shared Resources/Schema Definitions/Custom/SC_SUGERIDOCAO_TIENDA_DATA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/SCSugeridoTienda" schemaLocation="/Shared Resources/Schema Definitions/Custom/SC_SUGERIDOCAO_TIENDA_DATA_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/HebBankTablesList.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/HebBankTablesList.xsd"/>
+    <pd:name>RtSalesDeliveryToHEBank Processes/Main Process/Send_Delivery_Main.process</pd:name>
+    <pd:description>Envía las ventas realizadas por HEB donde el socio utilizó el préstamo de HebBanco para pagar.</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>60</pd:startX>
+    <pd:startY>388</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <articuloID>
+                <xsl:value-of select="$LoanSales_Header-Logic/pfx:MSG_CONTAINER/pfx:Body/pfx:SCSugeridoTiendaDetails[1]/pfx:ARTICULOID"/>
+            </articuloID>
+            <Procesado>
+                <xsl:value-of select="number ($Save_Pedido_Abasto/root/noOfUpdates) + number (if (exists($Update_Pedido_Abasto/root/noOfUpdates))then $Update_Pedido_Abasto/root/noOfUpdates else 0)"/>
+            </Procesado>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1803</pd:endX>
+    <pd:endY>391</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1448662549420</pd:targetNamespace>
+    <pd:group name="Transaction_Group">
+        <pd:type>com.tibco.pe.core.TransactionGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>550</pd:x>
+        <pd:y>61</pd:y>
+        <pd:width>975</pd:width>
+        <pd:height>641</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>transactionGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:transactionType>JDBCTransaction</pd:transactionType>
+            <pd:includeCheckpoint>false</pd:includeCheckpoint>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>SalesCharge_Group</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SalesCharge_Group</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:group name="SalesCharge_Group">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>612</pd:x>
+            <pd:y>91</pd:y>
+            <pd:width>834</pd:width>
+            <pd:height>570</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>inputLoop</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:over>$Call-SalesCharge/SalesChargeResponse/sales</pd:over>
+                <pd:iterationElementSlot>sales</pd:iterationElementSlot>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Header_Group</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>Detail_Group</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Header_Group</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Detail_Group</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:group name="Detail_Group">
+                <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+                <pd:resourceType>ae.process.group</pd:resourceType>
+                <pd:x>676</pd:x>
+                <pd:y>382</pd:y>
+                <pd:width>699</pd:width>
+                <pd:height>238</pd:height>
+                <pd:collapsedWidth>57</pd:collapsedWidth>
+                <pd:collapsedHeight>70</pd:collapsedHeight>
+                <pd:groupVariables/>
+                <pd:joinToggle>inherit</pd:joinToggle>
+                <config>
+                    <pd:groupType>repeat</pd:groupType>
+                    <pd:serializable>false</pd:serializable>
+                    <pd:indexSlot>k</pd:indexSlot>
+                    <pd:activityOutputName/>
+                    <pd:repeatCondition>$Get_RtSales_Detail/resultSet/lastSubset = "true"</pd:repeatCondition>
+                    <pd:accumulateOutput>false</pd:accumulateOutput>
+                </config>
+                <pd:inputBindings/>
+                <pd:expanded>true</pd:expanded>
+                <pd:transition>
+                    <pd:from>start</pd:from>
+                    <pd:to>Get_RtSales_Detail</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Null-3</pd:from>
+                    <pd:to>end</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Call-AuditProcess_LSD</pd:from>
+                    <pd:to>end</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Get_RtSales_Detail</pd:from>
+                    <pd:to>LoanSales_Detail Logic</pd:to>
+                    <pd:xpathDescription>HasRecords</pd:xpathDescription>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>xpath</pd:conditionType>
+                    <pd:xpath>count($Get_RtSales_Detail/resultSet/Record) &gt; 0</pd:xpath>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>LoanSales_Detail Logic</pd:from>
+                    <pd:to>Call Upsert_COMPRA_DETALLE_STG</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Get_RtSales_Detail</pd:from>
+                    <pd:to>Null-2</pd:to>
+                    <pd:xpathDescription>NoRecords</pd:xpathDescription>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>otherwise</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Null-2</pd:from>
+                    <pd:to>Null-3</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Call Upsert_COMPRA_DETALLE_STG</pd:from>
+                    <pd:to>Call-AuditProcess_LSD</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:activity name="Call-AuditProcess_LSD">
+                    <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                    <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                    <pd:x>1272</pd:x>
+                    <pd:y>446</pd:y>
+                    <config>
+                        <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+                    </config>
+                    <pd:inputBindings>
+                        <ns3:AuditingSchema>
+                            <ns3:inrtn_id>
+                                <xsl:value-of select="0"/>
+                            </ns3:inrtn_id>
+                            <ns3:inrtn_nm>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </ns3:inrtn_nm>
+                            <ns3:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                            </ns3:inrtn_instn_nm>
+                            <ns3:inrtn_proc_id>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                            </ns3:inrtn_proc_id>
+                            <ns3:inrtn_rec_cnt>
+                                <xsl:value-of select="0"/>
+                            </ns3:inrtn_rec_cnt>
+                            <ns3:inrtn_cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                            </ns3:inrtn_cre8_ts>
+                            <ns3:inrtn_ip_id>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </ns3:inrtn_ip_id>
+                            <ns3:inrtn_org_nm>
+                                <xsl:value-of select="&quot;RTSales&quot;"/>
+                            </ns3:inrtn_org_nm>
+                            <ns3:inrtn_trans_nm>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                            </ns3:inrtn_trans_nm>
+                            <ns3:inrtn_messtyp_nm>
+                                <xsl:value-of select="concat(&quot;Main Lot: &quot;, $i, &quot; | Detail Lot: &quot;, $k, &quot; | RecordsUpserted: &quot;, $Call-Upsert_COMPRA_DETALLE_STG/root/NoOfUpserts)"/>
+                            </ns3:inrtn_messtyp_nm>
+                            <ns3:inrtn_messcont_nm>
+                                <xsl:value-of select="tib:render-xml($LoanSales_Detail-Logic/root, true(), true())"/>
+                            </ns3:inrtn_messcont_nm>
+                            <ns3:inrtn_engine_nm>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                            </ns3:inrtn_engine_nm>
+                            <ns3:inrtn_on-off_nm>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                            </ns3:inrtn_on-off_nm>
+                        </ns3:AuditingSchema>
+                    </pd:inputBindings>
+                </pd:activity>
+                <pd:activity name="Get_RtSales_Detail">
+                    <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                    <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                    <pd:description>Obtiene la información requerida de CargaVentas.</pd:description>
+                    <pd:x>755</pd:x>
+                    <pd:y>446</pd:y>
+                    <config>
+                        <timeout>%%Connections/Database/DBSTG/GLB_TIMEOUT%%</timeout>
+                        <commit>false</commit>
+                        <maxRows>%%Connections/Database/DBSTG/GLB_MAX_ROWS%%</maxRows>
+                        <emptyStrAsNil>false</emptyStrAsNil>
+                        <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTG.sharedjdbc</jdbcSharedConfig>
+                        <wizardData/>
+                        <statement>SELECT
+    IIF(ISNULL(td.PK_Ticket,0) = 0,0,1) as "APLICAMSI"
+  , tv.BK_ArticuloSICA
+  , tv.BK_DepartamentoSICA
+  , (tv.MS_VentaPesosNormal + tv.MS_VentaPesosPromocion + tv.MS_AjusteVentaPesos) / 100.00 as "CostoArticulo"
+  , o.ART_DESCRI
+FROM
+    (
+        SELECT
+            PK_FechaVenta
+            , PK_Sucursal
+            , IK_CodigoTransaccion
+            , PK_Ticket
+            , MS_Monto
+            , PK_ConsecutivoTicket
+            , Tarjeta
+            , IDTipoPago
+            , IDRespuesta
+            , Bin
+            , Cliente
+        FROM
+            TH_Tarjetas
+        WHERE
+            IK_CodigoTransaccion = ?
+            AND IDTipoPago       = ?
+    ) AS A
+LEFT JOIN
+    TH_Tarjetas B ON (
+        A.PK_FechaVenta            = B.PK_FechaVenta
+        AND A.PK_Sucursal          = B.PK_Sucursal
+        AND A.PK_Ticket            = B.PK_Ticket
+        AND A.IK_CodigoTransaccion = B.IK_CodigoTransaccion
+        AND A.IDRespuesta          = B.IDRespuesta
+        AND A.PK_ConsecutivoTicket &lt; B.PK_ConsecutivoTicket
+        AND ( B.PK_ConsecutivoTicket - A.PK_ConsecutivoTicket ) &lt;= 5
+        AND ( A.MS_Monto + B.MS_Monto ) = 0
+        AND B.IDTipoPago = ?)
+JOIN
+    TH_TIPOSDEPAGO tt ON (tt.PK_FechaVenta = A.PK_FechaVenta AND tt.PK_Sucursal = A.PK_Sucursal AND tt.PK_Ticket = A.PK_Ticket AND tt.IDTipoPago = A.IDTipoPago AND tt.Bin = A.Bin AND tt.Cliente = A.Cliente)
+LEFT JOIN
+    TD_DATOSTICKET td ON (td.PK_FechaVenta = A.PK_FechaVenta AND td.PK_Sucursal = A.PK_Sucursal AND td.PK_Ticket = A.PK_Ticket)
+JOIN
+    TH_VENTAS tv ON (tv.BK_FechaVenta = A.PK_FechaVenta AND tv.BK_Sucursal = A.PK_Sucursal AND tv.Ticket = A.PK_Ticket)
+JOIN
+    OARTI o ON (o.ART_ARTICULO = tv.BK_ArticuloSICA)
+WHERE
+    A.PK_FechaVenta = ?
+    AND A.PK_Sucursal = ?
+    AND A.PK_Ticket = ?
+    AND A.IDRespuesta = ?
+    AND B.PK_ConsecutivoTicket IS NULL</statement>
+                        <processInSubsets>true</processInSubsets>
+                        <Prepared_Param_DataType>
+                            <parameter>
+                                <parameterName>TransactionCode</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>PaymentType</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>PaymentCancelType</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>SaleDate</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>Store</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>Ticket</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>ResponseId</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                        </Prepared_Param_DataType>
+                        <oraObjects/>
+                        <oraTables/>
+                        <QueryOutputCachedSchemaColumns>APLICAMSI</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                        <QueryOutputCachedSchemaColumns>BK_ArticuloSICA</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                        <QueryOutputCachedSchemaColumns>BK_DepartamentoSICA</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>5</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>smallint</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                        <QueryOutputCachedSchemaColumns>CostoArticulo</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>6</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>float</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                        <QueryOutputCachedSchemaColumns>ART_DESCRI</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                    </config>
+                    <pd:inputBindings>
+                        <jdbcQueryActivityInput>
+                            <TransactionCode>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_TRANSACTION_CODE"/>
+                            </TransactionCode>
+                            <PaymentType>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_PAYMENT_TYPE"/>
+                            </PaymentType>
+                            <PaymentCancelType>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_PAYMENT_CANCEL_TYPE"/>
+                            </PaymentCancelType>
+                            <SaleDate>
+                                <xsl:value-of select="tib:format-date(&quot;yyyyMMdd&quot;, tib:add-to-date(current-date(), 0, 0, -1))"/>
+                            </SaleDate>
+                            <Store>
+                                <xsl:value-of select="substring($sales/sales/f041, 1, 4)"/>
+                            </Store>
+                            <Ticket>
+                                <xsl:value-of select="$sales/sales/f037"/>
+                            </Ticket>
+                            <ResponseId>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_RESPONSE_ID"/>
+                            </ResponseId>
+                            <subsetSize>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DBSTG/CFG_BATCH_SIZE"/>
+                            </subsetSize>
+                        </jdbcQueryActivityInput>
+                    </pd:inputBindings>
+                </pd:activity>
+                <pd:activity name="LoanSales_Detail Logic">
+                    <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+                    <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+                    <pd:x>924</pd:x>
+                    <pd:y>454</pd:y>
+                    <config>
+                        <element>
+                            <xsd:element name="root">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element ref="pfx3:HB_SUPERTARJETA_COMPRA_DETALLE_STG" minOccurs="0" maxOccurs="unbounded"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </element>
+                    </config>
+                    <pd:inputBindings>
+                        <root>
+                            <xsl:for-each select="$Get_RtSales_Detail/resultSet/Record">
+                                <HB_SUPERTARJETA_COMPRA_DETALLE_STG>
+                                    <SUCURSAL>
+                                        <xsl:value-of select="substring($sales/sales/f041, 1, 4)"/>
+                                    </SUCURSAL>
+                                    <TARJETAID>
+                                        <xsl:value-of select="&quot;&quot;"/>
+                                    </TARJETAID>
+                                    <NUMEROTICKET>
+                                        <xsl:value-of select="$sales/sales/f037"/>
+                                    </NUMEROTICKET>
+                                    <ARTICULO>
+                                        <xsl:value-of select="BK_ArticuloSICA"/>
+                                    </ARTICULO>
+                                    <ARTICULODESCRIPCION>
+                                        <xsl:value-of select="ART_DESCRI"/>
+                                    </ARTICULODESCRIPCION>
+                                    <DEPARTAMENTO>
+                                        <xsl:value-of select="BK_DepartamentoSICA"/>
+                                    </DEPARTAMENTO>
+                                    <COSTO>
+                                        <xsl:value-of select="CostoArticulo"/>
+                                    </COSTO>
+                                    <APLICAMSI>
+                                        <xsl:value-of select="APLICAMSI"/>
+                                    </APLICAMSI>
+                                    <PARTNERID>
+                                        <xsl:value-of select="$sales/sales/f034"/>
+                                    </PARTNERID>
+                                </HB_SUPERTARJETA_COMPRA_DETALLE_STG>
+                            </xsl:for-each>
+                        </root>
+                    </pd:inputBindings>
+                </pd:activity>
+                <pd:activity name="Null-2">
+                    <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                    <pd:resourceType>ae.activities.null</pd:resourceType>
+                    <pd:x>752</pd:x>
+                    <pd:y>556</pd:y>
+                    <config/>
+                    <pd:inputBindings/>
+                </pd:activity>
+                <pd:activity name="Null-3">
+                    <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                    <pd:resourceType>ae.activities.null</pd:resourceType>
+                    <pd:x>1268</pd:x>
+                    <pd:y>556</pd:y>
+                    <config/>
+                    <pd:inputBindings/>
+                </pd:activity>
+                <pd:activity name="Call Upsert_COMPRA_DETALLE_STG">
+                    <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                    <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                    <pd:x>1096</pd:x>
+                    <pd:y>446</pd:y>
+                    <config>
+                        <processName>/RtSalesDeliveryToHEBank Processes/Sub Process/Upsert_COMPRA_DETALLE_STG.process</processName>
+                    </config>
+                    <pd:inputBindings>
+                        <root>
+                            <xsl:copy-of select="$LoanSales_Detail-Logic/root/HB_SUPERTARJETA_COMPRA_DETALLE_STG"/>
+                        </root>
+                    </pd:inputBindings>
+                </pd:activity>
+            </pd:group>
+            <pd:group name="Header_Group">
+                <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+                <pd:resourceType>ae.process.group</pd:resourceType>
+                <pd:x>670</pd:x>
+                <pd:y>126</pd:y>
+                <pd:width>691</pd:width>
+                <pd:height>239</pd:height>
+                <pd:collapsedWidth>57</pd:collapsedWidth>
+                <pd:collapsedHeight>70</pd:collapsedHeight>
+                <pd:groupVariables/>
+                <pd:joinToggle>inherit</pd:joinToggle>
+                <config>
+                    <pd:groupType>repeat</pd:groupType>
+                    <pd:serializable>false</pd:serializable>
+                    <pd:indexSlot>j</pd:indexSlot>
+                    <pd:activityOutputName/>
+                    <pd:repeatCondition>$Get_RtSales_Header/resultSet/lastSubset = "true"</pd:repeatCondition>
+                    <pd:accumulateOutput>false</pd:accumulateOutput>
+                </config>
+                <pd:inputBindings/>
+                <pd:expanded>true</pd:expanded>
+                <pd:transition>
+                    <pd:from>start</pd:from>
+                    <pd:to>Get_RtSales_Header</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Null-1</pd:from>
+                    <pd:to>end</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Call AuditProcess_LSH</pd:from>
+                    <pd:to>end</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Get_RtSales_Header</pd:from>
+                    <pd:to>LoanSales_Header Logic</pd:to>
+                    <pd:xpathDescription>HasRecords</pd:xpathDescription>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>xpath</pd:conditionType>
+                    <pd:xpath>count($Get_RtSales_Header/resultSet/Record) &gt; 0</pd:xpath>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>LoanSales_Header Logic</pd:from>
+                    <pd:to>Call Upsert_COMPRA_ENCABEZADO_STG</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Get_RtSales_Header</pd:from>
+                    <pd:to>Null</pd:to>
+                    <pd:xpathDescription>NoRecords</pd:xpathDescription>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>otherwise</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Null</pd:from>
+                    <pd:to>Null-1</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:transition>
+                    <pd:from>Call Upsert_COMPRA_ENCABEZADO_STG</pd:from>
+                    <pd:to>Call AuditProcess_LSH</pd:to>
+                    <pd:lineType>Default</pd:lineType>
+                    <pd:lineColor>-16777216</pd:lineColor>
+                    <pd:conditionType>always</pd:conditionType>
+                </pd:transition>
+                <pd:activity name="Call AuditProcess_LSH">
+                    <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                    <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                    <pd:x>1258</pd:x>
+                    <pd:y>189</pd:y>
+                    <config>
+                        <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+                    </config>
+                    <pd:inputBindings>
+                        <ns3:AuditingSchema>
+                            <ns3:inrtn_id>
+                                <xsl:value-of select="0"/>
+                            </ns3:inrtn_id>
+                            <ns3:inrtn_nm>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                            </ns3:inrtn_nm>
+                            <ns3:inrtn_instn_nm>
+                                <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                            </ns3:inrtn_instn_nm>
+                            <ns3:inrtn_proc_id>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                            </ns3:inrtn_proc_id>
+                            <ns3:inrtn_rec_cnt>
+                                <xsl:value-of select="0"/>
+                            </ns3:inrtn_rec_cnt>
+                            <ns3:inrtn_cre8_ts>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                            </ns3:inrtn_cre8_ts>
+                            <ns3:inrtn_ip_id>
+                                <xsl:value-of select="&quot;&quot;"/>
+                            </ns3:inrtn_ip_id>
+                            <ns3:inrtn_org_nm>
+                                <xsl:value-of select="&quot;RTSales&quot;"/>
+                            </ns3:inrtn_org_nm>
+                            <ns3:inrtn_trans_nm>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                            </ns3:inrtn_trans_nm>
+                            <ns3:inrtn_messtyp_nm>
+                                <xsl:value-of select="concat(&quot;Main Lot: &quot;, $i, &quot; | Header Lot: &quot;, $j, &quot; | RecordsUpserted: &quot;, $Call-Upsert_COMPRA_ENCABEZADO_STG/root/NoOfUpserts)"/>
+                            </ns3:inrtn_messtyp_nm>
+                            <ns3:inrtn_messcont_nm>
+                                <xsl:value-of select="tib:render-xml($LoanSales_Header-Logic/root, true(), true())"/>
+                            </ns3:inrtn_messcont_nm>
+                            <ns3:inrtn_engine_nm>
+                                <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                            </ns3:inrtn_engine_nm>
+                            <ns3:inrtn_on-off_nm>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                            </ns3:inrtn_on-off_nm>
+                        </ns3:AuditingSchema>
+                    </pd:inputBindings>
+                </pd:activity>
+                <pd:activity name="Get_RtSales_Header">
+                    <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+                    <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+                    <pd:description>Obtiene la información requerida de CargaVentas.</pd:description>
+                    <pd:x>754</pd:x>
+                    <pd:y>189</pd:y>
+                    <config>
+                        <timeout>%%Connections/Database/DBSTG/GLB_TIMEOUT%%</timeout>
+                        <commit>false</commit>
+                        <maxRows>%%Connections/Database/DBSTG/GLB_MAX_ROWS%%</maxRows>
+                        <emptyStrAsNil>false</emptyStrAsNil>
+                        <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_DBSTG.sharedjdbc</jdbcSharedConfig>
+                        <wizardData/>
+                        <statement>SELECT DISTINCT
+    tt.TIPOPAGO
+  , tt.MS_MONTO
+  , IIF(ISNULL(td.PK_Ticket,0) = 0,0,1) as "APLICAMSI"
+FROM
+    (
+        SELECT
+            PK_FechaVenta
+            , PK_Sucursal
+            , IK_CodigoTransaccion
+            , PK_Ticket
+            , MS_Monto
+            , PK_ConsecutivoTicket
+            , Tarjeta
+            , IDTipoPago
+            , IDRespuesta
+            , Bin
+            , Cliente
+        FROM
+            TH_Tarjetas
+        WHERE
+            IK_CodigoTransaccion = ?
+            AND IDTipoPago       = ?
+    ) AS A
+LEFT JOIN
+    TH_Tarjetas B ON (
+        A.PK_FechaVenta            = B.PK_FechaVenta
+        AND A.PK_Sucursal          = B.PK_Sucursal
+        AND A.PK_Ticket            = B.PK_Ticket
+        AND A.IK_CodigoTransaccion = B.IK_CodigoTransaccion
+        AND A.IDRespuesta          = B.IDRespuesta
+        AND A.PK_ConsecutivoTicket &lt; B.PK_ConsecutivoTicket
+        AND ( B.PK_ConsecutivoTicket - A.PK_ConsecutivoTicket ) &lt;= 5
+        AND ( A.MS_Monto + B.MS_Monto ) = 0
+        AND B.IDTipoPago = ?)
+JOIN
+    TH_TIPOSDEPAGO tt ON (tt.PK_FechaVenta = A.PK_FechaVenta AND tt.PK_Sucursal = A.PK_Sucursal AND tt.PK_Ticket = A.PK_Ticket AND tt.IDTipoPago = A.IDTipoPago AND tt.Bin = A.Bin AND tt.Cliente = A.Cliente)
+LEFT JOIN
+    TD_DATOSTICKET td ON (td.PK_FechaVenta = A.PK_FechaVenta AND td.PK_Sucursal = A.PK_Sucursal AND td.PK_Ticket = A.PK_Ticket)
+WHERE
+    A.PK_FechaVenta = ?
+    AND A.PK_Sucursal = ?
+    AND A.PK_Ticket = ?
+    AND A.IDRespuesta = ?
+    AND B.PK_ConsecutivoTicket IS NULL</statement>
+                        <processInSubsets>true</processInSubsets>
+                        <Prepared_Param_DataType>
+                            <parameter>
+                                <parameterName>TransactionCode</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>PaymentType</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>PaymentCancelType</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>SaleDate</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>Store</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>Ticket</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                            <parameter>
+                                <parameterName>ResponseId</parameterName>
+                                <dataType>VARCHAR</dataType>
+                            </parameter>
+                        </Prepared_Param_DataType>
+                        <oraObjects/>
+                        <oraTables/>
+                        <QueryOutputCachedSchemaColumns>TIPOPAGO</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                        <QueryOutputCachedSchemaColumns>MS_MONTO</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>6</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>float</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                        <QueryOutputCachedSchemaColumns>APLICAMSI</QueryOutputCachedSchemaColumns>
+                        <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                        <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                        <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                    </config>
+                    <pd:inputBindings>
+                        <jdbcQueryActivityInput>
+                            <TransactionCode>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_TRANSACTION_CODE"/>
+                            </TransactionCode>
+                            <PaymentType>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_PAYMENT_TYPE"/>
+                            </PaymentType>
+                            <PaymentCancelType>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_PAYMENT_CANCEL_TYPE"/>
+                            </PaymentCancelType>
+                            <SaleDate>
+                                <xsl:value-of select="tib:format-date(&quot;yyyyMMdd&quot;, tib:add-to-date(current-date(), 0, 0, -1))"/>
+                            </SaleDate>
+                            <Store>
+                                <xsl:value-of select="substring($sales/sales/f041, 1, 4)"/>
+                            </Store>
+                            <Ticket>
+                                <xsl:value-of select="$sales/sales/f037"/>
+                            </Ticket>
+                            <ResponseId>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/DBSTG/CFG_RESPONSE_ID"/>
+                            </ResponseId>
+                            <subsetSize>
+                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/Connections/Database/DBSTG/CFG_BATCH_SIZE"/>
+                            </subsetSize>
+                        </jdbcQueryActivityInput>
+                    </pd:inputBindings>
+                </pd:activity>
+                <pd:activity name="LoanSales_Header Logic">
+                    <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+                    <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+                    <pd:x>924</pd:x>
+                    <pd:y>197</pd:y>
+                    <config>
+                        <element>
+                            <xsd:element name="root">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element ref="pfx3:HB_SUPERTARJETA_COMPRA_ENCABEZADO_STG" minOccurs="0" maxOccurs="unbounded"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </element>
+                    </config>
+                    <pd:inputBindings>
+                        <root>
+                            <xsl:for-each select="$Get_RtSales_Header/resultSet/Record">
+                                <HB_SUPERTARJETA_COMPRA_ENCABEZADO_STG>
+                                    <SUCURSAL>
+                                        <xsl:value-of select="substring($sales/sales/f041, 1, 4)"/>
+                                    </SUCURSAL>
+                                    <TARJETAID>
+                                        <xsl:value-of select="&quot;&quot;"/>
+                                    </TARJETAID>
+                                    <NUMEROTICKET>
+                                        <xsl:value-of select="$sales/sales/f037"/>
+                                    </NUMEROTICKET>
+                                    <TIPOPAGO>
+                                        <xsl:value-of select="TIPOPAGO"/>
+                                    </TIPOPAGO>
+                                    <MONTOPAGADO>
+                                        <xsl:value-of select="$sales/sales/f058"/>
+                                    </MONTOPAGADO>
+                                    <APLICAMSI>
+                                        <xsl:value-of select="APLICAMSI"/>
+                                    </APLICAMSI>
+                                    <FECHACOMPRA>
+                                        <xsl:value-of select="tib:format-date(&quot;yyyy-MM-dd&quot;, tib:add-to-date(current-date(), 0, 0, -1))"/>
+                                    </FECHACOMPRA>
+                                    <ESTATUS>
+                                        <xsl:value-of select="&quot;INGRESADO&quot;"/>
+                                    </ESTATUS>
+                                    <PARTNERID>
+                                        <xsl:value-of select="$sales/sales/f034"/>
+                                    </PARTNERID>
+                                </HB_SUPERTARJETA_COMPRA_ENCABEZADO_STG>
+                            </xsl:for-each>
+                        </root>
+                    </pd:inputBindings>
+                </pd:activity>
+                <pd:activity name="Null">
+                    <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                    <pd:resourceType>ae.activities.null</pd:resourceType>
+                    <pd:x>754</pd:x>
+                    <pd:y>296</pd:y>
+                    <config/>
+                    <pd:inputBindings/>
+                </pd:activity>
+                <pd:activity name="Null-1">
+                    <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+                    <pd:resourceType>ae.activities.null</pd:resourceType>
+                    <pd:x>1258</pd:x>
+                    <pd:y>296</pd:y>
+                    <config/>
+                    <pd:inputBindings/>
+                </pd:activity>
+                <pd:activity name="Call Upsert_COMPRA_ENCABEZADO_STG">
+                    <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+                    <pd:resourceType>ae.process.subprocess</pd:resourceType>
+                    <pd:description>Actualiza o Inserta registros en la Tabla.</pd:description>
+                    <pd:x>1092</pd:x>
+                    <pd:y>189</pd:y>
+                    <config>
+                        <processName>/RtSalesDeliveryToHEBank Processes/Sub Process/Upsert_COMPRA_ENCABEZADO_STG.process</processName>
+                    </config>
+                    <pd:inputBindings>
+                        <root>
+                            <xsl:copy-of select="$LoanSales_Header-Logic/root/HB_SUPERTARJETA_COMPRA_ENCABEZADO_STG"/>
+                        </root>
+                    </pd:inputBindings>
+                </pd:activity>
+            </pd:group>
+        </pd:group>
+    </pd:group>
+    <pd:activity name="Call Get_TransactionId">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>303</pd:x>
+        <pd:y>388</pd:y>
+        <config>
+            <processName>/Utility Services/Custom Functions/Get_TransactionId.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <SequenceName>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_SEQUENCE_NAME"/>
+                </SequenceName>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call SalesCharge">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>427</pd:x>
+        <pd:y>387</pd:y>
+        <config>
+            <processName>/RtSalesDeliveryToHEBank Processes/Sub Process/SalesCharge.process</processName>
+        </config>
+        <pd:inputBindings>
+            <SalesChargeRequest>
+                <mti>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/SalesCharge/CFG_MTI"/>
+                </mti>
+                <f003>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/SalesCharge/CFG_F003"/>
+                </f003>
+                <f007>
+                    <xsl:value-of select="tib:format-dateTime(&quot;MMddHHmmss&quot;, tib:current-dateTime-timezone(0, 0))"/>
+                </f007>
+                <f011>
+                    <xsl:value-of select="$Call-Get_TransactionId/root/SequenceNumber"/>
+                </f011>
+                <f012>
+                    <xsl:value-of select="tib:format-date(&quot;HHmmss&quot;, current-dateTime())"/>
+                </f012>
+                <f013>
+                    <xsl:value-of select="tib:format-date(&quot;MMdd&quot;, current-dateTime())"/>
+                </f013>
+                <f017>
+                    <xsl:value-of select="tib:format-date(&quot;dd/MM/yyyy&quot;, tib:add-to-date(current-date(), 0, 0, -1))"/>
+                </f017>
+                <f025>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/SalesCharge/CFG_F025"/>
+                </f025>
+                <f032>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/SalesCharge/CFG_F032"/>
+                </f032>
+                <f037>
+                    <xsl:value-of select="&quot;&quot;"/>
+                </f037>
+                <f041>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/SalesCharge/CFG_F041"/>
+                </f041>
+                <f048>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/SalesCharge/CFG_F048"/>
+                </f048>
+                <f103>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/SalesCharge/CFG_F103"/>
+                </f103>
+            </SalesChargeRequest>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call AuditProcess_End">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1638</pd:x>
+        <pd:y>391</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns3:AuditingSchema>
+                <ns3:inrtn_id>
+                    <xsl:value-of select="0"/>
+                </ns3:inrtn_id>
+                <ns3:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns3:inrtn_nm>
+                <ns3:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns3:inrtn_instn_nm>
+                <ns3:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns3:inrtn_proc_id>
+                <ns3:inrtn_rec_cnt>
+                    <xsl:value-of select="0"/>
+                </ns3:inrtn_rec_cnt>
+                <ns3:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </ns3:inrtn_cre8_ts>
+                <ns3:inrtn_ip_id>
+                    <xsl:value-of select="&quot;&quot;"/>
+                </ns3:inrtn_ip_id>
+                <ns3:inrtn_org_nm>
+                    <xsl:value-of select="&quot;RTSales&quot;"/>
+                </ns3:inrtn_org_nm>
+                <ns3:inrtn_trans_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns3:inrtn_trans_nm>
+                <ns3:inrtn_messtyp_nm>
+                    <xsl:value-of select="&quot;End&quot;"/>
+                </ns3:inrtn_messtyp_nm>
+                <ns3:inrtn_messcont_nm>
+                    <xsl:value-of select="&quot;Proceso terminado&quot;"/>
+                </ns3:inrtn_messcont_nm>
+                <ns3:inrtn_engine_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </ns3:inrtn_engine_nm>
+                <ns3:inrtn_on-off_nm>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                </ns3:inrtn_on-off_nm>
+            </ns3:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call AuditProcess_Error">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1768</pd:x>
+        <pd:y>604</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns3:AuditingSchema>
+                <ns3:inrtn_id>
+                    <xsl:value-of select="0"/>
+                </ns3:inrtn_id>
+                <ns3:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns3:inrtn_nm>
+                <ns3:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns3:inrtn_instn_nm>
+                <ns3:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns3:inrtn_proc_id>
+                <ns3:inrtn_rec_cnt>
+                    <xsl:value-of select="0"/>
+                </ns3:inrtn_rec_cnt>
+                <ns3:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </ns3:inrtn_cre8_ts>
+                <ns3:inrtn_ip_id>
+                    <xsl:value-of select="&quot;&quot;"/>
+                </ns3:inrtn_ip_id>
+                <ns3:inrtn_org_nm>
+                    <xsl:value-of select="&quot;RTSales&quot;"/>
+                </ns3:inrtn_org_nm>
+                <ns3:inrtn_trans_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns3:inrtn_trans_nm>
+                <ns3:inrtn_messtyp_nm>
+                    <xsl:value-of select="&quot;Error&quot;"/>
+                </ns3:inrtn_messtyp_nm>
+                <ns3:inrtn_messcont_nm>
+                    <xsl:value-of select="tib:render-xml($_error/ns1:ErrorReport, true(), true())"/>
+                </ns3:inrtn_messcont_nm>
+                <ns3:inrtn_engine_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </ns3:inrtn_engine_nm>
+                <ns3:inrtn_on-off_nm>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                </ns3:inrtn_on-off_nm>
+            </ns3:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call AuditProcess_Start">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>181</pd:x>
+        <pd:y>389</pd:y>
+        <config>
+            <processName>/Utility Services/Audit Process/AuditProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns3:AuditingSchema>
+                <ns3:inrtn_id>
+                    <xsl:value-of select="0"/>
+                </ns3:inrtn_id>
+                <ns3:inrtn_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
+                </ns3:inrtn_nm>
+                <ns3:inrtn_instn_nm>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </ns3:inrtn_instn_nm>
+                <ns3:inrtn_proc_id>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns3:inrtn_proc_id>
+                <ns3:inrtn_rec_cnt>
+                    <xsl:value-of select="0"/>
+                </ns3:inrtn_rec_cnt>
+                <ns3:inrtn_cre8_ts>
+                    <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd HH:mm:ss&quot;, current-dateTime())"/>
+                </ns3:inrtn_cre8_ts>
+                <ns3:inrtn_ip_id>
+                    <xsl:value-of select="&quot;&quot;"/>
+                </ns3:inrtn_ip_id>
+                <ns3:inrtn_org_nm>
+                    <xsl:value-of select="&quot;RTSales&quot;"/>
+                </ns3:inrtn_org_nm>
+                <ns3:inrtn_trans_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </ns3:inrtn_trans_nm>
+                <ns3:inrtn_messtyp_nm>
+                    <xsl:value-of select="&quot;Start&quot;"/>
+                </ns3:inrtn_messtyp_nm>
+                <ns3:inrtn_messcont_nm>
+                    <xsl:value-of select="&quot;Inicio proceso de entregas&quot;"/>
+                </ns3:inrtn_messcont_nm>
+                <ns3:inrtn_engine_nm>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/EngineName"/>
+                </ns3:inrtn_engine_nm>
+                <ns3:inrtn_on-off_nm>
+                    <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/GLB_AUDIT_SWITCH_ON_OFF"/>
+                </ns3:inrtn_on-off_nm>
+            </ns3:AuditingSchema>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>1618</pd:x>
+        <pd:y>604</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Rethrow">
+        <pd:type>com.tibco.pe.core.RethrowActivity</pd:type>
+        <pd:resourceType>ae.activities.rethrow</pd:resourceType>
+        <pd:x>1923</pd:x>
+        <pd:y>604</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call AuditProcess_Start</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call AuditProcess_Start</pd:from>
+        <pd:to>Call Get_TransactionId</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Call AuditProcess_Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call AuditProcess_Error</pd:from>
+        <pd:to>Rethrow</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call Get_TransactionId</pd:from>
+        <pd:to>Call SalesCharge</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call SalesCharge</pd:from>
+        <pd:to>Transaction_Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Transaction_Group</pd:from>
+        <pd:to>Call AuditProcess_End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call AuditProcess_End</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
