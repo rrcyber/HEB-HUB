@@ -44,7 +44,31 @@
             <maxRows>%%Connections/Database/AUTHENTIC/GLB_MAX_ROWS%%</maxRows>
             <emptyStrAsNil>true</emptyStrAsNil>
             <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_AUTHENTIC.sharedjdbc</jdbcSharedConfig>
-            <statement>SELECT * FROM HEB_OWNER.HEB_MOVCXC WHERE TAKEDATE_DT IS NULL OR INTEGRATION_UPDATEDATE_DT IS NULL</statement>
+            <statement>SELECT 
+MOVCXC_ID,
+MOVTYPE_ID,
+ACCOUNTDETAIL_ID,
+AMOUNT_AMT,
+RECORDDATE_DT,
+RECORDUSER_UID,
+UPDATEDATE_DT,
+UPDATEUSER_UID,
+CLIENT_ID,
+DISPERSION_NUMBER,
+CLIENT_DEPOSIT_ID,
+STORE_ID,
+TAKEDATE_DT,
+ASIGNEE_DEPOSIT_ID,
+RESULTBALANCE_AMT,
+PURCHASEAUTORIZATION,
+CARD_ID,
+CASE
+    WHEN TAKEDATE_DT IS NULL THEN 'Insert'
+    ELSE 'Update'
+    END AS OPERATION
+FROM HEB_OWNER.HEB_MOVCXC
+WHERE TAKEDATE_DT IS NULL OR (TAKEDATE_DT &lt; UPDATEDATE_DT)
+ORDER BY OPERATION ASC</statement>
             <Prepared_Param_DataType/>
             <oraObjects/>
             <oraTables/>
@@ -104,21 +128,21 @@
             <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>INTEGRATION_UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaColumns>RESULTBALANCE_AMT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PURCHASEAUTORIZATION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
             <QueryOutputCachedSchemaColumns>CARD_ID</QueryOutputCachedSchemaColumns>
             <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>RESULTBALANCE_AMT</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>PURCHASEAUTORIZATION</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaColumns>OPERATION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
         </config>
         <pd:inputBindings>
@@ -217,6 +241,11 @@
                             <CARD_ID>
                                 <xsl:value-of select="CARD_ID"/>
                             </CARD_ID>
+                        </xsl:if>
+                        <xsl:if test="OPERATION">
+                            <OPERATION>
+                                <xsl:value-of select="OPERATION"/>
+                            </OPERATION>
                         </xsl:if>
                     </pfx8:MOVIMIENTO_CUENTAS>
                 </xsl:for-each>

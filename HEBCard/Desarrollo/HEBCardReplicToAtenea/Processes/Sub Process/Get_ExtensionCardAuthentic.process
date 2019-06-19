@@ -46,7 +46,38 @@
             <maxRows>%%Connections/Database/AUTHENTIC/GLB_MAX_ROWS%%</maxRows>
             <emptyStrAsNil>true</emptyStrAsNil>
             <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_AUTHENTIC.sharedjdbc</jdbcSharedConfig>
-            <statement>SELECT * FROM HEB_OWNER.HEB_CARD WHERE TAKEDATE_DT IS NULL OR INTEGRATION_UPDATEDATE_DT IS NULL</statement>
+            <statement>SELECT
+CARD_ID,
+CRD_ID,
+LOT_ID,
+CUSTOMDATA,
+CARDTYPE_ID,
+CANCELNUMBER_DES,
+RECORDDATE_DT,
+RECORDUSER_UID,
+UPDATEDATE_DT,
+UPDATEUSER_UID,
+SECRET_ID,
+SECRETANSWER,
+SECURE_CODE,
+SECURE_CODE_LAST_UPDATE_TS,
+CLIENT_ID,
+STORE_ID,
+ISPROVISIONALNIP,
+PRODUCT_ID,
+USER_ASSIGN,
+DATE_ASSIGN,
+ASSIGN_ID,
+TAKEDATE_DT,
+SECURE_CODE_RETRY_COUNT,
+CRD_ID_REPLACEMENT,
+CASE
+    WHEN TAKEDATE_DT IS NULL THEN 'Insert'
+    ELSE 'Update'
+    END AS OPERATION
+FROM HEB_OWNER.HEB_CARD 
+WHERE TAKEDATE_DT IS NULL OR (TAKEDATE_DT &lt; UPDATEDATE_DT)
+ORDER BY OPERATION ASC</statement>
             <Prepared_Param_DataType/>
             <oraObjects/>
             <oraTables/>
@@ -142,13 +173,13 @@
             <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>INTEGRATION_UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
             <QueryOutputCachedSchemaColumns>CRD_ID_REPLACEMENT</QueryOutputCachedSchemaColumns>
             <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OPERATION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
         </config>
         <pd:inputBindings>
@@ -278,6 +309,11 @@
                             <CRD_ID_REPLACEMENT>
                                 <xsl:value-of select="CRD_ID_REPLACEMENT"/>
                             </CRD_ID_REPLACEMENT>
+                        </xsl:if>
+                        <xsl:if test="OPERATION">
+                            <OPERATION>
+                                <xsl:value-of select="OPERATION"/>
+                            </OPERATION>
                         </xsl:if>
                     </pfx8:EXTENSION_CARD_AUTHENTIC>
                 </xsl:for-each>

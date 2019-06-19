@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/TarjetasAuthentic" xmlns:pfx="http://xmlns.heb.com/ei/error" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:pfx4="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx5="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx7="http://xmlns.heb.com/ei/Beneficios" xmlns:pfx="http://xmlns.heb.com/ei/error" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:pfx4="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx5="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="www.tibco.com/plugin/Sleep" xmlns:ns3="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
     <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS_SOAP.xsd"/>
-    <xsd:import namespace="http://xmlns.heb.com/ei/TarjetasAuthentic" schemaLocation="/Shared Resources/Schema Definitions/Custom/TARJETAS_AUTHENTIC_SOAP.xsd"/>
-    <pd:name>Processes/Main Process/TarjetasAuthentic_Subscriber_Main.process</pd:name>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficiarios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIARIOS_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIOS_SOAP.xsd"/>
+    <pd:name>Processes/Main Process/Beneficios_Subscriber_Main.process</pd:name>
     <pd:startName>Start</pd:startName>
     <pd:startType>
         <xsd:element name="emsRecibed" type="xsd:string"/>
@@ -32,7 +33,7 @@
             <inputStyle>text</inputStyle>
             <xsdVersion>default</xsdVersion>
             <validateOutput>false</validateOutput>
-            <term ref="pfx6:MSG_CONTAINER"/>
+            <term ref="pfx7:MSG_CONTAINER"/>
         </config>
         <pd:inputBindings>
             <xmlString>
@@ -88,23 +89,23 @@
                             <xsl:value-of select="$_error/ns2:ErrorReport/MsgCode"/>
                         </Code>
                         <Message>
-                            <xsl:value-of select="concat( 'ERROR MESSAGE:  HEB_CARD_TRANSIENT:  ', $Parse-XML/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:TARJETAS_AUTHENTIC[1]/CRD_ID,tib:render-xml($_error/ns2:ErrorReport ,0, 0))"/>
+                            <xsl:value-of select="concat( 'ERROR MESSAGE:  HEB_BENEFITDETAIL ID:  ' ,$Parse-XML/pfx7:MSG_CONTAINER/pfx7:Body/pfx7:BENEFICIOS[1]/BENEFITDETAIL_ID , tib:render-xml($_error/ns2:ErrorReport ,0, 0))"/>
                         </Message>
                     </Exception>
                 </data>
             </ns12:ActivityInput>
         </pd:inputBindings>
     </pd:activity>
-    <pd:activity name="Execute_TarjetasAuthentic">
+    <pd:activity name="Execute_Beneficios">
         <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
         <pd:resourceType>ae.process.subprocess</pd:resourceType>
-        <pd:x>392</pd:x>
-        <pd:y>135</pd:y>
+        <pd:x>394</pd:x>
+        <pd:y>136</pd:y>
         <config>
-            <processName>/Processes/Sub Process/Execute_TarjetasAuthentic.process</processName>
+            <processName>/Processes/Sub Process/Execute_Beneficios.process</processName>
         </config>
         <pd:inputBindings>
-            <xsl:copy-of select="$Parse-XML/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:TARJETAS_AUTHENTIC"/>
+            <xsl:copy-of select="$Parse-XML/pfx7:MSG_CONTAINER/pfx7:Body/pfx7:BENEFICIOS"/>
         </pd:inputBindings>
     </pd:activity>
     <pd:transition>
@@ -123,13 +124,13 @@
     </pd:transition>
     <pd:transition>
         <pd:from>Parse XML</pd:from>
-        <pd:to>Execute_TarjetasAuthentic</pd:to>
+        <pd:to>Execute_Beneficios</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
         <pd:conditionType>always</pd:conditionType>
     </pd:transition>
     <pd:transition>
-        <pd:from>Execute_TarjetasAuthentic</pd:from>
+        <pd:from>Execute_Beneficios</pd:from>
         <pd:to>End</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>

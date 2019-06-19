@@ -44,7 +44,23 @@
             <maxRows>%%Connections/Database/AUTHENTIC/GLB_MAX_ROWS%%</maxRows>
             <emptyStrAsNil>true</emptyStrAsNil>
             <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_AUTHENTIC.sharedjdbc</jdbcSharedConfig>
-            <statement>SELECT * FROM HEB_OWNER.HEB_CARD_TRANSIENT WHERE TAKEDATE_DT IS NULL OR INTEGRATION_UPDATEDATE_DT IS NULL</statement>
+            <statement>SELECT
+CRD_ID,
+CRD_PAN,
+CRD_PURGE_DATE,
+CRD_STATUS_1,
+CRD_STATUS_1_DATE,
+CRD_PIN_RETRY_COUNT,
+TAKEDATE_DT,
+UPDATEDATE_DT,
+RECORDDATE_DT,
+CASE
+    WHEN TAKEDATE_DT IS NULL THEN 'Insert'
+    ELSE 'Update'
+    END AS OPERATION
+FROM HEB_OWNER.HEB_CARD_TRANSIENT
+WHERE TAKEDATE_DT IS NULL OR (TAKEDATE_DT &lt; UPDATEDATE_DT)
+ORDER BY OPERATION ASC</statement>
             <Prepared_Param_DataType/>
             <oraObjects/>
             <oraTables/>
@@ -76,10 +92,6 @@
             <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>INTEGRATION_UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
             <QueryOutputCachedSchemaColumns>UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
             <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
@@ -88,6 +100,10 @@
             <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OPERATION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
         </config>
         <pd:inputBindings>
             <jdbcQueryActivityInput/>
@@ -152,6 +168,11 @@
                         <RECORDDATE_DT>
                             <xsl:value-of select="RECORDDATE_DT"/>
                         </RECORDDATE_DT>
+                        <xsl:if test="OPERATION">
+                            <OPERATION>
+                                <xsl:value-of select="OPERATION"/>
+                            </OPERATION>
+                        </xsl:if>
                     </pfx8:TARJETAS_AUTHENTIC>
                 </xsl:for-each>
             </Data>

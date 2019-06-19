@@ -44,7 +44,22 @@
             <maxRows>%%Connections/Database/AUTHENTIC/GLB_MAX_ROWS%%</maxRows>
             <emptyStrAsNil>true</emptyStrAsNil>
             <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_AUTHENTIC.sharedjdbc</jdbcSharedConfig>
-            <statement>SELECT * FROM HEB_OWNER.HEB_MOVTYPE WHERE TAKEDATE_DT IS NULL OR INTEGRATION_UPDATEDATE_DT IS NULL</statement>
+            <statement>SELECT
+MOV_TYPE_ID,
+OPERATOR,
+DESCRIPTION_DES,
+RECORDDATE_DT,
+RECORDUSER_UID,
+UPDATEDATE_DT,
+UPDATEUSER_UID,
+TAKEDATE_DT,
+MOV_TYPE_CODE,
+CASE
+    WHEN TAKEDATE_DT IS NULL THEN 'Insert'
+    ELSE 'Update'
+    END AS OPERATION
+FROM HEB_OWNER.HEB_MOVTYPE 
+WHERE TAKEDATE_DT IS NULL OR (TAKEDATE_DT &lt; UPDATEDATE_DT)</statement>
             <Prepared_Param_DataType/>
             <oraObjects/>
             <oraTables/>
@@ -84,9 +99,9 @@
             <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>INTEGRATION_UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaColumns>OPERATION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
         </config>
         <pd:inputBindings>
@@ -146,6 +161,11 @@
                         <MOV_TYPE_CODE>
                             <xsl:value-of select="MOV_TYPE_CODE"/>
                         </MOV_TYPE_CODE>
+                        <xsl:if test="OPERATION">
+                            <OPERATION>
+                                <xsl:value-of select="OPERATION"/>
+                            </OPERATION>
+                        </xsl:if>
                     </pfx7:TIPO_MOVIMIENTO_CUENTAS>
                 </xsl:for-each>
             </Data>
