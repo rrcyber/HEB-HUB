@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx7="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:pfx8="http://xmlns.heb.com/ei/CuentasHEBCard" xmlns:pfx="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx9="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx2="http://xmlns.heb.com/ei/Bitacora" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Products" xmlns:pfx4="http://xmlns.heb.com/ei/Socio" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx10="http://xmlns.heb.com/ei/Beneficios">
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx7="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:pfx8="http://xmlns.heb.com/ei/CuentasHEBCard" xmlns:pfx="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx9="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx2="http://xmlns.heb.com/ei/Bitacora" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Products" xmlns:pfx4="http://xmlns.heb.com/ei/Socio" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx10="http://xmlns.heb.com/ei/Cuentas_Authentic">
     <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO_PRICEINVENTORY.xsd"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO.xsd"/>
@@ -10,8 +10,8 @@
     <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS.xsd"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/CuentasHEBCard" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUENTAS_HEBCARD.xsd"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/Beneficiarios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIARIOS.xsd"/>
-    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIOS.xsd"/>
-    <pd:name>Processes/Sub Process/Get_Beneficios.process</pd:name>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Cuentas_Authentic" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUENTAS_AUTHENTIC.xsd"/>
+    <pd:name>Processes/Sub Process/Get_CuentasAuthentic.process</pd:name>
     <pd:startName>Start</pd:startName>
     <pd:startX>225</pd:startX>
     <pd:startY>117</pd:startY>
@@ -23,7 +23,7 @@
         <xsd:element name="Data">
             <xsd:complexType>
                 <xsd:sequence>
-                    <xsd:element ref="pfx10:BENEFICIOS" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="pfx10:CUENTAS_AUTHENTIC" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
         </xsd:element>
@@ -35,7 +35,7 @@
     </pd:errorSchemas>
     <pd:processVariables/>
     <pd:targetNamespace>http://xmlns.example.com/1518634750295</pd:targetNamespace>
-    <pd:activity name="JDBC Get_HEB_BENEFITDETAIL">
+    <pd:activity name="JDBC Get_HEB_ACCOUNT_TRANSIENT">
         <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
         <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
         <pd:x>228</pd:x>
@@ -47,31 +47,41 @@
             <emptyStrAsNil>true</emptyStrAsNil>
             <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_AUTHENTIC.sharedjdbc</jdbcSharedConfig>
             <statement>SELECT
-NAME_NM,
-STATUS_ID,
+ACN_ID,
+ACN_ACCOUNT_NUMBER,
+ACN_STATUS,
+ACN_STATUS_DATE,
+ACN_CREDIT_LIMIT,
 RECORDDATE_DT,
-RECORDUSER_UID,
 UPDATEDATE_DT,
-UPDATEUSER_UID,
-BEHAVIOR_ID,
-DESCRIPTION_DES,
-BENEFITDETAIL_ID,
 TAKEDATE_DT,
 CASE
     WHEN TAKEDATE_DT IS NULL THEN 'Insert'
     ELSE 'Update'
     END AS OPERATION
-FROM HEB_OWNER.HEB_BENEFITDETAIL
+FROM HEB_OWNER.HEB_ACCOUNT_TRANSIENT
 WHERE TAKEDATE_DT IS NULL OR (TAKEDATE_DT &lt; UPDATEDATE_DT)
 ORDER BY OPERATION ASC</statement>
             <Prepared_Param_DataType/>
             <oraObjects/>
             <oraTables/>
-            <QueryOutputCachedSchemaColumns>NAME_NM</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaColumns>ACN_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ACN_ACCOUNT_NUMBER</QueryOutputCachedSchemaColumns>
             <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>STATUS_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaColumns>ACN_STATUS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ACN_STATUS_DATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ACN_CREDIT_LIMIT</QueryOutputCachedSchemaColumns>
             <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
@@ -79,30 +89,10 @@ ORDER BY OPERATION ASC</statement>
             <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>RECORDUSER_UID</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
             <QueryOutputCachedSchemaColumns>UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
             <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
             <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>UPDATEUSER_UID</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>BEHAVIOR_ID</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>DESCRIPTION_DES</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
-            <QueryOutputCachedSchemaColumns>BENEFITDETAIL_ID</QueryOutputCachedSchemaColumns>
-            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
-            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
-            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
             <QueryOutputCachedSchemaColumns>TAKEDATE_DT</QueryOutputCachedSchemaColumns>
             <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
             <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
@@ -126,7 +116,7 @@ ORDER BY OPERATION ASC</statement>
                 <xsd:element name="Data">
                     <xsd:complexType>
                         <xsd:sequence>
-                            <xsd:element ref="pfx10:BENEFICIOS" minOccurs="0" maxOccurs="unbounded"/>
+                            <xsd:element ref="pfx10:CUENTAS_AUTHENTIC" minOccurs="0" maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
                 </xsd:element>
@@ -134,58 +124,42 @@ ORDER BY OPERATION ASC</statement>
         </config>
         <pd:inputBindings>
             <Data>
-                <xsl:for-each select="$JDBC-Get_HEB_BENEFITDETAIL/resultSet/Record">
-                    <pfx10:BENEFICIOS>
-                        <NAME_NM>
-                            <xsl:value-of select="NAME_NM"/>
-                        </NAME_NM>
-                        <xsl:if test="STATUS_ID">
-                            <STATUS_ID>
-                                <xsl:value-of select="STATUS_ID"/>
-                            </STATUS_ID>
-                        </xsl:if>
-                        <xsl:if test="RECORDDATE_DT">
-                            <RECORDDATE_DT>
-                                <xsl:value-of select="RECORDDATE_DT"/>
-                            </RECORDDATE_DT>
-                        </xsl:if>
-                        <xsl:if test="RECORDUSER_UID">
-                            <RECORDUSER_UID>
-                                <xsl:value-of select="RECORDUSER_UID"/>
-                            </RECORDUSER_UID>
-                        </xsl:if>
-                        <xsl:if test="UPDATEDATE_DT">
-                            <UPDATEDATE_DT>
-                                <xsl:value-of select="UPDATEDATE_DT"/>
-                            </UPDATEDATE_DT>
-                        </xsl:if>
-                        <xsl:if test="UPDATEUSER_UID">
-                            <UPDATEUSER_UID>
-                                <xsl:value-of select="UPDATEUSER_UID"/>
-                            </UPDATEUSER_UID>
-                        </xsl:if>
-                        <BEHAVIOR_ID>
-                            <xsl:value-of select="BEHAVIOR_ID"/>
-                        </BEHAVIOR_ID>
-                        <xsl:if test="DESCRIPTION_DES">
-                            <DESCRIPTION_DES>
-                                <xsl:value-of select="DESCRIPTION_DES"/>
-                            </DESCRIPTION_DES>
-                        </xsl:if>
-                        <BENEFITDETAIL_ID>
-                            <xsl:value-of select="BENEFITDETAIL_ID"/>
-                        </BENEFITDETAIL_ID>
+                <xsl:for-each select="$JDBC-Get_HEB_ACCOUNT_TRANSIENT/resultSet/Record">
+                    <pfx10:CUENTAS_AUTHENTIC>
+                        <ACN_ID>
+                            <xsl:value-of select="ACN_ID"/>
+                        </ACN_ID>
+                        <ACN_ACCOUNT_NUMBER>
+                            <xsl:value-of select="ACN_ACCOUNT_NUMBER"/>
+                        </ACN_ACCOUNT_NUMBER>
+                        <ACN_STATUS>
+                            <xsl:value-of select="ACN_STATUS"/>
+                        </ACN_STATUS>
+                        <ACN_STATUS_DATE>
+                            <xsl:value-of select="ACN_STATUS_DATE"/>
+                        </ACN_STATUS_DATE>
+                        <ACN_CREDIT_LIMIT>
+                            <xsl:value-of select="ACN_CREDIT_LIMIT"/>
+                        </ACN_CREDIT_LIMIT>
                         <xsl:if test="TAKEDATE_DT">
                             <TAKEDATE_DT>
                                 <xsl:value-of select="TAKEDATE_DT"/>
                             </TAKEDATE_DT>
+                        </xsl:if>
+                        <RECORDDATE_DT>
+                            <xsl:value-of select="RECORDDATE_DT"/>
+                        </RECORDDATE_DT>
+                        <xsl:if test="UPDATEDATE_DT">
+                            <UPDATEDATE_DT>
+                                <xsl:value-of select="UPDATEDATE_DT"/>
+                            </UPDATEDATE_DT>
                         </xsl:if>
                         <xsl:if test="OPERATION">
                             <OPERATION>
                                 <xsl:value-of select="OPERATION"/>
                             </OPERATION>
                         </xsl:if>
-                    </pfx10:BENEFICIOS>
+                    </pfx10:CUENTAS_AUTHENTIC>
                 </xsl:for-each>
             </Data>
         </pd:inputBindings>
@@ -198,7 +172,7 @@ ORDER BY OPERATION ASC</statement>
         <pd:conditionType>always</pd:conditionType>
     </pd:transition>
     <pd:transition>
-        <pd:from>JDBC Get_HEB_BENEFITDETAIL</pd:from>
+        <pd:from>JDBC Get_HEB_ACCOUNT_TRANSIENT</pd:from>
         <pd:to>Map Transactions</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
@@ -206,7 +180,7 @@ ORDER BY OPERATION ASC</statement>
     </pd:transition>
     <pd:transition>
         <pd:from>Start</pd:from>
-        <pd:to>JDBC Get_HEB_BENEFITDETAIL</pd:to>
+        <pd:to>JDBC Get_HEB_ACCOUNT_TRANSIENT</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
         <pd:conditionType>always</pd:conditionType>

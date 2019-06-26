@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/TarjetasCuentasAuthentic" xmlns:pfx7="http://xmlns.heb.com/ei/CuentasHEBCard" xmlns:pfx8="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx="http://xmlns.heb.com/ei/Products" xmlns:pfx2="http://xmlns.heb.com/ei/Socio" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx4="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx5="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/TarjetasCuentasAuthentic" xmlns:pfx7="http://xmlns.heb.com/ei/CuentasHEBCard" xmlns:pfx8="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx="http://xmlns.heb.com/ei/Products" xmlns:pfx9="http://xmlns.heb.com/ei/Beneficios" xmlns:pfx2="http://xmlns.heb.com/ei/Socio" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx4="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx5="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx10="http://xmlns.heb.com/ei/Cuentas_Authentic">
     <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS.xsd"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS_SOAP.xsd"/>
     <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
@@ -11,13 +11,17 @@
     <xsd:import namespace="http://xmlns.heb.com/ei/CuentasHEBCard" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUENTAS_HEBCARD_SOAP.xsd"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/Beneficiarios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIARIOS.xsd"/>
     <xsd:import namespace="http://xmlns.heb.com/ei/Beneficiarios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIARIOS_SOAP.xsd"/>
-    <pd:name>Processes/Sub Process/Send_Beneficiarios.process</pd:name>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIOS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIOS_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Cuentas_Authentic" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUENTAS_AUTHENTIC.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Cuentas_Authentic" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUENTAS_AUTHENTIC_SOAP.xsd"/>
+    <pd:name>Processes/Sub Process/Send_CuentasAuthentic.process</pd:name>
     <pd:startName>Start</pd:startName>
     <pd:startType>
         <xsd:element name="Data">
             <xsd:complexType>
                 <xsd:sequence>
-                    <xsd:element ref="pfx8:BENEFICIARIOS" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="pfx10:CUENTAS_AUTHENTIC" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
         </xsd:element>
@@ -33,7 +37,7 @@
     </pd:errorSchemas>
     <pd:processVariables/>
     <pd:targetNamespace>http://xmlns.example.com/1519150346049</pd:targetNamespace>
-    <pd:group name="Group Beneficiarios">
+    <pd:group name="Group Beneficios">
         <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
         <pd:resourceType>ae.process.group</pd:resourceType>
         <pd:x>145</pd:x>
@@ -47,7 +51,7 @@
         <config>
             <pd:groupType>inputLoop</pd:groupType>
             <pd:serializable>false</pd:serializable>
-            <pd:over>$Start/Data/pfx8:BENEFICIARIOS</pd:over>
+            <pd:over>$Start/Data/pfx10:CUENTAS_AUTHENTIC</pd:over>
             <pd:iterationElementSlot>Record</pd:iterationElementSlot>
             <pd:indexSlot>i</pd:indexSlot>
             <pd:activityOutputName/>
@@ -63,7 +67,7 @@
             <pd:conditionType>always</pd:conditionType>
         </pd:transition>
         <pd:transition>
-            <pd:from>Update_Beneficiarios</pd:from>
+            <pd:from>Update_CuentasAuthentic</pd:from>
             <pd:to>end</pd:to>
             <pd:lineType>Default</pd:lineType>
             <pd:lineColor>-16777216</pd:lineColor>
@@ -85,7 +89,7 @@
         </pd:transition>
         <pd:transition>
             <pd:from>JMS Queue</pd:from>
-            <pd:to>Update_Beneficiarios</pd:to>
+            <pd:to>Update_CuentasAuthentic</pd:to>
             <pd:lineType>Default</pd:lineType>
             <pd:lineColor>-16777216</pd:lineColor>
             <pd:conditionType>always</pd:conditionType>
@@ -98,10 +102,10 @@
             <config>
                 <renderAsText>text</renderAsText>
                 <validateInput>true</validateInput>
-                <term ref="pfx8:MSG_CONTAINER"/>
+                <term ref="pfx10:MSG_CONTAINER"/>
             </config>
             <pd:inputBindings>
-                <xsl:copy-of select="$Map-Data/pfx8:MSG_CONTAINER"/>
+                <xsl:copy-of select="$Map-Data/pfx10:MSG_CONTAINER"/>
             </pd:inputBindings>
         </pd:activity>
         <pd:activity name="Map Data">
@@ -110,117 +114,77 @@
             <pd:x>235</pd:x>
             <pd:y>123</pd:y>
             <config>
-                <element ref="pfx8:MSG_CONTAINER"/>
+                <element ref="pfx10:MSG_CONTAINER"/>
             </config>
             <pd:inputBindings>
-                <pfx8:MSG_CONTAINER>
-                    <pfx8:Header>
-                        <pfx8:ProjectName>
+                <pfx10:MSG_CONTAINER>
+                    <pfx10:Header>
+                        <pfx10:ProjectName>
                             <xsl:value-of select="$_processContext/ns1:ProcessContext/ProjectName"/>
-                        </pfx8:ProjectName>
-                        <pfx8:Source_Domain>
+                        </pfx10:ProjectName>
+                        <pfx10:Source_Domain>
                             <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Source_Domain"/>
-                        </pfx8:Source_Domain>
-                        <pfx8:Destination_Domain>
+                        </pfx10:Source_Domain>
+                        <pfx10:Destination_Domain>
                             <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/Destination_Domain"/>
-                        </pfx8:Destination_Domain>
-                        <pfx8:Transaction_Type>
+                        </pfx10:Destination_Domain>
+                        <pfx10:Transaction_Type>
                             <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/ProjectConfig/TransactionType"/>
-                        </pfx8:Transaction_Type>
-                        <pfx8:TimeStamp>
+                        </pfx10:Transaction_Type>
+                        <pfx10:TimeStamp>
                             <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;,   current-dateTime())"/>
-                        </pfx8:TimeStamp>
-                    </pfx8:Header>
-                    <pfx8:Body>
-                        <pfx8:BENEFICIARIOS>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/CLIENT_ID">
-                                <CLIENT_ID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/CLIENT_ID"/>
-                                </CLIENT_ID>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/GENERALDATA_ID">
-                                <GENERALDATA_ID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/GENERALDATA_ID"/>
-                                </GENERALDATA_ID>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/ACN_ID">
+                        </pfx10:TimeStamp>
+                    </pfx10:Header>
+                    <pfx10:Body>
+                        <pfx10:CUENTAS_AUTHENTIC>
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_ID">
                                 <ACN_ID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/ACN_ID"/>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_ID"/>
                                 </ACN_ID>
                             </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/CONTACT_ID">
-                                <CONTACT_ID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/CONTACT_ID"/>
-                                </CONTACT_ID>
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_ACCOUNT_NUMBER">
+                                <ACN_ACCOUNT_NUMBER>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_ACCOUNT_NUMBER"/>
+                                </ACN_ACCOUNT_NUMBER>
                             </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/EMPLOYEENUMBER_CD">
-                                <EMPLOYEENUMBER_CD>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/EMPLOYEENUMBER_CD"/>
-                                </EMPLOYEENUMBER_CD>
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_STATUS">
+                                <ACN_STATUS>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_STATUS"/>
+                                </ACN_STATUS>
                             </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/NSS_NM">
-                                <NSS_NM>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/NSS_NM"/>
-                                </NSS_NM>
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_STATUS_DATE">
+                                <ACN_STATUS_DATE>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_STATUS_DATE"/>
+                                </ACN_STATUS_DATE>
                             </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/STATUS_ID">
-                                <STATUS_ID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/STATUS_ID"/>
-                                </STATUS_ID>
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_CREDIT_LIMIT">
+                                <ACN_CREDIT_LIMIT>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/ACN_CREDIT_LIMIT"/>
+                                </ACN_CREDIT_LIMIT>
                             </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/RECORDDATE_DT">
-                                <RECORDDATE_DT>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/RECORDDATE_DT"/>
-                                </RECORDDATE_DT>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/RECORDUSER_UID">
-                                <RECORDUSER_UID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/RECORDUSER_UID"/>
-                                </RECORDUSER_UID>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/UPDATEDATE_DT">
-                                <UPDATEDATE_DT>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/UPDATEDATE_DT"/>
-                                </UPDATEDATE_DT>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/UPDATEUSER_UID">
-                                <UPDATEUSER_UID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/UPDATEUSER_UID"/>
-                                </UPDATEUSER_UID>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/ASIGNEE_ID">
-                                <ASIGNEE_ID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/ASIGNEE_ID"/>
-                                </ASIGNEE_ID>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/ADDRESS_ID">
-                                <ADDRESS_ID>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/ADDRESS_ID"/>
-                                </ADDRESS_ID>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/CREDIT_LIMIT">
-                                <CREDIT_LIMIT>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/CREDIT_LIMIT"/>
-                                </CREDIT_LIMIT>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/EMPLOYEE_REFERENCE_CD">
-                                <EMPLOYEE_REFERENCE_CD>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/EMPLOYEE_REFERENCE_CD"/>
-                                </EMPLOYEE_REFERENCE_CD>
-                            </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/TAKEDATE_DT">
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/TAKEDATE_DT">
                                 <TAKEDATE_DT>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/TAKEDATE_DT"/>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/TAKEDATE_DT"/>
                                 </TAKEDATE_DT>
                             </xsl:if>
-                            <xsl:if test="$Record/pfx8:BENEFICIARIOS/OPERATION">
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/RECORDDATE_DT">
+                                <RECORDDATE_DT>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/RECORDDATE_DT"/>
+                                </RECORDDATE_DT>
+                            </xsl:if>
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/UPDATEDATE_DT">
+                                <UPDATEDATE_DT>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/UPDATEDATE_DT"/>
+                                </UPDATEDATE_DT>
+                            </xsl:if>
+                            <xsl:if test="$Record/pfx10:CUENTAS_AUTHENTIC/OPERATION">
                                 <OPERATION>
-                                    <xsl:value-of select="$Record/pfx8:BENEFICIARIOS/OPERATION"/>
+                                    <xsl:value-of select="$Record/pfx10:CUENTAS_AUTHENTIC/OPERATION"/>
                                 </OPERATION>
                             </xsl:if>
-                        </pfx8:BENEFICIARIOS>
-                    </pfx8:Body>
-                </pfx8:MSG_CONTAINER>
+                        </pfx10:CUENTAS_AUTHENTIC>
+                    </pfx10:Body>
+                </pfx10:MSG_CONTAINER>
             </pd:inputBindings>
         </pd:activity>
         <pd:activity name="JMS Queue">
@@ -234,7 +198,7 @@
                     <transacted>false</transacted>
                     <acknowledgeMode>1</acknowledgeMode>
                     <maxSessions>1</maxSessions>
-                    <destination>%%Destinations/Queues/GLB_BENEFICIARIOS.QUEUE%%</destination>
+                    <destination>%%Destinations/Queues/GLB_CUENTAS_AUTHENTIC_QUEUE%%</destination>
                 </SessionAttributes>
                 <ConfigurableHeaders>
                     <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
@@ -251,18 +215,18 @@
                 </ns:ActivityInput>
             </pd:inputBindings>
         </pd:activity>
-        <pd:activity name="Update_Beneficiarios">
+        <pd:activity name="Update_CuentasAuthentic">
             <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
             <pd:resourceType>ae.process.subprocess</pd:resourceType>
             <pd:x>452</pd:x>
             <pd:y>204</pd:y>
             <config>
-                <processName>/Processes/Sub Process/Update_Beneficiarios.process</processName>
+                <processName>/Processes/Sub Process/Update_CuentasAuthentic.process</processName>
             </config>
             <pd:inputBindings>
                 <InPut>
                     <ID>
-                        <xsl:value-of select="$Map-Data/pfx8:MSG_CONTAINER/pfx8:Body/pfx8:BENEFICIARIOS[1]/ASIGNEE_ID"/>
+                        <xsl:value-of select="$Map-Data/pfx10:MSG_CONTAINER/pfx10:Body/pfx10:CUENTAS_AUTHENTIC[1]/ACN_ID"/>
                     </ID>
                 </InPut>
             </pd:inputBindings>
@@ -270,13 +234,13 @@
     </pd:group>
     <pd:transition>
         <pd:from>Start</pd:from>
-        <pd:to>Group Beneficiarios</pd:to>
+        <pd:to>Group Beneficios</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
         <pd:conditionType>always</pd:conditionType>
     </pd:transition>
     <pd:transition>
-        <pd:from>Group Beneficiarios</pd:from>
+        <pd:from>Group Beneficios</pd:from>
         <pd:to>End</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>

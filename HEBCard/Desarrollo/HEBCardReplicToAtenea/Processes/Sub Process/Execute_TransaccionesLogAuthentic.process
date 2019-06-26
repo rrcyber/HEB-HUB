@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_API.xsd" xmlns:pfx7="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:pfx8="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" xmlns:pfx9="http://xmlns.heb.com/ei/Transacciones_Log_Authentic" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx5="http://xmlns.heb.com/ei/Comisionista" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Dispersion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_API.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficiarios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIARIOS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Transacciones_Log_Authentic" schemaLocation="/Shared Resources/Schema Definitions/Custom/TRANSACCIONES_LOG_AUTHENTIC.xsd"/>
+    <pd:name>Processes/Sub Process/Execute_TransaccionesLogAuthentic.process</pd:name>
+    <pd:description>Process that send a dispersion</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx9:TRANSACCIONES_LOG_AUTHENTIC"/>
+    <pd:startX>115</pd:startX>
+    <pd:startY>139</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$API-Msg/VendorRequest"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>479</pd:endX>
+    <pd:endY>142</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1535725694804</pd:targetNamespace>
+    <pd:activity name=".">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>220</pd:x>
+        <pd:y>140</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>350</pd:x>
+        <pd:y>197</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <statement>UPDATE HEB_TRANSACTION_LOG_TRANSIENT SET
+TRL_PAN= ?,
+TRL_PAN_EKY_ID= ?,
+TRL_TSC_CODE= ?,
+TRL_STAN= ?,
+TRL_RRN= ?,
+TRL_AMT_TXN= ?,
+TRL_APPROVAL_CODE= ?,
+TRL_ACTION_RESPONSE_CODE= ?,
+TRL_CUSTOM_DATA= ?,
+TRL_CUSTOM_DATA_EKY_ID= ?,
+TRL_MESSAGE_TYPE= ?,
+TRL_SYSTEM_TIMESTAMP= ?,
+TRL_DATETIME_LOCAL_TXN= ?,
+TRL_CARD_ACPT_TERMINAL_IDENT= ?,
+TRL_ORIGIN_FEP_NBR= ?,
+RecordDate_DT= ?,
+UpdateDate_DT = ?
+WHERE TRL_ID = ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_ATENEA.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>TRL_PAN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_PAN_EKY_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_TSC_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_STAN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_RRN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_AMT_TXN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_APPROVAL_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_ACTION_RESPONSE_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_CUSTOM_DATA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_CUSTOM_DATA_EKY_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_MESSAGE_TYPE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_SYSTEM_TIMESTAMP</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_DATETIME_LOCAL_TXN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_CARD_ACPT_TERMINAL_IDENT</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_ORIGIN_FEP_NBR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RECORDDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>UPDATEDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <TRL_PAN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_PAN>
+                <TRL_PAN_EKY_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN_EKY_ID)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN_EKY_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_PAN_EKY_ID>
+                <TRL_TSC_CODE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_TSC_CODE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_TSC_CODE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_TSC_CODE>
+                <TRL_STAN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_STAN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_STAN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_STAN>
+                <TRL_RRN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_RRN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_RRN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_RRN>
+                <TRL_AMT_TXN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_AMT_TXN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_AMT_TXN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_AMT_TXN>
+                <TRL_APPROVAL_CODE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_APPROVAL_CODE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_APPROVAL_CODE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_APPROVAL_CODE>
+                <TRL_ACTION_RESPONSE_CODE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ACTION_RESPONSE_CODE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ACTION_RESPONSE_CODE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_ACTION_RESPONSE_CODE>
+                <TRL_CUSTOM_DATA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_CUSTOM_DATA>
+                <TRL_CUSTOM_DATA_EKY_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA_EKY_ID)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA_EKY_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_CUSTOM_DATA_EKY_ID>
+                <TRL_MESSAGE_TYPE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_MESSAGE_TYPE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_MESSAGE_TYPE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_MESSAGE_TYPE>
+                <TRL_SYSTEM_TIMESTAMP>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_SYSTEM_TIMESTAMP)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_SYSTEM_TIMESTAMP"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_SYSTEM_TIMESTAMP>
+                <TRL_DATETIME_LOCAL_TXN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_DATETIME_LOCAL_TXN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_DATETIME_LOCAL_TXN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_DATETIME_LOCAL_TXN>
+                <TRL_CARD_ACPT_TERMINAL_IDENT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CARD_ACPT_TERMINAL_IDENT)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CARD_ACPT_TERMINAL_IDENT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_CARD_ACPT_TERMINAL_IDENT>
+                <TRL_ORIGIN_FEP_NBR>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ORIGIN_FEP_NBR)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ORIGIN_FEP_NBR"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_ORIGIN_FEP_NBR>
+                <RECORDDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/RECORDDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/RECORDDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RECORDDATE_DT>
+                <UPDATEDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/UPDATEDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/UPDATEDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </UPDATEDATE_DT>
+                <TRL_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ID)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_ID>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Insert">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>350</pd:x>
+        <pd:y>84</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_ATENEA.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO HEB_TRANSACTION_LOG_TRANSIENT (
+TRL_ID,
+TRL_PAN,
+TRL_PAN_EKY_ID,
+TRL_TSC_CODE,
+TRL_STAN,
+TRL_RRN,
+TRL_AMT_TXN,
+TRL_APPROVAL_CODE,
+TRL_ACTION_RESPONSE_CODE,
+TRL_CUSTOM_DATA,
+TRL_CUSTOM_DATA_EKY_ID,
+TRL_MESSAGE_TYPE,
+TRL_SYSTEM_TIMESTAMP,
+TRL_DATETIME_LOCAL_TXN,
+TRL_CARD_ACPT_TERMINAL_IDENT,
+TRL_ORIGIN_FEP_NBR,
+RecordDate_DT,
+UpdateDate_DT
+) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>TRL_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_PAN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_PAN_EKY_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_TSC_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_STAN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_RRN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_AMT_TXN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_APPROVAL_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_ACTION_RESPONSE_CODE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_CUSTOM_DATA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_CUSTOM_DATA_EKY_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_MESSAGE_TYPE</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_SYSTEM_TIMESTAMP</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_DATETIME_LOCAL_TXN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_CARD_ACPT_TERMINAL_IDENT</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TRL_ORIGIN_FEP_NBR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RECORDDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>UPDATEDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <TRL_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ID)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_ID>
+                <TRL_PAN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_PAN>
+                <TRL_PAN_EKY_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN_EKY_ID)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_PAN_EKY_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_PAN_EKY_ID>
+                <TRL_TSC_CODE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_TSC_CODE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_TSC_CODE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_TSC_CODE>
+                <TRL_STAN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_STAN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_STAN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_STAN>
+                <TRL_RRN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_RRN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_RRN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_RRN>
+                <TRL_AMT_TXN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_AMT_TXN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_AMT_TXN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_AMT_TXN>
+                <TRL_APPROVAL_CODE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_APPROVAL_CODE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_APPROVAL_CODE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_APPROVAL_CODE>
+                <TRL_ACTION_RESPONSE_CODE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ACTION_RESPONSE_CODE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ACTION_RESPONSE_CODE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_ACTION_RESPONSE_CODE>
+                <TRL_CUSTOM_DATA>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_CUSTOM_DATA>
+                <TRL_CUSTOM_DATA_EKY_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA_EKY_ID)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CUSTOM_DATA_EKY_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_CUSTOM_DATA_EKY_ID>
+                <TRL_MESSAGE_TYPE>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_MESSAGE_TYPE)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_MESSAGE_TYPE"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_MESSAGE_TYPE>
+                <TRL_SYSTEM_TIMESTAMP>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_SYSTEM_TIMESTAMP)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_SYSTEM_TIMESTAMP"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_SYSTEM_TIMESTAMP>
+                <TRL_DATETIME_LOCAL_TXN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_DATETIME_LOCAL_TXN)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_DATETIME_LOCAL_TXN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_DATETIME_LOCAL_TXN>
+                <TRL_CARD_ACPT_TERMINAL_IDENT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CARD_ACPT_TERMINAL_IDENT)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_CARD_ACPT_TERMINAL_IDENT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_CARD_ACPT_TERMINAL_IDENT>
+                <TRL_ORIGIN_FEP_NBR>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ORIGIN_FEP_NBR)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/TRL_ORIGIN_FEP_NBR"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TRL_ORIGIN_FEP_NBR>
+                <RECORDDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/RECORDDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/RECORDDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RECORDDATE_DT>
+                <UPDATEDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/UPDATEDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/UPDATEDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </UPDATEDATE_DT>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>.</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:xpathDescription>Update</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx9:TRANSACCIONES_LOG_AUTHENTIC/OPERATION !='Insert'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>JDBC Insert</pd:to>
+        <pd:xpathDescription>Insert</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Insert</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
