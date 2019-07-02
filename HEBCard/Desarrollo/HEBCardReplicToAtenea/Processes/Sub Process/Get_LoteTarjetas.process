@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx7="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:pfx8="http://xmlns.heb.com/ei/CuentasHEBCard" xmlns:pfx="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx9="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx2="http://xmlns.heb.com/ei/Bitacora" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Products" xmlns:pfx4="http://xmlns.heb.com/ei/Socio" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx10="http://xmlns.heb.com/ei/LoteTarjetas">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO_PRICEINVENTORY.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Socio" schemaLocation="/Shared Resources/Schema Definitions/Custom/SOCIO_PEOPLE_SOFT.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Comisionista" schemaLocation="/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/CuentasHEBCard" schemaLocation="/Shared Resources/Schema Definitions/Custom/CUENTAS_HEBCARD.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficiarios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIARIOS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/LoteTarjetas" schemaLocation="/Shared Resources/Schema Definitions/Custom/LOTE_TARJETAS.xsd"/>
+    <pd:name>Processes/Sub Process/Get_LoteTarjetas.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>225</pd:startX>
+    <pd:startY>117</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Map-Transactions/Data"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Data">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx10:LOTE_TARJETAS" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>469</pd:endX>
+    <pd:endY>226</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1518634750295</pd:targetNamespace>
+    <pd:activity name="JDBC Get_HEB_LOT">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>228</pd:x>
+        <pd:y>225</pd:y>
+        <config>
+            <timeout>%%Connections/Database/AUTHENTIC/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/AUTHENTIC/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_AUTHENTIC.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT
+USERAUTHORIZE1_ID,
+USERAUTHORIZE2_ID,
+STATUS_ID,
+PRODUCT_ID,
+FOL_ID,
+RECORDDATE_DT,
+RECORDUSER_UID,
+UPDATEDATE_DT,
+UPDATEUSER_UID,
+NOCARDS_NBR,
+COMMENTS_DES,
+REQUEST_ID,
+PURCHASE_ORDER,
+PROVIDER_EMAIL,
+FILE_NAME,
+STAGE_ID,
+LOT_ID,
+EXPIRATIONDATE_DT,
+PROCESSSTATE_SW,
+ARRAYTOFILE_DES,
+KEY_NAME_NM,
+TITLE,
+PROVIDER_ID,
+START_NUMBER,
+END_NUMBER,
+CURRENT_NUMBER,
+AUTHENTIC_STAGE_ID,
+TAKEDATE_DT,
+CASE
+    WHEN TAKEDATE_DT IS NULL THEN 'Insert'
+    ELSE 'Update'
+    END AS OPERATION
+FROM HEB_OWNER.HEB_LOT
+WHERE TAKEDATE_DT IS NULL OR (TAKEDATE_DT &lt; UPDATEDATE_DT)
+ORDER BY OPERATION ASC</statement>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>USERAUTHORIZE1_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>USERAUTHORIZE2_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>STATUS_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRODUCT_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FOL_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>RECORDDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>RECORDUSER_UID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>UPDATEUSER_UID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>NOCARDS_NBR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>COMMENTS_DES</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>REQUEST_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PURCHASE_ORDER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PROVIDER_EMAIL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>FILE_NAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>STAGE_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>LOT_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EXPIRATIONDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PROCESSSTATE_SW</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>ARRAYTOFILE_DES</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2004</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>blob</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>KEY_NAME_NM</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TITLE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PROVIDER_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>START_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>END_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CURRENT_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AUTHENTIC_STAGE_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TAKEDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OPERATION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Transactions">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>349</pd:x>
+        <pd:y>226</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Data">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="pfx10:LOTE_TARJETAS" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Data>
+                <xsl:for-each select="$JDBC-Get_HEB_LOT/resultSet/Record">
+                    <pfx10:LOTE_TARJETAS>
+                        <xsl:if test="USERAUTHORIZE1_ID">
+                            <USERAUTHORIZE1_ID>
+                                <xsl:value-of select="USERAUTHORIZE1_ID"/>
+                            </USERAUTHORIZE1_ID>
+                        </xsl:if>
+                        <xsl:if test="USERAUTHORIZE2_ID">
+                            <USERAUTHORIZE2_ID>
+                                <xsl:value-of select="USERAUTHORIZE2_ID"/>
+                            </USERAUTHORIZE2_ID>
+                        </xsl:if>
+                        <STATUS_ID>
+                            <xsl:value-of select="STATUS_ID"/>
+                        </STATUS_ID>
+                        <PRODUCT_ID>
+                            <xsl:value-of select="PRODUCT_ID"/>
+                        </PRODUCT_ID>
+                        <FOL_ID>
+                            <xsl:value-of select="FOL_ID"/>
+                        </FOL_ID>
+                        <RECORDDATE_DT>
+                            <xsl:value-of select="RECORDDATE_DT"/>
+                        </RECORDDATE_DT>
+                        <RECORDUSER_UID>
+                            <xsl:value-of select="RECORDUSER_UID"/>
+                        </RECORDUSER_UID>
+                        <xsl:if test="UPDATEDATE_DT">
+                            <UPDATEDATE_DT>
+                                <xsl:value-of select="UPDATEDATE_DT"/>
+                            </UPDATEDATE_DT>
+                        </xsl:if>
+                        <xsl:if test="UPDATEUSER_UID">
+                            <UPDATEUSER_UID>
+                                <xsl:value-of select="UPDATEUSER_UID"/>
+                            </UPDATEUSER_UID>
+                        </xsl:if>
+                        <NOCARDS_NBR>
+                            <xsl:value-of select="NOCARDS_NBR"/>
+                        </NOCARDS_NBR>
+                        <xsl:if test="COMMENTS_DES">
+                            <COMMENTS_DES>
+                                <xsl:value-of select="COMMENTS_DES"/>
+                            </COMMENTS_DES>
+                        </xsl:if>
+                        <REQUEST_ID>
+                            <xsl:value-of select="REQUEST_ID"/>
+                        </REQUEST_ID>
+                        <xsl:if test="PURCHASE_ORDER">
+                            <PURCHASE_ORDER>
+                                <xsl:value-of select="PURCHASE_ORDER"/>
+                            </PURCHASE_ORDER>
+                        </xsl:if>
+                        <xsl:if test="PROVIDER_EMAIL">
+                            <PROVIDER_EMAIL>
+                                <xsl:value-of select="PROVIDER_EMAIL"/>
+                            </PROVIDER_EMAIL>
+                        </xsl:if>
+                        <xsl:if test="FILE_NAME">
+                            <FILE_NAME>
+                                <xsl:value-of select="FILE_NAME"/>
+                            </FILE_NAME>
+                        </xsl:if>
+                        <STAGE_ID>
+                            <xsl:value-of select="STAGE_ID"/>
+                        </STAGE_ID>
+                        <LOT_ID>
+                            <xsl:value-of select="LOT_ID"/>
+                        </LOT_ID>
+                        <EXPIRATIONDATE_DT>
+                            <xsl:value-of select="EXPIRATIONDATE_DT"/>
+                        </EXPIRATIONDATE_DT>
+                        <xsl:if test="PROCESSSTATE_SW">
+                            <PROCESSSTATE_SW>
+                                <xsl:value-of select="PROCESSSTATE_SW"/>
+                            </PROCESSSTATE_SW>
+                        </xsl:if>
+                        <xsl:if test="ARRAYTOFILE_DES">
+                            <ARRAYTOFILE_DES>
+                                <xsl:value-of select="ARRAYTOFILE_DES"/>
+                            </ARRAYTOFILE_DES>
+                        </xsl:if>
+                        <xsl:if test="KEY_NAME_NM">
+                            <KEY_NAME_NM>
+                                <xsl:value-of select="KEY_NAME_NM"/>
+                            </KEY_NAME_NM>
+                        </xsl:if>
+                        <xsl:if test="TITLE">
+                            <TITLE>
+                                <xsl:value-of select="TITLE"/>
+                            </TITLE>
+                        </xsl:if>
+                        <xsl:if test="PROVIDER_ID">
+                            <PROVIDER_ID>
+                                <xsl:value-of select="PROVIDER_ID"/>
+                            </PROVIDER_ID>
+                        </xsl:if>
+                        <xsl:if test="START_NUMBER">
+                            <START_NUMBER>
+                                <xsl:value-of select="START_NUMBER"/>
+                            </START_NUMBER>
+                        </xsl:if>
+                        <xsl:if test="END_NUMBER">
+                            <END_NUMBER>
+                                <xsl:value-of select="END_NUMBER"/>
+                            </END_NUMBER>
+                        </xsl:if>
+                        <CURRENT_NUMBER>
+                            <xsl:value-of select="CURRENT_NUMBER"/>
+                        </CURRENT_NUMBER>
+                        <AUTHENTIC_STAGE_ID>
+                            <xsl:value-of select="AUTHENTIC_STAGE_ID"/>
+                        </AUTHENTIC_STAGE_ID>
+                        <xsl:if test="TAKEDATE_DT">
+                            <TAKEDATE_DT>
+                                <xsl:value-of select="TAKEDATE_DT"/>
+                            </TAKEDATE_DT>
+                        </xsl:if>
+                        <xsl:if test="OPERATION">
+                            <OPERATION>
+                                <xsl:value-of select="OPERATION"/>
+                            </OPERATION>
+                        </xsl:if>
+                    </pfx10:LOTE_TARJETAS>
+                </xsl:for-each>
+            </Data>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Map Transactions</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Get_HEB_LOT</pd:from>
+        <pd:to>Map Transactions</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Get_HEB_LOT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
