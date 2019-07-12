@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_API.xsd" xmlns:pfx7="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:pfx8="http://xmlns.heb.com/ei/Beneficiarios" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" xmlns:pfx9="http://xmlns.heb.com/ei/Contactos" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/json" xmlns:pfx3="http://xmlns.heb.com/ei/Socio" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx5="http://xmlns.heb.com/ei/Comisionista" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/Dispersion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/Dispersion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/ALTA_SOCIO_PEOPLE_SOFT_API.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR_API.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Beneficiarios" schemaLocation="/Shared Resources/Schema Definitions/Custom/BENEFICIARIOS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Contactos" schemaLocation="/Shared Resources/Schema Definitions/Custom/CONTACTOS.xsd"/>
+    <pd:name>Processes/Sub Process/Execute_Contactos.process</pd:name>
+    <pd:description>Process that send a dispersion</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx9:CONTACTOS"/>
+    <pd:startX>115</pd:startX>
+    <pd:startY>139</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$API-Msg/VendorRequest"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endX>479</pd:endX>
+    <pd:endY>142</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx4:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1535725694804</pd:targetNamespace>
+    <pd:activity name=".">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>220</pd:x>
+        <pd:y>140</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>350</pd:x>
+        <pd:y>197</pd:y>
+        <config>
+            <timeout>%%Connections/Database/ATENEA/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <statement>UPDATE HEB_CONTACT SET
+CLIENT_ID  = ?,
+NAME_NM  = ?,
+PHONE1_PHN  = ?,
+PHONE2_PHN  = ?,
+EMAIL1_EML  = ?,
+EMAIL2_EML  = ?,
+EMAIL3_EML  = ?,
+STATUS_ID  = ?,
+RECORDDATE_DT  = ?,
+RECORDUSER_UID = ?,
+UPDATEDATE_DT  = ?,
+UPDATEUSER_UID  = ?,
+PRINCIPAL_SW = ?
+WHERE CONTACT_ID = ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_ATENEA.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CLIENT_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>NAME_NM</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PHONE1_PHN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PHONE2_PHN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EMAIL1_EML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EMAIL2_EML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EMAIL3_EML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>STATUS_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RECORDDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RECORDUSER_UID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>UPDATEDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>UPDATEUSER_UID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PRINCIPAL_SW</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CONTACT_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <CLIENT_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/CLIENT_ID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/CLIENT_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </CLIENT_ID>
+                <NAME_NM>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/NAME_NM)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/NAME_NM"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </NAME_NM>
+                <PHONE1_PHN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/PHONE1_PHN)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/PHONE1_PHN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PHONE1_PHN>
+                <PHONE2_PHN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/PHONE2_PHN)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/PHONE2_PHN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PHONE2_PHN>
+                <EMAIL1_EML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/EMAIL1_EML)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/EMAIL1_EML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EMAIL1_EML>
+                <EMAIL2_EML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/EMAIL2_EML)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/EMAIL2_EML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EMAIL2_EML>
+                <EMAIL3_EML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/EMAIL3_EML)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/EMAIL3_EML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EMAIL3_EML>
+                <STATUS_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/STATUS_ID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/STATUS_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </STATUS_ID>
+                <RECORDDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/RECORDDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/RECORDDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RECORDDATE_DT>
+                <RECORDUSER_UID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/RECORDUSER_UID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/RECORDUSER_UID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RECORDUSER_UID>
+                <UPDATEDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/UPDATEDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/UPDATEDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </UPDATEDATE_DT>
+                <UPDATEUSER_UID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/UPDATEUSER_UID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/UPDATEUSER_UID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </UPDATEUSER_UID>
+                <PRINCIPAL_SW>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/PRINCIPAL_SW)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/PRINCIPAL_SW"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PRINCIPAL_SW>
+                <CONTACT_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/CONTACT_ID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/CONTACT_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </CONTACT_ID>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Insert">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>350</pd:x>
+        <pd:y>84</pd:y>
+        <config>
+            <timeout>%%Connections/Database/ATENEA/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_ATENEA.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO HEB_CONTACT (
+CLIENT_ID,
+NAME_NM,
+PHONE1_PHN,
+PHONE2_PHN,
+EMAIL1_EML,
+EMAIL2_EML,
+EMAIL3_EML,
+STATUS_ID,
+RECORDDATE_DT,
+RECORDUSER_UID,
+UPDATEDATE_DT,
+UPDATEUSER_UID,
+CONTACT_ID,
+PRINCIPAL_SW
+) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>CLIENT_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>NAME_NM</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PHONE1_PHN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PHONE2_PHN</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EMAIL1_EML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EMAIL2_EML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>EMAIL3_EML</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>STATUS_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RECORDDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>RECORDUSER_UID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>UPDATEDATE_DT</parameterName>
+                    <dataType>TIMESTAMP</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>UPDATEUSER_UID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CONTACT_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PRINCIPAL_SW</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <CLIENT_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/CLIENT_ID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/CLIENT_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </CLIENT_ID>
+                <NAME_NM>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/NAME_NM)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/NAME_NM"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </NAME_NM>
+                <PHONE1_PHN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/PHONE1_PHN)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/PHONE1_PHN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PHONE1_PHN>
+                <PHONE2_PHN>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/PHONE2_PHN)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/PHONE2_PHN"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PHONE2_PHN>
+                <EMAIL1_EML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/EMAIL1_EML)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/EMAIL1_EML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EMAIL1_EML>
+                <EMAIL2_EML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/EMAIL2_EML)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/EMAIL2_EML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EMAIL2_EML>
+                <EMAIL3_EML>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/EMAIL3_EML)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/EMAIL3_EML"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </EMAIL3_EML>
+                <STATUS_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/STATUS_ID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/STATUS_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </STATUS_ID>
+                <RECORDDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/RECORDDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/RECORDDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RECORDDATE_DT>
+                <RECORDUSER_UID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/RECORDUSER_UID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/RECORDUSER_UID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </RECORDUSER_UID>
+                <UPDATEDATE_DT>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/UPDATEDATE_DT)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/UPDATEDATE_DT"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </UPDATEDATE_DT>
+                <UPDATEUSER_UID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/UPDATEUSER_UID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/UPDATEUSER_UID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </UPDATEUSER_UID>
+                <CONTACT_ID>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/CONTACT_ID)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/CONTACT_ID"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </CONTACT_ID>
+                <PRINCIPAL_SW>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx9:CONTACTOS/PRINCIPAL_SW)">
+                            <xsl:value-of select="$Start/pfx9:CONTACTOS/PRINCIPAL_SW"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PRINCIPAL_SW>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>.</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:xpathDescription>Update</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx9:CONTACTOS/OPERATION !='Insert'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>JDBC Insert</pd:to>
+        <pd:xpathDescription>Insert</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Insert</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

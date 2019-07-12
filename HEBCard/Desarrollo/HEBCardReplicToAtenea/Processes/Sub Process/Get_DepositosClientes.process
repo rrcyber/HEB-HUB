@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/Comisionista" xmlns:pfx7="http://xmlns.heb.com/ei/TipoMovimientoCuentas" xmlns:pfx8="http://xmlns.heb.com/ei/TarjetasAuthentic" xmlns:pfx="http://xmlns.heb.com/ei/PriceInventory" xmlns:pfx9="http://xmlns.heb.com/ei/Parametros" xmlns:pfx2="http://xmlns.heb.com/ei/Bitacora" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/Products" xmlns:pfx4="http://xmlns.heb.com/ei/Socio" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx10="http://xmlns.heb.com/ei/DepositosClientes">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO_PRICEINVENTORY.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PriceInventory"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_PROPUESTA_ARTICULO.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Products" schemaLocation="/Shared Resources/Schema Definitions/Custom/MAG_IMPORT_PRODUCTS.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Socio" schemaLocation="/Shared Resources/Schema Definitions/Custom/SOCIO_PEOPLE_SOFT.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Comisionista" schemaLocation="/Shared Resources/Schema Definitions/Custom/COMISIONISTA_PSAR.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TarjetasAuthentic" schemaLocation="/Shared Resources/Schema Definitions/Custom/TARJETAS_AUTHENTIC.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TipoMovimientoCuentas" schemaLocation="/Shared Resources/Schema Definitions/Custom/TIPO_MOVIMIENTO_CUENTAS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/Parametros" schemaLocation="/Shared Resources/Schema Definitions/Custom/PARAMETROS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/DepositosClientes" schemaLocation="/Shared Resources/Schema Definitions/Custom/DEPOSITOS_CLIENTES.xsd"/>
+    <pd:name>Processes/Sub Process/Get_DepositosClientes.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>223</pd:startX>
+    <pd:startY>117</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Map-Transactions/Data"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Data">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx10:DEPOSITOS_CLIENTES" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>469</pd:endX>
+    <pd:endY>226</pd:endY>
+    <pd:errorSchemas>
+        <Exception ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1518634750295</pd:targetNamespace>
+    <pd:activity name="JDBC Get_HEB_CLIENT_DEPOSIT">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>228</pd:x>
+        <pd:y>225</pd:y>
+        <config>
+            <timeout>%%Connections/Database/AUTHENTIC/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/AUTHENTIC/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_AUTHENTIC.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT
+CLIENT_DEPOSIT_ID,
+CLIENT_ID,
+AMOUNT_NBR,
+DEPOSITDATE,
+DEPOSITNUMBER_NM,
+BUSINESSUNIT,
+STATUS,
+RECORDDATE_DT,
+RECORDUSER_UID,
+UPDATEDATE_DT,
+UPDATEUSER_UID,
+TAKEDATE_DT,
+CASE
+    WHEN TAKEDATE_DT IS NULL THEN 'Insert'
+    ELSE 'Update'
+    END AS OPERATION
+FROM HEB_OWNER.HEB_CLIENT_DEPOSIT
+WHERE TAKEDATE_DT IS NULL OR (TAKEDATE_DT &lt; UPDATEDATE_DT)
+ORDER BY OPERATION ASC</statement>
+            <Prepared_Param_DataType/>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>CLIENT_DEPOSIT_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CLIENT_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AMOUNT_NBR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEPOSITDATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>DEPOSITNUMBER_NM</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>BUSINESSUNIT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>STATUS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>RECORDDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>RECORDUSER_UID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>UPDATEDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>UPDATEUSER_UID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar2</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TAKEDATE_DT</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>timestamp</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OPERATION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Transactions">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>349</pd:x>
+        <pd:y>226</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Data">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="pfx10:DEPOSITOS_CLIENTES" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <Data>
+                <xsl:for-each select="$JDBC-Get_HEB_CLIENT_DEPOSIT/resultSet/Record">
+                    <pfx10:DEPOSITOS_CLIENTES>
+                        <CLIENT_DEPOSIT_ID>
+                            <xsl:value-of select="CLIENT_DEPOSIT_ID"/>
+                        </CLIENT_DEPOSIT_ID>
+                        <CLIENT_ID>
+                            <xsl:value-of select="CLIENT_ID"/>
+                        </CLIENT_ID>
+                        <AMOUNT_NBR>
+                            <xsl:value-of select="AMOUNT_NBR"/>
+                        </AMOUNT_NBR>
+                        <xsl:if test="DEPOSITDATE">
+                            <DEPOSITDATE>
+                                <xsl:value-of select="DEPOSITDATE"/>
+                            </DEPOSITDATE>
+                        </xsl:if>
+                        <xsl:if test="DEPOSITNUMBER_NM">
+                            <DEPOSITNUMBER_NM>
+                                <xsl:value-of select="DEPOSITNUMBER_NM"/>
+                            </DEPOSITNUMBER_NM>
+                        </xsl:if>
+                        <BUSINESSUNIT>
+                            <xsl:value-of select="BUSINESSUNIT"/>
+                        </BUSINESSUNIT>
+                        <STATUS>
+                            <xsl:value-of select="STATUS"/>
+                        </STATUS>
+                        <RECORDDATE_DT>
+                            <xsl:value-of select="RECORDDATE_DT"/>
+                        </RECORDDATE_DT>
+                        <RECORDUSER_UID>
+                            <xsl:value-of select="RECORDUSER_UID"/>
+                        </RECORDUSER_UID>
+                        <xsl:if test="UPDATEDATE_DT">
+                            <UPDATEDATE_DT>
+                                <xsl:value-of select="UPDATEDATE_DT"/>
+                            </UPDATEDATE_DT>
+                        </xsl:if>
+                        <xsl:if test="UPDATEUSER_UID">
+                            <UPDATEUSER_UID>
+                                <xsl:value-of select="UPDATEUSER_UID"/>
+                            </UPDATEUSER_UID>
+                        </xsl:if>
+                        <xsl:if test="TAKEDATE_DT">
+                            <TAKEDATE_DT>
+                                <xsl:value-of select="TAKEDATE_DT"/>
+                            </TAKEDATE_DT>
+                        </xsl:if>
+                        <xsl:if test="OPERATION">
+                            <OPERATION>
+                                <xsl:value-of select="OPERATION"/>
+                            </OPERATION>
+                        </xsl:if>
+                    </pfx10:DEPOSITOS_CLIENTES>
+                </xsl:for-each>
+            </Data>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Map Transactions</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Get_HEB_CLIENT_DEPOSIT</pd:from>
+        <pd:to>Map Transactions</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Get_HEB_CLIENT_DEPOSIT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
