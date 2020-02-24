@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Sub Process/ListaDistribucion/GetListaDistribucion.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:PURCHASE_ORDER_DISTRIBUTION"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>73</pd:startY>
+    <pd:returnBindings>
+        <DistribucionList>
+            <xsl:for-each select="$OutDistribucionList/AccumulatedOutput/root">
+                <List>
+                    <ID_ORDEN_COMPRA>
+                        <xsl:value-of select="ID_ORDEN_COMPRA"/>
+                    </ID_ORDEN_COMPRA>
+                    <ID_ARTICULO>
+                        <xsl:value-of select="ID_ARTICULO"/>
+                    </ID_ARTICULO>
+                    <ID_SUCURSAL>
+                        <xsl:value-of select="ID_SUCURSAL"/>
+                    </ID_SUCURSAL>
+                    <FECHA_PEDIDO_CAT>
+                        <xsl:value-of select="FECHA_PEDIDO_CAT"/>
+                    </FECHA_PEDIDO_CAT>
+                    <CANTIDAD>
+                        <xsl:value-of select="CANTIDAD"/>
+                    </CANTIDAD>
+                </List>
+            </xsl:for-each>
+        </DistribucionList>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="DistribucionList">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="List" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ID_ORDEN_COMPRA" type="xsd:string"/>
+                                <xsd:element name="ID_ARTICULO" type="xsd:string"/>
+                                <xsd:element name="ID_SUCURSAL" type="xsd:string"/>
+                                <xsd:element name="FECHA_PEDIDO_CAT" type="xsd:string"/>
+                                <xsd:element name="CANTIDAD" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>485</pd:endX>
+    <pd:endY>77</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1429889756944</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>101</pd:x>
+        <pd:y>1</pd:y>
+        <pd:width>296</pd:width>
+        <pd:height>132</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx2:PURCHASE_ORDER_DISTRIBUTION/pfx2:ITEM</pd:over>
+            <pd:iterationElementSlot>InDistribucionList</pd:iterationElementSlot>
+            <pd:indexSlot>INDEXARRAY</pd:indexSlot>
+            <pd:outSlot>OutDistribucionList</pd:outSlot>
+            <pd:activityOutputName>Map Data</pd:activityOutputName>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Get_id_Art_Suc</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Data</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Get_id_Art_Suc</pd:from>
+            <pd:to>Map Data</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Get_id_Art_Suc">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>208</pd:x>
+            <pd:y>57</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT ID as IDArticulo, (SELECT ID FROM SUCURSAL (nolock) WHERE IDPMM =?)  as IDSucursal
+FROM ARTICULO (nolock) WHERE SKU =?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>IDArticulo</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>IDSucursal</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>SUCURSAL</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>SKU</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <SUCURSAL>
+                        <xsl:copy-of select="$InDistribucionList/pfx2:ITEM/pfx2:ORG_LVL_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$InDistribucionList/pfx2:ITEM/pfx2:ORG_LVL_NUMBER"/>
+                    </SUCURSAL>
+                    <SKU>
+                        <xsl:copy-of select="$InDistribucionList/pfx2:ITEM/pfx2:PRD_LVL_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$InDistribucionList/pfx2:ITEM/pfx2:PRD_LVL_NUMBER"/>
+                    </SKU>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Data">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>303</pd:x>
+            <pd:y>59</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="ID_ORDEN_COMPRA" type="xsd:string"/>
+                                <xsd:element name="ID_ARTICULO" type="xsd:string"/>
+                                <xsd:element name="ID_SUCURSAL" type="xsd:string"/>
+                                <xsd:element name="FECHA_PEDIDO_CAT" type="xsd:string"/>
+                                <xsd:element name="CANTIDAD" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <ID_ORDEN_COMPRA>
+                        <xsl:value-of select="$InDistribucionList/pfx2:ITEM/pfx2:PMG_PO_NUMBER"/>
+                    </ID_ORDEN_COMPRA>
+                    <ID_ARTICULO>
+                        <xsl:value-of select="$Get_id_Art_Suc/resultSet/Record[1]/IDArticulo"/>
+                    </ID_ARTICULO>
+                    <ID_SUCURSAL>
+                        <xsl:value-of select="$Get_id_Art_Suc/resultSet/Record[1]/IDSucursal"/>
+                    </ID_SUCURSAL>
+                    <FECHA_PEDIDO_CAT>
+                        <xsl:value-of select="tib:parse-dateTime('yyyy-MM-dd HH:mm:ss',$InDistribucionList/pfx2:ITEM/pfx2:PMG_RELEASE_DATE)"/>
+                    </FECHA_PEDIDO_CAT>
+                    <xsl:choose>
+                        <xsl:when test="string-length($InDistribucionList/pfx2:ITEM/pfx2:PMG_SELL_QTY)>0">
+                            <CANTIDAD>
+                                <xsl:value-of select="$InDistribucionList/pfx2:ITEM/pfx2:PMG_SELL_QTY"/>
+                            </CANTIDAD>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <CANTIDAD>
+                                <xsl:value-of select="0"/>
+                            </CANTIDAD>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

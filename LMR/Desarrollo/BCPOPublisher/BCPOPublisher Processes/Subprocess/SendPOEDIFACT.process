@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" xmlns:pfx7="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:pfx="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://www.tibco.com/ns/Foresight/2010/20" xmlns:pfx4="http://xmlns.heb.com/ei/PURCHASEORDER_EDI_INFORMATION_COMPLETED" xmlns:pfx5="http://www.heb.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/ns/ax/bc/EDI/2002/10/aeschema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://www.tibco.com/ns/ax/bc/EDI/2002/10/nonAeschema" xmlns:ns5="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns7="http://xmlns.heb.com/ei/BITACORA_INFORMATION" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema">
+    <xsd:import namespace="http://www.tibco.com/ns/Foresight/2010/20"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_EDI_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_EDI_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://www.heb.com" schemaLocation="/Shared Resources/Schema Definitions/Custom/D96_A_ORDERS_SCHEMA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORARESUMENOC.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_EDI_INFORMATION_COMPLETED.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/Foresight/2010/20" schemaLocation="/BCSchemas/EDIFACT/EDI/Outbound/D96A/T-ORDERS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <pd:name>BCPOPublisher Processes/Subprocess/SendPOEDIFACT.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Arguments">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Qualifier" type="xsd:string"/>
+                    <xsd:element name="ID" type="xsd:string"/>
+                    <xsd:element name="tpName" type="xsd:string"/>
+                    <xsd:element ref="pfx2:MSG_CONTAINER"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>133</pd:startX>
+    <pd:startY>169</pd:startY>
+    <pd:returnBindings>
+        <Estatus>
+            <xsl:value-of select="$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:statusMsg"/>
+        </Estatus>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Estatus" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>773</pd:endX>
+    <pd:endY>167</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1273730000853</pd:targetNamespace>
+    <pd:activity name="Bitacora Detalle">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>685</pd:x>
+        <pd:y>166</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/InsertBitacoraDet.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns7:MSG_CONTAINER>
+                <ns7:Body>
+                    <ns7:BITACORA>
+                        <ns7:PMG_PO_NUMBER>
+                            <xsl:value-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_PO_NUMBER"/>
+                        </ns7:PMG_PO_NUMBER>
+                        <ns7:OC_CREATED>
+                            <xsl:value-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_ENTRY_DATE"/>
+                        </ns7:OC_CREATED>
+                        <ns7:RECEIVER_ADDRESS>
+                            <xsl:value-of select="concat(&#xA;&#x9;$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:envelopeInfo/ns3:interchange/ns3:receiver/ns3:qualifier&#xA;&#x9;,' - '&#xA;&#x9;,$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:envelopeInfo/ns3:interchange/ns3:receiver/ns3:ID&#xA;)"/>
+                        </ns7:RECEIVER_ADDRESS>
+                        <xsl:if test="$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:controlNumInfo/ns3:interchange">
+                            <ns7:CONTROL_NUMBER>
+                                <xsl:value-of select="$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:controlNumInfo/ns3:interchange"/>
+                            </ns7:CONTROL_NUMBER>
+                        </xsl:if>
+                        <ns7:STANDARD_ID>
+                            <xsl:value-of select="concat($Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:standardID, ' - ', $Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:body/ns6:notificationResult/tp[1]/tpName)"/>
+                        </ns7:STANDARD_ID>
+                        <ns7:OPERATION_ID>
+                            <xsl:value-of select="concat($Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:operationID, '/', $Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:txName)"/>
+                        </ns7:OPERATION_ID>
+                        <ns7:TRANSACTION_ID>
+                            <xsl:value-of select="$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:transactionID"/>
+                        </ns7:TRANSACTION_ID>
+                        <ns7:STATUS_CODE>
+                            <xsl:value-of select="concat($Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:statusCode, ' - ', $Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:body/ns6:notificationResult/tp[1]/statusCode)"/>
+                        </ns7:STATUS_CODE>
+                        <ns7:STATUS_MSG>
+                            <xsl:value-of select="concat($Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:statusMsg, ' - ', $Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:body/ns6:notificationResult/tp[1]/statusMsg)"/>
+                        </ns7:STATUS_MSG>
+                    </ns7:BITACORA>
+                </ns7:Body>
+            </ns7:MSG_CONTAINER>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="PO to ORDERS">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>468</pd:x>
+        <pd:y>166</pd:y>
+        <config>
+            <element ref="pfx3:T-ORDERS"/>
+        </config>
+        <pd:inputBindings>
+            <pfx3:T-ORDERS>
+                <pfx3:S-UNH_1>
+                    <pfx3:E-0062_1_01>
+                        <xsl:value-of select="&quot;-999&quot;"/>
+                    </pfx3:E-0062_1_01>
+                    <pfx3:C-S009_1_02>
+                        <pfx3:E-0065_1_02.01>
+                            <xsl:value-of select="&quot;ORDERS&quot;"/>
+                        </pfx3:E-0065_1_02.01>
+                        <pfx3:E-0052_1_02.02>
+                            <xsl:value-of select="&quot;D&quot;"/>
+                        </pfx3:E-0052_1_02.02>
+                        <pfx3:E-0054_1_02.03>
+                            <xsl:value-of select="&quot;96A&quot;"/>
+                        </pfx3:E-0054_1_02.03>
+                        <pfx3:E-0051_1_02.04>
+                            <xsl:value-of select="&quot;EN&quot;"/>
+                        </pfx3:E-0051_1_02.04>
+                    </pfx3:C-S009_1_02>
+                </pfx3:S-UNH_1>
+                <pfx3:S-BGM_2>
+                    <pfx3:C-C002_2_01>
+                        <pfx3:E-1001_2_01.01>
+                            <xsl:value-of select="&quot;220&quot;"/>
+                        </pfx3:E-1001_2_01.01>
+                        <pfx3:E-3055_2_01.03>
+                            <xsl:value-of select="&quot;9&quot;"/>
+                        </pfx3:E-3055_2_01.03>
+                    </pfx3:C-C002_2_01>
+                    <pfx3:E-1004_2_02>
+                        <xsl:copy-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_PO_NUMBER"/>
+                    </pfx3:E-1004_2_02>
+                    <pfx3:E-1225_2_03>
+                        <xsl:value-of select="'9'"/>
+                    </pfx3:E-1225_2_03>
+                </pfx3:S-BGM_2>
+                <pfx3:S-DTM_3>
+                    <pfx3:C-C507_3_01>
+                        <pfx3:E-2005_3_01.01>
+                            <xsl:value-of select="&quot;137&quot;"/>
+                        </pfx3:E-2005_3_01.01>
+                        <pfx3:E-2380_3_01.02>
+                            <xsl:value-of select="number(tib:format-date('yyyyMMdd', current-date()))"/>
+                        </pfx3:E-2380_3_01.02>
+                        <pfx3:E-2379_3_01.03>
+                            <xsl:value-of select="&quot;102&quot;"/>
+                        </pfx3:E-2379_3_01.03>
+                    </pfx3:C-C507_3_01>
+                </pfx3:S-DTM_3>
+                <pfx3:S-DTM_3>
+                    <pfx3:C-C507_3_01>
+                        <pfx3:E-2005_3_01.01>
+                            <xsl:value-of select="&quot;2&quot;"/>
+                        </pfx3:E-2005_3_01.01>
+                        <pfx3:E-2380_3_01.02>
+                            <xsl:value-of select="concat(&#xA;&#x9;substring($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_EXP_RCT_DATE, 1, 4),&#xA;&#x9;substring($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_EXP_RCT_DATE, 6, 2),&#xA;&#x9;substring($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_EXP_RCT_DATE, 9, 2)&#xA;)"/>
+                        </pfx3:E-2380_3_01.02>
+                        <pfx3:E-2379_3_01.03>
+                            <xsl:value-of select="&quot;102&quot;"/>
+                        </pfx3:E-2379_3_01.03>
+                    </pfx3:C-C507_3_01>
+                </pfx3:S-DTM_3>
+                <pfx3:S-DTM_3>
+                    <pfx3:C-C507_3_01>
+                        <pfx3:E-2005_3_01.01>
+                            <xsl:value-of select="&quot;61&quot;"/>
+                        </pfx3:E-2005_3_01.01>
+                        <pfx3:E-2380_3_01.02>
+                            <xsl:value-of select="concat(&#xA;&#x9;substring($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_EXP_RCT_DATE, 1, 4),&#xA;&#x9;substring($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_EXP_RCT_DATE, 6, 2),&#xA;&#x9;substring($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_EXP_RCT_DATE, 9, 2)&#xA;)"/>
+                        </pfx3:E-2380_3_01.02>
+                        <pfx3:E-2379_3_01.03>
+                            <xsl:value-of select="&quot;102&quot;"/>
+                        </pfx3:E-2379_3_01.03>
+                    </pfx3:C-C507_3_01>
+                </pfx3:S-DTM_3>
+                <pfx3:L-NAD_12>
+                    <pfx3:S-NAD_12>
+                        <pfx3:E-3035_12_01>
+                            <xsl:value-of select="&quot;BY&quot;"/>
+                        </pfx3:E-3035_12_01>
+                        <pfx3:C-C082_12_02>
+                            <pfx3:E-3039_12_02.01>
+                                <xsl:value-of select="$getOrganizationNumber/IDBodega"/>
+                            </pfx3:E-3039_12_02.01>
+                            <pfx3:E-3055_12_02.03>
+                                <xsl:value-of select="&quot;9&quot;"/>
+                            </pfx3:E-3055_12_02.03>
+                        </pfx3:C-C082_12_02>
+                    </pfx3:S-NAD_12>
+                </pfx3:L-NAD_12>
+                <pfx3:L-NAD_12>
+                    <pfx3:S-NAD_12>
+                        <pfx3:E-3035_12_01>
+                            <xsl:value-of select="&quot;SU&quot;"/>
+                        </pfx3:E-3035_12_01>
+                        <pfx3:C-C082_12_02>
+                            <pfx3:E-3039_12_02.01>
+                                <xsl:value-of select="tib:pad-front($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:VENDOR_NUMBER, 6, '0')"/>
+                            </pfx3:E-3039_12_02.01>
+                            <pfx3:E-3055_12_02.03>
+                                <xsl:value-of select="&quot;9&quot;"/>
+                            </pfx3:E-3055_12_02.03>
+                        </pfx3:C-C082_12_02>
+                    </pfx3:S-NAD_12>
+                </pfx3:L-NAD_12>
+                <xsl:for-each select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER/pfx2:PURCHASE_ORDER_DETAIL/pfx2:ITEM">
+                    <pfx3:L-LIN_94>
+                        <pfx3:S-LIN_94>
+                            <pfx3:E-1082_94_01>
+                                <xsl:value-of select="position()"/>
+                            </pfx3:E-1082_94_01>
+                            <pfx3:C-C212_94_03>
+                                <pfx3:E-7140_94_03.01>
+                                    <xsl:value-of select="if(string-length(current()/pfx2:PRD_LVL_NUMBER) !=0 and string-length(current()/pfx2:PRD_UPC) !=0)&#xA;then  tib:pad-front(current()/pfx2:PRD_UPC, 13, '0')&#xA;else &#xA;if(string-length($getUPC/root/param[PRD_LVL_NUMBER = current()/pfx2:PRD_LVL_NUMBER]/PRD_UPC) !=0)&#xA;then tib:pad-front($getUPC/root/param[PRD_LVL_NUMBER = current()/pfx2:PRD_LVL_NUMBER]/PRD_UPC, 13, '0')&#xA;else '0000000000000'"/>
+                                </pfx3:E-7140_94_03.01>
+                                <pfx3:E-7143_94_03.02>
+                                    <xsl:value-of select="&quot;EN&quot;"/>
+                                </pfx3:E-7143_94_03.02>
+                            </pfx3:C-C212_94_03>
+                        </pfx3:S-LIN_94>
+                        <pfx3:S-PIA_95>
+                            <pfx3:E-4347_95_01>
+                                <xsl:value-of select="&quot;1&quot;"/>
+                            </pfx3:E-4347_95_01>
+                            <pfx3:C-C212_95_02>
+                                <pfx3:E-7140_95_02.01>
+                                    <xsl:copy-of select="pfx2:PRD_LVL_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PRD_LVL_NUMBER"/>
+                                </pfx3:E-7140_95_02.01>
+                                <pfx3:E-7143_95_02.02>
+                                    <xsl:value-of select="&quot;IN&quot;"/>
+                                </pfx3:E-7143_95_02.02>
+                                <pfx3:E-3055_95_02.04>
+                                    <xsl:value-of select="&quot;92&quot;"/>
+                                </pfx3:E-3055_95_02.04>
+                            </pfx3:C-C212_95_02>
+                        </pfx3:S-PIA_95>
+                        <pfx3:S-IMD_96>
+                            <pfx3:E-7077_96_01>
+                                <xsl:value-of select="&quot;A&quot;"/>
+                            </pfx3:E-7077_96_01>
+                            <pfx3:C-C273_96_03>
+                                <pfx3:E-7008_96_03.04>
+                                    <xsl:value-of select="tib:left(translate(translate(upper-case($getItemSize/root/param[tib:trim(PRD_LVL_NUMBER)=tib:trim(current()/pfx2:PRD_LVL_NUMBER)]/PRD_NAME_FULL),$_globalVariables/ns:GlobalVariables/BCPOPublisher/Traslate/FROM_REPLACE, $_globalVariables/ns:GlobalVariables/BCPOPublisher/Traslate/TO_REPLACE), translate(translate(translate(upper-case($getItemSize/root/param[tib:trim(PRD_LVL_NUMBER)=tib:trim(current()/pfx2:PRD_LVL_NUMBER)]/PRD_NAME_FULL),$_globalVariables/ns:GlobalVariables/BCPOPublisher/Traslate/FROM_REPLACE, $_globalVariables/ns:GlobalVariables/BCPOPublisher/Traslate/TO_REPLACE),$_globalVariables/ns:GlobalVariables/BCPOPublisher/Traslate/FROM_CHAR, $_globalVariables/ns:GlobalVariables/BCPOPublisher/Traslate/TO_CHAR), ' ',''), ''), $_globalVariables/ns:GlobalVariables/BCPOPublisher/Traslate/LEN_DESCRI)"/>
+                                </pfx3:E-7008_96_03.04>
+                            </pfx3:C-C273_96_03>
+                        </pfx3:S-IMD_96>
+                        <pfx3:S-QTY_98>
+                            <pfx3:C-C186_98_01>
+                                <pfx3:E-6063_98_01.01>
+                                    <xsl:value-of select="&quot;21&quot;"/>
+                                </pfx3:E-6063_98_01.01>
+                                <pfx3:E-6060_98_01.02>
+                                    <xsl:value-of select="if(current()/pfx2:NUMBER_OF_INNERS=1) then round(number(current()/pfx2:PMG_TOTAL_INNERS)) else round(number(current()/pfx2:PMG_PACK_QTY))"/>
+                                </pfx3:E-6060_98_01.02>
+                                <pfx3:E-6411_98_01.03>
+                                    <xsl:value-of select="&quot;CS&quot;"/>
+                                </pfx3:E-6411_98_01.03>
+                            </pfx3:C-C186_98_01>
+                        </pfx3:S-QTY_98>
+                        <pfx3:L-PRI_119>
+                            <pfx3:S-PRI_119>
+                                <pfx3:C-C509_119_01>
+                                    <pfx3:E-5125_119_01.01>
+                                        <xsl:value-of select="&quot;AAB&quot;"/>
+                                    </pfx3:E-5125_119_01.01>
+                                    <pfx3:E-5118_119_01.02>
+                                        <xsl:value-of select="tib:round-fraction(if(not(number(current()/pfx2:PMG_PACK_COST))=true()) then 0 else current()/pfx2:PMG_PACK_COST,2)"/>
+                                    </pfx3:E-5118_119_01.02>
+                                </pfx3:C-C509_119_01>
+                            </pfx3:S-PRI_119>
+                        </pfx3:L-PRI_119>
+                    </pfx3:L-LIN_94>
+                </xsl:for-each>
+                <pfx3:S-UNS_209>
+                    <pfx3:E-0081_209_01>
+                        <xsl:value-of select="&quot;S&quot;"/>
+                    </pfx3:E-0081_209_01>
+                </pfx3:S-UNS_209>
+                <pfx3:S-MOA_210>
+                    <pfx3:C-C516_210_01>
+                        <pfx3:E-5025_210_01.01>
+                            <xsl:value-of select="&quot;86&quot;"/>
+                        </pfx3:E-5025_210_01.01>
+                        <pfx3:E-5004_210_01.02>
+                            <xsl:copy-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_TOT_PO_COST/@xsi:nil"/>
+                            <xsl:value-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_TOT_PO_COST"/>
+                        </pfx3:E-5004_210_01.02>
+                    </pfx3:C-C516_210_01>
+                </pfx3:S-MOA_210>
+                <pfx3:S-CNT_211>
+                    <pfx3:C-C270_211_01>
+                        <pfx3:E-6069_211_01.01>
+                            <xsl:value-of select="&quot;2&quot;"/>
+                        </pfx3:E-6069_211_01.01>
+                        <pfx3:E-6066_211_01.02>
+                            <xsl:value-of select="count($Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER/pfx2:PURCHASE_ORDER_DETAIL/pfx2:ITEM)"/>
+                        </pfx3:E-6066_211_01.02>
+                    </pfx3:C-C270_211_01>
+                </pfx3:S-CNT_211>
+                <pfx3:S-UNT_216>
+                    <pfx3:E-0074_216_01>
+                        <xsl:value-of select="-999"/>
+                    </pfx3:E-0074_216_01>
+                    <pfx3:E-0062_216_02>
+                        <xsl:value-of select="&quot;-999&quot;"/>
+                    </pfx3:E-0062_216_02>
+                </pfx3:S-UNT_216>
+            </pfx3:T-ORDERS>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send Orders Txn">
+        <pd:type>com.tibco.plugin.ax.bc.B2BSendRequestActivity</pd:type>
+        <pd:resourceType>ae.activities.SendRequest</pd:resourceType>
+        <pd:x>569</pd:x>
+        <pd:y>165</pd:y>
+        <config>
+            <sharedB2BConfig>/Shared Resources/Connections/BusinessConnect/BCServerConfigEDIFACT.bcsc</sharedB2BConfig>
+            <parsePayload>true</parsePayload>
+            <operationName>1/D96A/ORDERS</operationName>
+            <generateTranID>true</generateTranID>
+            <responseWaitTime>86400</responseWaitTime>
+            <asyncRequest>false</asyncRequest>
+            <protocol>EDIFACT</protocol>
+            <discovery_jdbcDbType/>
+        </config>
+        <pd:inputBindings>
+            <ns3:SendRequestInput>
+                <ns3:BCInitiatorRequest>
+                    <ns3:transactionID>
+                        <xsl:value-of select="$_processContext/ns4:ProcessContext/ProcessId"/>
+                    </ns3:transactionID>
+                    <ns3:tpName>
+                        <xsl:value-of select="$Start/Arguments/tpName"/>
+                    </ns3:tpName>
+                    <ns3:perMessage>
+                        <ns3:interchange>
+                            <ns3:sender>
+                                <ns3:qualifier>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/BCPOPublisher/GLB_BC_HOST_QUALIFIER"/>
+                                </ns3:qualifier>
+                                <ns3:ID>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/BCPOPublisher/GLB_BC_HOST"/>
+                                </ns3:ID>
+                            </ns3:sender>
+                            <ns3:receiver>
+                                <ns3:qualifier>
+                                    <xsl:value-of select="$Start/Arguments/Qualifier"/>
+                                </ns3:qualifier>
+                                <ns3:ID>
+                                    <xsl:value-of select="$Start/Arguments/ID"/>
+                                </ns3:ID>
+                            </ns3:receiver>
+                            <ns3:interchangeHeaderInfo/>
+                        </ns3:interchange>
+                        <ns3:group>
+                            <ns3:senderApp>
+                                <ns3:qualifier>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/BCPOPublisher/GLB_BC_HOST_QUALIFIER"/>
+                                </ns3:qualifier>
+                                <ns3:ID>
+                                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/BCPOPublisher/GLB_BC_HOST"/>
+                                </ns3:ID>
+                            </ns3:senderApp>
+                            <ns3:receiverApp>
+                                <ns3:qualifier>
+                                    <xsl:value-of select="$Start/Arguments/Qualifier"/>
+                                </ns3:qualifier>
+                                <ns3:ID>
+                                    <xsl:value-of select="$Start/Arguments/ID"/>
+                                </ns3:ID>
+                            </ns3:receiverApp>
+                        </ns3:group>
+                    </ns3:perMessage>
+                </ns3:BCInitiatorRequest>
+                <ns3:body>
+                    <xsl:copy-of select="$PO-to-ORDERS/pfx3:T-ORDERS"/>
+                </ns3:body>
+            </ns3:SendRequestInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getItemSize">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>341</pd:x>
+        <pd:y>83</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/getItemSize.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER/pfx2:PURCHASE_ORDER_DETAIL"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>574</pd:x>
+        <pd:y>271</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Exception>
+                <Domain>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Domain"/>
+                </Domain>
+                <Deployment>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Deployment"/>
+                </Deployment>
+                <Project>
+                    <xsl:value-of select="$_processContext/ns4:ProcessContext/ProjectName"/>
+                </Project>
+                <EngineName>
+                    <xsl:value-of select="$_processContext/ns4:ProcessContext/EngineName"/>
+                </EngineName>
+                <TimeStamp>
+                    <xsl:value-of select="current-dateTime()"/>
+                </TimeStamp>
+                <Code>
+                    <xsl:value-of select="concat($Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:statusCode, ' - ', $Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:body/ns6:notificationResult/tp[1]/statusCode)"/>
+                </Code>
+                <Message>
+                    <xsl:value-of select="concat($Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:statusMsg, ' - ', $Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:body/ns6:notificationResult/tp[1]/statusMsg)"/>
+                </Message>
+            </Exception>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getUPC">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>342</pd:x>
+        <pd:y>168</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/getUPC.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Arguments/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER/pfx2:PURCHASE_ORDER_DETAIL"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getOrganizationNumber">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>341</pd:x>
+        <pd:y>262</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/getOrganizationNumber.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/Arguments/pfx2:MSG_CONTAINER"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name=".">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>232</pd:x>
+        <pd:y>168</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>PO to ORDERS</pd:from>
+        <pd:to>Send Orders Txn</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Orders Txn</pd:from>
+        <pd:to>Bitacora Detalle</pd:to>
+        <pd:xpathDescription>Success</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:statusMsg = 'OK'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Bitacora Detalle</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getItemSize</pd:from>
+        <pd:to>PO to ORDERS</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send Orders Txn</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:xpathDescription>Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>Bitacora Detalle</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getUPC</pd:from>
+        <pd:to>PO to ORDERS</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>.</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>getItemSize</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>getUPC</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>.</pd:from>
+        <pd:to>getOrganizationNumber</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getOrganizationNumber</pd:from>
+        <pd:to>PO to ORDERS</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

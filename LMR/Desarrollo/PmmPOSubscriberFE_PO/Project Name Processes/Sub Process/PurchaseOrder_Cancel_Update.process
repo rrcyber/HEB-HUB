@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://xmlns.heb.com/ei/TABLE_HEADER" xmlns:pfx4="http://xmlns.heb.com/ei/TABLE_DETAIL" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_HEADER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_HEADER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_DETAIL" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_DETAIL.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/PurchaseOrder_Cancel_Update.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="DeleteData">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx2:PURCHASE_ORDER"/>
+                    <xsd:element name="OCE_ID" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>61</pd:startX>
+    <pd:startY>54</pd:startY>
+    <pd:returnBindings>
+        <NoUpdates>
+            <xsl:value-of select="$JDBC-Update/jdbcUpdateActivityOutput/noOfUpdates"/>
+        </NoUpdates>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="NoUpdates" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>285</pd:endX>
+    <pd:endY>54</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1347575108050</pd:targetNamespace>
+    <pd:activity name="JDBC Update">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>179</pd:x>
+        <pd:y>54</pd:y>
+        <config>
+            <timeout>%%Connections/Database/SXD2010177_VISORFE/GLB_QUERYTIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>UPDATE	tblOrdenCompra_Encabezado
+SET		OCE_Estatus=?,
+		OCE_FechaCancelacion=?
+WHERE	OCE_ID =?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>OCE_Estatus</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>OCE_FechaCancelacion</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>OCE_ID</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD2010177_VISORFE.sharedjdbc</jdbcSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <OCE_Estatus>
+                    <xsl:copy-of select="$Start/DeleteData/pfx2:PURCHASE_ORDER/pfx2:PMG_STAT_CODE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/DeleteData/pfx2:PURCHASE_ORDER/pfx2:PMG_STAT_CODE"/>
+                </OCE_Estatus>
+                <OCE_FechaCancelacion>
+                    <xsl:copy-of select="$Start/DeleteData/pfx2:PURCHASE_ORDER/pfx2:PMG_CNCL_BY_DATE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/DeleteData/pfx2:PURCHASE_ORDER/pfx2:PMG_CNCL_BY_DATE"/>
+                </OCE_FechaCancelacion>
+                <OCE_ID>
+                    <xsl:value-of select="$Start/DeleteData/OCE_ID"/>
+                </OCE_ID>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC Update</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Update</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx3="http://xmlns.heb.com/ei/BITACORA_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORARESUMENOC.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/BITACORA_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_INFORMATION_SOAP.xsd"/>
+    <pd:name>BCPOPublisher Processes/Subprocess/UpdateBitacoraEnvio.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:MSG_CONTAINER"/>
+    <pd:startX>70</pd:startX>
+    <pd:startY>59</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>358</pd:endX>
+    <pd:endY>61</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx2:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1375286674284</pd:targetNamespace>
+    <pd:activity name="Update BitacoraEnvioDetalle">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>210</pd:x>
+        <pd:y>67</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE SC_EDI_BitacoraEnvioDetalle SET
+		FECHA_ENVIO_GXS_PRV = CURRENT_TIMESTAMP,
+		FECHA_RECEPCION_PRV = ?,
+WHERE	CONTROL_NUMBER = ?
+AND PMG_PO_NUMBER = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>FECHA_RECEPCION_PRV</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>CONTROL_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>PMG_PO_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <FECHA_RECEPCION_PRV>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:BITACORA/pfx3:DATE_RECEPTION_VND)">
+                            <xsl:value-of select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:BITACORA/pfx3:DATE_RECEPTION_VND"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </FECHA_RECEPCION_PRV>
+                <CONTROL_NUMBER>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:BITACORA/pfx3:CONTROL_NUMBER)">
+                            <xsl:value-of select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:BITACORA/pfx3:CONTROL_NUMBER"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </CONTROL_NUMBER>
+                <PMG_PO_NUMBER>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:BITACORA/pfx3:PMG_PO_NUMBER)">
+                            <xsl:value-of select="$Start/pfx3:MSG_CONTAINER/pfx3:Body/pfx3:BITACORA/pfx3:PMG_PO_NUMBER"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PMG_PO_NUMBER>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Update BitacoraEnvioDetalle</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update BitacoraEnvioDetalle</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

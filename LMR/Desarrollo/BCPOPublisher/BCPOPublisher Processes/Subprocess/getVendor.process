@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PROVEEDORES.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PROVEEDOR.xsd" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx3="http://xmlns.heb.com/ei/VENDOR_INFORMATION" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://xmlns.heb.com/ei/VENDOR_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/VENDOR_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PROVEEDOR.xsd"/>
+    <pd:name>BCPOPublisher Processes/Subprocess/getVendor.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="VENDOR_NUMBER" type="xsd:string"/>
+    </pd:startType>
+    <pd:startX>206</pd:startX>
+    <pd:startY>77</pd:startY>
+    <pd:returnBindings>
+        <xsl:copy-of select="$Vendor/pfx3:MSG_CONTAINER"/>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx3:MSG_CONTAINER"/>
+    <pd:endX>594</pd:endX>
+    <pd:endY>76</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1374180997862</pd:targetNamespace>
+    <pd:activity name="getVendorDB">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>319</pd:x>
+        <pd:y>76</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/BDCMP/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT ProvID, Estatus, Envio, Formato, Calificador, CommandID, VAN, EDIEmail
+FROM SC_EDI_Proveedor
+WHERE ProvID = ? AND Estatus = 'ACTIVO' AND Envio = 'ACTIVO'
+ORDER BY ProvID</statement>
+            <wizardData/>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>VENDOR_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>ProvID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Estatus</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Envio</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Formato</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>Calificador</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>CommandID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>VAN</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>EDIEmail</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <VENDOR_NUMBER>
+                    <xsl:value-of select="$Start/VENDOR_NUMBER"/>
+                </VENDOR_NUMBER>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Vendor">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>456</pd:x>
+        <pd:y>77</pd:y>
+        <config>
+            <element ref="pfx3:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <pfx3:MSG_CONTAINER>
+                <pfx3:Body>
+                    <xsl:for-each select="$getVendorDB/resultSet/Record">
+                        <pfx3:VENDOR>
+                            <pfx3:VENDOR_NUMBER>
+                                <xsl:value-of select="ProvID"/>
+                            </pfx3:VENDOR_NUMBER>
+                            <pfx3:EDI_STATUS>
+                                <xsl:value-of select="Estatus"/>
+                            </pfx3:EDI_STATUS>
+                            <pfx3:EDI_STATUS_SEND>
+                                <xsl:value-of select="Envio"/>
+                            </pfx3:EDI_STATUS_SEND>
+                            <pfx3:EDI_FORMAT>
+                                <xsl:value-of select="Formato"/>
+                            </pfx3:EDI_FORMAT>
+                            <pfx3:EDI_QUALIFIER>
+                                <xsl:value-of select="Calificador"/>
+                            </pfx3:EDI_QUALIFIER>
+                            <pfx3:EDI_COMMAND_ID>
+                                <xsl:value-of select="CommandID"/>
+                            </pfx3:EDI_COMMAND_ID>
+                            <pfx3:EDI_VAN_OR_NET>
+                                <xsl:value-of select="VAN"/>
+                            </pfx3:EDI_VAN_OR_NET>
+                            <pfx3:EDI_EMAIL>
+                                <xsl:value-of select="EDIEmail"/>
+                            </pfx3:EDI_EMAIL>
+                        </pfx3:VENDOR>
+                    </xsl:for-each>
+                </pfx3:Body>
+            </pfx3:MSG_CONTAINER>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>getVendorDB</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Vendor</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getVendorDB</pd:from>
+        <pd:to>Vendor</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

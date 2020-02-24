@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx3="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" xmlns:pfx4="http://xmlns.heb.com/ei/PORECEPTION_HEB_INFORMATION" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_HEB_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_HEB_INFORMATION_SOAP.xsd"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Sub Process/Reproceso/SendReprocesoRecibo.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx4:MSG_CONTAINER"/>
+    <pd:startX>154</pd:startX>
+    <pd:startY>113</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>606</pd:endX>
+    <pd:endY>114</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1463505518265</pd:targetNamespace>
+    <pd:activity name="JMS Queue Sender Reproceso">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>454</pd:x>
+        <pd:y>121</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_REPROCESAR_RECIBO_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ApplicationProperties/>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMSConnection.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx4:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <ns1:ActivityInput>
+                <Body>
+                    <xsl:copy-of select="$Start/pfx4:MSG_CONTAINER"/>
+                </Body>
+            </ns1:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="REGISTROINTEGRACIONES_HEB2B NivelDetalle">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>302</pd:x>
+        <pd:y>120</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement> insert into REGISTROINTEGRACIONES_HEB2B(TablaDestino, Integracion, Llave1,Llave2,Llave3,Llave4,Llave5,Descripcion, EAI_PROCESSFLAG, Fecha)
+values ('OrdenCompra',?, ?, ?, ?, ?, ?,?,  'S', GetDate())</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>Integracion</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Llave1</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Llave2</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Llave3</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Llave4</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Llave5</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>Descripcion</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <batchUpdate>true</batchUpdate>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <Record>
+                    <Integracion>
+                        <xsl:value-of select="'Heb2bOrdenesCompraSuscriber'"/>
+                    </Integracion>
+                    <Llave1>
+                        <xsl:copy-of select="$Start/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:PMG_PO_NUMBER/@xsi:nil"/>
+                        <xsl:value-of select="$Start/pfx4:MSG_CONTAINER/pfx4:Body/pfx4:PURCHASE_ORDER[1]/pfx4:PMG_PO_NUMBER"/>
+                    </Llave1>
+                    <Llave2>
+                        <xsl:value-of select="''"/>
+                    </Llave2>
+                    <Llave3>
+                        <xsl:value-of select="''"/>
+                    </Llave3>
+                    <Llave4>
+                        <xsl:value-of select="''"/>
+                    </Llave4>
+                    <Llave5>
+                        <xsl:value-of select="''"/>
+                    </Llave5>
+                    <Descripcion>
+                        <xsl:value-of select="'ERROR, La Orden de Compra definida en el campo Llave1 = IdOrdenCompra no existe en HEBusiness'"/>
+                    </Descripcion>
+                </Record>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>REGISTROINTEGRACIONES_HEB2B NivelDetalle</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Sender Reproceso</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Straight</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>REGISTROINTEGRACIONES_HEB2B NivelDetalle</pd:from>
+        <pd:to>JMS Queue Sender Reproceso</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

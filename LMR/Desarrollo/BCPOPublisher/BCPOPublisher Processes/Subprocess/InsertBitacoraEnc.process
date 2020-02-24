@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/BITACORA_INFORMATION" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/BITACORA_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORA_INFORMATION_SOAP.xsd"/>
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION"/>
+    <pd:name>BCPOPublisher Processes/Subprocess/InsertBitacoraEnc.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:MSG_CONTAINER"/>
+    <pd:startX>121</pd:startX>
+    <pd:startY>102</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>400</pd:endX>
+    <pd:endY>98</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1375286674284</pd:targetNamespace>
+    <pd:activity name="Update BitacoraEnvioEncabezado">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>226</pd:x>
+        <pd:y>110</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP.sharedjdbc</jdbcSharedConfig>
+            <statement>UPDATE SC_EDI_BitacoraEnvioEncabezado 
+SET DOWNLOAD_DATE = CURRENT_TIMESTAMP
+WHERE PMG_PO_NUMBER = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PMG_PO_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <PMG_PO_NUMBER>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:BITACORA/pfx2:PMG_PO_NUMBER)">
+                            <xsl:value-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:BITACORA/pfx2:PMG_PO_NUMBER"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PMG_PO_NUMBER>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Insert BitacoraEnvioEncabezado">
+        <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+        <pd:x>396</pd:x>
+        <pd:y>200</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP.sharedjdbc</jdbcSharedConfig>
+            <statement>INSERT INTO SC_EDI_BitacoraEnvioEncabezado 
+	(PMG_PO_NUMBER, 	DOWNLOAD_DATE, OC_CREATED) 
+VALUES (?, CURRENT_TIMESTAMP, ?)</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PMG_PO_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>OC_CREATED</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+        </config>
+        <pd:inputBindings>
+            <jdbcUpdateActivityInput>
+                <PMG_PO_NUMBER>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:BITACORA/pfx2:PMG_PO_NUMBER)">
+                            <xsl:value-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:BITACORA/pfx2:PMG_PO_NUMBER"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </PMG_PO_NUMBER>
+                <OC_CREATED>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:BITACORA/pfx2:OC_CREATED)">
+                            <xsl:value-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:BITACORA/pfx2:OC_CREATED"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </OC_CREATED>
+            </jdbcUpdateActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Update BitacoraEnvioEncabezado</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update BitacoraEnvioEncabezado</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>UpdateRows &gt; 0</pd:xpathDescription>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Update BitacoraEnvioEncabezado</pd:from>
+        <pd:to>Insert BitacoraEnvioEncabezado</pd:to>
+        <pd:xpathDescription>Insert</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Update-BitacoraEnvioEncabezado/jdbcUpdateActivityOutput/noOfUpdates =0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Insert BitacoraEnvioEncabezado</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

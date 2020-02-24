@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/GetEncabezado.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <group>
+            <pfx2:PURCHASE_ORDER>
+                <pfx2:NUMEROORDEN>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER"/>
+                </pfx2:NUMEROORDEN>
+                <pfx2:IDPROVEEDOR>
+                    <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDPROVEEDOR"/>
+                </pfx2:IDPROVEEDOR>
+                <pfx2:IDSUCURSAL>
+                    <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDSUCURSAL"/>
+                </pfx2:IDSUCURSAL>
+                <pfx2:IDESTATUS>
+                    <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDESTATUSORDENCOMPRA"/>
+                </pfx2:IDESTATUS>
+                <pfx2:IDMETODODISTRIBUCION>
+                    <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDMETODODISTRIBUCION"/>
+                </pfx2:IDMETODODISTRIBUCION>
+                <pfx2:FECHAORDEN>
+                    <xsl:value-of select="tib:left($Start/pfx:PURCHASE_ORDER/pfx:PMG_RELEASE_DATE,10)"/>
+                </pfx2:FECHAORDEN>
+                <pfx2:FECHAENTREGA>
+                    <xsl:value-of select="tib:left($Start/pfx:PURCHASE_ORDER/pfx:PMG_EXP_RCT_DATE,10)"/>
+                </pfx2:FECHAENTREGA>
+                <pfx2:FECHACANCELACION>
+                    <xsl:value-of select="tib:left($Start/pfx:PURCHASE_ORDER/pfx:PMG_CNCL_BY_DATE,10)"/>
+                </pfx2:FECHACANCELACION>
+                <pfx2:COMENTARIOS>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NOTES/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NOTES"/>
+                </pfx2:COMENTARIOS>
+                <pfx2:COMPRADOR>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:USR_TECH_KEY/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:USR_TECH_KEY"/>
+                </pfx2:COMPRADOR>
+            </pfx2:PURCHASE_ORDER>
+            <xsl:choose>
+                <xsl:when test="$ValidateErrors/root/IDPROVEEDOR = 'ERROR'">
+                    <IDPROVEEDOR>
+                        <xsl:value-of select="$ValidateErrors/root/IDPROVEEDOR"/>
+                    </IDPROVEEDOR>
+                </xsl:when>
+                <xsl:otherwise>
+                    <IDPROVEEDOR>
+                        <xsl:value-of select="''"/>
+                    </IDPROVEEDOR>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="$ValidateErrors/root/IDSUCURSAL = 'ERROR'">
+                    <IDSUCURSAL>
+                        <xsl:value-of select="$ValidateErrors/root/IDSUCURSAL"/>
+                    </IDSUCURSAL>
+                </xsl:when>
+                <xsl:otherwise>
+                    <IDSUCURSAL>
+                        <xsl:value-of select="''"/>
+                    </IDSUCURSAL>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="$ValidateErrors/root/IDESTATUS = 'ERROR'">
+                    <IDESTATUS>
+                        <xsl:value-of select="$ValidateErrors/root/IDESTATUS"/>
+                    </IDESTATUS>
+                </xsl:when>
+                <xsl:otherwise>
+                    <IDESTATUS>
+                        <xsl:value-of select="''"/>
+                    </IDESTATUS>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="$ValidateErrors/root/IDMETODODISTRIBUCION = 'ERROR'">
+                    <IDMETODODISTRIBUCION>
+                        <xsl:value-of select="$ValidateErrors/root/IDMETODODISTRIBUCION"/>
+                    </IDMETODODISTRIBUCION>
+                </xsl:when>
+                <xsl:otherwise>
+                    <IDMETODODISTRIBUCION>
+                        <xsl:value-of select="''"/>
+                    </IDMETODODISTRIBUCION>
+                </xsl:otherwise>
+            </xsl:choose>
+            <Reproceso>
+                <xsl:value-of select="$Reproceso/Reproceso"/>
+            </Reproceso>
+        </group>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="group">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx2:PURCHASE_ORDER"/>
+                    <xsd:element name="IDPROVEEDOR" type="xsd:string"/>
+                    <xsd:element name="IDSUCURSAL" type="xsd:string"/>
+                    <xsd:element name="IDESTATUS" type="xsd:string"/>
+                    <xsd:element name="IDMETODODISTRIBUCION" type="xsd:string"/>
+                    <xsd:element name="Reproceso" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>512</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Reproceso>
+            <xsd:element name="Reproceso" type="xsd:int"/>
+        </Reproceso>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1472745509408</pd:targetNamespace>
+    <pd:activity name="JDBC-GetIEncabezado">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>243</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_HEBB/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/JDBC_HEBB/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT ID as IDSUCURSAL,
+(SELECT ID FROM PROVEEDOR WITH(nolock) WHERE IDPMM = ?) as IDPROVEEDOR,
+(SELECT ID FROM ESTATUSORDENCOMPRA WITH(nolock) WHERE IDPMM =?) as IDESTATUSORDENCOMPRA,
+(SELECT ID FROM METODODISTRIBUCION WITH(nolock) WHERE IDPMM =?) as IDMETODODISTRIBUCION
+FROM SUCURSAL WITH(nolock)
+WHERE IDPMM = ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_HEBB.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PROVEEDOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>ESTATUSORDENCOMPRA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>METODODISTRIBUCION</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>SUCURSAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>IDSUCURSAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>IDPROVEEDOR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>IDESTATUSORDENCOMPRA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>IDMETODODISTRIBUCION</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <PROVEEDOR>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:VENDOR_NUMBER"/>
+                </PROVEEDOR>
+                <ESTATUSORDENCOMPRA>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_STAT_CODE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_STAT_CODE"/>
+                </ESTATUSORDENCOMPRA>
+                <METODODISTRIBUCION>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:DMT_CODE/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:DMT_CODE"/>
+                </METODODISTRIBUCION>
+                <SUCURSAL>
+                    <xsl:value-of select="$Map-Data/IDBodega"/>
+                </SUCURSAL>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ValidateErrors">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>369</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="IDPROVEEDOR" type="xsd:string"/>
+                            <xsd:element name="IDSUCURSAL" type="xsd:string"/>
+                            <xsd:element name="IDESTATUS" type="xsd:string"/>
+                            <xsd:element name="IDMETODODISTRIBUCION" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:choose>
+                    <xsl:when test="string-length($JDBC-GetIEncabezado/resultSet/Record[1]/IDPROVEEDOR) > 0">
+                        <IDPROVEEDOR>
+                            <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDPROVEEDOR"/>
+                        </IDPROVEEDOR>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <IDPROVEEDOR>
+                            <xsl:value-of select="'ERROR'"/>
+                        </IDPROVEEDOR>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:choose>
+                    <xsl:when test="string-length($JDBC-GetIEncabezado/resultSet/Record[1]/IDSUCURSAL) > 0">
+                        <IDSUCURSAL>
+                            <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDSUCURSAL"/>
+                        </IDSUCURSAL>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <IDSUCURSAL>
+                            <xsl:value-of select="'ERROR'"/>
+                        </IDSUCURSAL>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:choose>
+                    <xsl:when test="string-length($JDBC-GetIEncabezado/resultSet/Record[1]/IDESTATUSORDENCOMPRA)!=0">
+                        <IDESTATUS>
+                            <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDESTATUSORDENCOMPRA"/>
+                        </IDESTATUS>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <IDESTATUS>
+                            <xsl:value-of select="'ERROR'"/>
+                        </IDESTATUS>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:choose>
+                    <xsl:when test="string-length($JDBC-GetIEncabezado/resultSet/Record[1]/IDMETODODISTRIBUCION) > 0">
+                        <IDMETODODISTRIBUCION>
+                            <xsl:value-of select="$JDBC-GetIEncabezado/resultSet/Record[1]/IDMETODODISTRIBUCION"/>
+                        </IDMETODODISTRIBUCION>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <IDMETODODISTRIBUCION>
+                            <xsl:value-of select="'ERROR'"/>
+                        </IDMETODODISTRIBUCION>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Reproceso = 1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>370</pd:x>
+        <pd:y>140</pd:y>
+        <config>
+            <variableName>Reproceso</variableName>
+        </config>
+        <pd:inputBindings>
+            <Reproceso>
+                <xsl:value-of select="1"/>
+            </Reproceso>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Inicializar = 0">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>127</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <variableName>Reproceso</variableName>
+        </config>
+        <pd:inputBindings>
+            <Reproceso>
+                <xsl:value-of select="0"/>
+            </Reproceso>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Get_BodegaID_LMR">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>129</pd:x>
+        <pd:y>141</pd:y>
+        <config>
+            <timeout>%%Connections/Database/JDBC_BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/JDBC_BDCMP/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>true</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC_BDCMP.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT BodegaID_LMR
+FROM SC_LMR_RelacionSeparacionOrdenes 
+WHERE Orden_Original = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>ORDEN_COMPRA</parameterName>
+                    <dataType>INTEGER</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>BodegaID_LMR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>smallint</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <ORDEN_COMPRA>
+                    <xsl:copy-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PMG_PO_NUMBER"/>
+                </ORDEN_COMPRA>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>243</pd:x>
+        <pd:y>140</pd:y>
+        <config>
+            <element>
+                <xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" name="IDBodega" type="xsd:string"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <xsl:choose xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <xsl:when test="exists($JDBC-Get_BodegaID_LMR/resultSet/Record/BodegaID_LMR)">
+                    <IDBodega>
+                        <xsl:value-of select="$JDBC-Get_BodegaID_LMR/resultSet/Record[1]/BodegaID_LMR"/>
+                    </IDBodega>
+                </xsl:when>
+                <xsl:otherwise>
+                    <IDBodega>
+                        <xsl:value-of select="$Start/pfx:PURCHASE_ORDER/pfx:PRIM_ORG_LVL_NUMBER"/>
+                    </IDBodega>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Inicializar = 0</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC-GetIEncabezado</pd:from>
+        <pd:to>ValidateErrors</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ValidateErrors</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ValidateErrors</pd:from>
+        <pd:to>Reproceso = 1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$ValidateErrors/root/IDPROVEEDOR = 'ERROR' or $ValidateErrors/root/IDSUCURSAL= 'ERROR'  or $ValidateErrors/root/IDESTATUS= 'ERROR'  or $ValidateErrors/root/IDMETODODISTRIBUCION= 'ERROR'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Reproceso = 1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Inicializar = 0</pd:from>
+        <pd:to>JDBC Get_BodegaID_LMR</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Get_BodegaID_LMR</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>JDBC-GetIEncabezado</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

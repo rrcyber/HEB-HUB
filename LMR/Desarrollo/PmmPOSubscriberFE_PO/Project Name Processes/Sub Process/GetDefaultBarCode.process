@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/tblOrdenCompra_Detalle" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/TABLE_DETAIL" xmlns:pfx3="http://www.tibco.com/schemas/PmmPOSubscriberFE/Shared Resources/Schema Definitions/Custom/FIXUPCData.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/tblOrdenCompra_Detalle" schemaLocation="/Shared Resources/Schema Definitions/Custom/tblOrdenCompra_Detalle.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_DETAIL" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_DETAIL.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/PmmPOSubscriberFE/Shared Resources/Schema Definitions/Custom/FIXUPCData.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/FIXUPCData.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/GetDefaultBarCode.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:FIXUPCData"/>
+    <pd:startX>80</pd:startX>
+    <pd:startY>49</pd:startY>
+    <pd:returnBindings>
+        <pfx3:FIXUPCData>
+            <pfx3:PRD_LVL_NUMBER>
+                <xsl:copy-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER/@xsi:nil"/>
+                <xsl:value-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER"/>
+            </pfx3:PRD_LVL_NUMBER>
+            <pfx3:PRD_UPC>
+                <xsl:value-of select="if($Start/pfx3:FIXUPCData/pfx3:PRD_UPC/@xsi:nil =0 or&#xA;&#x9;$Start/pfx3:FIXUPCData/pfx3:PRD_UPC='')&#xA;then&#x9;if(count($JDBC_GetDefaultUPC/resultSet/Record)> 0)&#xA;&#x9;&#x9;then &#x9;string($JDBC_GetDefaultUPC/resultSet/Record[1]/PRD_UPC )&#xA;&#x9;&#x9;else&#x9;if(count($JDBC_GetHistoricalUPC/resultSet/Record)>0 )&#xA;&#x9;&#x9;&#x9;&#x9;then string($JDBC_GetHistoricalUPC/resultSet/Record[1]/PRD_UPC)&#xA;&#x9;&#x9;&#x9;&#x9;else $Start/pfx3:FIXUPCData/pfx3:PRD_UPC&#xA;else $Start/pfx3:FIXUPCData/pfx3:PRD_UPC"/>
+            </pfx3:PRD_UPC>
+        </pfx3:FIXUPCData>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx3:FIXUPCData"/>
+    <pd:endX>489</pd:endX>
+    <pd:endY>49</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1422984375028</pd:targetNamespace>
+    <pd:activity name="JDBC_GetDefaultUPC">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>82</pd:x>
+        <pd:y>210</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/PMM/MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-PMM.sharedjdbc</jdbcSharedConfig>
+            <statement>select  a.prd_lvl_number,
+        a.prd_upc,
+        a.priority
+from  (
+  SELECT  mst.prd_lvl_number,
+          upc.prd_upc,
+          '1' as priority        
+  FROM    PMM.prdmstee mst inner join
+          PMM.prdupcee upc on mst.prd_lvl_child = upc.prd_lvl_child
+  WHERE   mst.prd_lvl_number = ? and
+          upc.active_flag='T' and
+          upc.vpc_primary_flag='T'
+  union 
+  SELECT  mst.prd_lvl_number,
+          upc.prd_upc,
+          '2' as priority
+  FROM    PMM.prdmstee mst inner join
+          PMM.prdupcee upc on mst.prd_lvl_child = upc.prd_lvl_child
+  WHERE   mst.prd_lvl_number = ? and
+          upc.active_flag='T' and
+          upc.prd_primary_flag='T'
+)a 
+order by a.priority</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>prd_lvl_number</parameterName>
+                    <dataType>NUMERIC</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>prd_lvl_number1</parameterName>
+                    <dataType>NUMERIC</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRD_UPC</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRIORITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <prd_lvl_number>
+                    <xsl:copy-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER"/>
+                </prd_lvl_number>
+                <prd_lvl_number1>
+                    <xsl:copy-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER"/>
+                </prd_lvl_number1>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC_GetHistoricalUPC">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>486</pd:x>
+        <pd:y>213</pd:y>
+        <config>
+            <timeout>%%Connections/Database/PMM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/PMM/MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>SELECT  a.prd_lvl_number,
+        a.prd_upc,
+        a.audit_date,
+        a.priority        
+from (
+    SELECT  mst.prd_lvl_number,
+            upc.prd_upc,
+            upc.audit_date,
+            1 as priority 
+    FROM    PMM.prdmstee mst inner join
+            PMM.prdupcah upc on mst.prd_lvl_child = upc.prd_lvl_child
+    WHERE   mst.prd_lvl_number = ? and
+            upc.active_flag='T' and
+            upc.vpc_primary_flag='T' 
+    union    
+    SELECT  mst.prd_lvl_number,
+            upc.prd_upc,
+            upc.audit_date,
+            2 as priority
+    FROM    PMM.prdmstee mst inner join
+            PMM.prdupcah upc on mst.prd_lvl_child = upc.prd_lvl_child
+    WHERE   mst.prd_lvl_number = ? and
+            upc.active_flag='T' and
+            upc.prd_primary_flag='T'
+ 
+  )a
+ORDER BY A.PRIORITY, A.AUDIT_DATE DESC</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-PMM.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>prd_lvl_number</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>prd_lvl_number1</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>PRD_LVL_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRD_UPC</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>AUDIT_DATE</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>date</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>PRIORITY</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>2</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>number</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <prd_lvl_number>
+                    <xsl:copy-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER"/>
+                </prd_lvl_number>
+                <prd_lvl_number1>
+                    <xsl:copy-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx3:FIXUPCData/pfx3:PRD_LVL_NUMBER"/>
+                </prd_lvl_number1>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC_GetDefaultUPC</pd:to>
+        <pd:xpathDescription>Si el código de barras viene vacio</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777012</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx3:FIXUPCData/pfx3:PRD_UPC/@xsi:nil =0 or
+$Start/pfx3:FIXUPCData/pfx3:PRD_UPC=''</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetDefaultUPC</pd:from>
+        <pd:to>JDBC_GetHistoricalUPC</pd:to>
+        <pd:xpathDescription>No hay UPC</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_GetDefaultUPC/resultSet/Record)&lt;1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetHistoricalUPC</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetDefaultUPC</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>Hay UPC</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

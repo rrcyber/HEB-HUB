@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PROVEEDORES.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PROVEEDOR.xsd" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:pfx3="http://xmlns.heb.com/ei/VENDOR_INFORMATION" xmlns:pfx4="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType">
+    <xsd:import namespace="http://xmlns.heb.com/ei/VENDOR_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/VENDOR_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/PROVEEDOR.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <pd:name>BCPOPublisher Processes/Subprocess/getUPC.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx4:PURCHASE_ORDER_DETAIL"/>
+    <pd:startX>206</pd:startX>
+    <pd:startY>77</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xsl:copy-of select="$UPC/root/param"/>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="param" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="PRD_LVL_NUMBER" type="xsd:string"/>
+                                <xsd:element name="PRD_UPC" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>548</pd:endX>
+    <pd:endY>77</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1374180997862</pd:targetNamespace>
+    <pd:activity name="UPC">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>442</pd:x>
+        <pd:y>75</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="param" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="PRD_LVL_NUMBER" type="xsd:string"/>
+                                        <xsd:element name="PRD_UPC" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$OCODP/jdbcGeneralActivityOutput/unknownResultset/row">
+                    <param>
+                        <PRD_LVL_NUMBER>
+                            <xsl:value-of select="column[1]/value"/>
+                        </PRD_LVL_NUMBER>
+                        <PRD_UPC>
+                            <xsl:value-of select="column[2]/value"/>
+                        </PRD_UPC>
+                    </param>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="OCODP">
+        <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+        <pd:x>320</pd:x>
+        <pd:y>76</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/BDCMP/GLB_MAX_ROWS%%</maxRows>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP.sharedjdbc</jdbcSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <jdbcGeneralActivityInput>
+                <statement>
+                    <xsl:value-of select="concat('SELECT A.COD_ARTICULO, A.COD_CODIGOPROD FROM ( ',&#xA;&#x9;&#x9;'SELECT COD_ARTICULO, COD_CODIGOPROD, ROW_NUMBER() OVER (PARTITION BY COD_ARTICULO ORDER BY CASE WHEN XXX_ORIGEN = ', &quot;'T'&quot;, ' THEN XXX_ORIGEN END DESC, CASE WHEN XXX_ORIGEN = ', &quot;'F'&quot;, ' THEN COD_FEMOD END DESC) AS ROWNUMBER ',&#xA;&#x9;&#x9;'FROM OCODP WHERE COD_ARTICULO IN(', tib:concat-sequence-format($Start/pfx4:PURCHASE_ORDER_DETAIL/pfx4:ITEM/pfx4:PRD_LVL_NUMBER,',', true()), ') AND COD_TICODPRO = 1) A ', &#xA;&#x9;&#x9;'WHERE A.ROWNUMBER = 1')"/>
+                </statement>
+            </jdbcGeneralActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>UPC</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>OCODP</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>OCODP</pd:from>
+        <pd:to>UPC</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

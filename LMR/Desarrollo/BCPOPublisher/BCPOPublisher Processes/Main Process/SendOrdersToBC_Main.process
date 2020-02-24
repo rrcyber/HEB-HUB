@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/VENDOR_INFORMATION" xmlns:pfx7="http://xmlns.heb.com/ei/BITACORA_INFORMATION" xmlns:pfx="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://www.tibco.com/ns/Foresight/2010/20" xmlns:pfx4="http://xmlns.heb.com/ei/PURCHASEORDER_EDI_INFORMATION_COMPLETED" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns0="www.tibco.com/plugin/Sleep" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/ns/ax/bc/EDI/2002/10/aeschema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" xmlns:ns5="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx31="http://xmlns.heb.com/ei/TRADING_PARTNER_PMM_EDI_CONFIGURATION" xmlns:pfx1="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:pfx21="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Container.xsd">
+    <xsd:import namespace="http://www.tibco.com/ns/Foresight/2010/20"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_EDI_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_EDI_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_EDI_INFORMATION_COMPLETED.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <pd:name>BCPOPublisher Processes/Main Process/SendOrdersToBC_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:MSG_CONTAINER"/>
+    <pd:startX>102</pd:startX>
+    <pd:startY>112</pd:startY>
+    <pd:returnBindings>
+        <Estatus>
+            <xsl:value-of select="if ($Send-ANSI/Estatus = 'OK' or $Send-EDFT/Estatus= 'OK' )&#xA;then 'ok'&#xA;else 'nonAudit'"/>
+        </Estatus>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Estatus" type="xsd:string"/>
+    </pd:endType>
+    <pd:endX>733</pd:endX>
+    <pd:endY>113</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx5:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1273730000853</pd:targetNamespace>
+    <pd:activity name="Send ANSI">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>658</pd:x>
+        <pd:y>176</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/SendPOANSI.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Arguments>
+                <Qualifier>
+                    <xsl:value-of select="$getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR[1]/pfx6:EDI_QUALIFIER"/>
+                </Qualifier>
+                <ID>
+                    <xsl:value-of select="$getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR[1]/pfx6:EDI_COMMAND_ID"/>
+                </ID>
+                <tpName>
+                    <xsl:value-of select="translate(upper-case(tib:trim($getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR[1]/pfx6:EDI_VAN_OR_NET)), ' ', '_')"/>
+                </tpName>
+                <pfx2:MSG_CONTAINER>
+                    <xsl:copy-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Header"/>
+                    <pfx2:Body>
+                        <xsl:for-each select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER">
+                            <pfx2:PURCHASE_ORDER>
+                                <pfx2:PRIM_ORG_LVL_NUMBER>
+                                    <xsl:copy-of select="pfx2:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PRIM_ORG_LVL_NUMBER"/>
+                                </pfx2:PRIM_ORG_LVL_NUMBER>
+                                <pfx2:PMG_PO_NUMBER>
+                                    <xsl:copy-of select="pfx2:PMG_PO_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_PO_NUMBER"/>
+                                </pfx2:PMG_PO_NUMBER>
+                                <pfx2:PMG_STAT_CODE>
+                                    <xsl:copy-of select="pfx2:PMG_STAT_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_STAT_CODE"/>
+                                </pfx2:PMG_STAT_CODE>
+                                <pfx2:VENDOR_NUMBER>
+                                    <xsl:copy-of select="pfx2:VENDOR_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VENDOR_NUMBER"/>
+                                </pfx2:VENDOR_NUMBER>
+                                <pfx2:PMG_RELEASE_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_RELEASE_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_RELEASE_DATE"/>
+                                </pfx2:PMG_RELEASE_DATE>
+                                <pfx2:PMG_ENTRY_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_ENTRY_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_ENTRY_DATE"/>
+                                </pfx2:PMG_ENTRY_DATE>
+                                <pfx2:CURR_CODE>
+                                    <xsl:copy-of select="pfx2:CURR_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:CURR_CODE"/>
+                                </pfx2:CURR_CODE>
+                                <pfx2:PMG_SHORT_CODE>
+                                    <xsl:copy-of select="pfx2:PMG_SHORT_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_SHORT_CODE"/>
+                                </pfx2:PMG_SHORT_CODE>
+                                <pfx2:PMG_USER>
+                                    <xsl:copy-of select="pfx2:PMG_USER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_USER"/>
+                                </pfx2:PMG_USER>
+                                <pfx2:VPC_PO_PROC_TIME>
+                                    <xsl:copy-of select="pfx2:VPC_PO_PROC_TIME/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_PO_PROC_TIME"/>
+                                </pfx2:VPC_PO_PROC_TIME>
+                                <pfx2:VPC_PO_SHIP_TIME>
+                                    <xsl:copy-of select="pfx2:VPC_PO_SHIP_TIME/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_PO_SHIP_TIME"/>
+                                </pfx2:VPC_PO_SHIP_TIME>
+                                <pfx2:PMG_PO_NOTES>
+                                    <xsl:copy-of select="pfx2:PMG_PO_NOTES/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_PO_NOTES"/>
+                                </pfx2:PMG_PO_NOTES>
+                                <pfx2:PMG_RECV_NOTES>
+                                    <xsl:copy-of select="pfx2:PMG_RECV_NOTES/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_RECV_NOTES"/>
+                                </pfx2:PMG_RECV_NOTES>
+                                <pfx2:PMG_CNCL_BY_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_CNCL_BY_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_CNCL_BY_DATE"/>
+                                </pfx2:PMG_CNCL_BY_DATE>
+                                <pfx2:PMG_EXP_RCT_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_EXP_RCT_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_EXP_RCT_DATE"/>
+                                </pfx2:PMG_EXP_RCT_DATE>
+                                <pfx2:VPC_EXT_PAY_DAYS>
+                                    <xsl:copy-of select="pfx2:VPC_EXT_PAY_DAYS/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_EXT_PAY_DAYS"/>
+                                </pfx2:VPC_EXT_PAY_DAYS>
+                                <pfx2:DMT_CODE>
+                                    <xsl:copy-of select="pfx2:DMT_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:DMT_CODE"/>
+                                </pfx2:DMT_CODE>
+                                <pfx2:USR_TECH_KEY>
+                                    <xsl:copy-of select="pfx2:USR_TECH_KEY/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:USR_TECH_KEY"/>
+                                </pfx2:USR_TECH_KEY>
+                                <pfx2:PMG_LAST_CHG_DT>
+                                    <xsl:copy-of select="pfx2:PMG_LAST_CHG_DT/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_LAST_CHG_DT"/>
+                                </pfx2:PMG_LAST_CHG_DT>
+                                <pfx2:VPC_PO_REQUIRED>
+                                    <xsl:copy-of select="pfx2:VPC_PO_REQUIRED/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_PO_REQUIRED"/>
+                                </pfx2:VPC_PO_REQUIRED>
+                                <pfx2:PMG_TOT_PO_COST>
+                                    <xsl:copy-of select="pfx2:PMG_TOT_PO_COST/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_TOT_PO_COST"/>
+                                </pfx2:PMG_TOT_PO_COST>
+                                <pfx2:VENDOR_NAME>
+                                    <xsl:copy-of select="pfx2:VENDOR_NAME/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VENDOR_NAME"/>
+                                </pfx2:VENDOR_NAME>
+                                <pfx2:VPC_TECH_KEY>
+                                    <xsl:copy-of select="pfx2:VPC_TECH_KEY/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_TECH_KEY"/>
+                                </pfx2:VPC_TECH_KEY>
+                                <pfx2:PMG_TOT_CASE_QTY>
+                                    <xsl:copy-of select="pfx2:PMG_TOT_CASE_QTY/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_TOT_CASE_QTY"/>
+                                </pfx2:PMG_TOT_CASE_QTY>
+                                <pfx2:PMG_TYPE_CODE>
+                                    <xsl:copy-of select="pfx2:PMG_TYPE_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_TYPE_CODE"/>
+                                </pfx2:PMG_TYPE_CODE>
+                                <xsl:for-each select="pfx2:PURCHASE_ORDER_DETAIL">
+                                    <pfx2:PURCHASE_ORDER_DETAIL>
+                                        <xsl:for-each-group select="pfx2:ITEM" group-by="pfx2:PRD_LVL_NUMBER">
+                                            <pfx2:ITEM>
+                                                <pfx2:PRIM_ORG_LVL_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRIM_ORG_LVL_NUMBER"/>
+                                                </pfx2:PRIM_ORG_LVL_NUMBER>
+                                                <pfx2:PMG_PO_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PMG_PO_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_PO_NUMBER"/>
+                                                </pfx2:PMG_PO_NUMBER>
+                                                <pfx2:PMG_STATUS_A>
+                                                    <xsl:copy-of select="pfx2:PMG_STATUS_A/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_STATUS_A"/>
+                                                </pfx2:PMG_STATUS_A>
+                                                <pfx2:PMG_STATUS>
+                                                    <xsl:copy-of select="pfx2:PMG_STATUS/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_STATUS"/>
+                                                </pfx2:PMG_STATUS>
+                                                <pfx2:PRD_LVL_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PRD_LVL_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_LVL_NUMBER"/>
+                                                </pfx2:PRD_LVL_NUMBER>
+                                                <pfx2:PMG_SELL_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_SELL_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_SELL_QTY"/>
+                                                </pfx2:PMG_SELL_QTY>
+                                                <pfx2:PMG_PACK_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_PACK_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_PACK_QTY"/>
+                                                </pfx2:PMG_PACK_QTY>
+                                                <pfx2:PMG_RETAIL>
+                                                    <xsl:copy-of select="pfx2:PMG_RETAIL/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_RETAIL"/>
+                                                </pfx2:PMG_RETAIL>
+                                                <pfx2:PMG_SELL_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_SELL_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_SELL_COST"/>
+                                                </pfx2:PMG_SELL_COST>
+                                                <pfx2:NUMBER_OF_INNERS>
+                                                    <xsl:copy-of select="pfx2:NUMBER_OF_INNERS/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:NUMBER_OF_INNERS"/>
+                                                </pfx2:NUMBER_OF_INNERS>
+                                                <pfx2:PMG_TOTAL_INNERS>
+                                                    <xsl:copy-of select="pfx2:PMG_TOTAL_INNERS/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_TOTAL_INNERS"/>
+                                                </pfx2:PMG_TOTAL_INNERS>
+                                                <pfx2:SLL_UNITS_PER_INNER>
+                                                    <xsl:copy-of select="pfx2:SLL_UNITS_PER_INNER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:SLL_UNITS_PER_INNER"/>
+                                                </pfx2:SLL_UNITS_PER_INNER>
+                                                <pfx2:VPC_CASE_QTY>
+                                                    <xsl:copy-of select="pfx2:VPC_CASE_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CASE_QTY"/>
+                                                </pfx2:VPC_CASE_QTY>
+                                                <pfx2:PMG_FREE_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_FREE_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_FREE_QTY"/>
+                                                </pfx2:PMG_FREE_QTY>
+                                                <pfx2:PMG_UNIT_NLC_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_UNIT_NLC_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_UNIT_NLC_COST"/>
+                                                </pfx2:PMG_UNIT_NLC_COST>
+                                                <pfx2:TXS_CODE>
+                                                    <xsl:copy-of select="pfx2:TXS_CODE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TXS_CODE"/>
+                                                </pfx2:TXS_CODE>
+                                                <pfx2:TXS_RATE>
+                                                    <xsl:copy-of select="pfx2:TXS_RATE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TXS_RATE"/>
+                                                </pfx2:TXS_RATE>
+                                                <pfx2:PMG_PACK_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_PACK_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_PACK_COST"/>
+                                                </pfx2:PMG_PACK_COST>
+                                                <pfx2:VPC_CASE_PACK_ID>
+                                                    <xsl:copy-of select="pfx2:VPC_CASE_PACK_ID/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CASE_PACK_ID"/>
+                                                </pfx2:VPC_CASE_PACK_ID>
+                                                <pfx2:PMG_DTL_TECH_KEY>
+                                                    <xsl:copy-of select="pfx2:PMG_DTL_TECH_KEY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_DTL_TECH_KEY"/>
+                                                </pfx2:PMG_DTL_TECH_KEY>
+                                                <pfx2:PMG_SEQ_NUM>
+                                                    <xsl:copy-of select="pfx2:PMG_SEQ_NUM/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_SEQ_NUM"/>
+                                                </pfx2:PMG_SEQ_NUM>
+                                                <pfx2:VPC_CST_START>
+                                                    <xsl:copy-of select="pfx2:VPC_CST_START/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CST_START"/>
+                                                </pfx2:VPC_CST_START>
+                                                <pfx2:PMG_CANCEL_PQTY>
+                                                    <xsl:copy-of select="pfx2:PMG_CANCEL_PQTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_CANCEL_PQTY"/>
+                                                </pfx2:PMG_CANCEL_PQTY>
+                                                <pfx2:TOT_CHG_EFFECT>
+                                                    <xsl:copy-of select="pfx2:TOT_CHG_EFFECT/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TOT_CHG_EFFECT"/>
+                                                </pfx2:TOT_CHG_EFFECT>
+                                                <pfx2:TOT_ALL_EFFECT>
+                                                    <xsl:copy-of select="pfx2:TOT_ALL_EFFECT/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TOT_ALL_EFFECT"/>
+                                                </pfx2:TOT_ALL_EFFECT>
+                                                <pfx2:PRD_UPC>
+                                                    <xsl:copy-of select="pfx2:PRD_UPC/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_UPC"/>
+                                                </pfx2:PRD_UPC>
+                                                <pfx2:PRD_NAME_FULL>
+                                                    <xsl:copy-of select="pfx2:PRD_NAME_FULL/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_NAME_FULL"/>
+                                                </pfx2:PRD_NAME_FULL>
+                                                <pfx2:INNER_PACK_ID>
+                                                    <xsl:copy-of select="pfx2:INNER_PACK_ID/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:INNER_PACK_ID"/>
+                                                </pfx2:INNER_PACK_ID>
+                                                <pfx2:VPC_CASE_WGT_UOM>
+                                                    <xsl:copy-of select="pfx2:VPC_CASE_WGT_UOM/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CASE_WGT_UOM"/>
+                                                </pfx2:VPC_CASE_WGT_UOM>
+                                                <pfx2:PRD_EST_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PRD_EST_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_EST_NUMBER"/>
+                                                </pfx2:PRD_EST_NUMBER>
+                                                <pfx2:VPC_BUY_MULTIPLE>
+                                                    <xsl:copy-of select="pfx2:VPC_BUY_MULTIPLE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_BUY_MULTIPLE"/>
+                                                </pfx2:VPC_BUY_MULTIPLE>
+                                                <pfx2:PRD_UOM_SIZE>
+                                                    <xsl:copy-of select="pfx2:PRD_UOM_SIZE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_UOM_SIZE"/>
+                                                </pfx2:PRD_UOM_SIZE>
+                                                <pfx2:PRD_SIZE_UOM>
+                                                    <xsl:copy-of select="pfx2:PRD_SIZE_UOM/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_SIZE_UOM"/>
+                                                </pfx2:PRD_SIZE_UOM>
+                                                <pfx2:PMG_TOT_PO_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_TOT_PO_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_TOT_PO_COST"/>
+                                                </pfx2:PMG_TOT_PO_COST>
+                                                <pfx2:PMG_TOT_CASE_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_TOT_CASE_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_TOT_CASE_QTY"/>
+                                                </pfx2:PMG_TOT_CASE_QTY>
+                                            </pfx2:ITEM>
+                                        </xsl:for-each-group>
+                                    </pfx2:PURCHASE_ORDER_DETAIL>
+                                </xsl:for-each>
+                                <xsl:if test="pfx2:STO_REF_NUMBER">
+                                    <pfx2:STO_REF_NUMBER>
+                                        <xsl:copy-of select="pfx2:STO_REF_NUMBER/@xsi:nil"/>
+                                        <xsl:value-of select="pfx2:STO_REF_NUMBER"/>
+                                    </pfx2:STO_REF_NUMBER>
+                                </xsl:if>
+                            </pfx2:PURCHASE_ORDER>
+                        </xsl:for-each>
+                    </pfx2:Body>
+                </pfx2:MSG_CONTAINER>
+            </Arguments>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Send EDFT">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>658</pd:x>
+        <pd:y>57</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/SendPOEDIFACT.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Arguments>
+                <Qualifier>
+                    <xsl:value-of select="$getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR[1]/pfx6:EDI_QUALIFIER"/>
+                </Qualifier>
+                <ID>
+                    <xsl:value-of select="$getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR[1]/pfx6:EDI_COMMAND_ID"/>
+                </ID>
+                <tpName>
+                    <xsl:value-of select="translate(upper-case(tib:trim($getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR[1]/pfx6:EDI_VAN_OR_NET)), ' ', '_')"/>
+                </tpName>
+                <pfx2:MSG_CONTAINER>
+                    <xsl:copy-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Header"/>
+                    <pfx2:Body>
+                        <xsl:for-each select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER">
+                            <pfx2:PURCHASE_ORDER>
+                                <pfx2:PRIM_ORG_LVL_NUMBER>
+                                    <xsl:copy-of select="pfx2:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PRIM_ORG_LVL_NUMBER"/>
+                                </pfx2:PRIM_ORG_LVL_NUMBER>
+                                <pfx2:PMG_PO_NUMBER>
+                                    <xsl:copy-of select="pfx2:PMG_PO_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_PO_NUMBER"/>
+                                </pfx2:PMG_PO_NUMBER>
+                                <pfx2:PMG_STAT_CODE>
+                                    <xsl:copy-of select="pfx2:PMG_STAT_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_STAT_CODE"/>
+                                </pfx2:PMG_STAT_CODE>
+                                <pfx2:VENDOR_NUMBER>
+                                    <xsl:copy-of select="pfx2:VENDOR_NUMBER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VENDOR_NUMBER"/>
+                                </pfx2:VENDOR_NUMBER>
+                                <pfx2:PMG_RELEASE_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_RELEASE_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_RELEASE_DATE"/>
+                                </pfx2:PMG_RELEASE_DATE>
+                                <pfx2:PMG_ENTRY_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_ENTRY_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_ENTRY_DATE"/>
+                                </pfx2:PMG_ENTRY_DATE>
+                                <pfx2:CURR_CODE>
+                                    <xsl:copy-of select="pfx2:CURR_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:CURR_CODE"/>
+                                </pfx2:CURR_CODE>
+                                <pfx2:PMG_SHORT_CODE>
+                                    <xsl:copy-of select="pfx2:PMG_SHORT_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_SHORT_CODE"/>
+                                </pfx2:PMG_SHORT_CODE>
+                                <pfx2:PMG_USER>
+                                    <xsl:copy-of select="pfx2:PMG_USER/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_USER"/>
+                                </pfx2:PMG_USER>
+                                <pfx2:VPC_PO_PROC_TIME>
+                                    <xsl:copy-of select="pfx2:VPC_PO_PROC_TIME/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_PO_PROC_TIME"/>
+                                </pfx2:VPC_PO_PROC_TIME>
+                                <pfx2:VPC_PO_SHIP_TIME>
+                                    <xsl:copy-of select="pfx2:VPC_PO_SHIP_TIME/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_PO_SHIP_TIME"/>
+                                </pfx2:VPC_PO_SHIP_TIME>
+                                <pfx2:PMG_PO_NOTES>
+                                    <xsl:copy-of select="pfx2:PMG_PO_NOTES/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_PO_NOTES"/>
+                                </pfx2:PMG_PO_NOTES>
+                                <pfx2:PMG_RECV_NOTES>
+                                    <xsl:copy-of select="pfx2:PMG_RECV_NOTES/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_RECV_NOTES"/>
+                                </pfx2:PMG_RECV_NOTES>
+                                <pfx2:PMG_CNCL_BY_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_CNCL_BY_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_CNCL_BY_DATE"/>
+                                </pfx2:PMG_CNCL_BY_DATE>
+                                <pfx2:PMG_EXP_RCT_DATE>
+                                    <xsl:copy-of select="pfx2:PMG_EXP_RCT_DATE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_EXP_RCT_DATE"/>
+                                </pfx2:PMG_EXP_RCT_DATE>
+                                <pfx2:VPC_EXT_PAY_DAYS>
+                                    <xsl:copy-of select="pfx2:VPC_EXT_PAY_DAYS/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_EXT_PAY_DAYS"/>
+                                </pfx2:VPC_EXT_PAY_DAYS>
+                                <pfx2:DMT_CODE>
+                                    <xsl:copy-of select="pfx2:DMT_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:DMT_CODE"/>
+                                </pfx2:DMT_CODE>
+                                <pfx2:USR_TECH_KEY>
+                                    <xsl:copy-of select="pfx2:USR_TECH_KEY/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:USR_TECH_KEY"/>
+                                </pfx2:USR_TECH_KEY>
+                                <pfx2:PMG_LAST_CHG_DT>
+                                    <xsl:copy-of select="pfx2:PMG_LAST_CHG_DT/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_LAST_CHG_DT"/>
+                                </pfx2:PMG_LAST_CHG_DT>
+                                <pfx2:VPC_PO_REQUIRED>
+                                    <xsl:copy-of select="pfx2:VPC_PO_REQUIRED/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_PO_REQUIRED"/>
+                                </pfx2:VPC_PO_REQUIRED>
+                                <pfx2:PMG_TOT_PO_COST>
+                                    <xsl:copy-of select="pfx2:PMG_TOT_PO_COST/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_TOT_PO_COST"/>
+                                </pfx2:PMG_TOT_PO_COST>
+                                <pfx2:VENDOR_NAME>
+                                    <xsl:copy-of select="pfx2:VENDOR_NAME/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VENDOR_NAME"/>
+                                </pfx2:VENDOR_NAME>
+                                <pfx2:VPC_TECH_KEY>
+                                    <xsl:copy-of select="pfx2:VPC_TECH_KEY/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:VPC_TECH_KEY"/>
+                                </pfx2:VPC_TECH_KEY>
+                                <pfx2:PMG_TOT_CASE_QTY>
+                                    <xsl:copy-of select="pfx2:PMG_TOT_CASE_QTY/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_TOT_CASE_QTY"/>
+                                </pfx2:PMG_TOT_CASE_QTY>
+                                <pfx2:PMG_TYPE_CODE>
+                                    <xsl:copy-of select="pfx2:PMG_TYPE_CODE/@xsi:nil"/>
+                                    <xsl:value-of select="pfx2:PMG_TYPE_CODE"/>
+                                </pfx2:PMG_TYPE_CODE>
+                                <xsl:for-each select="pfx2:PURCHASE_ORDER_DETAIL">
+                                    <pfx2:PURCHASE_ORDER_DETAIL>
+                                        <xsl:for-each-group select="pfx2:ITEM" group-by="pfx2:PRD_LVL_NUMBER">
+                                            <pfx2:ITEM>
+                                                <pfx2:PRIM_ORG_LVL_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PRIM_ORG_LVL_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRIM_ORG_LVL_NUMBER"/>
+                                                </pfx2:PRIM_ORG_LVL_NUMBER>
+                                                <pfx2:PMG_PO_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PMG_PO_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_PO_NUMBER"/>
+                                                </pfx2:PMG_PO_NUMBER>
+                                                <pfx2:PMG_STATUS_A>
+                                                    <xsl:copy-of select="pfx2:PMG_STATUS_A/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_STATUS_A"/>
+                                                </pfx2:PMG_STATUS_A>
+                                                <pfx2:PMG_STATUS>
+                                                    <xsl:copy-of select="pfx2:PMG_STATUS/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_STATUS"/>
+                                                </pfx2:PMG_STATUS>
+                                                <pfx2:PRD_LVL_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PRD_LVL_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_LVL_NUMBER"/>
+                                                </pfx2:PRD_LVL_NUMBER>
+                                                <pfx2:PMG_SELL_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_SELL_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_SELL_QTY"/>
+                                                </pfx2:PMG_SELL_QTY>
+                                                <pfx2:PMG_PACK_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_PACK_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_PACK_QTY"/>
+                                                </pfx2:PMG_PACK_QTY>
+                                                <pfx2:PMG_RETAIL>
+                                                    <xsl:copy-of select="pfx2:PMG_RETAIL/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_RETAIL"/>
+                                                </pfx2:PMG_RETAIL>
+                                                <pfx2:PMG_SELL_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_SELL_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_SELL_COST"/>
+                                                </pfx2:PMG_SELL_COST>
+                                                <pfx2:NUMBER_OF_INNERS>
+                                                    <xsl:copy-of select="pfx2:NUMBER_OF_INNERS/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:NUMBER_OF_INNERS"/>
+                                                </pfx2:NUMBER_OF_INNERS>
+                                                <pfx2:PMG_TOTAL_INNERS>
+                                                    <xsl:copy-of select="pfx2:PMG_TOTAL_INNERS/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_TOTAL_INNERS"/>
+                                                </pfx2:PMG_TOTAL_INNERS>
+                                                <pfx2:SLL_UNITS_PER_INNER>
+                                                    <xsl:copy-of select="pfx2:SLL_UNITS_PER_INNER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:SLL_UNITS_PER_INNER"/>
+                                                </pfx2:SLL_UNITS_PER_INNER>
+                                                <pfx2:VPC_CASE_QTY>
+                                                    <xsl:copy-of select="pfx2:VPC_CASE_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CASE_QTY"/>
+                                                </pfx2:VPC_CASE_QTY>
+                                                <pfx2:PMG_FREE_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_FREE_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_FREE_QTY"/>
+                                                </pfx2:PMG_FREE_QTY>
+                                                <pfx2:PMG_UNIT_NLC_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_UNIT_NLC_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_UNIT_NLC_COST"/>
+                                                </pfx2:PMG_UNIT_NLC_COST>
+                                                <pfx2:TXS_CODE>
+                                                    <xsl:copy-of select="pfx2:TXS_CODE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TXS_CODE"/>
+                                                </pfx2:TXS_CODE>
+                                                <pfx2:TXS_RATE>
+                                                    <xsl:copy-of select="pfx2:TXS_RATE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TXS_RATE"/>
+                                                </pfx2:TXS_RATE>
+                                                <pfx2:PMG_PACK_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_PACK_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_PACK_COST"/>
+                                                </pfx2:PMG_PACK_COST>
+                                                <pfx2:VPC_CASE_PACK_ID>
+                                                    <xsl:copy-of select="pfx2:VPC_CASE_PACK_ID/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CASE_PACK_ID"/>
+                                                </pfx2:VPC_CASE_PACK_ID>
+                                                <pfx2:PMG_DTL_TECH_KEY>
+                                                    <xsl:copy-of select="pfx2:PMG_DTL_TECH_KEY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_DTL_TECH_KEY"/>
+                                                </pfx2:PMG_DTL_TECH_KEY>
+                                                <pfx2:PMG_SEQ_NUM>
+                                                    <xsl:copy-of select="pfx2:PMG_SEQ_NUM/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_SEQ_NUM"/>
+                                                </pfx2:PMG_SEQ_NUM>
+                                                <pfx2:VPC_CST_START>
+                                                    <xsl:copy-of select="pfx2:VPC_CST_START/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CST_START"/>
+                                                </pfx2:VPC_CST_START>
+                                                <pfx2:PMG_CANCEL_PQTY>
+                                                    <xsl:copy-of select="pfx2:PMG_CANCEL_PQTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_CANCEL_PQTY"/>
+                                                </pfx2:PMG_CANCEL_PQTY>
+                                                <pfx2:TOT_CHG_EFFECT>
+                                                    <xsl:copy-of select="pfx2:TOT_CHG_EFFECT/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TOT_CHG_EFFECT"/>
+                                                </pfx2:TOT_CHG_EFFECT>
+                                                <pfx2:TOT_ALL_EFFECT>
+                                                    <xsl:copy-of select="pfx2:TOT_ALL_EFFECT/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:TOT_ALL_EFFECT"/>
+                                                </pfx2:TOT_ALL_EFFECT>
+                                                <pfx2:PRD_UPC>
+                                                    <xsl:copy-of select="pfx2:PRD_UPC/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_UPC"/>
+                                                </pfx2:PRD_UPC>
+                                                <pfx2:PRD_NAME_FULL>
+                                                    <xsl:copy-of select="pfx2:PRD_NAME_FULL/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_NAME_FULL"/>
+                                                </pfx2:PRD_NAME_FULL>
+                                                <pfx2:INNER_PACK_ID>
+                                                    <xsl:copy-of select="pfx2:INNER_PACK_ID/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:INNER_PACK_ID"/>
+                                                </pfx2:INNER_PACK_ID>
+                                                <pfx2:VPC_CASE_WGT_UOM>
+                                                    <xsl:copy-of select="pfx2:VPC_CASE_WGT_UOM/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_CASE_WGT_UOM"/>
+                                                </pfx2:VPC_CASE_WGT_UOM>
+                                                <pfx2:PRD_EST_NUMBER>
+                                                    <xsl:copy-of select="pfx2:PRD_EST_NUMBER/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_EST_NUMBER"/>
+                                                </pfx2:PRD_EST_NUMBER>
+                                                <pfx2:VPC_BUY_MULTIPLE>
+                                                    <xsl:copy-of select="pfx2:VPC_BUY_MULTIPLE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:VPC_BUY_MULTIPLE"/>
+                                                </pfx2:VPC_BUY_MULTIPLE>
+                                                <pfx2:PRD_UOM_SIZE>
+                                                    <xsl:copy-of select="pfx2:PRD_UOM_SIZE/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_UOM_SIZE"/>
+                                                </pfx2:PRD_UOM_SIZE>
+                                                <pfx2:PRD_SIZE_UOM>
+                                                    <xsl:copy-of select="pfx2:PRD_SIZE_UOM/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PRD_SIZE_UOM"/>
+                                                </pfx2:PRD_SIZE_UOM>
+                                                <pfx2:PMG_TOT_PO_COST>
+                                                    <xsl:copy-of select="pfx2:PMG_TOT_PO_COST/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_TOT_PO_COST"/>
+                                                </pfx2:PMG_TOT_PO_COST>
+                                                <pfx2:PMG_TOT_CASE_QTY>
+                                                    <xsl:copy-of select="pfx2:PMG_TOT_CASE_QTY/@xsi:nil"/>
+                                                    <xsl:value-of select="pfx2:PMG_TOT_CASE_QTY"/>
+                                                </pfx2:PMG_TOT_CASE_QTY>
+                                            </pfx2:ITEM>
+                                        </xsl:for-each-group>
+                                    </pfx2:PURCHASE_ORDER_DETAIL>
+                                </xsl:for-each>
+                                <xsl:if test="pfx2:STO_REF_NUMBER">
+                                    <pfx2:STO_REF_NUMBER>
+                                        <xsl:copy-of select="pfx2:STO_REF_NUMBER/@xsi:nil"/>
+                                        <xsl:value-of select="pfx2:STO_REF_NUMBER"/>
+                                    </pfx2:STO_REF_NUMBER>
+                                </xsl:if>
+                            </pfx2:PURCHASE_ORDER>
+                        </xsl:for-each>
+                    </pfx2:Body>
+                </pfx2:MSG_CONTAINER>
+            </Arguments>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="getVendor">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>352</pd:x>
+        <pd:y>113</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/getVendor.process</processName>
+        </config>
+        <pd:inputBindings>
+            <VENDOR_NUMBER>
+                <xsl:value-of select="tib:trim($Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:VENDOR_NUMBER)"/>
+            </VENDOR_NUMBER>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validate OC">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>213</pd:x>
+        <pd:y>111</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/BDCMP/GLB_MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/BDCMP.sharedjdbc</jdbcSharedConfig>
+            <statement>SELECT COUNT(PMG_PO_NUMBER) AS PMG_PO_NUMBER
+FROM SC_EDI_BitacoraEnvioEncabezado
+WHERE
+	PMG_PO_NUMBER = ?
+	AND DOWNLOAD_DATE is not null</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>PMG_PO_NUMBER</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>PMG_PO_NUMBER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <PMG_PO_NUMBER>
+                    <xsl:copy-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_PO_NUMBER/@xsi:nil"/>
+                    <xsl:value-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_PO_NUMBER"/>
+                </PMG_PO_NUMBER>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Discard OC">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>354</pd:x>
+        <pd:y>226</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Bitacora Encabezado">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>455</pd:x>
+        <pd:y>121</pd:y>
+        <config>
+            <processName>/BCPOPublisher Processes/Subprocess/InsertBitacoraEnc.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx7:MSG_CONTAINER>
+                <pfx7:Body>
+                    <pfx7:BITACORA>
+                        <pfx7:PMG_PO_NUMBER>
+                            <xsl:value-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_PO_NUMBER"/>
+                        </pfx7:PMG_PO_NUMBER>
+                        <pfx7:OC_CREATED>
+                            <xsl:value-of select="$Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_ENTRY_DATE"/>
+                        </pfx7:OC_CREATED>
+                    </pfx7:BITACORA>
+                </pfx7:Body>
+            </pfx7:MSG_CONTAINER>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Send EDFT</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Send ANSI</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Validate OC</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validate OC</pd:from>
+        <pd:to>getVendor</pd:to>
+        <pd:xpathDescription>Else</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validate OC</pd:from>
+        <pd:to>Discard OC</pd:to>
+        <pd:xpathDescription>Sent or !Confirm or FilterTypeCode</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Validate-OC/resultSet/Record/PMG_PO_NUMBER &gt; 0 
+or $Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER/pfx2:PMG_STAT_CODE !=4
+or contains($_globalVariables/ns:GlobalVariables/BCPOPublisher/GLB_FILTER_TYPECODE, $Start/pfx2:MSG_CONTAINER/pfx2:Body/pfx2:PURCHASE_ORDER[1]/pfx2:PMG_TYPE_CODE)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Discard OC</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>One Bend</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getVendor</pd:from>
+        <pd:to>Discard OC</pd:to>
+        <pd:xpathDescription>!Vendor EDI or !Envio</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR/pfx6:VENDOR_NUMBER = 0  or  not(exists ($getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>getVendor</pd:from>
+        <pd:to>Bitacora Encabezado</pd:to>
+        <pd:xpathDescription>Else</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Bitacora Encabezado</pd:from>
+        <pd:to>Send EDFT</pd:to>
+        <pd:xpathDescription>is EDFT</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR/pfx6:EDI_FORMAT = 'EDIFACT'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Bitacora Encabezado</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>Is not EDI PO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Bitacora Encabezado</pd:from>
+        <pd:to>Send ANSI</pd:to>
+        <pd:xpathDescription>is ANSI</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$getVendor/pfx6:MSG_CONTAINER/pfx6:Body/pfx6:VENDOR/pfx6:EDI_FORMAT = 'ANSI'</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

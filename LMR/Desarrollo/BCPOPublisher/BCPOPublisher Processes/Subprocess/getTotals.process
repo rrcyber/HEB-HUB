@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <pd:name>BCPOPublisher Processes/Subprocess/getTotals.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER_DETAIL"/>
+    <pd:startX>135</pd:startX>
+    <pd:startY>83</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <hashTotal>
+                <xsl:value-of select="round(sum($Map-Data1/root/hashTotal))"/>
+            </hashTotal>
+            <poTotal>
+                <xsl:value-of select="sum($Map-Data1/root/poTotal)"/>
+            </poTotal>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="hashTotal" type="xsd:string"/>
+                    <xsd:element name="poTotal" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>426</pd:endX>
+    <pd:endY>83</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1382541539719</pd:targetNamespace>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>227</pd:x>
+        <pd:y>82</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="param" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="EMPORD" type="xsd:string"/>
+                                        <xsd:element name="FACTCONV" type="xsd:string"/>
+                                        <xsd:element name="EDICOSTOFERTA" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$Start/pfx:PURCHASE_ORDER_DETAIL/pfx:ITEM">
+                    <param>
+                        <EMPORD>
+                            <xsl:value-of select="if(current()/pfx:NUMBER_OF_INNERS = 1)&#xA;&#xA;then&#xA;&#x9;(&#xA;&#x9;&#x9;if&#xA;&#x9;&#x9;&#x9;(string-length(current()/pfx:SLL_UNITS_PER_INNER)=0)&#xA;&#x9;&#x9;then&#xA;&#x9;&#x9;&#x9;0&#xA;&#x9;&#x9;else &#xA;&#x9;&#x9;&#x9;tib:round-fraction((current()/pfx:SLL_UNITS_PER_INNER * 100), 0)&#xA;&#x9;)&#xA;&#xA;else&#xA;&#x9;(&#xA;&#x9;&#x9;if&#xA;&#x9;&#x9;&#x9;(string-length(current()/pfx:VPC_CASE_QTY)=0)&#xA;&#x9;&#x9;then&#xA;&#x9;&#x9;&#x9;0&#xA;&#x9;&#x9;else&#xA;&#x9;&#x9;&#x9;tib:round-fraction((current()/pfx:VPC_CASE_QTY * 100), 0)&#xA;&#x9;)"/>
+                        </EMPORD>
+                        <FACTCONV>
+                            <xsl:value-of select="if(current()/pfx:NUMBER_OF_INNERS=1)&#xA;then round(number(current()/pfx:PMG_TOTAL_INNERS))&#xA;else round(number(current()/pfx:PMG_PACK_QTY))"/>
+                        </FACTCONV>
+                        <EDICOSTOFERTA>
+                            <xsl:value-of select="if(string-length(current()/pfx:PMG_UNIT_NLC_COST)>0)&#xA;then tib:round-fraction((number(current()/pfx:PMG_UNIT_NLC_COST)*10000),2)&#xA;else 0"/>
+                        </EDICOSTOFERTA>
+                    </param>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data1">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>328</pd:x>
+        <pd:y>83</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="hashTotal" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                            <xsd:element name="poTotal" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:for-each select="$Map-Data/root/param">
+                    <hashTotal>
+                        <xsl:value-of select="if(string-length(tib:trim(current()/FACTCONV)) = 0&#xA;)&#xA;then 0&#xA;else (&#xA;&#x9;&#x9;current()/EMPORD *&#xA;&#x9;&#x9;(&#xA;&#x9;&#x9;&#x9;(if(string-length(tib:trim(current()/FACTCONV)) = 0) then 0 else current()/FACTCONV)&#xA;&#x9;&#x9;&#x9;div&#xA;&#x9;&#x9;&#x9;100&#xA;&#x9;&#x9;)&#xA;&#x9;)"/>
+                    </hashTotal>
+                </xsl:for-each>
+                <xsl:for-each select="$Map-Data/root/param">
+                    <poTotal>
+                        <xsl:value-of select="(&#xA;&#x9;if(string-length(tib:trim(current()/FACTCONV))=0)&#xA;&#x9;then 0&#xA;&#x9;else&#xA;&#x9;&#x9;(&#xA;&#x9;&#x9;&#x9;current()/EMPORD&#xA;&#x9;&#x9;&#x9;*&#xA;&#x9;&#x9;&#x9;(&#xA;&#x9;&#x9;&#x9;&#x9;(&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;if(string-length(tib:trim(current()/FACTCONV))=0)&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;then 0&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;else current()/FACTCONV&#xA;&#x9;&#x9;&#x9;&#x9;)&#xA;&#x9;&#x9;&#x9;&#x9;div&#xA;&#x9;&#x9;&#x9;&#x9;100&#xA;&#x9;&#x9;&#x9;)&#xA;&#x9;&#x9;)&#xA;)&#xA;*&#xA;(&#xA;&#x9;(&#xA;&#x9;&#x9;if(string-length(tib:trim(current()/EDICOSTOFERTA))=0)&#xA;&#x9;&#x9;then 0&#xA;&#x9;&#x9;else current()/EDICOSTOFERTA&#xA;&#x9;)&#xA;&#x9;div&#xA;&#x9;100&#xA;)"/>
+                    </poTotal>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Map Data1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

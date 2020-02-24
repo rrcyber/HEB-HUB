@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:ns12="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/HEB2BPURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/HEB2BPURCHASEORDER_INFORMATION_COMPLETED"/>
+    <pd:name>Heb2bOrdenCompraSubscriber Processes/Sub Process/OrdenCompra/PublicQueue.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:PURCHASE_ORDER"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>249</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1472745551509</pd:targetNamespace>
+    <pd:activity name="JMS Queue Sender">
+        <pd:type>com.tibco.plugin.jms.JMSQueueSendActivity</pd:type>
+        <pd:resourceType>ae.activities.JMSQueueSendActivity</pd:resourceType>
+        <pd:x>134</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <PermittedMessageType>XML Text</PermittedMessageType>
+            <SessionAttributes>
+                <transacted>false</transacted>
+                <acknowledgeMode>1</acknowledgeMode>
+                <maxSessions>1</maxSessions>
+                <destination>%%Destinations/Queues/GLB_HEB2B_ORDEN_COMPRA_QUEUE%%</destination>
+            </SessionAttributes>
+            <ConfigurableHeaders>
+                <JMSDeliveryMode>PERSISTENT</JMSDeliveryMode>
+                <JMSExpiration>0</JMSExpiration>
+                <JMSPriority>4</JMSPriority>
+            </ConfigurableHeaders>
+            <ConnectionReference>/Shared Resources/Connections/JMS/JMSConnection.sharedjmscon</ConnectionReference>
+            <InDataxsdString ref="pfx:MSG_CONTAINER"/>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <Body>
+                    <pfx:MSG_CONTAINER>
+                        <pfx:Header>
+                            <pfx:ProjectName>
+                                <xsl:value-of select="$_processContext/ns:ProcessContext/ProjectName"/>
+                            </pfx:ProjectName>
+                            <xsl:if test="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain">
+                                <pfx:Source_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Source_Domain"/>
+                                </pfx:Source_Domain>
+                            </xsl:if>
+                            <xsl:if test="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain">
+                                <pfx:Destination_Domain>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Destination_Domain"/>
+                                </pfx:Destination_Domain>
+                            </xsl:if>
+                            <xsl:if test="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type">
+                                <pfx:Transaction_Type>
+                                    <xsl:value-of select="$_globalVariables/ns1:GlobalVariables/ProjectConfig/Transaction_Type"/>
+                                </pfx:Transaction_Type>
+                            </xsl:if>
+                            <pfx:TimeStamp>
+                                <xsl:value-of select="tib:format-dateTime(&quot;yyyy-MM-dd hh:mm:ss&quot;, current-dateTime())"/>
+                            </pfx:TimeStamp>
+                        </pfx:Header>
+                        <pfx:Body>
+                            <xsl:for-each select="$Start/pfx:PURCHASE_ORDER">
+                                <pfx:PURCHASE_ORDER>
+                                    <pfx:NUMEROORDEN>
+                                        <xsl:copy-of select="pfx:NUMEROORDEN/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:NUMEROORDEN"/>
+                                    </pfx:NUMEROORDEN>
+                                    <pfx:IDPROVEEDOR>
+                                        <xsl:copy-of select="pfx:IDPROVEEDOR/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:IDPROVEEDOR"/>
+                                    </pfx:IDPROVEEDOR>
+                                    <pfx:IDSUCURSAL>
+                                        <xsl:copy-of select="pfx:IDSUCURSAL/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:IDSUCURSAL"/>
+                                    </pfx:IDSUCURSAL>
+                                    <pfx:IDESTATUS>
+                                        <xsl:copy-of select="pfx:IDESTATUS/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:IDESTATUS"/>
+                                    </pfx:IDESTATUS>
+                                    <pfx:IDMETODODISTRIBUCION>
+                                        <xsl:copy-of select="pfx:IDMETODODISTRIBUCION/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:IDMETODODISTRIBUCION"/>
+                                    </pfx:IDMETODODISTRIBUCION>
+                                    <pfx:FECHAORDEN>
+                                        <xsl:copy-of select="pfx:FECHAORDEN/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:FECHAORDEN"/>
+                                    </pfx:FECHAORDEN>
+                                    <pfx:FECHAENTREGA>
+                                        <xsl:copy-of select="pfx:FECHAENTREGA/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:FECHAENTREGA"/>
+                                    </pfx:FECHAENTREGA>
+                                    <pfx:FECHACANCELACION>
+                                        <xsl:copy-of select="pfx:FECHACANCELACION/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:FECHACANCELACION"/>
+                                    </pfx:FECHACANCELACION>
+                                    <pfx:COMENTARIOS>
+                                        <xsl:copy-of select="pfx:COMENTARIOS/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:COMENTARIOS"/>
+                                    </pfx:COMENTARIOS>
+                                    <pfx:COMPRADOR>
+                                        <xsl:copy-of select="pfx:COMPRADOR/@xsi:nil"/>
+                                        <xsl:value-of select="pfx:COMPRADOR"/>
+                                    </pfx:COMPRADOR>
+                                    <xsl:for-each select="pfx:PURCHASE_ORDER_DETAIL">
+                                        <pfx:PURCHASE_ORDER_DETAIL>
+                                            <xsl:for-each select="pfx:ITEM">
+                                                <pfx:ITEM>
+                                                    <pfx:IDORDENCOMPRA>
+                                                        <xsl:copy-of select="pfx:IDORDENCOMPRA/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:IDORDENCOMPRA"/>
+                                                    </pfx:IDORDENCOMPRA>
+                                                    <pfx:IDARTICULO>
+                                                        <xsl:copy-of select="pfx:IDARTICULO/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:IDARTICULO"/>
+                                                    </pfx:IDARTICULO>
+                                                    <pfx:IDCASEPACK>
+                                                        <xsl:copy-of select="pfx:IDCASEPACK/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:IDCASEPACK"/>
+                                                    </pfx:IDCASEPACK>
+                                                    <pfx:SINCARGO>
+                                                        <xsl:copy-of select="pfx:SINCARGO/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:SINCARGO"/>
+                                                    </pfx:SINCARGO>
+                                                    <pfx:FACTOR>
+                                                        <xsl:copy-of select="pfx:FACTOR/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:FACTOR"/>
+                                                    </pfx:FACTOR>
+                                                    <pfx:CANTIDADUNIDADESCASEPACK>
+                                                        <xsl:copy-of select="pfx:CANTIDADUNIDADESCASEPACK/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:CANTIDADUNIDADESCASEPACK"/>
+                                                    </pfx:CANTIDADUNIDADESCASEPACK>
+                                                    <pfx:CANTIDADUNIDADESINNERPACK>
+                                                        <xsl:copy-of select="pfx:CANTIDADUNIDADESINNERPACK/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:CANTIDADUNIDADESINNERPACK"/>
+                                                    </pfx:CANTIDADUNIDADESINNERPACK>
+                                                    <pfx:CANTIDADINNERPACK>
+                                                        <xsl:copy-of select="pfx:CANTIDADINNERPACK/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:CANTIDADINNERPACK"/>
+                                                    </pfx:CANTIDADINNERPACK>
+                                                    <pfx:TOTALPEDIDOUNIDADES>
+                                                        <xsl:copy-of select="pfx:TOTALPEDIDOUNIDADES/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:TOTALPEDIDOUNIDADES"/>
+                                                    </pfx:TOTALPEDIDOUNIDADES>
+                                                    <pfx:DESCUENTOARTICULO>
+                                                        <xsl:copy-of select="pfx:DESCUENTOARTICULO/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:DESCUENTOARTICULO"/>
+                                                    </pfx:DESCUENTOARTICULO>
+                                                    <pfx:COSTOPORARTICULO>
+                                                        <xsl:copy-of select="pfx:COSTOPORARTICULO/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:COSTOPORARTICULO"/>
+                                                    </pfx:COSTOPORARTICULO>
+                                                    <pfx:CANTIDADORDENADA>
+                                                        <xsl:copy-of select="pfx:CANTIDADORDENADA/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:CANTIDADORDENADA"/>
+                                                    </pfx:CANTIDADORDENADA>
+                                                </pfx:ITEM>
+                                            </xsl:for-each>
+                                        </pfx:PURCHASE_ORDER_DETAIL>
+                                    </xsl:for-each>
+                                    <xsl:for-each select="pfx:PURCHASE_ORDER_DISTRIBUTION">
+                                        <pfx:PURCHASE_ORDER_DISTRIBUTION>
+                                            <xsl:for-each select="pfx:ITEM">
+                                                <pfx:ITEM>
+                                                    <pfx:ID_ORDEN_COMPRA>
+                                                        <xsl:copy-of select="pfx:ID_ORDEN_COMPRA/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:ID_ORDEN_COMPRA"/>
+                                                    </pfx:ID_ORDEN_COMPRA>
+                                                    <pfx:ID_ARTICULO>
+                                                        <xsl:copy-of select="pfx:ID_ARTICULO/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:ID_ARTICULO"/>
+                                                    </pfx:ID_ARTICULO>
+                                                    <pfx:ID_SUCURSAL>
+                                                        <xsl:copy-of select="pfx:ID_SUCURSAL/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:ID_SUCURSAL"/>
+                                                    </pfx:ID_SUCURSAL>
+                                                    <pfx:FECHA_PEDIDO_CAT>
+                                                        <xsl:copy-of select="pfx:FECHA_PEDIDO_CAT/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:FECHA_PEDIDO_CAT"/>
+                                                    </pfx:FECHA_PEDIDO_CAT>
+                                                    <pfx:CANTIDAD>
+                                                        <xsl:copy-of select="pfx:CANTIDAD/@xsi:nil"/>
+                                                        <xsl:value-of select="pfx:CANTIDAD"/>
+                                                    </pfx:CANTIDAD>
+                                                </pfx:ITEM>
+                                            </xsl:for-each>
+                                        </pfx:PURCHASE_ORDER_DISTRIBUTION>
+                                    </xsl:for-each>
+                                </pfx:PURCHASE_ORDER>
+                            </xsl:for-each>
+                        </pfx:Body>
+                    </pfx:MSG_CONTAINER>
+                </Body>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JMS Queue Sender</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JMS Queue Sender</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

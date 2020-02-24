@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" xmlns:pfx7="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" xmlns:pfx="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://www.tibco.com/ns/Foresight/2010/20" xmlns:pfx4="http://xmlns.heb.com/ei/PURCHASEORDER_EDI_INFORMATION_COMPLETED" xmlns:pfx5="http://www.heb.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://xmlns.heb.com/ei/BITACORA_INFORMATION" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:ns4="http://www.tibco.com/pe/EngineTypes" xmlns:ns3="http://www.tibco.com/ns/ax/bc/EDI/2002/10/aeschema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns6="http://www.tibco.com/ns/ax/bc/EDI/2002/10/nonAeschema" xmlns:ns5="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns13="www.tibco.com/plugin/Sleep" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns12="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:ns14="http://xmlns.heb.com/ei/ErrorManagementSchema">
+    <xsd:import namespace="http://www.tibco.com/ns/Foresight/2010/20"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_EDI_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_EDI_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://www.heb.com" schemaLocation="/Shared Resources/Schema Definitions/Custom/D96_A_ORDERS_SCHEMA.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED"/>
+    <xsd:import namespace="http://www.tibco.com/ns/Foresight/2010/20" schemaLocation="/BCSchemas/EDIFACT/1/D96A/ORDERS/T-ORDERS.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/BITACORA_RESUMEN_OC_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/BITACORARESUMENOC.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_EDI_INFORMATION_COMPLETED.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Common/Exception.xsd" schemaLocation="/Shared Resources/Schema Definitions/Common/Exception.xsd"/>
+    <pd:name>BCPOPublisher Processes/Starter Process/ReceivePOAckEDIFACT.process</pd:name>
+    <pd:startName>ReceiveRequest</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings>
+        <pfx6:BITACORARESUMENOC>
+            <pfx6:ReceiverAddress>
+                <xsl:value-of select="concat(&#xA;&#x9;$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:envelopeInfo/ns3:interchange/ns3:receiver/ns3:qualifier&#xA;&#x9;,'-'&#xA;&#x9;,$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:envelopeInfo/ns3:interchange/ns3:receiver/ns3:ID&#xA;)"/>
+            </pfx6:ReceiverAddress>
+            <pfx6:NumeroControl>
+                <xsl:value-of select="$Send-Orders-Txn/ns3:ReceiveResponseOutput/ns3:BCInitiatorResponse/ns3:controlNumInfo/ns3:interchange"/>
+            </pfx6:NumeroControl>
+            <pfx6:Fecha>
+                <xsl:value-of select="current-date()"/>
+            </pfx6:Fecha>
+            <pfx6:FechaHoraTransmisionTIBCO>
+                <xsl:value-of select="concat(&#xA;&#x9;tib:get-year-from-date(current-date()),&#xA;&#x9;'-',&#xA;&#x9;tib:get-month-from-date(current-date()),&#xA;&#x9;'-',&#xA;&#x9;tib:get-day-from-date(current-date()),&#xA;&#x9;' ',&#xA;&#x9;tib:get-hours-from-dateTime(current-dateTime()),&#xA;&#x9;':',&#xA;&#x9;tib:get-minutes-from-dateTime(current-dateTime()),&#xA;&#x9;':',&#xA;&#x9;tib:get-seconds-from-dateTime(current-dateTime())&#xA;)"/>
+            </pfx6:FechaHoraTransmisionTIBCO>
+            <pfx6:FechaHoraTransmisionGXS>
+                <xsl:value-of select="concat(&#xA;&#x9;tib:get-year-from-date(current-date()),&#xA;&#x9;'-',&#xA;&#x9;tib:get-month-from-date(current-date()),&#xA;&#x9;'-',&#xA;&#x9;tib:get-day-from-date(current-date()),&#xA;&#x9;' ',&#xA;&#x9;tib:get-hours-from-dateTime(current-dateTime()),&#xA;&#x9;':',&#xA;&#x9;tib:get-minutes-from-dateTime(current-dateTime()),&#xA;&#x9;':',&#xA;&#x9;tib:get-seconds-from-dateTime(current-dateTime())&#xA;)"/>
+            </pfx6:FechaHoraTransmisionGXS>
+        </pfx6:BITACORARESUMENOC>
+    </pd:returnBindings>
+    <pd:starter name="ReceiveRequest">
+        <pd:type>com.tibco.plugin.ax.bc.B2BResponderRequestEventSource</pd:type>
+        <pd:resourceType>ae.eventsources.ResponderRequest</pd:resourceType>
+        <pd:x>80</pd:x>
+        <pd:y>297</pd:y>
+        <config>
+            <parsePayload>true</parsePayload>
+            <eventSmartidOK>false</eventSmartidOK>
+            <eventSmartidShared>false</eventSmartidShared>
+            <eventSmartid/>
+            <sharedB2BConfig>/Shared Resources/Connections/BusinessConnect/BCServerConfigEDIFACT.bcsc</sharedB2BConfig>
+            <operationName>1/D96A/ORDERS</operationName>
+            <discovery_jdbcDbType/>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>641</pd:endX>
+    <pd:endY>297</pd:endY>
+    <pd:errorSchemas>
+        <Error ref="pfx7:Exception"/>
+    </pd:errorSchemas>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1273730000853</pd:targetNamespace>
+    <pd:group name="Retry Group on Error">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>168</pd:x>
+        <pd:y>99</pd:y>
+        <pd:width>359</pd:width>
+        <pd:height>383</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>errorLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>count</pd:indexSlot>
+            <pd:errorCondition>$count &gt;= $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:errorCondition>
+            <pd:suspendAfterErrorRetry>true</pd:suspendAfterErrorRetry>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>UpdateBitacoraEnvio</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>UpdateBitacoraEnvio</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>Is Error Data</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Validate-Error/ErrorCode='true'</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>ErrorProcess-1</pd:to>
+            <pd:xpathDescription>Count =3</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$count = $_globalVariables/ns:GlobalVariables/RetryConfig/GBL_MAX_RETRIES</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sleep-1</pd:from>
+            <pd:to>Generate-Error-1</pd:to>
+            <pd:xpathDescription>No</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch</pd:from>
+            <pd:to>Validate Error</pd:to>
+            <pd:xpathDescription>Is Error</pd:xpathDescription>
+            <pd:lineType>One Bend</pd:lineType>
+            <pd:lineColor>-3407872</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Validate Error</pd:from>
+            <pd:to>Sleep-1</pd:to>
+            <pd:xpathDescription>Is Technical Error</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="UpdateBitacoraEnvio">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>246</pd:x>
+            <pd:y>160</pd:y>
+            <config>
+                <processName>/BCPOPublisher Processes/Subprocess/UpdateBitacoraEnvio.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns0:MSG_CONTAINER>
+                    <ns0:Body>
+                        <ns0:BITACORA>
+                            <xsl:if test="$ReceiveRequest/ns3:ResponderRequestOutput/ns3:body/pfx3:T-ORDERS/pfx3:S-BGM_2/pfx3:E-1004_2_02">
+                                <ns0:PMG_PO_NUMBER>
+                                    <xsl:value-of select="$ReceiveRequest/ns3:ResponderRequestOutput/ns3:body/pfx3:T-ORDERS/pfx3:S-BGM_2/pfx3:E-1004_2_02"/>
+                                </ns0:PMG_PO_NUMBER>
+                            </xsl:if>
+                            <xsl:if test="$ReceiveRequest/ns3:ResponderRequestOutput/ns3:BCResponderRequest/ns3:receivedTime">
+                                <ns0:DATE_RECEPTION_VND>
+                                    <xsl:value-of select="$ReceiveRequest/ns3:ResponderRequestOutput/ns3:BCResponderRequest/ns3:receivedTime"/>
+                                </ns0:DATE_RECEPTION_VND>
+                            </xsl:if>
+                            <xsl:if test="$ReceiveRequest/ns3:ResponderRequestOutput/ns3:BCResponderRequest/ns3:controlNumInfo/ns3:interchange">
+                                <ns0:CONTROL_NUMBER>
+                                    <xsl:value-of select="$ReceiveRequest/ns3:ResponderRequestOutput/ns3:BCResponderRequest/ns3:controlNumInfo/ns3:interchange"/>
+                                </ns0:CONTROL_NUMBER>
+                            </xsl:if>
+                        </ns0:BITACORA>
+                    </ns0:Body>
+                </ns0:MSG_CONTAINER>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Sleep-1">
+            <pd:type>com.tibco.plugin.timer.SleepActivity</pd:type>
+            <pd:resourceType>ae.activities.sleep</pd:resourceType>
+            <pd:x>334</pd:x>
+            <pd:y>403</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <ns13:SleepInputSchema>
+                    <IntervalInMillisec>
+                        <xsl:value-of select="$_globalVariables/ns:GlobalVariables/RetryConfig/GBL_RETRY_DELAY"/>
+                    </IntervalInMillisec>
+                </ns13:SleepInputSchema>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="ErrorProcess-1">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>434</pd:x>
+            <pd:y>403</pd:y>
+            <config>
+                <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+            </config>
+            <pd:inputBindings>
+                <xsl:copy-of select="$_error_UpdateBitacoraEnvio/Exception"/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>255</pd:x>
+            <pd:y>239</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Generate-Error-1">
+            <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+            <pd:resourceType>ae.activities.throw</pd:resourceType>
+            <pd:x>240</pd:x>
+            <pd:y>404</pd:y>
+            <config>
+                <faultName/>
+            </config>
+            <pd:inputBindings>
+                <ns12:ActivityInput>
+                    <message>
+                        <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                    </message>
+                    <messageCode>
+                        <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                    </messageCode>
+                </ns12:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Validate Error">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>331</pd:x>
+            <pd:y>295</pd:y>
+            <config>
+                <element>
+                    <xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" name="ErrorCode" type="xsd:string"/>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <ErrorCode>
+                    <xsl:value-of xmlns:xsl="http://www.w3.org/1999/XSL/Transform" select="contains($_globalVariables/ns:GlobalVariables/ExceptionHandling/GLB_CONDITION_FOR_SUSPEND, $_error/ns4:ErrorReport/MsgCode)"/>
+                </ErrorCode>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Generate Error">
+        <pd:type>com.tibco.pe.core.GenerateErrorActivity</pd:type>
+        <pd:resourceType>ae.activities.throw</pd:resourceType>
+        <pd:x>350</pd:x>
+        <pd:y>555</pd:y>
+        <config>
+            <faultName>Error</faultName>
+        </config>
+        <pd:inputBindings>
+            <ns12:ActivityInput>
+                <message>
+                    <xsl:value-of select="$_error/ns4:ErrorReport/Msg"/>
+                </message>
+                <messageCode>
+                    <xsl:value-of select="$_error/ns4:ErrorReport/MsgCode"/>
+                </messageCode>
+                <data>
+                    <xsl:copy-of select="$_error_UpdateBitacoraEnvio/Exception"/>
+                </data>
+            </ns12:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ErrorProcess">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>641</pd:x>
+        <pd:y>423</pd:y>
+        <config>
+            <processName>/Utility Services/Exception Handling/ErrorProcess.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Catch-1/Exception"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch-1">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>644</pd:x>
+        <pd:y>545</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <fault>localname=Exception</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>ReceiveRequest</pd:from>
+        <pd:to>Retry Group on Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>Generate Error</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-3407872</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Retry Group on Error</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>No Error</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>not(exists($_error))</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch-1</pd:from>
+        <pd:to>ErrorProcess</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ErrorProcess</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

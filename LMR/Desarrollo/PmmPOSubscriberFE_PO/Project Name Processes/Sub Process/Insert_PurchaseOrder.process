@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://xmlns.heb.com/ei/TABLE_DETAIL" xmlns:pfx7="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" xmlns:pfx8="http://xmlns.heb.com/ei/TABLE_STOREORDER" xmlns:pfx="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" xmlns:pfx9="http://xmlns.heb.com/ei/tblOrdenCompra_Encabezado" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx3="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" xmlns:pfx4="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx5="http://xmlns.heb.com/ei/TABLE_HEADER" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.tibco.com/namespaces/tnt/plugins/mail" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns3="http://xmlns.tibco.com/body" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns5="http://xmlns.heb.com/ei/tblOrdenCompra_Detalle" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_HEADER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_HEADER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_DETAIL" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_DETAIL.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION_COMPLETED" schemaLocation="/Shared Resources/Schema Definitions/Custom/PURCHASEORDER_INFORMATION_COMPLETED_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_TT_DISTRIBUCION" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_TT_DISTRIBUCION.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_STOREORDER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_STOREORDER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/tblOrdenCompra_Encabezado" schemaLocation="/Shared Resources/Schema Definitions/Custom/tblOrdenCompra_Encabezado.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/tblOrdenCompra_Detalle" schemaLocation="/Shared Resources/Schema Definitions/Custom/tblOrdenCompra_Detalle.xsd"/>
+    <pd:name>Project Name Processes/Sub Process/Insert_PurchaseOrder.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:PURCHASE_ORDER"/>
+    <pd:startX>270</pd:startX>
+    <pd:startY>254</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>861</pd:endX>
+    <pd:endY>265</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1346687282036</pd:targetNamespace>
+    <pd:activity name="Call_CompleteHeader">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>427</pd:x>
+        <pd:y>255</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/CompleteHeaderData.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx3:PURCHASE_ORDER"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Call_CompleteDetail">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>426</pd:x>
+        <pd:y>358</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/CompleteDetailData.process</processName>
+        </config>
+        <pd:inputBindings>
+            <xsl:copy-of select="$Start/pfx3:PURCHASE_ORDER"/>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBCCall_spIns_tblOrdenCompraEncabezado">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>547</pd:x>
+        <pd:y>258</pd:y>
+        <config>
+            <timeout>%%Connections/Database/SXD2010177_VISORFE/GLB_QUERYTIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/SXD2010177_VISORFE/MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD2010177_VISORFE.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spIns_tblOrdenCompraEncabezadoTBC;1</ProcedureName>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_TipoDocmento</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_RFC_HEB</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_NumProveedor</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_ProvRFC</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_TotalLineasDetalle</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_FolioOrdenCompra</colName>
+                    <colType>1</colType>
+                    <dataType>-5</dataType>
+                    <typeName>bigint</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_GLNSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>nvarchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_NumSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_SucursalDesc</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_DireccionSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_CiudadSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_FechaCancelacion</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_DepartamentoIDOrden</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_NombreDepartamentoOrden</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_NombreProveedor</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_FechaOrden</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_FechaOperacion</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_Estatus</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_FechaRecepcion</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_Comentarios</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_CompradorID</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_NombreComprador</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_TotalSinImpuestos</colName>
+                    <colType>1</colType>
+                    <dataType>3</dataType>
+                    <typeName>decimal</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_TotalEmpaques</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCE_Moneda</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>char</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@OCID</colName>
+                    <colType>2</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <xsl:for-each select="$Call_CompleteHeader/pfx9:HEADER_DATA">
+                    <inputSet>
+                        <OCE_TipoDocmento>
+                            <xsl:copy-of select="pfx9:OCE_TipoDocmento/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_TipoDocmento"/>
+                        </OCE_TipoDocmento>
+                        <OCE_RFC_HEB>
+                            <xsl:copy-of select="pfx9:OCE_RFC_HEB/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_RFC_HEB"/>
+                        </OCE_RFC_HEB>
+                        <OCE_NumProveedor>
+                            <xsl:copy-of select="pfx9:OCE_NumProveedor/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_NumProveedor"/>
+                        </OCE_NumProveedor>
+                        <OCE_ProvRFC>
+                            <xsl:copy-of select="pfx9:OCE_ProvRFC/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_ProvRFC"/>
+                        </OCE_ProvRFC>
+                        <OCE_TotalLineasDetalle>
+                            <xsl:copy-of select="pfx9:OCE_TotalLineasDetalle/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_TotalLineasDetalle"/>
+                        </OCE_TotalLineasDetalle>
+                        <OCE_FolioOrdenCompra>
+                            <xsl:copy-of select="pfx9:OCE_FolioOrdenCompra/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_FolioOrdenCompra"/>
+                        </OCE_FolioOrdenCompra>
+                        <OCE_GLNSucursal>
+                            <xsl:copy-of select="pfx9:OCE_GLNSucursal/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_GLNSucursal"/>
+                        </OCE_GLNSucursal>
+                        <OCE_NumSucursal>
+                            <xsl:copy-of select="pfx9:OCE_NumSucursal/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_NumSucursal"/>
+                        </OCE_NumSucursal>
+                        <OCE_SucursalDesc>
+                            <xsl:copy-of select="pfx9:OCE_SucursalDesc/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_SucursalDesc"/>
+                        </OCE_SucursalDesc>
+                        <OCE_DireccionSucursal>
+                            <xsl:copy-of select="pfx9:OCE_DireccionSucursal/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_DireccionSucursal"/>
+                        </OCE_DireccionSucursal>
+                        <OCE_CiudadSucursal>
+                            <xsl:copy-of select="pfx9:OCE_CiudadSucursal/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_CiudadSucursal"/>
+                        </OCE_CiudadSucursal>
+                        <OCE_FechaCancelacion>
+                            <xsl:value-of select="tib:parse-dateTime('yyyyMMdd'  ,pfx9:OCE_FechaCancelacion)"/>
+                        </OCE_FechaCancelacion>
+                        <OCE_DepartamentoIDOrden>
+                            <xsl:copy-of select="pfx9:OCE_DepartamentoIDOrden/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_DepartamentoIDOrden"/>
+                        </OCE_DepartamentoIDOrden>
+                        <OCE_NombreDepartamentoOrden>
+                            <xsl:copy-of select="pfx9:OCE_NombreDepartamentoOrden/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_NombreDepartamentoOrden"/>
+                        </OCE_NombreDepartamentoOrden>
+                        <OCE_NombreProveedor>
+                            <xsl:copy-of select="pfx9:OCE_NombreProveedor/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_NombreProveedor"/>
+                        </OCE_NombreProveedor>
+                        <OCE_FechaOrden>
+                            <xsl:value-of select="tib:parse-dateTime('yyyyMMdd'  ,pfx9:OCE_FechaOrden)"/>
+                        </OCE_FechaOrden>
+                        <OCE_FechaOperacion>
+                            <xsl:value-of select="tib:parse-dateTime('yyyyMMdd'  ,pfx9:OCE_FechaOperacion)"/>
+                        </OCE_FechaOperacion>
+                        <OCE_Estatus>
+                            <xsl:copy-of select="pfx9:OCE_Estatus/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_Estatus"/>
+                        </OCE_Estatus>
+                        <OCE_FechaRecepcion>
+                            <xsl:value-of select="tib:parse-dateTime('yyyyMMdd'  ,pfx9:OCE_FechaRecepcion)"/>
+                        </OCE_FechaRecepcion>
+                        <OCE_Comentarios>
+                            <xsl:copy-of select="pfx9:OCE_Comentarios/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_Comentarios"/>
+                        </OCE_Comentarios>
+                        <OCE_CompradorID>
+                            <xsl:copy-of select="pfx9:OCE_CompradorID/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_CompradorID"/>
+                        </OCE_CompradorID>
+                        <OCE_NombreComprador>
+                            <xsl:copy-of select="pfx9:OCE_NombreComprador/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_NombreComprador"/>
+                        </OCE_NombreComprador>
+                        <OCE_TotalSinImpuestos>
+                            <xsl:copy-of select="pfx9:OCE_TotalSinImpuestos/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_TotalSinImpuestos"/>
+                        </OCE_TotalSinImpuestos>
+                        <OCE_TotalEmpaques>
+                            <xsl:value-of select="round(pfx9:OCE_TotalEmpaques)"/>
+                        </OCE_TotalEmpaques>
+                        <OCE_Moneda>
+                            <xsl:copy-of select="pfx9:OCE_Moneda/@xsi:nil"/>
+                            <xsl:value-of select="pfx9:OCE_Moneda"/>
+                        </OCE_Moneda>
+                        <OCID>
+                            <xsl:value-of select="-1"/>
+                        </OCID>
+                    </inputSet>
+                </xsl:for-each>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map-Data-2">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>636</pd:x>
+        <pd:y>360</pd:y>
+        <config>
+            <element>
+                <xsd:element name="Group">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="ns5:DETAIL_DATA" minOccurs="0" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <xsl:for-each select="$Call_CompleteDetail/group">
+                <Group>
+                    <xsl:for-each select="ns5:DETAIL_DATA">
+                        <ns5:DETAIL_DATA>
+                            <xsl:if test="$JDBCCall_spIns_tblOrdenCompraEncabezado/resultSet/outputSet/OCID">
+                                <ns5:OCD_OrdenID>
+                                    <xsl:copy-of select="$JDBCCall_spIns_tblOrdenCompraEncabezado/resultSet/outputSet/OCID/@xsi:nil"/>
+                                    <xsl:value-of select="$JDBCCall_spIns_tblOrdenCompraEncabezado/resultSet/outputSet/OCID"/>
+                                </ns5:OCD_OrdenID>
+                            </xsl:if>
+                            <ns5:OCD_Detalle>
+                                <xsl:copy-of select="ns5:OCD_Detalle/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_Detalle"/>
+                            </ns5:OCD_Detalle>
+                            <ns5:OCD_CodigoArticulo>
+                                <xsl:copy-of select="ns5:OCD_CodigoArticulo/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_CodigoArticulo"/>
+                            </ns5:OCD_CodigoArticulo>
+                            <ns5:OCD_DepartamentoIDArticulo>
+                                <xsl:copy-of select="ns5:OCD_DepartamentoIDArticulo/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_DepartamentoIDArticulo"/>
+                            </ns5:OCD_DepartamentoIDArticulo>
+                            <ns5:OCD_DepartamentoDescArticulo>
+                                <xsl:copy-of select="ns5:OCD_DepartamentoDescArticulo/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_DepartamentoDescArticulo"/>
+                            </ns5:OCD_DepartamentoDescArticulo>
+                            <ns5:OCD_CodigoBarras>
+                                <xsl:copy-of select="ns5:OCD_CodigoBarras/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_CodigoBarras"/>
+                            </ns5:OCD_CodigoBarras>
+                            <ns5:OCD_ArtDescripcion>
+                                <xsl:copy-of select="ns5:OCD_ArtDescripcion/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_ArtDescripcion"/>
+                            </ns5:OCD_ArtDescripcion>
+                            <ns5:OCD_UnidadMedida>
+                                <xsl:copy-of select="ns5:OCD_UnidadMedida/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_UnidadMedida"/>
+                            </ns5:OCD_UnidadMedida>
+                            <ns5:OCD_CantidadPedida>
+                                <xsl:copy-of select="ns5:OCD_CantidadPedida/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_CantidadPedida"/>
+                            </ns5:OCD_CantidadPedida>
+                            <ns5:OCD_FactorEmpaque>
+                                <xsl:copy-of select="ns5:OCD_FactorEmpaque/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_FactorEmpaque"/>
+                            </ns5:OCD_FactorEmpaque>
+                            <ns5:OCD_CantidadEmpaques>
+                                <xsl:copy-of select="ns5:OCD_CantidadEmpaques/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_CantidadEmpaques"/>
+                            </ns5:OCD_CantidadEmpaques>
+                            <ns5:OCD_PUnitario>
+                                <xsl:copy-of select="ns5:OCD_PUnitario/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_PUnitario"/>
+                            </ns5:OCD_PUnitario>
+                            <ns5:OCD_Importe>
+                                <xsl:copy-of select="ns5:OCD_Importe/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_Importe"/>
+                            </ns5:OCD_Importe>
+                            <ns5:OCD_CodigoProveedor>
+                                <xsl:copy-of select="ns5:OCD_CodigoProveedor/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_CodigoProveedor"/>
+                            </ns5:OCD_CodigoProveedor>
+                            <ns5:OCD_CapacidadArticulo>
+                                <xsl:copy-of select="ns5:OCD_CapacidadArticulo/@xsi:nil"/>
+                                <xsl:value-of select="ns5:OCD_CapacidadArticulo"/>
+                            </ns5:OCD_CapacidadArticulo>
+                        </ns5:DETAIL_DATA>
+                    </xsl:for-each>
+                </Group>
+            </xsl:for-each>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-3">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>549</pd:x>
+        <pd:y>358</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Call_Insert_tblOrdenCompra_Detalle">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>763</pd:x>
+        <pd:y>363</pd:y>
+        <config>
+            <processName>/Project Name Processes/Sub Process/Insert_tblOrdenCompra_Detalle.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:copy-of select="$Map-Data-2/Group/ancestor-or-self::*/namespace::node()"/>
+                <xsl:copy-of select="$Map-Data-2/Group/@*"/>
+                <xsl:copy-of select="$Map-Data-2/Group/node()"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Call_CompleteHeader</pd:from>
+        <pd:to>JDBCCall_spIns_tblOrdenCompraEncabezado</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBCCall_spIns_tblOrdenCompraEncabezado</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_CompleteDetail</pd:from>
+        <pd:to>Null-3</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-3</pd:from>
+        <pd:to>Map-Data-2</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map-Data-2</pd:from>
+        <pd:to>Call_Insert_tblOrdenCompra_Detalle</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call_CompleteHeader</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Call_CompleteDetail</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Call_Insert_tblOrdenCompra_Detalle</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

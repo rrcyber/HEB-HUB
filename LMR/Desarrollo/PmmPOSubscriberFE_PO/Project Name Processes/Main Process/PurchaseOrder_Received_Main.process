@@ -1,0 +1,1396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/tblFolioRecepcion.xsd" xmlns:pfx7="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:pfx="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" xmlns:pfx2="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/jms" xmlns:pfx3="http://www.tibco.com/pe/GenerateErrorActivity/InputSchema" xmlns:pfx4="http://xmlns.heb.com/ei/TABLE_HEADER" xmlns:pfx5="http://xmlns.heb.com/ei/TABLE_DETAIL" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://xmlns.heb.com/ei/ErrorManagementSchema" xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <xsd:import namespace="http://xmlns.heb.com/ei/PORECEPTION_INFORMATION" schemaLocation="/Shared Resources/Schema Definitions/Custom/PORECEPTION_INFORMATION_SOAP.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/PURCHASEORDER_INFORMATION"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_HEADER" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_HEADER.xsd"/>
+    <xsd:import namespace="http://xmlns.heb.com/ei/TABLE_DETAIL" schemaLocation="/Shared Resources/Schema Definitions/Custom/TABLE_DETAIL.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schema Definitions/Custom/tblFolioRecepcion.xsd" schemaLocation="/Shared Resources/Schema Definitions/Custom/tblFolioRecepcion.xsd"/>
+    <pd:name>Project Name Processes/Main Process/PurchaseOrder_Received_Main.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:MSG_CONTAINER"/>
+    <pd:startX>30</pd:startX>
+    <pd:startY>195</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <IsPOFound>
+                <xsl:value-of select="if(count($JDBC_GetHeader/resultSet/Record)=0)&#xA;then 0&#xA;else 1"/>
+            </IsPOFound>
+            <noOfUpdates>
+                <xsl:value-of select="'a'"/>
+            </noOfUpdates>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="IsPOFound" type="xsd:boolean"/>
+                    <xsd:element name="noOfUpdates" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>1151</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1347553671531</pd:targetNamespace>
+    <pd:group name="DetailLoop">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>642</pd:x>
+        <pd:y>107</pd:y>
+        <pd:width>274</pd:width>
+        <pd:height>173</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>inputLoop</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:over>$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL/pfx:ITEM</pd:over>
+            <pd:iterationElementSlot>detailArray</pd:iterationElementSlot>
+            <pd:indexSlot>index</pd:indexSlot>
+            <pd:outSlot>MapResult</pd:outSlot>
+            <pd:activityOutputName/>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>JDBC-GetDetail</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Update</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Multiple Bends</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC-GetDetail</pd:from>
+            <pd:to>JDBC Update</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC-GetDetail">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>711</pd:x>
+            <pd:y>201</pd:y>
+            <config>
+                <timeout>%%Connections/Database/SXD2010177_VISORFE/GLB_QUERYTIMEOUT%%</timeout>
+                <commit>false</commit>
+                <maxRows>%%Connections/Database/SXD2010177_VISORFE/MAX_ROWS%%</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT	 TOP 1
+		OCD_OrdenID,OCD_Detalle,OCD_CodigoArticulo,OCD_DepartamentoIDArticulo,OCD_DepartamentoDescArticulo,OCD_CodigoBarras,OCD_ArtDescripcion,OCD_UnidadMedida,OCD_CantidadPedida,OCD_FactorEmpaque,OCD_CantidadEmpaques,OCD_PUnitario,OCD_Importe,OCD_CodigoProveedor,OCD_CapacidadArticulo
+FROM	tblOrdenCompra_Detalle
+WHERE	OCD_CodigoArticulo =? and
+		OCD_OrdenID=?</statement>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD2010177_VISORFE.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>OCD_CodigoArticulo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>OCD_OrdenID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>OCD_OrdenID</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>bigint</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_Detalle</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_CodigoArticulo</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_DepartamentoIDArticulo</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_DepartamentoDescArticulo</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_CodigoBarras</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_ArtDescripcion</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_UnidadMedida</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_CantidadPedida</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_FactorEmpaque</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_CantidadEmpaques</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_PUnitario</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_Importe</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_CodigoProveedor</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>OCD_CapacidadArticulo</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <OCD_CodigoArticulo>
+                        <xsl:value-of select="$detailArray/pfx:ITEM/pfx:PRD_LVL_NUMBER"/>
+                    </OCD_CodigoArticulo>
+                    <OCD_OrdenID>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_ID)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_ID"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </OCD_OrdenID>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="JDBC Update">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>825</pd:x>
+            <pd:y>201</pd:y>
+            <config>
+                <timeout>%%Connections/Database/SXD2010177_VISORFE/GLB_QUERYTIMEOUT%%</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD2010177_VISORFE.sharedjdbc</jdbcSharedConfig>
+                <statement>INSERT INTO [VISORFE].[dbo].[tblFolioRecepcion_Detalle]
+           ([FRD_FolioID]
+           ,[FRD_Detalle]
+           ,[FRD_Codigoarticulo]
+           ,[FRD_CodigoBarras]
+           ,[FRD_DepartamentoIDArticulo]
+           ,[FRD_DepartamentoDescArticulo]
+           ,[FRD_ArtDescripcion]
+           ,[FRD_CantidadRecibida]
+           ,[FRD_UnidadMedida]
+           ,[FRD_CantidadPedida]
+           ,[FRD_Diferencia]
+           ,[FRD_NoRecepcion]
+           ,[FRD_NoSucursal])
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)</statement>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>FRD_FolioID</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_Detalle</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_Codigoarticulo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_CodigoBarras</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_DepartamentoIDArticulo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_DepartamentoDescArticulo</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_ArtDescripcion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_CantidadRecibida</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_UnidadMedida</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_CantidadPedida</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_Diferencia</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_NoRecepcion</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>FRD_NoSucursal</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <FRD_FolioID>
+                        <xsl:copy-of select="$JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC/resultSet/outputSet/ID/@xsi:nil"/>
+                        <xsl:value-of select="$JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC/resultSet/outputSet/ID"/>
+                    </FRD_FolioID>
+                    <FRD_Detalle>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_Detalle)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_Detalle"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_Detalle>
+                    <FRD_Codigoarticulo>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_CodigoArticulo)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_CodigoArticulo"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_Codigoarticulo>
+                    <FRD_CodigoBarras>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_CodigoBarras)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_CodigoBarras"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_CodigoBarras>
+                    <FRD_DepartamentoIDArticulo>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_DepartamentoIDArticulo)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_DepartamentoIDArticulo"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_DepartamentoIDArticulo>
+                    <FRD_DepartamentoDescArticulo>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_DepartamentoDescArticulo)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_DepartamentoDescArticulo"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_DepartamentoDescArticulo>
+                    <FRD_ArtDescripcion>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_ArtDescripcion)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_ArtDescripcion"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_ArtDescripcion>
+                    <FRD_CantidadRecibida>
+                        <xsl:value-of select="$detailArray/pfx:ITEM/pfx:RCV_SELL_QTY"/>
+                    </FRD_CantidadRecibida>
+                    <FRD_UnidadMedida>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_UnidadMedida)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_UnidadMedida"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_UnidadMedida>
+                    <FRD_CantidadPedida>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC-GetDetail/resultSet/Record[1]/OCD_CantidadPedida)">
+                                <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_CantidadPedida"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRD_CantidadPedida>
+                    <FRD_Diferencia>
+                        <xsl:value-of select="$JDBC-GetDetail/resultSet/Record[1]/OCD_CantidadPedida - &#xA;$detailArray/pfx:ITEM/pfx:RCV_SELL_QTY"/>
+                    </FRD_Diferencia>
+                    <FRD_NoRecepcion>
+                        <xsl:value-of select="$detailArray/pfx:ITEM/pfx:RCV_SESSION_ID"/>
+                    </FRD_NoRecepcion>
+                    <FRD_NoSucursal>
+                        <xsl:value-of select="$detailArray/pfx:ITEM/pfx:ORG_LVL_NUMBER"/>
+                    </FRD_NoSucursal>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="JDBC_GetHeader">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>120</pd:x>
+        <pd:y>195</pd:y>
+        <config>
+            <timeout>%%Connections/Database/SXD2010177_VISORFE/GLB_QUERYTIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/SXD2010177_VISORFE/MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <statement>select	OCE_ID,OCE_TipoDocmento,OCE_RFC_HEB,OCE_NumProveedor,OCE_ProvRFC,OCE_TotalLineasDetalle,OCE_FolioOrdenCompra,OCE_GLNSucursal,OCE_NumSucursal,OCE_SucursalDesc,OCE_DireccionSucursal,OCE_CiudadSucursal,OCE_DepartamentoIDOrden,OCE_NombreDepartamentoOrden,OCE_NombreProveedor,OCE_FechaOrden,OCE_FechaOperacion,OCE_FechaRecepcion,OCE_TotalSinImpuestos
+from	tblOrdenCompra_Encabezado
+WHERE	OCE_NumSucursal=? AND
+		OCE_FolioOrdenCompra= ?</statement>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD2010177_VISORFE.sharedjdbc</jdbcSharedConfig>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>OCE_NumSucursal</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>OCE_FolioOrdenCompra</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>OCE_ID</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint identity</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_TipoDocmento</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_RFC_HEB</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_NumProveedor</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_ProvRFC</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_TotalLineasDetalle</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_FolioOrdenCompra</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>-5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>bigint</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_GLNSucursal</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>nvarchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_NumSucursal</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_SucursalDesc</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_DireccionSucursal</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_CiudadSucursal</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_DepartamentoIDOrden</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_NombreDepartamentoOrden</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_NombreProveedor</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_FechaOrden</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_FechaOperacion</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_FechaRecepcion</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>OCE_TotalSinImpuestos</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>3</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>decimal</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <OCE_NumSucursal>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER)">
+                            <xsl:value-of select="$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </OCE_NumSucursal>
+                <OCE_FolioOrdenCompra>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:PMG_PO_NUMBER)">
+                            <xsl:value-of select="$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </OCE_FolioOrdenCompra>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC_GetTlxEncabezadoRecibo">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>256</pd:x>
+        <pd:y>195</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCOM/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/BDCOM/MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD201001_BDCOM.sharedjdbc</jdbcSharedConfig>
+            <statement>select	TEN_PROVEEDOR,TEN_DEPTO,TEN_FACTURA,TEN_SUCURSAL,TEN_CHOFER,TEN_ORDENCOMPRA,TEN_TOTALCANTIDA,TEN_COSTOBRUTO,TEN_IVA,TEN_IEPS,TEN_ESTADO,TEN_FECHA,TEN_ORIGCOP,TEN_TOTAL,TEN_FEING,TEN_FOLIO,TEN_USUARIO,TEN_HORAINI,TEN_HORAFIN,TEN_USUARIORECIBO,TEN_PLACAS
+from	dbo.TlxEncabezadoRecibo
+where	TEN_SUCURSAL=? and
+		TEN_FOLIO=? and
+		TEN_ORDENCOMPRA=? and
+		TEN_PROVEEDOR =?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>TEN_SUCURSAL</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TEN_FOLIO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TEN_ORDENCOMPRA</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+                <parameter>
+                    <parameterName>TEN_PROVEEDOR</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>TEN_PROVEEDOR</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_DEPTO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>smallint</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_FACTURA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>varchar</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_SUCURSAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>5</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>smallint</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_CHOFER</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_ORDENCOMPRA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_TOTALCANTIDA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_COSTOBRUTO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_IVA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_IEPS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_ESTADO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_FECHA</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_ORIGCOP</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_TOTAL</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_FEING</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>int</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_FOLIO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_USUARIO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_HORAINI</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_HORAFIN</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>93</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>datetime</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_USUARIORECIBO</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>TEN_PLACAS</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <TEN_SUCURSAL>
+                    <xsl:choose>
+                        <xsl:when test="exists($Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER)">
+                            <xsl:value-of select="$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:ORG_LVL_NUMBER"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TEN_SUCURSAL>
+                <TEN_FOLIO>
+                    <xsl:choose>
+                        <xsl:when test="exists(substring(&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_SESSION_ID,&#xA;&#x9;&#x9; &#x9;5, &#xA;&#x9;&#x9;&#x9;string-length($Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_SESSION_ID) -4 &#xA;&#x9;&#x9;))">
+                            <xsl:value-of select="substring(&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_SESSION_ID,&#xA;&#x9;&#x9; &#x9;5, &#xA;&#x9;&#x9;&#x9;string-length($Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_SESSION_ID) -4 &#xA;&#x9;&#x9;)"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TEN_FOLIO>
+                <TEN_ORDENCOMPRA>
+                    <xsl:choose>
+                        <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_FolioOrdenCompra)">
+                            <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_FolioOrdenCompra"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TEN_ORDENCOMPRA>
+                <TEN_PROVEEDOR>
+                    <xsl:choose>
+                        <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_NumProveedor)">
+                            <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_NumProveedor"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </TEN_PROVEEDOR>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>255</pd:x>
+        <pd:y>35</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>491</pd:x>
+        <pd:y>197</pd:y>
+        <config>
+            <timeout>%%Connections/Database/SXD2010177_VISORFE/GLB_QUERYTIMEOUT%%</timeout>
+            <maxRows>%%Connections/Database/SXD2010177_VISORFE/MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD2010177_VISORFE.sharedjdbc</jdbcSharedConfig>
+            <schema>dbo</schema>
+            <catalog>VISORFE</catalog>
+            <ProcedureName>spIns_tblFolioRecepcion_EncabezadoTBC</ProcedureName>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_TipoDocumento</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_RFC_HEB</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_NumProveedor</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_ProvRFC</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_TotalLineasDetalle</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_FolioRecepcion</colName>
+                    <colType>1</colType>
+                    <dataType>-5</dataType>
+                    <typeName>bigint</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_GLNSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>nvarchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_NumSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_SucursalDesc</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_DireccionSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_CiudadSucursal</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_NombreProveedor</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_FechaOperacion</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Placas</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_FechaRecepcion</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_DepartamentoIDOrden</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_NombreDepartamentoOrden</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_FolioOrdenCompra</colName>
+                    <colType>1</colType>
+                    <dataType>-5</dataType>
+                    <typeName>bigint</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Chofer</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Total</colName>
+                    <colType>1</colType>
+                    <dataType>3</dataType>
+                    <typeName>decimal</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Cantidad</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Subtotal</colName>
+                    <colType>1</colType>
+                    <dataType>3</dataType>
+                    <typeName>decimal</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_TotalIVA</colName>
+                    <colType>1</colType>
+                    <dataType>3</dataType>
+                    <typeName>decimal</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_TotalIEPS</colName>
+                    <colType>1</colType>
+                    <dataType>3</dataType>
+                    <typeName>decimal</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_OrigCopia</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Factura</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_FechaOrden</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_TotalArticulos</colName>
+                    <colType>1</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Confirmo</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@FRE_Recibio</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@ID</colName>
+                    <colType>2</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <FRE_TipoDocumento>
+                        <xsl:value-of select="'FOLIORECIBO'"/>
+                    </FRE_TipoDocumento>
+                    <FRE_RFC_HEB>
+                        <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/RFC_HEB"/>
+                    </FRE_RFC_HEB>
+                    <FRE_NumProveedor>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_NumProveedor)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_NumProveedor"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_NumProveedor>
+                    <FRE_ProvRFC>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_ProvRFC)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_ProvRFC"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_ProvRFC>
+                    <FRE_TotalLineasDetalle>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_TotalLineasDetalle)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_TotalLineasDetalle"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_TotalLineasDetalle>
+                    <FRE_FolioRecepcion>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_FOLIO)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_FOLIO"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_FolioRecepcion>
+                    <FRE_GLNSucursal>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_GLNSucursal)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_GLNSucursal"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_GLNSucursal>
+                    <FRE_NumSucursal>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_NumSucursal)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_NumSucursal"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_NumSucursal>
+                    <FRE_SucursalDesc>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_SucursalDesc)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_SucursalDesc"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_SucursalDesc>
+                    <FRE_DireccionSucursal>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_DireccionSucursal)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_DireccionSucursal"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_DireccionSucursal>
+                    <FRE_CiudadSucursal>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_CiudadSucursal)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_CiudadSucursal"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_CiudadSucursal>
+                    <FRE_NombreProveedor>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_NombreProveedor)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_NombreProveedor"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_NombreProveedor>
+                    <FRE_FechaOperacion>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_FechaOperacion)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_FechaOperacion"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_FechaOperacion>
+                    <FRE_Placas>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_PLACAS)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_PLACAS"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Placas>
+                    <FRE_FechaRecepcion>
+                        <xsl:choose>
+                            <xsl:when test="exists(tib:parse-dateTime('yyyy-mm-dd HH:mm:ss',&#xA;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_DATE))">
+                                <xsl:value-of select="tib:parse-dateTime('yyyy-mm-dd HH:mm:ss',&#xA;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_DATE)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_FechaRecepcion>
+                    <FRE_DepartamentoIDOrden>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_DEPTO)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_DEPTO"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_DepartamentoIDOrden>
+                    <FRE_NombreDepartamentoOrden>
+                        <xsl:choose>
+                            <xsl:when test="exists(if(string-length($JDBC_GetDepto/resultSet/Record[1]/DEP_DESCRI) >0)&#xA;then $JDBC_GetDepto/resultSet/Record[1]/DEP_DESCRI&#xA;else ' ')">
+                                <xsl:value-of select="if(string-length($JDBC_GetDepto/resultSet/Record[1]/DEP_DESCRI) >0)&#xA;then $JDBC_GetDepto/resultSet/Record[1]/DEP_DESCRI&#xA;else ' '"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_NombreDepartamentoOrden>
+                    <FRE_FolioOrdenCompra>
+                        <xsl:choose>
+                            <xsl:when test="exists($Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:PMG_PO_NUMBER)">
+                                <xsl:value-of select="$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:PMG_PO_NUMBER"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_FolioOrdenCompra>
+                    <FRE_Chofer>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_CHOFER)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_CHOFER"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Chofer>
+                    <FRE_Total>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_TOTAL)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_TOTAL"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Total>
+                    <FRE_Cantidad>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_TOTALCANTIDA)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_TOTALCANTIDA"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Cantidad>
+                    <FRE_Subtotal>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_COSTOBRUTO)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_COSTOBRUTO"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Subtotal>
+                    <FRE_TotalIVA>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_IVA)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_IVA"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_TotalIVA>
+                    <FRE_TotalIEPS>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_IEPS)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_IEPS"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_TotalIEPS>
+                    <FRE_OrigCopia>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_ORIGCOP)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_ORIGCOP"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_OrigCopia>
+                    <FRE_Factura>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_FACTURA)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_FACTURA"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Factura>
+                    <FRE_FechaOrden>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetHeader/resultSet/Record[1]/OCE_FechaOrden)">
+                                <xsl:value-of select="$JDBC_GetHeader/resultSet/Record[1]/OCE_FechaOrden"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_FechaOrden>
+                    <FRE_TotalArticulos>
+                        <xsl:value-of select="count($Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL/pfx:ITEM)"/>
+                    </FRE_TotalArticulos>
+                    <FRE_Confirmo>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_USUARIO)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_USUARIO"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Confirmo>
+                    <FRE_Recibio>
+                        <xsl:choose>
+                            <xsl:when test="exists($JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_USUARIORECIBO)">
+                                <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_USUARIORECIBO"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </FRE_Recibio>
+                    <ID>
+                        <xsl:value-of select="-2"/>
+                    </ID>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC_GetDepto">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>372</pd:x>
+        <pd:y>196</pd:y>
+        <config>
+            <timeout>%%Connections/Database/BDCMP/GLB_TIMEOUT%%</timeout>
+            <commit>false</commit>
+            <maxRows>%%Connections/Database/BDCMP/MAX_ROWS%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Shared Resources/Connections/Database/JDBC-SXD201001_BDCMP.sharedjdbc</jdbcSharedConfig>
+            <statement>select	DEP_DESCRI
+from	ODPTO
+where	DEP_DEPTO = ?</statement>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>DEP_DEPTO</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>DEP_DESCRI</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>1</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>char</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <DEP_DEPTO>
+                    <xsl:value-of select="$JDBC_GetTlxEncabezadoRecibo/resultSet/Record[1]/TEN_DEPTO"/>
+                </DEP_DEPTO>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>553</pd:x>
+        <pd:y>99</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <pfx7:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat(&#x9;'Recibo Con errores ->',&#xA;&#x9;&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:PMG_PO_NUMBER,&#xA;&#x9;&#x9;' |Recepcion -> ',&#xA;&#x9;&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_SESSION_ID&#x9;&#x9;&#xA;&#x9;&#x9;)"/>
+                </message>
+                <msgCode>
+                    <xsl:value-of select="'RCV_Error'"/>
+                </msgCode>
+            </pfx7:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log-1">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>1147</pd:x>
+        <pd:y>204</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <pfx7:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat(&#x9;'Recibo Sin errores ->',&#xA;&#x9;&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:PMG_PO_NUMBER,&#xA;&#x9;&#x9;' |Recepcion -> ',&#xA;&#x9;&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_SESSION_ID&#x9;&#x9;&#xA;&#x9;&#x9;)"/>
+                </message>
+                <msgCode>
+                    <xsl:value-of select="'RCV_Succesful'"/>
+                </msgCode>
+            </pfx7:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null-1">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>725</pd:x>
+        <pd:y>315</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Log-RecepcionYaRegistrada">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>1043</pd:x>
+        <pd:y>316</pd:y>
+        <config>
+            <role>User</role>
+        </config>
+        <pd:inputBindings>
+            <pfx7:ActivityInput>
+                <message>
+                    <xsl:value-of select="concat(&#x9;'La recepcion ya había sido registrada OC->' ,&#xA;&#x9;&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:PMG_PO_NUMBER,&#xA;&#x9;&#x9;'Folio recepcion->',&#xA;&#x9;&#x9;$Start/pfx:MSG_CONTAINER/pfx:Body/pfx:PURCHASE_ORDER_RECEPTION_DETAIL[1]/pfx:ITEM[1]/pfx:RCV_SESSION_ID&#x9;&#xA;)"/>
+                </message>
+            </pfx7:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>JDBC_GetHeader</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetHeader</pd:from>
+        <pd:to>JDBC_GetTlxEncabezadoRecibo</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetHeader</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($JDBC_GetHeader/resultSet/Record)=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Log</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-6697984</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$_globalVariables/ns2:GlobalVariables/LogEvents="1"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetTlxEncabezadoRecibo</pd:from>
+        <pd:to>JDBC_GetDepto</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_GetDepto</pd:from>
+        <pd:to>JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC</pd:from>
+        <pd:to>DetailLoop</pd:to>
+        <pd:xpathDescription>Recepcion Nueva</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>DetailLoop</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>DetailLoop</pd:from>
+        <pd:to>Log-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-3355648</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$_globalVariables/ns2:GlobalVariables/LogEvents="1"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC</pd:from>
+        <pd:to>Null-1</pd:to>
+        <pd:xpathDescription>La recepcion ya fué registrada</pd:xpathDescription>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$JDBC_Insert_TBLFolioRecepcion_EncabezadoTBC/resultSet/outputSet/ID =-1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null-1</pd:from>
+        <pd:to>Log-RecepcionYaRegistrada</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-6711040</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$_globalVariables/ns2:GlobalVariables/LogEvents="1"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log-RecepcionYaRegistrada</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Multiple Bends</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
